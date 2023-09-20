@@ -1,0 +1,34 @@
+@page "/Product/{id:int}"
+@using BlazorElectronics.Client.Services.Products
+@using BlazorElectronics.Shared.DataTransferObjects.Products
+@inject IProductServiceClient ProductServiceClient;
+
+@if ( _productDetails == null ) {
+    <span>Loading Product...</span>
+}
+else {
+    <div class="product-details media">
+        <div class="media-img-wrapper mr-2">
+            <img class="media-img" src="" alt="@_productDetails.ProductName"/>
+        </div>
+        <div class="media-body">
+            <h2 class="mb-0">@_productDetails.ProductName</h2>
+            <p>@_productDetails.ProductDescription</p>
+            <h4 class="price">
+                $100.00
+            </h4>
+        </div>
+    </div>    
+}
+
+@code {
+    ProductDetails_DTO? _productDetails;
+    
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        
+    }
+}

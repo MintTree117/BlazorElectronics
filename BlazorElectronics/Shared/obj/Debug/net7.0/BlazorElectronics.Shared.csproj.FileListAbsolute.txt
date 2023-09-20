@@ -1,0 +1,12 @@
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/bin/Debug/net7.0/BlazorElectronics.Shared.deps.json
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/bin/Debug/net7.0/BlazorElectronics.Shared.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/bin/Debug/net7.0/BlazorElectronics.Shared.pdb
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.csproj.AssemblyReference.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.AssemblyInfoInputs.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.AssemblyInfo.cs
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.csproj.CoreCompileInputs.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/refint/BlazorElectronics.Shared.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.pdb
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/ref/BlazorElectronics.Shared.dll
