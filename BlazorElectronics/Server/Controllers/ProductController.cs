@@ -28,10 +28,10 @@ public class ProductController : ControllerBase
         
         return Ok( new ControllerResponse<List<Product_DTO>>( response.Data, response.Success, response.Message ) );
     }
-    [HttpGet("product-details")]
-    public async Task<ActionResult<ControllerResponse<ProductDetails_DTO>>> GetProductDetails()
+    [HttpGet("product_details/{productId:int}")]
+    public async Task<ActionResult<ControllerResponse<ProductDetails_DTO>>> GetProductDetails( int productId )
     {
-        ServiceResponse<ProductDetails_DTO?>? response = await _productService.GetProductDetails();
+        ServiceResponse<ProductDetails_DTO?>? response = await _productService.GetProductDetails( productId );
 
         if ( response == null )
             return new ActionResult<ControllerResponse<ProductDetails_DTO>>(

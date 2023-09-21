@@ -6,5 +6,5 @@ namespace BlazorElectronics.Server.Repositories;
 public interface IProductRepository
 {
     Task<IEnumerable<Product>?> GetProducts();
-    Task<ProductDetails> GetProductDetails();
+    Task<ProductDetails> GetProductDetails( int productId );
 }

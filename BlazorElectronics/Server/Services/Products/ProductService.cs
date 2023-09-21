@@ -38,9 +38,9 @@ public class ProductService : IProductService
 
         return new ServiceResponse<List<Product_DTO>?>( productDtos, true, "Successfully retrieved product Dto's from repository." );
     }
-    public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails()
+    public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
-        ProductDetails productDetails = await _productRepository.GetProductDetails();
+        ProductDetails productDetails = await _productRepository.GetProductDetails( productId );
 
         return productDetails == null
             ? new ServiceResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve product details from database!" )

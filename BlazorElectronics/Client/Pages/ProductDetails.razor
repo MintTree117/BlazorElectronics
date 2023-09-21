@@ -4,7 +4,7 @@
 @inject IProductServiceClient ProductServiceClient;
 
 @if ( _productDetails == null ) {
-    <span>Loading Product...</span>
+    <span>@message</span>
 }
 else {
     <div class="product-details media">
@@ -23,12 +23,19 @@ else {
 
 @code {
     ProductDetails_DTO? _productDetails;
+    string? message;
     
     [Parameter]
     public int Id { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        
+        message = "Loading Product Details...";
+        await ProductServiceClient.GetProductDetails( Id );
+
+        if ( ProductServiceClient.ProductDetails == null )
+            message = "Failed to load Product Details!";
+        else 
+            _productDetails = ProductServiceClient.ProductDetails;
     }
 }
