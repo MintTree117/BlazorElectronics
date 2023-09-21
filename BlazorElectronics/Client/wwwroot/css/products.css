@@ -1,18 +1,32 @@
-.media-img {
-    max-height: 200px;
+.pl-item {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.pl-item-img-wrapper {
     max-width: 200px;
+    max-height: 200px;
+    text-align: center;
+    margin: 0 10px 10px 10px;
+}
+
+.pl-item-img {
+    width: 100%;
+    height: auto;
     border-radius: 6px;
     margin-bottom: 10px;
     transition: transform .2s;
 }
 
-.media-img:hover {
+.pl-item-img:hover {
     transform: scale(1.1);
 }
 
-.media-img-wrapper {
-    width: 200px;
-    text-align: center;
+.pl-item-body {
+    display: flex;
+    flex-direction: column;
 }
 
 .price {

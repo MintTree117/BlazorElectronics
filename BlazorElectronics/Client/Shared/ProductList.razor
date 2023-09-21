@@ -8,13 +8,13 @@
 else {
     <ul class="list-unstyled">
         @foreach ( Product_DTO product in ProductServiceClient.Products ) {
-            <li class="media my-3">
-                <div class="media-img-wrapper mr-2">
+            <li class="pl-item my-3">
+                <div class="pl-item-img-wrapper mr-2">
                     <a href="/Product/@product.Id">
-                        <img class="media-img" src="@product.Thumbnail" alt="@product.Title"/>
+                        <img class="pl-item-img" src="@product.Thumbnail" alt="@product.Title"/>
                     </a>
                 </div>
-                <div class="media-body">
+                <div class="pl-item-body">
                     <a href="/Product/@product.Id">
                         <h4 class="mb-0">@product.Title</h4>
                     </a>

@@ -1,14 +1,23 @@
 using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories;
+using BlazorElectronics.Server.Repositories.Categories;
+using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Services;
+using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
 builder.Services.AddSingleton<DapperContext>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+//builder.Services.AddSingleton<IProductCache, ProductCache>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductService, ProductService>();

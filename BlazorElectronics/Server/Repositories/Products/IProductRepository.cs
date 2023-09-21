@@ -1,7 +1,6 @@
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Shared.DataTransferObjects.Products;
 
-namespace BlazorElectronics.Server.Repositories;
+namespace BlazorElectronics.Server.Repositories.Products;
 
 public interface IProductRepository
 {

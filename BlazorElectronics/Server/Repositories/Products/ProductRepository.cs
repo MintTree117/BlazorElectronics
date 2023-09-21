@@ -1,10 +1,10 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
-using Microsoft.Data.SqlClient;
 using Dapper;
+using Microsoft.Data.SqlClient;
 
-namespace BlazorElectronics.Server.Repositories;
+namespace BlazorElectronics.Server.Repositories.Products;
 
 public sealed class ProductRepository : IProductRepository
 {

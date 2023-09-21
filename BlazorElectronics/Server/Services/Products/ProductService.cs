@@ -1,6 +1,6 @@
 using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Server.Repositories;
+using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.DataTransferObjects.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
