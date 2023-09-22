@@ -2,6 +2,7 @@ namespace BlazorElectronics.Shared.DataTransferObjects.Categories;
 
 public sealed class CategoryLists_DTO
 {
-    public List<Category_DTO> PrimaryCategories = new();
-    public List<CategorySub_DTO> SubCategories = new();
+    // REMEMBER TO MAAKE MEMBERS PROPERTIES!!!!!!!!!!!
+    public List<Category_DTO> PrimaryCategories { get; set; } = new();
+    public List<CategorySub_DTO> SubCategories { get; set; } = new();
 }

@@ -16,17 +16,15 @@ public class CategoryService : ICategoryService
     public async Task<ServiceResponse<CategoryLists_DTO?>> GetCategories()
     {
         CategoryCollections? categories = await _categoryRepository.GetCategories();
-
+        
         if ( categories == null )
             return new ServiceResponse<CategoryLists_DTO?>( null, false, "Failed to retrieve products from database!" );
 
         var categoryDtos = new CategoryLists_DTO();
 
-        /*await Task.Run( () => {
-            foreach ( Category c in categories ) {
-                if ( c.CategoryName == null )
-                    continue;
-                categoryDtos.Add( new Category_DTO {
+        await Task.Run( () => {
+            foreach ( Category c in categories.Categories ) {
+                categoryDtos.PrimaryCategories.Add( new Category_DTO {
                     Id = c.CategoryId,
                     Name = c.CategoryName ?? string.Empty,
                     Url = c.CategoryUrl ?? string.Empty,
@@ -34,7 +32,13 @@ public class CategoryService : ICategoryService
                     IsPrimary = c.IsPrimaryCategory
                 } );
             }
-        } );*/
+            foreach ( CategorySub cs in categories.CategoriesSub ) {
+                categoryDtos.SubCategories.Add( new CategorySub_DTO {
+                    CategoryId = cs.CategoryId,
+                    PrimaryCategoryId = cs.PrimaryCategoryId
+                } );
+            }
+        } );
 
         return new ServiceResponse<CategoryLists_DTO?>( categoryDtos, true, "Successfully retrieved category Dto's from repository." );
     }

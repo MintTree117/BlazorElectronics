@@ -2,6 +2,6 @@ namespace BlazorElectronics.Server.Models.Categories;
 
 public sealed class CategoryCollections
 {
-    public IEnumerable<Category>? Categories;
-    public IEnumerable<CategorySub>? CategoriesSub;
+    public List<Category> Categories = new();
+    public List<CategorySub> CategoriesSub = new();
 }

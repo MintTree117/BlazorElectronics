@@ -24,27 +24,28 @@ public class CategoryRepository : ICategoryRepository
         await using SqlConnection connection = _dbContext.CreateConnection();
         await connection.OpenAsync();
 
+        var collections = new CategoryCollections();
         var categoryDictionary = new Dictionary<int, Category>();
-        var subCategories = new List<CategorySub>();
+        var subCategoryDictionary = new Dictionary<int, CategorySub>();
 
         await connection.QueryAsync
             <Category, CategorySub, CategoryCollections>
                 ( STORED_PROCEDURE_GET_CATEGORIES,
                 ( category, categorySub ) => {
-                    if ( !categoryDictionary.TryGetValue( category.CategoryId, out Category? categoryEntry ) ) {
-                        categoryEntry = category;
-                        categoryDictionary.Add( category.CategoryId, categoryEntry );
-                    }
+                    if ( category != null )
+                        categoryDictionary.TryAdd( category.CategoryId, category );
+                        //collections.Categories.Add( category );
                     if ( categorySub != null )
-                        subCategories.Add( categorySub );
-                    return new CategoryCollections();
+                        subCategoryDictionary.TryAdd( categorySub.CategorySubId, categorySub );
+                        //collections.CategoriesSub.Add( categorySub );
+                    return collections;
                 },
                 splitOn: CATEGORY_ID_COLUMN,
                 commandType: CommandType.StoredProcedure );
 
-        return new CategoryCollections {
-            Categories = categoryDictionary.Values,
-            CategoriesSub = subCategories
-        };
+        collections.Categories.AddRange( categoryDictionary.Values );
+        collections.CategoriesSub.AddRange( subCategoryDictionary.Values );
+        
+        return collections;
     }
 }
