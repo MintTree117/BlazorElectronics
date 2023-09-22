@@ -2,7 +2,7 @@ namespace BlazorElectronics.Shared;
 
 public sealed class ControllerResponse<T>
 {
-    public ControllerResponse( T data, bool success, string message )
+    public ControllerResponse( T? data, bool success, string message = "No response message..." )
     {
         Success = success;
         Message = message;
@@ -10,6 +10,6 @@ public sealed class ControllerResponse<T>
     }
 
     public bool Success { get; set; }
-    public string? Message { get; set; }
+    public string Message { get; set; }
     public T? Data { get; set; }
 }

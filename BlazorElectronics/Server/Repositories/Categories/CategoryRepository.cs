@@ -34,10 +34,8 @@ public class CategoryRepository : ICategoryRepository
                 ( category, categorySub ) => {
                     if ( category != null )
                         categoryDictionary.TryAdd( category.CategoryId, category );
-                        //collections.Categories.Add( category );
                     if ( categorySub != null )
                         subCategoryDictionary.TryAdd( categorySub.CategorySubId, categorySub );
-                        //collections.CategoriesSub.Add( categorySub );
                     return collections;
                 },
                 splitOn: CATEGORY_ID_COLUMN,

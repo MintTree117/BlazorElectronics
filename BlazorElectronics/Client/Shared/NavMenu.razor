@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using BlazorElectronics.Client.Services.Categories
+@using BlazorElectronics.Shared.DataTransferObjects.Categories
+@inject ICategoryService CategoryService;
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">BlazorElectronics</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -13,8 +17,25 @@
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
+            
+            @if ( CategoryService.PrimaryCategories == null ) {
+                <span>Awaiting categories from the server...</span>
+            }
+            else if ( !string.IsNullOrEmpty( CategoryService.ControllerMessage ) ) {
+                <span>@CategoryService.ControllerMessage</span>
+            }
+            else {
+                @foreach ( Category_DTO c in CategoryService.PrimaryCategories ) {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@c.Url">
+                            @c.Name
+                        </NavLink>
+                    </div>
+                }
+            }
+            
         </div>
-        <div class="nav-item px-3">
+        <!--<div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
                 <span class="oi oi-plus" aria-hidden="true"></span> Counter
             </NavLink>
@@ -23,7 +44,7 @@
             <NavLink class="nav-link" href="fetchdata">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
             </NavLink>
-        </div>
+        </div>-->
     </nav>
 </div>
 
@@ -35,4 +56,9 @@
         : null;
 
     private void ToggleNavMenu() { collapseNavMenu = !collapseNavMenu; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CategoryService.GetCategories();
+    }
 }

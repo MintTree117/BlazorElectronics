@@ -2,7 +2,7 @@ namespace BlazorElectronics.Server.Services;
 
 public sealed class ServiceResponse<T>
 {
-    public ServiceResponse( T data, bool success, string message )
+    public ServiceResponse( T? data, bool success, string message = "No service message provided..." )
     {
         Data = data;
         Success = success;
@@ -10,6 +10,6 @@ public sealed class ServiceResponse<T>
     }
 
     public bool Success { get; set; }
-    public string? Message { get; set; }
+    public string Message { get; set; }
     public T? Data { get; set; }
 }

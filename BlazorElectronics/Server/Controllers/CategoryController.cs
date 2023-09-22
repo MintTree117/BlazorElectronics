@@ -2,7 +2,6 @@ using BlazorElectronics.Server.Services;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DataTransferObjects.Categories;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
