@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using BlazorElectronics.Server.Services;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DataTransferObjects.Products;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
 
@@ -18,7 +18,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("products")]
-    public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetProducts()
+    public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO searchFilters )
     {
         ServiceResponse<ProductList_DTO?> response = await _productService.GetProducts();
 

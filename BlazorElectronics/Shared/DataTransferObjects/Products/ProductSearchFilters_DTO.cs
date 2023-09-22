@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Shared.DataTransferObjects.Products;
 
-public sealed class ProductSearchParams_DTO
+public sealed class ProductSearchFilters_DTO
 {
     public int Page { get; set; } = 0;
     public int Rows { get; set; } = 1;

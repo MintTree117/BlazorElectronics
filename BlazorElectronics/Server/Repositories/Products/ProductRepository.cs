@@ -1,6 +1,7 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
+using BlazorElectronics.Shared.DataTransferObjects.Products;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -38,6 +39,8 @@ public sealed class ProductRepository : IProductRepository
         
         return await connection.QueryAsync<Product>( query );
     }
+    public Task<IEnumerable<Product>> GetAllProducts() { throw new NotImplementedException(); }
+    public Task<IEnumerable<Product>> SearchProducts( ProductSearchFilters_DTO searchFilters ) { throw new NotImplementedException(); }
     public async Task<ProductDetails> GetProductDetails( int productId )
     {
         await using SqlConnection connection = _dbContext.CreateConnection();

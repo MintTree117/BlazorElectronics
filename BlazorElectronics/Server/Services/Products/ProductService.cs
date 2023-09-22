@@ -1,32 +1,37 @@
 using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Products;
+using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Shared.DataTransferObjects.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
 
 public class ProductService : IProductService
 {
+    readonly ICategoryService _categoryService;
     readonly IProductCache _productCache;
     readonly IProductRepository _productRepository;
 
-    public ProductService( IProductCache productCache, IProductRepository productRepository )
+    public ProductService( ICategoryService categoryService, IProductCache productCache, IProductRepository productRepository )
     {
+        _categoryService = categoryService;
         _productCache = productCache;
         _productRepository = productRepository;
     }
 
-    public async Task<ServiceResponse<ProductList_DTO?>> GetProducts()
+    public async Task<ServiceResponse<ProductList_DTO?>> GetProducts( ProductSearchFilters_DTO? searchFilters = null )
     {
-        IEnumerable<Product>? products = await _productRepository.GetProducts();
+        ServiceResponse<IEnumerable<Product>> getResult = searchFilters == null
+            ? await GetAllProducts()
+            : await SearchProducts( searchFilters );
 
-        if ( products == null )
+        if ( getResult?.Data == null )
             return new ServiceResponse<ProductList_DTO?>( null, false, "Failed to retrieve products from database!" );
 
         var productList = new ProductList_DTO();
 
         await Task.Run( () => {
-            foreach ( Product p in products ) {
+            foreach ( Product p in getResult.Data ) {
                 productList.Products.Add( new Product_DTO {
                     Id = p.ProductId,
                     Title = p.ProductName,
@@ -47,6 +52,16 @@ public class ProductService : IProductService
             : new ServiceResponse<ProductDetails_DTO?>( GetProductDetailsDTO( productDetails ), true, "Successfully retrieved product details from the database." );
     }
 
+    async Task<ServiceResponse<IEnumerable<Product>>> GetAllProducts()
+    {
+        return null;
+    }
+
+    async Task<ServiceResponse<IEnumerable<Product>>> SearchProducts( ProductSearchFilters_DTO filters )
+    {
+        return null;
+    }
+
     static ProductDetails_DTO GetProductDetailsDTO( ProductDetails productDetails )
     {
         var DTO = new ProductDetails_DTO();
@@ -63,7 +78,7 @@ public class ProductService : IProductService
                 VariantPriceSale = variant.VariantPriceSale,
             } );
         }
-        
+
         foreach ( ProductImage image in productDetails.ProductImages ) {
             DTO.ProductImages.Add( new ProductImage_DTO {
                 Url = image.ImageUrl,

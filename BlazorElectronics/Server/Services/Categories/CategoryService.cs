@@ -42,4 +42,8 @@ public class CategoryService : ICategoryService
 
         return new ServiceResponse<CategoryLists_DTO?>( categoryDtos, true, "Successfully retrieved category Dto's from repository." );
     }
+    public async Task<ServiceResponse<string?>> GetCategoryName( string categoryUrl )
+    {
+        return new ServiceResponse<string?>( null, false, "Failed to validate category url!" );
+    }
 }
