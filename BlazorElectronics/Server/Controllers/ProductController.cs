@@ -18,15 +18,15 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("products")]
-    public async Task<ActionResult<ControllerResponse<List<Product_DTO>>>> GetProducts()
+    public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetProducts()
     {
-        ServiceResponse<List<Product_DTO>?> response = await _productService.GetProducts();
+        ServiceResponse<ProductList_DTO?> response = await _productService.GetProducts();
 
         if ( response == null )
-            return new ActionResult<ControllerResponse<List<Product_DTO>>>( 
-                new ControllerResponse<List<Product_DTO>>( null, false, "Service response is null!" ) );
+            return new ActionResult<ControllerResponse<ProductList_DTO>>( 
+                new ControllerResponse<ProductList_DTO>( null, false, "Service response is null!" ) );
         
-        return Ok( new ControllerResponse<List<Product_DTO>>( response.Data, response.Success, response.Message ) );
+        return Ok( new ControllerResponse<ProductList_DTO>( response.Data, response.Success, response.Message ) );
     }
     [HttpGet("product_details/{productId:int}")]
     public async Task<ActionResult<ControllerResponse<ProductDetails_DTO>>> GetProductDetails( int productId )

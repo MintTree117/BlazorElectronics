@@ -17,10 +17,10 @@ public class ProductServiceClient : IProductServiceClient
     
     public async Task GetProducts()
     {
-        var result = await _http.GetFromJsonAsync<ControllerResponse<List<Product_DTO>>>( "api/Product/products" );
+        var result = await _http.GetFromJsonAsync<ControllerResponse<ProductList_DTO>>( "api/Product/products" );
 
         if ( result is { Data: not null } )
-            Products = result.Data;
+            Products = result.Data.Products;
     }
     public async Task GetProductDetails( int productId )
     {

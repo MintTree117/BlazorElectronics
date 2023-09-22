@@ -4,6 +4,6 @@ namespace BlazorElectronics.Server.Services.Products;
 
 public interface IProductService
 {
-    Task<ServiceResponse<List<Product_DTO>?>> GetProducts();
+    Task<ServiceResponse<ProductList_DTO?>> GetProducts();
     Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

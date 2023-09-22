@@ -16,18 +16,18 @@ public class ProductService : IProductService
         _productRepository = productRepository;
     }
 
-    public async Task<ServiceResponse<List<Product_DTO>?>> GetProducts()
+    public async Task<ServiceResponse<ProductList_DTO?>> GetProducts()
     {
         IEnumerable<Product>? products = await _productRepository.GetProducts();
 
         if ( products == null )
-            return new ServiceResponse<List<Product_DTO>?>( null, false, "Failed to retrieve products from database!" );
+            return new ServiceResponse<ProductList_DTO?>( null, false, "Failed to retrieve products from database!" );
 
-        var productDtos = new List<Product_DTO>();
+        var productList = new ProductList_DTO();
 
         await Task.Run( () => {
             foreach ( Product p in products ) {
-                productDtos.Add( new Product_DTO {
+                productList.Products.Add( new Product_DTO {
                     Id = p.ProductId,
                     Title = p.ProductName,
                     Thumbnail = p.ProductThumbnail,
@@ -36,7 +36,7 @@ public class ProductService : IProductService
             }
         } );
 
-        return new ServiceResponse<List<Product_DTO>?>( productDtos, true, "Successfully retrieved product Dto's from repository." );
+        return new ServiceResponse<ProductList_DTO?>( productList, true, "Successfully retrieved product Dto's from repository." );
     }
     public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
