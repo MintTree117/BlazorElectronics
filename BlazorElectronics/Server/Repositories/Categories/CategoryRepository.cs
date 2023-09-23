@@ -9,7 +9,6 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 public class CategoryRepository : ICategoryRepository
 {
     const string CATEGORY_ID_COLUMN = "CategoryId";
-    
     const string STORED_PROCEDURE_GET_CATEGORIES = "Get_Categories";
 
     readonly DapperContext _dbContext;
@@ -18,7 +17,7 @@ public class CategoryRepository : ICategoryRepository
     {
         _dbContext = dapperContext;
     }
-
+    
     public async Task<CategoryCollections> GetCategories()
     {
         await using SqlConnection connection = _dbContext.CreateConnection();

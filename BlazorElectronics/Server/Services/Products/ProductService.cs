@@ -54,9 +54,12 @@ public class ProductService : IProductService
 
     async Task<ServiceResponse<IEnumerable<Product>>> GetAllProducts()
     {
-        return null;
-    }
+        IEnumerable<Product>? result = await _productRepository.GetAllProducts();
 
+        return result == null
+            ? new ServiceResponse<IEnumerable<Product>>( null, false, "Failed to retrieve products from database!" )
+            : new ServiceResponse<IEnumerable<Product>>( result, true, "Successfully retrieved products from database." );
+    }
     async Task<ServiceResponse<IEnumerable<Product>>> SearchProducts( ProductSearchFilters_DTO filters )
     {
         return null;
@@ -64,11 +67,11 @@ public class ProductService : IProductService
 
     static ProductDetails_DTO GetProductDetailsDTO( ProductDetails productDetails )
     {
-        var DTO = new ProductDetails_DTO();
-
-        DTO.ProductId = productDetails.Product.ProductId;
-        DTO.ProductName = productDetails.Product.ProductName;
-        DTO.ProductDescription = productDetails.ProductDescription.DescriptionBody;
+        var DTO = new ProductDetails_DTO {
+            ProductId = productDetails.Product.ProductId,
+            ProductName = productDetails.Product.ProductName,
+            ProductDescription = productDetails.ProductDescription.DescriptionBody
+        };
 
         foreach ( ProductVariant variant in productDetails.ProductVariants ) {
             DTO.ProductVariants.Add( new ProductVariant_DTO {
