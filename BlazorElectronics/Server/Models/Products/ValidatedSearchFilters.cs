@@ -8,9 +8,10 @@ public sealed class ValidatedSearchFilters
     public string? SearchText { get; set; }
     public int? Category { get; set; }
 
-    public int? MinPrice { get; set; } = 0;
+    public int? MinPrice { get; set; }
     public int? MaxPrice { get; set; }
     public int? MinRating { get; set; }
+    public int? MaxRating { get; set; }
 
     public List<SpecFilter> LookupSpecFilters { get; set; } = new();
     public List<SpecFilter> RawSpecFilters { get; set; } = new();

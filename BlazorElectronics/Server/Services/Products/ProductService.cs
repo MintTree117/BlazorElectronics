@@ -19,8 +19,15 @@ public class ProductService : IProductService
         _productRepository = productRepository;
     }
 
+
+    public async Task<ServiceResponse<string>> TestGetQueryString( ProductSearchFilters_DTO filters )
+    {
+        string query = await _productRepository.TEST_GET_QUERY_STRING( new ValidatedSearchFilters() );
+        return new ServiceResponse<string?>( query, true, "Test query" );
+    }
     public async Task<ServiceResponse<ProductList_DTO?>> GetProducts( ProductSearchFilters_DTO? searchFilters = null )
     {
+
         ServiceResponse<IEnumerable<Product>> getResult = searchFilters == null
             ? await GetAllProducts()
             : await SearchProducts( searchFilters );
@@ -62,7 +69,12 @@ public class ProductService : IProductService
     }
     async Task<ServiceResponse<IEnumerable<Product>>> SearchProducts( ProductSearchFilters_DTO filters )
     {
-        return null;
+        // VALIDATE THE FILTERS
+        // THEN RETURN THE RESULTS FROM THE REPOSITORY
+
+        var f = new ValidatedSearchFilters();
+        IEnumerable<Product> products = await _productRepository.SearchProducts( f );
+        return new ServiceResponse<IEnumerable<Product>>( products, true, "Repo Message" );
     }
 
     static ProductDetails_DTO GetProductDetailsDTO( ProductDetails productDetails )

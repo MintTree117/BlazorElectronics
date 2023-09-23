@@ -17,10 +17,16 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
+    [HttpGet( "searchQuery" )]
+    public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetSearchQuery( [FromQuery] ProductSearchFilters_DTO searchFilters )
+    {
+        ServiceResponse<string?> r = await _productService.TestGetQueryString( searchFilters );
+        return Ok( r );
+    }
     [HttpGet("products")]
     public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO searchFilters )
     {
-        ServiceResponse<ProductList_DTO?> response = await _productService.GetProducts();
+        ServiceResponse<ProductList_DTO?> response = await _productService.GetProducts( searchFilters );
 
         if ( response == null )
             return new ActionResult<ControllerResponse<ProductList_DTO>>( 
