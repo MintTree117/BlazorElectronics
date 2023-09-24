@@ -96,7 +96,13 @@ public class ProductService : IProductService
 
         if ( filters.SpecFilters != null ) {
             foreach ( ProductSpecFilter_DTO specFilter in filters.SpecFilters ) {
-                
+                // trygetspecs() from cache or repository
+                // foreach spec
+                //   try match spec name to cache value
+                //   if (match)
+                //     if (we have a category)
+                //       then check if the spec is even part of this category
+                //     now check the spec value against it's data type (validate)
             }
         }
         

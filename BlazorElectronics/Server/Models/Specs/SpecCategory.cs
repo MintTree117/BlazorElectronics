@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Models.Specs;
 
-public sealed class SpecCategoryRaw
+public sealed class SpecCategory
 {
     public int SpecCategoryId { get; set; }
     public int CategoryId { get; set; }
