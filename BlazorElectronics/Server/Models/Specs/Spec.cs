@@ -1,8 +1,8 @@
 namespace BlazorElectronics.Server.Models.Specs;
 
-public sealed class SpecLookup
+public sealed class Spec
 {
     public int SpecId { get; set; }
-    public int FK_SpecLookup_SpecDataTypeId { get; set; }
+    public int DataTypeId { get; set; }
     public string? SpecName { get; set; }
 }

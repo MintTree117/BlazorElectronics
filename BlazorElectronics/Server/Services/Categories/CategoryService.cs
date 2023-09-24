@@ -6,44 +6,67 @@ namespace BlazorElectronics.Server.Services.Categories;
 
 public class CategoryService : ICategoryService
 {
-    readonly ICategoryRepository _categoryRepository;
+    readonly ICategoryRepository _repository;
+    readonly ICategoryCache _cache;
 
-    public CategoryService( ICategoryRepository categoryRepository )
+    public CategoryService( ICategoryRepository repository, ICategoryCache cache )
     {
-        _categoryRepository = categoryRepository;
+        _repository = repository;
+        _cache = cache;
     }
     
-    public async Task<ServiceResponse<CategoryLists_DTO?>> GetCategories()
+    public async Task<ServiceResponse<Categories_DTO?>> GetCategories()
     {
-        CategoryCollections? categories = await _categoryRepository.GetCategories();
-        
-        if ( categories == null )
-            return new ServiceResponse<CategoryLists_DTO?>( null, false, "Failed to retrieve products from database!" );
+        List<Category>? categories = await TryGetCategories();
 
-        var categoryDtos = new CategoryLists_DTO();
+        if ( categories == null )
+            return new ServiceResponse<Categories_DTO?>( null, false, "Failed to get categories from cache or database!" );
+
+        var categoriesDto = new Categories_DTO();
 
         await Task.Run( () => {
-            foreach ( Category c in categories.Categories ) {
-                categoryDtos.PrimaryCategories.Add( new Category_DTO {
+            foreach ( Category c in categories ) {
+                var categoryDTO = new Category_DTO {
                     Id = c.CategoryId,
                     Name = c.CategoryName ?? string.Empty,
                     Url = c.CategoryUrl ?? string.Empty,
                     ImageUrl = c.CategoryImageUrl ?? string.Empty,
                     IsPrimary = c.IsPrimaryCategory
-                } );
-            }
-            foreach ( CategorySub cs in categories.CategoriesSub ) {
-                categoryDtos.SubCategories.Add( new CategorySub_DTO {
-                    CategoryId = cs.CategoryId,
-                    PrimaryCategoryId = cs.PrimaryCategoryId
-                } );
+                };
+                foreach ( CategorySub cs in c.SubCategories ) {
+                    categoryDTO.SubCategories.Add( new CategorySub_DTO {
+                        CategoryId = cs.CategoryId,
+                        PrimaryCategoryId = cs.PrimaryCategoryId
+                    } );
+                }
+                categoriesDto.Categories.Add( categoryDTO );
             }
         } );
 
-        return new ServiceResponse<CategoryLists_DTO?>( categoryDtos, true, "Successfully retrieved category Dto's from repository." );
+        return new ServiceResponse<Categories_DTO?>( categoriesDto, true, "Successfully retrieved category Dto's from repository." );
     }
-    public async Task<ServiceResponse<string?>> GetCategoryName( string categoryUrl )
+    public async Task<ServiceResponse<int>> CategoryIdFromUrl( string categoryUrl )
     {
-        return new ServiceResponse<string?>( null, false, "Failed to validate category url!" );
+        if ( !_cache.HasCategoryUrls() || await _cache.GetCategories() == null )
+            return new ServiceResponse<int>( -1, false, "Failed to get Categories!" );
+        if ( !_cache.UrlToCategoryId( categoryUrl, out int id ) )
+            return new ServiceResponse<int>( -1, false, "Failed to get Categories!" );
+        return new ServiceResponse<int>( id, true, "Successfully validated url to category id." );
+    }
+
+    async Task<List<Category>?> TryGetCategories()
+    {
+        List<Category>? categories = await _cache.GetCategories();
+        
+        if ( categories != null ) 
+            return categories;
+        
+        categories = await _repository.GetCategories();
+        
+        if ( categories == null )
+            return null;
+        
+        await _cache.CacheCategories( categories );
+        return categories;
     }
 }

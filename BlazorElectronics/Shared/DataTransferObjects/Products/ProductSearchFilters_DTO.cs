@@ -8,10 +8,10 @@ public sealed class ProductSearchFilters_DTO
     public string? SearchText { get; set; }
     public string? Category { get; set; }
 
-    public int? MinPrice { get; set; }
-    public int? MaxPrice { get; set; }
-    public int? MinRating { get; set; }
-    public int? MaxRating { get; set; }
+    public int MinPrice { get; set; } = -1;
+    public int MaxPrice { get; set; } = -1;
+    public int MinRating { get; set; } = -1;
+    public int MaxRating { get; set; } = -1;
 
     public List<ProductSpecFilter_DTO>? SpecFilters { get; set; }
 }

@@ -17,7 +17,7 @@ public class ProductServiceClient : IProductServiceClient
     
     public async Task GetProducts()
     {
-        var result = await _http.GetFromJsonAsync<ControllerResponse<ProductList_DTO>>( "api/Product/products" );
+        var result = await _http.GetFromJsonAsync<ControllerResponse<Products_DTO>>( "api/Product/products" );
 
         if ( result is { Data: not null } )
             Products = result.Data.Products;

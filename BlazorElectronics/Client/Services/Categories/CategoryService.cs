@@ -7,8 +7,7 @@ namespace BlazorElectronics.Client.Services.Categories;
 public class CategoryService : ICategoryService
 {
     public string ControllerMessage { get; set; } = string.Empty;
-    public List<Category_DTO>? PrimaryCategories { get; set; }
-    public List<CategorySub_DTO>? SubCategories { get; set; }
+    public List<Category_DTO>? Categories { get; set; }
 
     readonly HttpClient _http;
 
@@ -19,11 +18,8 @@ public class CategoryService : ICategoryService
 
     public async Task GetCategories()
     {
-        var response = await _http.GetFromJsonAsync<ControllerResponse<CategoryLists_DTO>>( "api/Category/categories" );
-
-        if ( response is { Data: not null } ) {
-            PrimaryCategories = response.Data.PrimaryCategories;
-            SubCategories = response.Data.SubCategories;
-        }
+        var response = await _http.GetFromJsonAsync<ControllerResponse<Categories_DTO>>( "api/Category/categories" );
+        if ( response is { Data: not null } )
+            Categories = response.Data.Categories;
     }
 }

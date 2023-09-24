@@ -18,21 +18,21 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet( "searchQuery" )]
-    public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetSearchQuery( [FromQuery] ProductSearchFilters_DTO searchFilters )
+    public async Task<ActionResult<ControllerResponse<Products_DTO>>> GetSearchQuery( [FromQuery] ProductSearchFilters_DTO searchFilters )
     {
         ServiceResponse<string?> r = await _productService.TestGetQueryString( searchFilters );
         return Ok( r );
     }
     [HttpGet("products")]
-    public async Task<ActionResult<ControllerResponse<ProductList_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO searchFilters )
+    public async Task<ActionResult<ControllerResponse<Products_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO searchFilters )
     {
-        ServiceResponse<ProductList_DTO?> response = await _productService.GetProducts( searchFilters );
+        ServiceResponse<Products_DTO?> response = await _productService.GetProducts( searchFilters );
 
         if ( response == null )
-            return new ActionResult<ControllerResponse<ProductList_DTO>>( 
-                new ControllerResponse<ProductList_DTO>( null, false, "Service response is null!" ) );
+            return new ActionResult<ControllerResponse<Products_DTO>>( 
+                new ControllerResponse<Products_DTO>( null, false, "Service response is null!" ) );
         
-        return Ok( new ControllerResponse<ProductList_DTO>( response.Data, response.Success, response.Message ) );
+        return Ok( new ControllerResponse<Products_DTO>( response.Data, response.Success, response.Message ) );
     }
     [HttpGet("product_details/{productId:int}")]
     public async Task<ActionResult<ControllerResponse<ProductDetails_DTO>>> GetProductDetails( int productId )

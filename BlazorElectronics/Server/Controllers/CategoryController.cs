@@ -18,14 +18,14 @@ public class CategoryController : ControllerBase
     }
     
     [HttpGet("categories")]
-    public async Task<ActionResult<ControllerResponse<CategoryLists_DTO>>> GetCategories()
+    public async Task<ActionResult<ControllerResponse<Categories_DTO>>> GetCategories()
     {
-        ServiceResponse<CategoryLists_DTO?>? response = await _categoryService.GetCategories();
+        ServiceResponse<Categories_DTO?>? response = await _categoryService.GetCategories();
 
-        if ( response == null )
-            return new ActionResult<ControllerResponse<CategoryLists_DTO>>(
-                new ControllerResponse<CategoryLists_DTO>( null, false, "Service response is null!" ) );
+        if ( response?.Data == null )
+            return new ActionResult<ControllerResponse<Categories_DTO>>(
+                new ControllerResponse<Categories_DTO>( null, false, "Service response is null!" ) );
 
-        return Ok( new ControllerResponse<CategoryLists_DTO>( response.Data, response.Success, response.Message ) );
+        return Ok( new ControllerResponse<Categories_DTO>( response.Data, response.Success, response.Message ) );
     }
 }

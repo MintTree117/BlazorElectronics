@@ -1,4 +1,3 @@
-using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Services.Categories;
@@ -12,43 +11,52 @@ public class ProductService : IProductService
     readonly IProductCache _productCache;
     readonly IProductRepository _productRepository;
 
+    const int MAX_PRODUCT_LIST_ROWS = 100;
+
     public ProductService( ICategoryService categoryService, IProductCache productCache, IProductRepository productRepository )
     {
         _categoryService = categoryService;
         _productCache = productCache;
         _productRepository = productRepository;
     }
-
-
+    
     public async Task<ServiceResponse<string>> TestGetQueryString( ProductSearchFilters_DTO filters )
     {
         string query = await _productRepository.TEST_GET_QUERY_STRING( new ValidatedSearchFilters() );
         return new ServiceResponse<string?>( query, true, "Test query" );
     }
-    public async Task<ServiceResponse<ProductList_DTO?>> GetProducts( ProductSearchFilters_DTO? searchFilters = null )
+    public async Task<ServiceResponse<Products_DTO?>> GetProducts( ProductSearchFilters_DTO? searchFilters = null )
     {
-
         ServiceResponse<IEnumerable<Product>> getResult = searchFilters == null
             ? await GetAllProducts()
             : await SearchProducts( searchFilters );
 
         if ( getResult?.Data == null )
-            return new ServiceResponse<ProductList_DTO?>( null, false, "Failed to retrieve products from database!" );
+            return new ServiceResponse<Products_DTO?>( null, false, "Failed to retrieve products from database!" );
 
-        var productList = new ProductList_DTO();
+        var productList = new Products_DTO();
 
         await Task.Run( () => {
             foreach ( Product p in getResult.Data ) {
-                productList.Products.Add( new Product_DTO {
+                var productDto = new Product_DTO {
                     Id = p.ProductId,
                     Title = p.ProductName,
                     Thumbnail = p.ProductThumbnail,
                     Rating = p.ProductRating
-                } );
+                };
+                foreach ( ProductVariant v in p.ProductVariants ) {
+                    productDto.Variants.Add( new ProductVariant_DTO {
+                        VariantId = v.VariantId,
+                        VariantName = v.VariantName,
+                        Price = v.VariantPriceMain,
+                        SalePrice = v.VariantPriceSale
+                    } );
+                }
+                productList.Products.Add( productDto );
             }
         } );
 
-        return new ServiceResponse<ProductList_DTO?>( productList, true, "Successfully retrieved product Dto's from repository." );
+        return new ServiceResponse<Products_DTO?>( productList, true, "Successfully retrieved product Dto's from repository." );
     }
     public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
@@ -69,14 +77,32 @@ public class ProductService : IProductService
     }
     async Task<ServiceResponse<IEnumerable<Product>>> SearchProducts( ProductSearchFilters_DTO filters )
     {
-        // VALIDATE THE FILTERS
-        // THEN RETURN THE RESULTS FROM THE REPOSITORY
+        var validatedFilters = new ValidatedSearchFilters();
+        
+        validatedFilters.Page = Math.Max( filters.Page, 0 );
+        validatedFilters.Rows = Math.Max( filters.Rows, 0 );
+        validatedFilters.Rows = Math.Min( filters.Rows, MAX_PRODUCT_LIST_ROWS );
+        validatedFilters.MinPrice = filters.MinPrice < 0 ? null : Math.Max( filters.MinPrice, 0 );
+        validatedFilters.MaxPrice = filters.MaxPrice < 0 ? null : Math.Max( filters.MaxPrice, 0 );
+        validatedFilters.MinRating = filters.MinRating < 0 ? null : Math.Max( filters.MinRating, 0 );
+        validatedFilters.MaxRating = filters.MaxRating < 0 ? null : Math.Max( filters.MaxRating, 0 );
+        validatedFilters.SearchText = string.IsNullOrEmpty( filters.SearchText ) ? null : filters.SearchText;
 
-        var f = new ValidatedSearchFilters();
-        IEnumerable<Product> products = await _productRepository.SearchProducts( f );
+        if ( !string.IsNullOrEmpty( filters.Category ) ) {
+            ServiceResponse<int> validatedCategory = await _categoryService.CategoryIdFromUrl( filters.Category );
+            if ( validatedCategory.Success )
+                validatedFilters.Category = validatedCategory.Data;
+        }
+
+        if ( filters.SpecFilters != null ) {
+            foreach ( ProductSpecFilter_DTO specFilter in filters.SpecFilters ) {
+                
+            }
+        }
+        
+        IEnumerable<Product> products = await _productRepository.SearchProducts( validatedFilters );
         return new ServiceResponse<IEnumerable<Product>>( products, true, "Repo Message" );
     }
-
     static ProductDetails_DTO GetProductDetailsDTO( ProductDetails productDetails )
     {
         var DTO = new ProductDetails_DTO {
@@ -89,8 +115,8 @@ public class ProductService : IProductService
             DTO.ProductVariants.Add( new ProductVariant_DTO {
                 VariantId = variant.VariantId,
                 VariantName = variant.VariantName,
-                VariantPriceMain = variant.VariantPriceMain,
-                VariantPriceSale = variant.VariantPriceSale,
+                Price = variant.VariantPriceMain,
+                SalePrice = variant.VariantPriceSale,
             } );
         }
 

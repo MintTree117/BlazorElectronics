@@ -4,5 +4,5 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 
 public interface ICategoryRepository
 {
-    Task<CategoryCollections> GetCategories();
+    Task<List<Category>> GetCategories();
 }

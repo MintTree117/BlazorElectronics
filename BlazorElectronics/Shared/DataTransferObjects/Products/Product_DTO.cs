@@ -8,5 +8,5 @@ public sealed class Product_DTO
     public string Thumbnail { get; set; } = string.Empty;
     public int Rating { get; set; }
 
-    public List<ProductVariant_DTO>? Variants { get; set; }
+    public List<ProductVariant_DTO> Variants { get; set; } = new();
 }

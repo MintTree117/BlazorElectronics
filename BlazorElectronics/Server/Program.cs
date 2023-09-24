@@ -1,4 +1,3 @@
-using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Categories;
@@ -14,8 +13,8 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<DapperContext>();
 
+builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-//builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

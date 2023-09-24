@@ -18,31 +18,31 @@ public class CategoryRepository : ICategoryRepository
         _dbContext = dapperContext;
     }
     
-    public async Task<CategoryCollections> GetCategories()
+    public async Task<List<Category>> GetCategories()
     {
         await using SqlConnection connection = _dbContext.CreateConnection();
         await connection.OpenAsync();
 
-        var collections = new CategoryCollections();
+        var categories = new List<Category>();
         var categoryDictionary = new Dictionary<int, Category>();
         var subCategoryDictionary = new Dictionary<int, CategorySub>();
 
         await connection.QueryAsync
-            <Category, CategorySub, CategoryCollections>
+            <Category, CategorySub, List<Category>>
                 ( STORED_PROCEDURE_GET_CATEGORIES,
                 ( category, categorySub ) => {
-                    if ( category != null )
-                        categoryDictionary.TryAdd( category.CategoryId, category );
-                    if ( categorySub != null )
-                        subCategoryDictionary.TryAdd( categorySub.CategorySubId, categorySub );
-                    return collections;
+                    if ( category == null ) 
+                        return categories;
+                    categoryDictionary.TryAdd( category.CategoryId, category );
+                    if ( categorySub != null && subCategoryDictionary.TryAdd( categorySub.CategorySubId, categorySub ) )
+                        category.SubCategories.Add( categorySub );
+                    return categories;
                 },
                 splitOn: CATEGORY_ID_COLUMN,
                 commandType: CommandType.StoredProcedure );
 
-        collections.Categories.AddRange( categoryDictionary.Values );
-        collections.CategoriesSub.AddRange( subCategoryDictionary.Values );
-        
-        return collections;
+        categories = categoryDictionary.Values.ToList();
+
+        return categories;
     }
 }
