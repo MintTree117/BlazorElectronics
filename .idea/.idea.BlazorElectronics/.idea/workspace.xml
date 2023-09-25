@@ -12,16 +12,15 @@
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/CacheService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/CacheService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryCache.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/SpecFilter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ProductSpecFilter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ValidatedSearchFilters.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ValidatedSearchFilters.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecDataType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecDataDescr.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecMetaData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecMetaData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecCache.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecCache.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductSpecFilter_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductSpecFilter_DTO.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +33,9 @@
         <option value="CSS File" />
       </list>
     </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecMetaData.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="2Va5HkkH2f30CvsBSAHyhE7a99S" />
   <component name="ProjectViewState">
@@ -153,7 +155,9 @@
       <workItem from="1695505251465" duration="13496000" />
       <workItem from="1695579469207" duration="6849000" />
       <workItem from="1695597308748" duration="5888000" />
-      <workItem from="1695604240662" duration="1536000" />
+      <workItem from="1695604240662" duration="1578000" />
+      <workItem from="1695606562417" duration="429000" />
+      <workItem from="1695647641183" duration="4399000" />
     </task>
     <servers />
   </component>

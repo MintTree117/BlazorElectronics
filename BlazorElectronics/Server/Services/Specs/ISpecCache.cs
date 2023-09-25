@@ -6,12 +6,12 @@ namespace BlazorElectronics.Server.Services.Specs;
 public interface ISpecCache
 {
     // SET
-    Task CacheSpecDataTypes( List<SpecDataType> dataTypes );
+    Task CacheSpecDataTypes( List<SpecDataDescr> dataTypes );
     Task CacheSpecCategories( List<SpecCategory> specCategories );
     Task CacheSpecs( List<Spec> specs );
     Task CacheSpecLookups( List<SpecLookup> specLookups );
     // GET
-    ConcurrentDictionary<int, SpecDataType>? TryGetDataTypesById();
+    ConcurrentDictionary<int, SpecDataDescr>? TryGetDataTypesById();
     ConcurrentDictionary<int, List<int>>? TryGetSpecIdsByCategoryId();
     ConcurrentDictionary<string, int>? TryGetSpecIdsByName();
     ConcurrentDictionary<int, Spec>? TryGetSpecsById();

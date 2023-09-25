@@ -8,7 +8,7 @@ public sealed class SpecCache : CacheService, ISpecCache
 {
     const string LOOKUP_SPEC_VALUES_KEY = "LookupValues";
 
-    ConcurrentDictionary<int, SpecDataType>? _dataTypesById;
+    ConcurrentDictionary<int, SpecDataDescr>? _dataTypesById;
     ConcurrentDictionary<int, List<int>>? _specIdsByCategoryId;
     ConcurrentDictionary<string, int>? _specIdsByName;
     ConcurrentDictionary<int, Spec>? _specsById;
@@ -16,11 +16,11 @@ public sealed class SpecCache : CacheService, ISpecCache
     public SpecCache( IMemoryCache cache ) : base( cache ) { }
 
     // SET
-    public async Task CacheSpecDataTypes( List<SpecDataType> dataTypes )
+    public async Task CacheSpecDataTypes( List<SpecDataDescr> dataTypes )
     {
         await Task.Run( () => {
-            _dataTypesById = new ConcurrentDictionary<int, SpecDataType>();
-            foreach ( SpecDataType d in dataTypes )
+            _dataTypesById = new ConcurrentDictionary<int, SpecDataDescr>();
+            foreach ( SpecDataDescr d in dataTypes )
                 _dataTypesById.TryAdd( d.DataTypeId, d );
         } );
     }
@@ -66,7 +66,7 @@ public sealed class SpecCache : CacheService, ISpecCache
     }
     
     // GET
-    public ConcurrentDictionary<int, SpecDataType>? TryGetDataTypesById()
+    public ConcurrentDictionary<int, SpecDataDescr>? TryGetDataTypesById()
     {
         return _dataTypesById;
     }

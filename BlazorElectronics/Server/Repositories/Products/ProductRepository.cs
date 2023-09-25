@@ -38,14 +38,7 @@ public sealed class ProductRepository : IProductRepository
     {
         _dbContext = dapperContext;
     }
-
-    public async Task<IEnumerable<Product>?> GetProducts()
-    {
-        await using SqlConnection connection = _dbContext.CreateConnection();
-        await connection.OpenAsync();
-
-        return null;
-    }
+    
     public async Task<string> TEST_GET_QUERY_STRING( ValidatedSearchFilters searchFilters )
     {
         var productDictionary = new Dictionary<int, Product>();
