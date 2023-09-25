@@ -1,23 +1,28 @@
+using System.Collections.Concurrent;
 using BlazorElectronics.Server.Models.Products;
+using BlazorElectronics.Server.Models.Specs;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Services.Categories;
+using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Shared.DataTransferObjects.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
 
 public class ProductService : IProductService
 {
+    readonly ISpecService _specService;
     readonly ICategoryService _categoryService;
     readonly IProductCache _productCache;
     readonly IProductRepository _productRepository;
 
     const int MAX_PRODUCT_LIST_ROWS = 100;
 
-    public ProductService( ICategoryService categoryService, IProductCache productCache, IProductRepository productRepository )
+    public ProductService( ICategoryService categoryService, IProductCache productCache, IProductRepository productRepository, ISpecService specService )
     {
         _categoryService = categoryService;
         _productCache = productCache;
         _productRepository = productRepository;
+        _specService = specService;
     }
     
     public async Task<ServiceResponse<string>> TestGetQueryString( ProductSearchFilters_DTO filters )
@@ -95,14 +100,42 @@ public class ProductService : IProductService
         }
 
         if ( filters.SpecFilters != null ) {
+            Task<ServiceResponse<SpecMetaData>> metaTask = _specService.GetSpecMetaData();
+            Task<ServiceResponse<Dictionary<int, List<object>>>> lookupTask = _specService.GetSpecLookups();
+
+            await Task.WhenAll( metaTask, lookupTask );
+
+            if ( metaTask.Result.Data == null || !metaTask.Result.Success )
+                return new ServiceResponse<IEnumerable<Product>>( null, false, metaTask.Result.Message );
+            if ( lookupTask.Result.Data == null || !lookupTask.Result.Success )
+                return new ServiceResponse<IEnumerable<Product>>( null, false, lookupTask.Result.Message );
+
+            SpecMetaData specMeta = metaTask.Result.Data;
+            Dictionary<int, List<object>> specLookup = lookupTask.Result.Data;
+            
             foreach ( ProductSpecFilter_DTO specFilter in filters.SpecFilters ) {
-                // trygetspecs() from cache or repository
-                // foreach spec
-                //   try match spec name to cache value
-                //   if (match)
-                //     if (we have a category)
-                //       then check if the spec is even part of this category
-                //     now check the spec value against it's data type (validate)
+                if ( string.IsNullOrEmpty( specFilter.SpecName ) )
+                    continue;
+                if ( specFilter.SpecValue == null )
+                    continue;
+                if ( !specMeta._specIdsByName.TryGetValue( specFilter.SpecName, out int specId ) )
+                    continue;
+                if ( !specMeta._specsById.TryGetValue( specId, out Spec? spec ) || spec == null )
+                    continue;
+                if ( validatedFilters.Category != null && !specMeta._specIdsByCategoryId.TryGetValue( validatedFilters.Category.Value, out List<int>? specsOfCategory ) )
+                    continue;
+                if ( !Enum.IsDefined( typeof( SpecType ), specFilter.SpecType ) )
+                    continue;
+                if (!Enum.IsDefined( typeof( FilterType ), specFilter.FilterType ))
+                    continue;
+                if ( specFilter.SpecType == ( int ) SpecType.Lookup
+                     || !specLookup.TryGetValue( specId, out List<object>? lookupValues )
+                     || !TryValidateLookupFilter( specFilter.SpecValue, ( FilterType ) specFilter.FilterType ) )
+                    continue;
+                validatedFilters.LookupSpecFilters.Add( new SpecFilter {
+                    SpecName = specFilter.SpecName,
+                    SpecValue = specFilter.SpecValue
+                } );
             }
         }
         
@@ -142,5 +175,13 @@ public class ProductService : IProductService
         }
 
         return DTO;
+    }
+    static bool TryValidateLookupFilter( object value, FilterType filterType )
+    {
+        return false;
+    }
+    static bool TryValidateRawFilter()
+    {
+        return false;
     }
 }

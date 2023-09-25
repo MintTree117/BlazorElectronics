@@ -4,10 +4,10 @@ namespace BlazorElectronics.Server.Services;
 
 public abstract class CacheService
 {
-    protected readonly IMemoryCache _cache;
+    protected readonly IMemoryCache MemoryCache;
 
-    public CacheService( IMemoryCache cache )
+    public CacheService( IMemoryCache memoryCache )
     {
-        _cache = cache;
+        MemoryCache = memoryCache;
     }
 }

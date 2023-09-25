@@ -12,17 +12,16 @@
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/Spec.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/Spec.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecCategoryRaw.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecCategory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecDataType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecDataType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupValue.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookup.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/CacheService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/CacheService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductCache.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecCache.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/BlazorElectronics.Shared.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/BlazorElectronics.Shared.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductCategory_DTO.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductLookups_DTO.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductSpec_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductSpec_DTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductSpecFilter_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/DataTransferObjects/Products/ProductSpecFilter_DTO.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,7 +151,9 @@
       <workItem from="1695492646335" duration="7268000" />
       <workItem from="1695500960034" duration="620000" />
       <workItem from="1695505251465" duration="13496000" />
-      <workItem from="1695579469207" duration="6148000" />
+      <workItem from="1695579469207" duration="6849000" />
+      <workItem from="1695597308748" duration="5888000" />
+      <workItem from="1695604240662" duration="1536000" />
     </task>
     <servers />
   </component>

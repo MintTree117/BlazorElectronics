@@ -9,10 +9,11 @@ public interface ISpecCache
     Task CacheSpecDataTypes( List<SpecDataType> dataTypes );
     Task CacheSpecCategories( List<SpecCategory> specCategories );
     Task CacheSpecs( List<Spec> specs );
-    Task CacheSpecLookups( List<SpecLookup> lookupValues );
+    Task CacheSpecLookups( List<SpecLookup> specLookups );
     // GET
-    Task<ConcurrentDictionary<int, List<string>>?> TryGetSpecIdsByCategoryId();
-    Task<ConcurrentDictionary<int, SpecDataType>?> TryGetDataTypesById();
-    Task<List<Spec>?> TryGetSpecs();
+    ConcurrentDictionary<int, SpecDataType>? TryGetDataTypesById();
+    ConcurrentDictionary<int, List<int>>? TryGetSpecIdsByCategoryId();
+    ConcurrentDictionary<string, int>? TryGetSpecIdsByName();
+    ConcurrentDictionary<int, Spec>? TryGetSpecsById();
     Task<Dictionary<int, List<object>>?> TryGetSpecLookupsById();
 }

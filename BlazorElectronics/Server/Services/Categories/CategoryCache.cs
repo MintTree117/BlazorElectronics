@@ -13,7 +13,7 @@ public class CategoryCache : CacheService, ICategoryCache
 
     public async Task<List<Category>?> GetCategories()
     {
-        return await Task.Run( () => _cache.TryGetValue( CATEGORY_KEY, out List<Category>? categories ) ? categories : null );
+        return await Task.Run( () => MemoryCache.TryGetValue( CATEGORY_KEY, out List<Category>? categories ) ? categories : null );
     }
     public async Task CacheCategories( List<Category> categories )
     {
@@ -21,7 +21,7 @@ public class CategoryCache : CacheService, ICategoryCache
             _urlToCategoryId = new ConcurrentDictionary<string, int>();
             foreach ( Category c in categories )
                 _urlToCategoryId.TryAdd( c.CategoryUrl, c.CategoryId );
-            _cache.Set( "Categories", categories );
+            MemoryCache.Set( "Categories", categories );
         } );
     }
     public bool HasCategoryUrls()
