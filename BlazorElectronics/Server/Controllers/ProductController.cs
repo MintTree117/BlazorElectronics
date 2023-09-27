@@ -24,12 +24,12 @@ public class ProductController : ControllerBase
         return Ok( r );
     }
     [HttpGet("products")]
-    public async Task<ActionResult<ControllerResponse<Products_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO searchFilters )
+    public async Task<ActionResult<ControllerResponse<Products_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO? searchFilters )
     {
         ServiceResponse<Products_DTO?> response = await _productService.GetProducts( searchFilters );
 
         if ( response == null )
-            return new ActionResult<ControllerResponse<Products_DTO>>( 
+            return new ActionResult<ControllerResponse<Products_DTO>>(
                 new ControllerResponse<Products_DTO>( null, false, "Service response is null!" ) );
         
         return Ok( new ControllerResponse<Products_DTO>( response.Data, response.Success, response.Message ) );

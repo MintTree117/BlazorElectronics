@@ -13,5 +13,5 @@ public sealed class ProductSearchFilters_DTO
     public int MinRating { get; set; } = -1;
     public int MaxRating { get; set; } = -1;
 
-    public List<ProductSpecFilter_DTO>? SpecFilters { get; set; }
+    public List<ProductSpecFilter_DTO> SpecFilters { get; set; } = new();
 }

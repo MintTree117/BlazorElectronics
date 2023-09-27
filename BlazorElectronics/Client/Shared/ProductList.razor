@@ -1,6 +1,7 @@
 @using BlazorElectronics.Shared.DataTransferObjects.Products
 @using BlazorElectronics.Client.Services.Products
 @inject IProductServiceClient ProductServiceClient;
+@implements IDisposable;
 
 @if ( ProductServiceClient.Products is not { Count: > 0 } ) {
     <span>Loading Products...</span>
@@ -25,5 +26,6 @@ else {
 }
 
 @code {
-    protected override async Task OnInitializedAsync() { await ProductServiceClient.GetProducts(); }
+    protected override void OnInitialized() { ProductServiceClient.ProductsChanged += StateHasChanged; }
+    public void Dispose() { ProductServiceClient.ProductsChanged -= StateHasChanged; }
 }

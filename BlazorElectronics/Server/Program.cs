@@ -2,9 +2,11 @@ using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Server.Repositories.Products;
+using BlazorElectronics.Server.Repositories.Specs;
 using BlazorElectronics.Server.Services;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
+using BlazorElectronics.Server.Services.Specs;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
@@ -13,13 +15,17 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<DapperContext>();
 
-builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddSingleton<ICategoryRepository, CachedCategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<IProductCache, ProductCache>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<SpecRepository>();
+builder.Services.AddSingleton<ISpecRepository, CachedSpecRepository>();
+builder.Services.AddScoped<ISpecService, SpecService>();
 
 WebApplication app = builder.Build();
 

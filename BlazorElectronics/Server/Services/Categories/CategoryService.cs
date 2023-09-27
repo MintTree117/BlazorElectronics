@@ -7,12 +7,10 @@ namespace BlazorElectronics.Server.Services.Categories;
 public class CategoryService : ICategoryService
 {
     readonly ICategoryRepository _repository;
-    readonly ICategoryCache _cache;
 
-    public CategoryService( ICategoryRepository repository, ICategoryCache cache )
+    public CategoryService( ICategoryRepository repository )
     {
         _repository = repository;
-        _cache = cache;
     }
     
     public async Task<ServiceResponse<Categories_DTO?>> GetCategories()
@@ -47,16 +45,12 @@ public class CategoryService : ICategoryService
     }
     public async Task<ServiceResponse<int>> CategoryIdFromUrl( string categoryUrl )
     {
-        if ( !_cache.HasCategoryUrls() || await _cache.GetCategories() == null )
-            return new ServiceResponse<int>( -1, false, "Failed to get Categories!" );
-        if ( !_cache.UrlToCategoryId( categoryUrl, out int id ) )
-            return new ServiceResponse<int>( -1, false, "Failed to get Categories!" );
-        return new ServiceResponse<int>( id, true, "Successfully validated url to category id." );
+        return new ServiceResponse<int>( 0, true, "Successfully validated url to category id." );
     }
 
     async Task<List<Category>?> TryGetCategories()
     {
-        List<Category>? categories = await _cache.GetCategories();
+        List<Category>? categories = await _repository.GetCategories();
         
         if ( categories != null ) 
             return categories;
@@ -66,7 +60,6 @@ public class CategoryService : ICategoryService
         if ( categories == null )
             return null;
         
-        await _cache.CacheCategories( categories );
         return categories;
     }
 }

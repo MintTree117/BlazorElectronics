@@ -17,7 +17,11 @@ public class CategoryRepository : ICategoryRepository
     {
         _dbContext = dapperContext;
     }
-    
+
+    public Task<Dictionary<string, Category>> GetCategories2()
+    {
+        return null;
+    }
     public async Task<List<Category>> GetCategories()
     {
         await using SqlConnection connection = _dbContext.CreateConnection();

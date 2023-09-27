@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Df1v7MejPbxUbPlheF6am2lAsv228IkIHcssXWv1AThcaKHw1acu+nFkcx8s7wXO/c2iAuNc+2ow12YRgrMBHw==",
+  "dgSpecHash": "YtLDqqHvC7hXkDtl4gQ38MLq0kW7822TXuZDsywyxy/0Z8fPdwZXaSLN9e7o+NEPcZkZ3ejI75GJPPYEigYsTg==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/BlazorElectronics.Client.csproj",
   "expectedPackageFiles": [
@@ -28,6 +28,7 @@
     "/home/martin/.nuget/packages/microsoft.extensions.primitives/7.0.0/microsoft.extensions.primitives.7.0.0.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.jsinterop/7.0.11/microsoft.jsinterop.7.0.11.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.jsinterop.webassembly/7.0.11/microsoft.jsinterop.webassembly.7.0.11.nupkg.sha512",
+    "/home/martin/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/home/martin/.nuget/packages/system.io.pipelines/7.0.0/system.io.pipelines.7.0.0.nupkg.sha512",
     "/home/martin/.nuget/packages/system.text.encodings.web/7.0.0/system.text.encodings.web.7.0.0.nupkg.sha512",
     "/home/martin/.nuget/packages/system.text.json/7.0.0/system.text.json.7.0.0.nupkg.sha512",

@@ -834,3 +834,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/refint/BlazorElectronics.Client.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/ref/BlazorElectronics.Client.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Newtonsoft.Json.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Newtonsoft.Json.dll.gz
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/Newtonsoft.Json.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/+DhnqB5w.gz

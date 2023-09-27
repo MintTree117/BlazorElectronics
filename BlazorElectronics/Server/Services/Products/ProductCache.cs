@@ -1,8 +1,10 @@
+using BlazorElectronics.Server.Repositories;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace BlazorElectronics.Server.Services.Products;
 
-public sealed class ProductCache : CacheService, IProductCache
+public sealed class ProductCache : CachedRepository, IProductCache
 {
-    public ProductCache( IMemoryCache memoryCache ) : base( memoryCache ) { }
+    public ProductCache( IDistributedCache memoryCache ) : base( memoryCache ) { }
 }

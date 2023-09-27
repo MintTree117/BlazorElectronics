@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "4U+3uKn3CTNOvEPl3Z26ggMCkKSiDiF89KkMn7zVsvQ=",
+  "Hash": "1o6iHdsNdwYqIvjLv3EBErYrO8K9LV0OBQK0z77oLJU=",
   "Source": "BlazorElectronics.Server",
   "BasePath": "_content/BlazorElectronics.Server",
   "Mode": "Default",
@@ -741,6 +741,23 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.netcore.app.runtime.mono.browser-wasm/7.0.11/runtimes/browser-wasm/lib/net7.0/netstandard.dll"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Newtonsoft.Json.dll",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Project",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Newtonsoft.Json.dll",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "BlazorWebAssemblyResource",
+      "AssetTraitValue": "runtime",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/.nuget/packages/newtonsoft.json/13.0.3/lib/net6.0/Newtonsoft.Json.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.AppContext.dll",
@@ -3563,6 +3580,23 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.IO.Compression.Brotli.dll"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/+DhnqB5w.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Project",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Newtonsoft.Json.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Newtonsoft.Json.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Newtonsoft.Json.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/+e+9wgwA.gz",
