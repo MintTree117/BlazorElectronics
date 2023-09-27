@@ -12,6 +12,14 @@ public abstract class CachedRepository
         MemoryCache = memoryCache;
     }
 
+    protected async Task Cache<T>( string key, T data, DistributedCacheEntryOptions entryOptions ) where T : class?
+    {
+        await Task.Run( () =>
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes( data );
+            MemoryCache.Set( key, bytes, entryOptions );
+        } );
+    }
     protected async Task<T?> GetFromCache<T>( string key, DistributedCacheEntryOptions entryOptions ) where T : class?
     {
         var specs = await MemoryCache.GetAsync( key );

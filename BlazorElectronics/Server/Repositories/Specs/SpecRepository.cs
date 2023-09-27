@@ -18,33 +18,58 @@ public class SpecRepository : ISpecRepository
 
     public SpecRepository( DapperContext dapperContext ) { _dbContext = dapperContext; }
     
-    public async Task<Dictionary<string, Spec>?> GetSpecs()
+    public async Task<IEnumerable<Spec>?> GetSpecs()
     {
         await using SqlConnection connection = _dbContext.CreateConnection();
         await connection.OpenAsync();
 
-        var specDictionary = new Dictionary<string, Spec>();
+        var specDictionary = new Dictionary<int, Spec>();
 
-        IEnumerable<Spec?>? specs = await connection.QueryAsync<Spec, SpecCategory, SpecFilter, Spec?>
+        IEnumerable<Spec>? specs = await connection.QueryAsync<Spec, SpecCategory, SpecFilter, Spec>
         ( STORED_PROCEDURE_GET_SPECS, ( spec, category, filter ) =>
             {
-                if ( spec?.SpecName == null )
-                    return null;
-                if ( !specDictionary.TryGetValue( spec.SpecName, out Spec? specEntry ) )
+                if ( !specDictionary.TryGetValue( spec.SpecId, out Spec? specEntry ) )
                 {
                     specEntry = spec;
-                    specDictionary.Add( specEntry.SpecName, specEntry );
+                    specDictionary.Add( specEntry.SpecId, specEntry );
                 }
-                if ( category != null && !specEntry.SpecCategories.Contains( category.CategoryId ) )
-                    specEntry.SpecCategories.Add( category.CategoryId );
-                if ( filter != null && !specEntry.SpecFilters.Contains( filter.FilterId ) )
-                    specEntry.SpecFilters.Add( filter.FilterId );
+                if ( category != null && !specEntry.SpecCategories.Contains( category ) )
+                    specEntry.SpecCategories.Add( category );
+                if ( filter != null && !specEntry.SpecFilters.Contains( filter ) )
+                    specEntry.SpecFilters.Add( filter );
                 return specEntry;
             },
             splitOn: $"{COLUMN_NAME_SPEC_ID},{COLUMN_NAME_SPEC_CATEGORY_ID}",
             commandType: CommandType.StoredProcedure );
 
-        return specs == null ? null : specDictionary;
+        return specs;
     }
-    public Task<Dictionary<int, List<object>>?> GetSpecLookups() { throw new NotImplementedException(); }
+    public async Task<IEnumerable<SpecLookup>?> GetSpecLookups()
+    {
+        await using SqlConnection connection = _dbContext.CreateConnection();
+        await connection.OpenAsync();
+        return await connection.QueryAsync<SpecLookup>(
+            STORED_PROCEDURE_GET_SPEC_LOOKUPS, CommandType.StoredProcedure );
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

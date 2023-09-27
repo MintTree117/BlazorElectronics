@@ -12,6 +12,6 @@ public sealed class Spec
     public int SpecDataId { get; set; }
     public SpecType SpecType { get; set; }
     public string? SpecName { get; set; }
-    public List<int> SpecCategories { get; set; } = new();
-    public List<int> SpecFilters { get; set; } = new();
+    public List<SpecCategory> SpecCategories { get; set; } = new();
+    public List<SpecFilter> SpecFilters { get; set; } = new();
 }

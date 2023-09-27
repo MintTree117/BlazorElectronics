@@ -4,8 +4,6 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Shared.DataTransferObjects.Products;
-using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
@@ -29,6 +27,8 @@ public sealed class ProductRepository : IProductRepository
     const string PRODUCT_SPECS_RAW_TABLE = "ProductSpecsRaw";
     const string PRODUCT_VARIANTS_TABLE = "ProductVariants";
 
+    const string STORED_PROCEDURE_COUNT_PRODUCTS_ALL = "Count_Products";
+    const string STORED_PROCEDURE_COUNT_PRODUCTS_SEARCH = "Count_ProductsSearch";
     const string STORED_PROCEDURE_GET_PRODUCTS = "Get_Products";
     const string STORED_PROCEDURE_GET_PRODUCT_DETAILS = "Get_ProductDetails";
 
@@ -41,57 +41,64 @@ public sealed class ProductRepository : IProductRepository
     
     public async Task<string> TEST_GET_QUERY_STRING( ValidatedSearchFilters searchFilters )
     {
-        var productDictionary = new Dictionary<int, Product>();
-        var paramDictionary = new Dictionary<string, object>();
         var productQuery = new StringBuilder();
         var countQuery = new StringBuilder();
 
-        await BuildProductSearchQuery( searchFilters, paramDictionary, productQuery, countQuery );
+        await BuildProductSearchQuery( searchFilters, productQuery, countQuery );
         return productQuery.ToString();
     }
-    public async Task<IEnumerable<Product>> GetAllProducts()
+    public async Task<(IEnumerable<Product>?, int)?> GetAllProducts()
     {
         await using SqlConnection connection = _dbContext.CreateConnection();
         await connection.OpenAsync();
 
         var productDictionary = new Dictionary<int, Product>();
-        
-        await connection.QueryAsync
-            <Product, ProductVariant, Product?>
-            ( STORED_PROCEDURE_GET_PRODUCTS,
-                ( product, variant ) => {
-                    if ( product == null )
-                        return null;
-                    productDictionary.TryAdd( product.ProductId, product );
-                    if ( variant != null )
-                        product.ProductVariants.Add( variant );
-                    return product;
-                },
-                splitOn: PRODUCT_ID_COLUMN,
-                commandType: CommandType.StoredProcedure );
 
-        return productDictionary.Values;
+        Task<int> countTask = connection.QuerySingleAsync<int>( STORED_PROCEDURE_COUNT_PRODUCTS_ALL, commandType: CommandType.StoredProcedure );
+
+        Task<IEnumerable<Product>> productsTask = connection.QueryAsync<Product, ProductVariant, Product>
+        ( STORED_PROCEDURE_GET_PRODUCTS, ( product, variant ) =>
+            {
+                if ( !productDictionary.TryGetValue( product.ProductId, out Product? productEntry ) )
+                {
+                    productEntry = product;
+                    productDictionary.Add( productEntry.ProductId, productEntry );
+                }
+                if ( variant != null && !product.ProductVariants.Contains( variant ) )
+                    product.ProductVariants.Add( variant );
+                return product;
+            },
+            splitOn: PRODUCT_ID_COLUMN,
+            commandType: CommandType.StoredProcedure );
+
+        await Task.WhenAll( countTask, productsTask );
+
+        if ( productsTask.Result == null || countTask.Result < 0 )
+            return null;
+
+        return ( productsTask.Result, countTask.Result );
     }
-    public async Task<IEnumerable<Product>> SearchProducts( ValidatedSearchFilters searchFilters )
+    public async Task<(IEnumerable<Product>?, int)?> SearchProducts( ValidatedSearchFilters searchFilters )
     {
-        var productDictionary = new Dictionary<int, Product>();
-        var paramDictionary = new Dictionary<string, object>();
         var productQuery = new StringBuilder();
         var countQuery = new StringBuilder();
 
-        await BuildProductSearchQuery( searchFilters, paramDictionary, productQuery, countQuery );
-
-        var sqlParamsDynamic = new DynamicParameters( paramDictionary );
+        DynamicParameters dynamicParams = await BuildProductSearchQuery( searchFilters, productQuery, countQuery );
 
         await using SqlConnection connection = _dbContext.CreateConnection();
         await connection.OpenAsync();
 
-        Task searchTask = SearchProducts( connection, productQuery.ToString(), productDictionary, sqlParamsDynamic );
-        await Task.WhenAll( searchTask );
+        Task<IEnumerable<Product>?> productTask = SearchProducts( connection, productQuery.ToString(), dynamicParams );
+        Task<int> countTask = CountProducts( connection, countQuery.ToString(), dynamicParams );
 
-        return productDictionary.Values;
+        await Task.WhenAll( productTask, countTask );
+
+        if ( productTask.Result == null || countTask.Result < 0 )
+            return null;
+
+        return ( productTask.Result, countTask.Result );
     }
-    public async Task<ProductDetails> GetProductDetails( int productId )
+    public async Task<ProductDetails?> GetProductDetails( int productId )
     {
         await using SqlConnection connection = _dbContext.CreateConnection();
         await connection.OpenAsync();
@@ -99,10 +106,9 @@ public sealed class ProductRepository : IProductRepository
         var productDetails = new ProductDetails();
         var parameters = new DynamicParameters( new { id = productId } );
 
-        await connection.QueryAsync
-            <Product, ProductDescription, ProductVariant, ProductImage, ProductReview, ProductDetails>
-            ( STORED_PROCEDURE_GET_PRODUCT_DETAILS,
-            ( product, description, variant, image, review ) => {
+        await connection.QueryAsync<Product, ProductDescription, ProductVariant, ProductImage, ProductReview, ProductDetails>
+        ( STORED_PROCEDURE_GET_PRODUCT_DETAILS, ( product, description, variant, image, review ) =>
+            {
                 productDetails.Product ??= product;
                 if ( description != null )
                     productDetails.ProductDescription = description;
@@ -121,9 +127,11 @@ public sealed class ProductRepository : IProductRepository
         return productDetails;
     }
     
-    async Task BuildProductSearchQuery( 
-        ValidatedSearchFilters filters, Dictionary<string, object> paramDictionary, StringBuilder productQuery, StringBuilder countQuery )
+    async Task<DynamicParameters> BuildProductSearchQuery( 
+        ValidatedSearchFilters filters, StringBuilder productQuery, StringBuilder countQuery )
     {
+        var paramDictionary = new Dictionary<string, object>();
+        
         await Task.Run( () => {
             // BASE
             productQuery.Append( $"SELECT p.*, pv.*" );
@@ -205,22 +213,28 @@ public sealed class ProductRepository : IProductRepository
             paramDictionary.Add( "@queryOffset", filters.Page * filters.Rows );
             paramDictionary.Add( "@queryRows", filters.Rows );
         } );
+
+        return new DynamicParameters( paramDictionary );
     }
-    async Task SearchProducts( SqlConnection connection, string dynamicQuery, Dictionary<int, Product> productDictionary, DynamicParameters sqlParamsDynamic )
+    async Task<IEnumerable<Product>?> SearchProducts( SqlConnection connection, string dynamicQuery, DynamicParameters dynamicParams )
     {
-        await connection.QueryAsync<Product, ProductVariant, Product>
-        ( dynamicQuery, ( product, variant ) => {
-                if ( !productDictionary.TryGetValue( product.ProductId, out Product? productEntry ) ) {
+        var productDictionary = new Dictionary<int, Product>();
+        
+        return await connection.QueryAsync<Product, ProductVariant, Product>
+        ( dynamicQuery, ( product, variant ) =>
+            {
+                if ( !productDictionary.TryGetValue( product.ProductId, out Product? productEntry ) )
+                {
                     productEntry = product;
-                    productEntry.ProductVariants = new List<ProductVariant>();
                     productDictionary.Add( productEntry.ProductId, productEntry );
                 }
                 if ( variant != null )
                     productEntry.ProductVariants.Add( variant );
                 return productEntry;
-            }, 
-            sqlParamsDynamic,
-            splitOn: $"{PRODUCT_ID_COLUMN},{VARIANT_ID_COLUMN}", 
+            },
+            dynamicParams,
+            splitOn: $"{PRODUCT_ID_COLUMN},{VARIANT_ID_COLUMN}",
             commandType: CommandType.Text );
     }
+    async Task<int> CountProducts( SqlConnection connection, string dynamicQuery, DynamicParameters dynamicParams ) { return await connection.QuerySingleAsync<int>( dynamicQuery, dynamicParams, commandType: CommandType.Text ); }
 }

@@ -15,16 +15,16 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<DapperContext>();
 
-builder.Services.AddScoped<CategoryRepository>();
-builder.Services.AddSingleton<ICategoryRepository, CachedCategoryRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddScoped<SpecRepository>();
-builder.Services.AddSingleton<ISpecRepository, CachedSpecRepository>();
+builder.Services.AddScoped<ISpecRepository, SpecRepository>();
+builder.Services.AddSingleton<ISpecCache, SpecCache>();
 builder.Services.AddScoped<ISpecService, SpecService>();
 
 WebApplication app = builder.Build();

@@ -6,24 +6,43 @@ namespace BlazorElectronics.Server.Services.Categories;
 
 public class CategoryService : ICategoryService
 {
+    readonly ICategoryCache _cache;
     readonly ICategoryRepository _repository;
 
-    public CategoryService( ICategoryRepository repository )
+    public CategoryService( ICategoryCache cache, ICategoryRepository repository )
     {
+        _cache = cache;
         _repository = repository;
     }
     
     public async Task<ServiceResponse<Categories_DTO?>> GetCategories()
     {
-        List<Category>? categories = await TryGetCategories();
+        Categories_DTO? dto = await _cache.Get();
 
-        if ( categories == null )
-            return new ServiceResponse<Categories_DTO?>( null, false, "Failed to get categories from cache or database!" );
+        if ( dto != null )
+            return new ServiceResponse<Categories_DTO?>( dto, true, "Success. Retrieved Categories_DTO from cache." );
 
-        var categoriesDto = new Categories_DTO();
+        IEnumerable<Category>? models = await _repository.GetCategories();
 
-        await Task.Run( () => {
-            foreach ( Category c in categories ) {
+        if ( models == null )
+            return new ServiceResponse<Categories_DTO?>( null, false, "Failed to retrieve Categories_DTO from cache, and Categories from repository!" );
+
+        dto = await MapModelsToDtos( models );
+        await _cache.Set( dto );
+        
+        return new ServiceResponse<Categories_DTO?>( dto, true, "Successfully retrieved Categories from repository, mapped to DTO, and cached." );
+    }
+    static async Task<Categories_DTO> MapModelsToDtos( IEnumerable<Category> categories )
+    {
+        var dto = new Categories_DTO();
+
+        await Task.Run( () =>
+        {
+            foreach ( Category c in categories )
+            {
+                if ( dto.CategoriesById.ContainsKey( c.CategoryId ) )
+                    continue;
+                
                 var categoryDTO = new Category_DTO {
                     Id = c.CategoryId,
                     Name = c.CategoryName ?? string.Empty,
@@ -31,35 +50,19 @@ public class CategoryService : ICategoryService
                     ImageUrl = c.CategoryImageUrl ?? string.Empty,
                     IsPrimary = c.IsPrimaryCategory
                 };
-                foreach ( CategorySub cs in c.SubCategories ) {
+                foreach ( CategorySub cs in c.SubCategories )
+                {
                     categoryDTO.SubCategories.Add( new CategorySub_DTO {
                         CategoryId = cs.CategoryId,
                         PrimaryCategoryId = cs.PrimaryCategoryId
                     } );
                 }
-                categoriesDto.Categories.Add( categoryDTO );
+                
+                dto.CategoriesById.Add( categoryDTO.Id, categoryDTO );
+                dto.CategoryIdsByName.Add( categoryDTO.Name, categoryDTO.Id );
             }
         } );
 
-        return new ServiceResponse<Categories_DTO?>( categoriesDto, true, "Successfully retrieved category Dto's from repository." );
-    }
-    public async Task<ServiceResponse<int>> CategoryIdFromUrl( string categoryUrl )
-    {
-        return new ServiceResponse<int>( 0, true, "Successfully validated url to category id." );
-    }
-
-    async Task<List<Category>?> TryGetCategories()
-    {
-        List<Category>? categories = await _repository.GetCategories();
-        
-        if ( categories != null ) 
-            return categories;
-        
-        categories = await _repository.GetCategories();
-        
-        if ( categories == null )
-            return null;
-        
-        return categories;
+        return dto;
     }
 }

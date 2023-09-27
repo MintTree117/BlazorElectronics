@@ -20,6 +20,6 @@ public class CategoryService : ICategoryService
     {
         var response = await _http.GetFromJsonAsync<ControllerResponse<Categories_DTO>>( "api/Category/categories" );
         if ( response is { Data: not null } )
-            Categories = response.Data.Categories;
+            Categories = response.Data.CategoriesById.Values.ToList();
     }
 }

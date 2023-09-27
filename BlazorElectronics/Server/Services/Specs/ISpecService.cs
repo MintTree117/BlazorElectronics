@@ -1,14 +1,9 @@
-using System.Collections.Concurrent;
-using BlazorElectronics.Server.Models.Specs;
+using BlazorElectronics.Shared.DataTransferObjects.Specs;
 
 namespace BlazorElectronics.Server.Services.Specs;
 
 public interface ISpecService
 {
-    Task<ServiceResponse<SpecMetaData>> GetSpecMetaData();
-    Task<ServiceResponse<Dictionary<int, List<object>>>> GetSpecLookups();
-
-    // Client Will Request...
-    // - all lookup specs with their values, both for all, and per category, or multiple categories
-    // - all raw specs... but not their values
+    Task<ServiceResponse<Specs_DTO?>> GetSpecsDTO();
+    Task<ServiceResponse<SpecLookups_DTO?>> GetSpecLookupsDTO();
 }

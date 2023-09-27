@@ -4,6 +4,6 @@ namespace BlazorElectronics.Server.Repositories.Specs;
 
 public interface ISpecRepository
 {
-    Task<Dictionary<string, Spec>?> GetSpecs();
-    Task<Dictionary<int, List<object>>?> GetSpecLookups();
+    Task<IEnumerable<Spec>?> GetSpecs();
+    Task<IEnumerable<SpecLookup>?> GetSpecLookups();
 }

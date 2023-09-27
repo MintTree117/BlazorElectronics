@@ -4,6 +4,5 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 
 public interface ICategoryRepository
 {
-    Task<Dictionary<string, Category>?> GetCategories2();
-    Task<List<Category>?> GetCategories();
+    Task<IEnumerable<Category>?> GetCategories();
 }

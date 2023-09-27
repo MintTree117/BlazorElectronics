@@ -2,7 +2,8 @@ using BlazorElectronics.Shared.DataTransferObjects.Categories;
 
 namespace BlazorElectronics.Server.Services.Categories;
 
-public interface ICategoryService
+public interface ICategoryCache
 {
-    Task<ServiceResponse<Categories_DTO?>> GetCategories();
+    Task<Categories_DTO?> Get();
+    Task Set( Categories_DTO dto );
 }
