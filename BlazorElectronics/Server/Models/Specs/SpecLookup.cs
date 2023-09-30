@@ -4,5 +4,6 @@ public sealed class SpecLookup
 {
     public int LookupId { get; set; }
     public int SpecId { get; set; }
-    public object? LookupValue { get; set; }
+    public int ValueId { get; set; }
+    public object? Value { get; set; }
 }

@@ -18,7 +18,7 @@ public class CategoryService : ICategoryService
 
     public async Task GetCategories()
     {
-        var response = await _http.GetFromJsonAsync<ControllerResponse<Categories_DTO>>( "api/Category/categories" );
+        var response = await _http.GetFromJsonAsync<DtoResponse<Categories_DTO>>( "api/Category/categories" );
         if ( response is { Data: not null } )
             Categories = response.Data.CategoriesById.Values.ToList();
     }

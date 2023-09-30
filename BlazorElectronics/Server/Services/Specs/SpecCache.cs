@@ -21,15 +21,15 @@ public sealed class SpecCache : CachedService, ISpecCache
 
     public SpecCache( IDistributedCache cache, ISpecRepository repository ) : base( cache ) { _repository = repository; }
 
-    public async Task<Specs_DTO?> GetSpecs() { return await GetFromCache<Specs_DTO>( CACHE_KEY_SPECS ); }
-    public async Task<SpecLookups_DTO?> GetSpecLookups() { return await GetFromCache<SpecLookups_DTO>( CACHE_KEY_LOOKUP_VALUES ); }
-    public async Task CacheSpecs( Specs_DTO dto )
+    public async Task<CachedSpecDescrs?> GetSpecDescrs() { return await GetFromCache<CachedSpecDescrs>( CACHE_KEY_SPECS ); }
+    public async Task<CachedSpecLookups?> GetSpecLookups() { return await GetFromCache<CachedSpecLookups>( CACHE_KEY_LOOKUP_VALUES ); }
+    public async Task CacheSpecDescrs( CachedSpecDescrs dto )
     {
         await Cache( CACHE_KEY_SPECS, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
             .SetAbsoluteExpiration( TimeSpan.FromDays( 1 ) ) );
     }
-    public async Task CacheSpecLookups( SpecLookups_DTO dto )
+    public async Task CacheSpecLookups( CachedSpecLookups dto )
     {
         await Cache( CACHE_KEY_LOOKUP_VALUES, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )

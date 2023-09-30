@@ -7,7 +7,7 @@ using BlazorElectronics.Server.Models.Products;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
-public sealed class ProductRepository : IProductRepository
+public sealed class ProductRepository : DapperRepository, IProductRepository
 {
     const string PRODUCT_ID_COLUMN = "ProductId";
     const string PRODUCT_NAME_COLUMN = "ProductName";
@@ -32,12 +32,7 @@ public sealed class ProductRepository : IProductRepository
     const string STORED_PROCEDURE_GET_PRODUCTS = "Get_Products";
     const string STORED_PROCEDURE_GET_PRODUCT_DETAILS = "Get_ProductDetails";
 
-    readonly DapperContext _dbContext;
-
-    public ProductRepository( DapperContext dapperContext )
-    {
-        _dbContext = dapperContext;
-    }
+    public ProductRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<string> TEST_GET_QUERY_STRING( ValidatedSearchFilters searchFilters )
     {

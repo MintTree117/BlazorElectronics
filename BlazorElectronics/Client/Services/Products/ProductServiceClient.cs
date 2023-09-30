@@ -29,7 +29,7 @@ public class ProductServiceClient : IProductServiceClient
         //string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
         string url = PRODUCT_SEARCH_URL_BASE + query;
 
-        var result = await _http.GetFromJsonAsync<ControllerResponse<Products_DTO>>( url );
+        var result = await _http.GetFromJsonAsync<DtoResponse<Products_DTO>>( url );
 
         if ( result is { Data: not null } )
         {
@@ -43,7 +43,7 @@ public class ProductServiceClient : IProductServiceClient
         string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
         string url = PRODUCT_SEARCH_URL_BASE + queryString;
         
-        var result = await _http.GetFromJsonAsync<ControllerResponse<Products_DTO>>( url );
+        var result = await _http.GetFromJsonAsync<DtoResponse<Products_DTO>>( url );
 
         if ( result is { Data: not null } ) {
             Products = result.Data.Products;
@@ -55,7 +55,7 @@ public class ProductServiceClient : IProductServiceClient
     {
         string url = PRODUCT_DETAILS_URL_BASE + $"{productId}";
         
-        var result = await _http.GetFromJsonAsync<ControllerResponse<ProductDetails_DTO>>( url );
+        var result = await _http.GetFromJsonAsync<DtoResponse<ProductDetails_DTO>>( url );
 
         if ( result is { Data: not null } )
             ProductDetails = result.Data;

@@ -6,18 +6,13 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Repositories.Categories;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryRepository : DapperRepository, ICategoryRepository
 {
     const string CATEGORY_ID_COLUMN = "CategoryId";
     const string CATEGORY_SUB_ID_COLUMN = "CategorySubId";
     const string STORED_PROCEDURE_GET_CATEGORIES = "Get_Categories";
 
-    readonly DapperContext _dbContext;
-
-    public CategoryRepository( DapperContext dapperContext )
-    {
-        _dbContext = dapperContext;
-    }
+    public CategoryRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<IEnumerable<Category>?> GetCategories()
     {

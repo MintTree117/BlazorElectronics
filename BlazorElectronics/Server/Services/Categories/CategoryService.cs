@@ -1,5 +1,6 @@
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Server.Repositories.Categories;
+using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DataTransferObjects.Categories;
 
 namespace BlazorElectronics.Server.Services.Categories;
@@ -15,22 +16,34 @@ public class CategoryService : ICategoryService
         _repository = repository;
     }
     
-    public async Task<ServiceResponse<Categories_DTO?>> GetCategories()
+    public async Task<DtoResponse<Categories_DTO?>> GetCategories()
     {
         Categories_DTO? dto = await _cache.Get();
 
         if ( dto != null )
-            return new ServiceResponse<Categories_DTO?>( dto, true, "Success. Retrieved Categories_DTO from cache." );
+            return new DtoResponse<Categories_DTO?>( dto, true, "Success. Retrieved Categories_DTO from cache." );
 
         IEnumerable<Category>? models = await _repository.GetCategories();
 
         if ( models == null )
-            return new ServiceResponse<Categories_DTO?>( null, false, "Failed to retrieve Categories_DTO from cache, and Categories from repository!" );
+            return new DtoResponse<Categories_DTO?>( null, false, "Failed to retrieve Categories_DTO from cache, and Categories from repository!" );
 
         dto = await MapModelsToDtos( models );
         await _cache.Set( dto );
         
-        return new ServiceResponse<Categories_DTO?>( dto, true, "Successfully retrieved Categories from repository, mapped to DTO, and cached." );
+        return new DtoResponse<Categories_DTO?>( dto, true, "Successfully retrieved Categories from repository, mapped to DTO, and cached." );
+    }
+    public async Task<DtoResponse<int>> GetCategoryIdFromUrl( string url )
+    {
+        DtoResponse<Categories_DTO?> dtoResponse = await GetCategories();
+
+        if ( !dtoResponse.IsSuccessful() )
+            return new DtoResponse<int>( dtoResponse.Message );
+
+        if ( !dtoResponse.Data!.CategoryIdsByUrl.TryGetValue( url, out int id ) )
+            return new DtoResponse<int>( "Invalid Category Url!" );
+
+        return new DtoResponse<int>( id, true, "Successfully validated category id by url." );
     }
     static async Task<Categories_DTO> MapModelsToDtos( IEnumerable<Category> categories )
     {
@@ -59,7 +72,7 @@ public class CategoryService : ICategoryService
                 }
                 
                 dto.CategoriesById.Add( categoryDTO.Id, categoryDTO );
-                dto.CategoryIdsByName.Add( categoryDTO.Name, categoryDTO.Id );
+                dto.CategoryIdsByUrl.Add( categoryDTO.Name, categoryDTO.Id );
             }
         } );
 

@@ -13,6 +13,6 @@ public sealed class ValidatedSearchFilters
     public int? MinRating { get; set; }
     public int? MaxRating { get; set; }
 
-    public List<ProductSpecFilter> LookupSpecFilters { get; set; } = new();
-    public List<ProductSpecFilter> RawSpecFilters { get; set; } = new();
+    public List<ProductSpecFilter>? LookupSpecFilters { get; set; }
+    public List<ProductSpecFilter>? RawSpecFilters { get; set; }
 }

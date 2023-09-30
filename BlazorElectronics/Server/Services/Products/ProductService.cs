@@ -3,6 +3,8 @@ using BlazorElectronics.Server.Models.Specs;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Specs;
+using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.DataTransferObjects.Categories;
 using BlazorElectronics.Shared.DataTransferObjects.Products;
 using BlazorElectronics.Shared.DataTransferObjects.Specs;
 
@@ -10,85 +12,83 @@ namespace BlazorElectronics.Server.Services.Products;
 
 public class ProductService : IProductService
 {
-    readonly ISpecService _specService;
-    readonly ICategoryService _categoryService;
-    readonly IProductCache _productCache;
+    readonly IProductCache _cache;
     readonly IProductRepository _repository;
+
+    readonly ICategoryService _categoryService;
+    readonly ISpecService _specService;
 
     const int MAX_PRODUCT_LIST_ROWS = 100;
 
-    public ProductService( ICategoryService categoryService, IProductCache productCache, IProductRepository repository, ISpecService specService )
+    public ProductService( IProductCache cache, IProductRepository repository, ICategoryService categoryService, ISpecService specService )
     {
-        _categoryService = categoryService;
-        _productCache = productCache;
+        _cache = cache;
         _repository = repository;
+        _categoryService = categoryService;
         _specService = specService;
     }
     
-    public async Task<ServiceResponse<string>> TestGetQueryString( ProductSearchFilters_DTO filters )
+    public async Task<DtoResponse<string?>> TestGetQueryString( ProductSearchFilters_DTO filters )
     {
         string query = await _repository.TEST_GET_QUERY_STRING( new ValidatedSearchFilters() );
-        return new ServiceResponse<string?>( query, true, "Test query" );
+        return new DtoResponse<string?>( query, true, "Test query" );
     }
-    public async Task<ServiceResponse<Products_DTO?>> GetProducts( ProductSearchFilters_DTO? searchFilters = null )
+    public async Task<DtoResponse<Products_DTO?>> GetProducts( ProductSearchFilters_DTO? searchFilters = null )
     {
-        ServiceResponse<(IEnumerable<Product>?, int)?> getResult;
+        DtoResponse<(IEnumerable<Product>?, int)?> getResult = searchFilters == null
+            ? await GetAllProducts()
+            : await SearchProducts( searchFilters );
 
-        if ( searchFilters == null )
-            getResult = await GetAllProducts();
-        else
-        {
-            ServiceResponse<ValidatedSearchFilters> validatedFilters = await GetValidatedSearchFilters( searchFilters );
-            if ( validatedFilters.Data == null || !validatedFilters.Success )
-                return new ServiceResponse<Products_DTO?>( null, false, validatedFilters.Message );
-            getResult = await SearchProducts( validatedFilters.Data );
-        }
+        if ( !getResult.Success || getResult.Data?.Item1 == null )
+            return new DtoResponse<Products_DTO?>( getResult.Message );
 
-        if ( getResult.Data == null || !getResult.Success )
-            return new ServiceResponse<Products_DTO?>( null, false, getResult.Message );
-
-        Products_DTO productsDto = await MapProductsToDto( getResult.Data.Value.Item1!, getResult.Data.Value.Item2 );
+        Products_DTO productsDto = await MapProductsToDto( getResult.Data.Value.Item1, getResult.Data.Value.Item2 );
         
-        return new ServiceResponse<Products_DTO?>( productsDto, true, "Successfully retrieved product Dto's from repository." );
+        return new DtoResponse<Products_DTO?>( productsDto, true, "Successfully retrieved product Dto's from repository." );
     }
-    public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<DtoResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
-        ProductDetails_DTO? dto = await _productCache.GetProductDetails( productId );
+        ProductDetails_DTO? dto = await _cache.GetProductDetails( productId );
 
         if ( dto != null )
-            return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Success. Retrieved ProductDetails_DTO from cache." );
+            return new DtoResponse<ProductDetails_DTO?>( dto, true, "Success. Retrieved ProductDetails_DTO from cache." );
 
         ProductDetails? model = await _repository.GetProductDetails( productId );
 
         if ( model == null )
-            return new ServiceResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve ProductDetails_DTO from cache, and ProductDetails from repository!" );
+            return new DtoResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve ProductDetails_DTO from cache, and ProductDetails from repository!" );
 
         dto = await MapProductDetailsToDto( model );
-        await _productCache.CacheProductDetails( dto );
+        await _cache.CacheProductDetails( dto );
 
-        return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, mapped to DTO, and cached." );
+        return new DtoResponse<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, mapped to DTO, and cached." );
     }
 
-    async Task<ServiceResponse<(IEnumerable<Product>?, int)?>> GetAllProducts()
+    async Task<DtoResponse<(IEnumerable<Product>?, int)?>> GetAllProducts()
     {
         (IEnumerable<Product>?, int)? result = await _repository.GetAllProducts();
-        bool success = result is { Item1: not null, Item2: > 0 };
-        return result == null
-            ? new ServiceResponse<(IEnumerable<Product>?, int)?>( null, false, "Failed to retrieve products from database!" )
-            : new ServiceResponse<(IEnumerable<Product>?, int)?>( result, true, "Successfully retrieved products from database." );
+        
+        return result is { Item1: not null, Item2: > 0 }
+            ? new DtoResponse<(IEnumerable<Product>?, int)?>( null, false, "Failed to retrieve all Products from repository!" )
+            : new DtoResponse<(IEnumerable<Product>?, int)?>( result, true, "Successfully retrieved all Products from repository." );
     }
-    async Task<ServiceResponse<(IEnumerable<Product>?, int)?>> SearchProducts( ValidatedSearchFilters searchFiltersDTO )
+    async Task<DtoResponse<(IEnumerable<Product>?, int)?>> SearchProducts( ProductSearchFilters_DTO searchFiltersDTO )
     {
-        (IEnumerable<Product>?, int)? result = await _repository.SearchProducts( searchFiltersDTO );
-        bool success = result is { Item1: not null, Item2: > 0 };
-        return success ?
-            new ServiceResponse<(IEnumerable<Product>?, int)?>( null, false, "Failed to retrieve products search from repository!" ) :
-            new ServiceResponse<(IEnumerable<Product>?, int)?>( result!.Value!, true, "Repo Message" );
+        DtoResponse<ValidatedSearchFilters?> validatedFilters = await GetValidatedSearchFilters( searchFiltersDTO );
+
+        if ( !validatedFilters.IsSuccessful() )
+            return new DtoResponse<(IEnumerable<Product>?, int)?>( validatedFilters.Message );
+
+        (IEnumerable<Product>?, int)? result = await _repository.SearchProducts( validatedFilters.Data! );
+
+        return result is { Item1: not null, Item2: > 0 } ?
+            new DtoResponse<(IEnumerable<Product>?, int)?>( null, false, "Failed to retrieve products search from repository!" ) :
+            new DtoResponse<(IEnumerable<Product>?, int)?>( result!.Value!, true, "Successfully retrieved Products from repository." );
     }
-    async Task<ServiceResponse<ValidatedSearchFilters>> GetValidatedSearchFilters( ProductSearchFilters_DTO searchFiltersDTO )
+    async Task<DtoResponse<ValidatedSearchFilters?>> GetValidatedSearchFilters( ProductSearchFilters_DTO searchFiltersDTO )
     {
         var validatedFilters = new ValidatedSearchFilters();
-
+        // BASE
         validatedFilters.Page = Math.Max( searchFiltersDTO.Page, 0 );
         validatedFilters.Rows = Math.Max( searchFiltersDTO.Rows, 0 );
         validatedFilters.Rows = Math.Min( searchFiltersDTO.Rows, MAX_PRODUCT_LIST_ROWS );
@@ -97,29 +97,27 @@ public class ProductService : IProductService
         validatedFilters.MinRating = searchFiltersDTO.MinRating < 0 ? null : Math.Max( searchFiltersDTO.MinRating, 0 );
         validatedFilters.MaxRating = searchFiltersDTO.MaxRating < 0 ? null : Math.Max( searchFiltersDTO.MaxRating, 0 );
         validatedFilters.SearchText = string.IsNullOrEmpty( searchFiltersDTO.SearchText ) ? null : searchFiltersDTO.SearchText;
-
-        if ( !string.IsNullOrEmpty( searchFiltersDTO.Category ) )
-        {
-            ServiceResponse<int> validatedCategory = null;// await _categoryService.CategoryIdFromUrl( searchFiltersDTO.Category );
-            if ( validatedCategory.Success )
-                validatedFilters.Category = validatedCategory.Data;
-        }
-
+        //CATEGORY
+        DtoResponse<int> categoryResult = await ValidateCategoryFilter( searchFiltersDTO.Category );
+        if ( !categoryResult.IsSuccessful() )
+            return new DtoResponse<ValidatedSearchFilters?>( categoryResult.Message );
+        validatedFilters.Category = categoryResult.Data;
+        // NO SPECS
         if ( searchFiltersDTO.SpecFilters == null )
-            return new ServiceResponse<ValidatedSearchFilters>( validatedFilters, true, "Successfully validated the product filters." );
-        
-        Task<ServiceResponse<Specs_DTO?>> specsTask = _specService.GetSpecsDTO();
-        Task<ServiceResponse<SpecLookups_DTO?>> lookupsTask = _specService.GetSpecLookupsDTO();
+            return new DtoResponse<ValidatedSearchFilters?>( validatedFilters, true, "Successfully validated the Product Filters." );
+        // HAS SPECS
+        Task<DtoResponse<CachedSpecDescrs?>> specsTask = null; //_specService.GetSpecsDTO();
+        Task<DtoResponse<SpecValues_DTO?>> lookupsTask = null; //_specService.GetSpecLookupsDTO();
 
         await Task.WhenAll( specsTask, lookupsTask );
 
         if ( specsTask.Result.Data == null || !specsTask.Result.Success )
-            return new ServiceResponse<ValidatedSearchFilters>( null, false, specsTask.Result.Message );
+            return new DtoResponse<ValidatedSearchFilters?>( null, false, specsTask.Result.Message );
         if ( lookupsTask.Result.Data == null || !lookupsTask.Result.Success )
-            return new ServiceResponse<ValidatedSearchFilters>( null, false, lookupsTask.Result.Message );
+            return new DtoResponse<ValidatedSearchFilters?>( null, false, lookupsTask.Result.Message );
 
-        Specs_DTO? specs = specsTask.Result.Data;
-        SpecLookups_DTO? lookups = lookupsTask.Result.Data;
+        CachedSpecDescrs? specs = specsTask.Result.Data;
+        SpecValues_DTO? lookups = lookupsTask.Result.Data;
 
         await Task.Run( () =>
         {
@@ -135,9 +133,14 @@ public class ProductService : IProductService
                     continue;
                 if ( validatedFilters.Category != null && !spec.SpecCategoryIds.Contains( validatedFilters.Category.Value ) )
                     continue;
-                if ( !Enum.IsDefined( typeof( SpecType ), specFilterDTO.SpecType ) )
-                    continue;
-                if ( !Enum.IsDefined( typeof( SpecFilterType ), specFilterDTO.FilterType ) )
+                //if ( !Enum.IsDefined( typeof( SpecFilterType ), specFilterDTO.FilterType ) )
+                    //continue;
+                /*
+                var specType = ( SpecType ) specs.SpecsById[ specId ].SpecType;
+                
+                if (specType == SpecType.Lookup && !ValidateSpecLookup( specId,  ) )
+                
+                if ( specFilterDTO.SpecType == ( int ) SpecType.Lookup && !ValidateSpecLookup( specId, specFilterDTO, lookups ) )
                     continue;
                 if ( !ValidateSpecLookup( specId, specFilterDTO, lookups ) )
                     continue;
@@ -147,13 +150,28 @@ public class ProductService : IProductService
                     DataType = ( SpecDataType ) specFilterDTO.DataType,
                     FilterType = ( SpecFilterType ) specFilterDTO.FilterType,
                     SpecType = ( SpecType ) specFilterDTO.SpecType
-                } );
+                } );*/
             }
         } );
 
-        return new ServiceResponse<ValidatedSearchFilters>( validatedFilters, true, "Successfully validated the product filters." );
+        return new DtoResponse<ValidatedSearchFilters?>( validatedFilters, true, "Successfully validated the product filters." );
     }
-    
+
+    async Task<DtoResponse<int>> ValidateCategoryFilter( string? categoryUrl )
+    {
+        if ( categoryUrl == null )
+            return new DtoResponse<int>( -1, true, "Successfully validated CategoryFilter." );
+        
+        DtoResponse<Categories_DTO?> categories = await _categoryService.GetCategories();
+
+        if ( !categories.IsSuccessful() )
+            return new DtoResponse<int>( categories.Message );
+
+        return !categories.Data!.CategoryIdsByUrl.TryGetValue( categoryUrl, out int categoryId ) 
+            ? new DtoResponse<int>( "Invalid Category!" ) 
+            : new DtoResponse<int>( categoryId, true, "Successfully validated CategoryFilter." );
+    }
+
     static ProductDetails_DTO GetProductDetailsDTO( ProductDetails productDetails )
     {
         var DTO = new ProductDetails_DTO {
@@ -188,12 +206,38 @@ public class ProductService : IProductService
 
         return DTO;
     }
-    static bool ValidateSpecLookup( int specId, ProductSpecFilter_DTO specFilterDTO, SpecLookups_DTO specLookup )
+    static bool ValidateSpecLookup( int specId, ProductSpecFilter_DTO specFilterDTO, Dictionary<int, Dictionary<int, object>> specValueLookup )
     {
-        if ( specFilterDTO.SpecType != ( int ) SpecType.Lookup )
+        return false;
+        /*if ( specFilterDTO.SpecType != ( int ) SpecType.Lookup )
             return true;
-        return specLookup.LookupValuesBySpecId.TryGetValue( specId, out List<object>? values )
-               && values.Any( o => specFilterDTO.SpecValue == o );
+        
+        if (specValueLookup.TryGetValue( specFilterDTO. ))
+        
+        return specValueLookup.StaticValuesBySpecId.TryGetValue( specId, out Dictionary<int, object>? values )
+               && values.Any( o => specFilterDTO.SpecValue == o );*/
+
+        return false;
+    }
+    static bool ValidateSpecFilterValue( Spec_DTO specDto, int valueId, object value, SpecValues_DTO lookups )
+    {
+        /*if ( specDto.SpecType == ( int ) SpecType.Lookup )
+        {
+            if ( !lookups.LookupValuesBySpecId.TryGetValue( specDto.Id, out Dictionary<int, object>? values ) )
+                return false;
+            if ( !values.TryGetValue( valueId, out object? staticValue ) )
+                return false;
+            return value == staticValue;
+        }
+        else
+        {
+            if ( !lookups.DynamicLimitsBySpecId.TryGetValue( specDto.Id, out Dictionary<int, SpecDynamicValueLimits_DTO>? limits ) )
+                return false;
+            if ( !limits.TryGetValue( valueId, out SpecDynamicValueLimits_DTO? limit ) )
+                return false;
+            return false;
+        }*/
+        return false;
     }
     static async Task<Products_DTO> MapProductsToDto( IEnumerable<Product> models, int count )
     {

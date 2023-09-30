@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DataTransferObjects.Products;
@@ -18,31 +17,22 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet( "searchQuery" )]
-    public async Task<ActionResult<ControllerResponse<Products_DTO>>> GetSearchQuery( [FromQuery] ProductSearchFilters_DTO searchFilters )
+    public async Task<ActionResult<DtoResponse<Products_DTO>>> GetSearchQuery( [FromQuery] ProductSearchFilters_DTO searchFilters )
     {
-        ServiceResponse<string?> r = await _productService.TestGetQueryString( searchFilters );
-        return Ok( r );
+        DtoResponse<string?> response = await _productService.TestGetQueryString( searchFilters );
+        return Ok( response );
     }
+    
     [HttpGet("products")]
-    public async Task<ActionResult<ControllerResponse<Products_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO? searchFilters )
+    public async Task<ActionResult<DtoResponse<Products_DTO>>> GetProducts( [FromQuery] ProductSearchFilters_DTO? searchFilters )
     {
-        ServiceResponse<Products_DTO?> response = await _productService.GetProducts( searchFilters );
-
-        if ( response == null )
-            return new ActionResult<ControllerResponse<Products_DTO>>(
-                new ControllerResponse<Products_DTO>( null, false, "Service response is null!" ) );
-        
-        return Ok( new ControllerResponse<Products_DTO>( response.Data, response.Success, response.Message ) );
+        DtoResponse<Products_DTO?> response = await _productService.GetProducts( searchFilters );
+        return Ok( response );
     }
     [HttpGet("product_details/{productId:int}")]
-    public async Task<ActionResult<ControllerResponse<ProductDetails_DTO>>> GetProductDetails( int productId )
+    public async Task<ActionResult<DtoResponse<ProductDetails_DTO>>> GetProductDetails( int productId )
     {
-        ServiceResponse<ProductDetails_DTO?>? response = await _productService.GetProductDetails( productId );
-
-        if ( response == null )
-            return new ActionResult<ControllerResponse<ProductDetails_DTO>>(
-                new ControllerResponse<ProductDetails_DTO>( null, false, "Service response is null!" ) );
-
-        return Ok( new ControllerResponse<ProductDetails_DTO>( response.Data, response.Success, response.Message ) );
+        DtoResponse<ProductDetails_DTO?> response = await _productService.GetProductDetails( productId );
+        return Ok( response );
     }
 }

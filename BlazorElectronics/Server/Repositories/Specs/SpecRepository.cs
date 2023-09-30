@@ -6,70 +6,43 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Repositories.Specs;
 
-public class SpecRepository : ISpecRepository
+public class SpecRepository : DapperRepository, ISpecRepository
 {
     const string STORED_PROCEDURE_GET_SPECS = "GetSpecs";
     const string STORED_PROCEDURE_GET_SPEC_LOOKUPS = "GetSpecLookups";
 
     const string COLUMN_NAME_SPEC_ID = "SpecId";
     const string COLUMN_NAME_SPEC_CATEGORY_ID = "SpecCategoryId";
-    
-    readonly DapperContext _dbContext;
 
-    public SpecRepository( DapperContext dapperContext ) { _dbContext = dapperContext; }
+    public SpecRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public async Task<IEnumerable<Spec>?> GetSpecs()
+    public async Task<IEnumerable<SpecDescr>?> GetSpecDescrs()
     {
-        await using SqlConnection connection = _dbContext.CreateConnection();
-        await connection.OpenAsync();
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
 
-        var specDictionary = new Dictionary<int, Spec>();
+        var specDictionary = new Dictionary<int, SpecDescr>();
+        const string splitOnColumns = $"{COLUMN_NAME_SPEC_ID},{COLUMN_NAME_SPEC_CATEGORY_ID}";
 
-        IEnumerable<Spec>? specs = await connection.QueryAsync<Spec, SpecCategory, SpecFilter, Spec>
-        ( STORED_PROCEDURE_GET_SPECS, ( spec, category, filter ) =>
+        IEnumerable<SpecDescr>? specs = await connection.QueryAsync<SpecDescr, SpecCategory, SpecDescr>
+        ( STORED_PROCEDURE_GET_SPECS, ( spec, category ) =>
             {
-                if ( !specDictionary.TryGetValue( spec.SpecId, out Spec? specEntry ) )
+                if ( !specDictionary.TryGetValue( spec.SpecId, out SpecDescr? specEntry ) )
                 {
                     specEntry = spec;
                     specDictionary.Add( specEntry.SpecId, specEntry );
                 }
                 if ( category != null && !specEntry.SpecCategories.Contains( category ) )
                     specEntry.SpecCategories.Add( category );
-                if ( filter != null && !specEntry.SpecFilters.Contains( filter ) )
-                    specEntry.SpecFilters.Add( filter );
                 return specEntry;
             },
-            splitOn: $"{COLUMN_NAME_SPEC_ID},{COLUMN_NAME_SPEC_CATEGORY_ID}",
+            splitOn: splitOnColumns,
             commandType: CommandType.StoredProcedure );
 
         return specs;
     }
     public async Task<IEnumerable<SpecLookup>?> GetSpecLookups()
     {
-        await using SqlConnection connection = _dbContext.CreateConnection();
-        await connection.OpenAsync();
-        return await connection.QueryAsync<SpecLookup>(
-            STORED_PROCEDURE_GET_SPEC_LOOKUPS, CommandType.StoredProcedure );
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+        return await connection.QueryAsync<SpecLookup>( STORED_PROCEDURE_GET_SPEC_LOOKUPS, commandType: CommandType.StoredProcedure );
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
