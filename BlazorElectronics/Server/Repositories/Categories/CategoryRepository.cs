@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Repositories.Categories;
 
-public class CategoryRepository : DapperRepository, ICategoryRepository
+public class CategoryRepository : DapperRepository<Category>, ICategoryRepository
 {
     const string CATEGORY_ID_COLUMN = "CategoryId";
     const string CATEGORY_SUB_ID_COLUMN = "CategorySubId";
@@ -14,11 +14,10 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
 
     public CategoryRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public async Task<IEnumerable<Category>?> GetCategories()
+    public override async Task<IEnumerable<Category>> GetAll()
     {
-        await using SqlConnection connection = _dbContext.CreateConnection();
-        await connection.OpenAsync();
-        
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+
         var categoryDictionary = new Dictionary<int, Category>();
 
         IEnumerable<Category>? categories = await connection.QueryAsync<Category, CategorySub, Category>
@@ -39,4 +38,5 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
 
         return categories;
     }
+    public override Task<Category> GetById( int id ) { throw new NotImplementedException(); }
 }

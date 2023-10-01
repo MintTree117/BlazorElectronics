@@ -6,17 +6,16 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Repositories.Specs;
 
-public class SpecRepository : DapperRepository, ISpecRepository
+public class SpecDescrRepository : DapperRepository<SpecDescr>, ISpecDescrRepository
 {
     const string STORED_PROCEDURE_GET_SPECS = "GetSpecs";
-    const string STORED_PROCEDURE_GET_SPEC_LOOKUPS = "GetSpecLookups";
 
     const string COLUMN_NAME_SPEC_ID = "SpecId";
     const string COLUMN_NAME_SPEC_CATEGORY_ID = "SpecCategoryId";
 
-    public SpecRepository( DapperContext dapperContext ) : base( dapperContext ) { }
+    public SpecDescrRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public async Task<IEnumerable<SpecDescr>?> GetSpecDescrs()
+    public override async Task<IEnumerable<SpecDescr>> GetAll()
     {
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
 
@@ -40,9 +39,5 @@ public class SpecRepository : DapperRepository, ISpecRepository
 
         return specs;
     }
-    public async Task<IEnumerable<SpecLookup>?> GetSpecLookups()
-    {
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
-        return await connection.QueryAsync<SpecLookup>( STORED_PROCEDURE_GET_SPEC_LOOKUPS, commandType: CommandType.StoredProcedure );
-    }
+    public override Task<SpecDescr> GetById( int id ) { throw new NotImplementedException(); }
 }

@@ -23,7 +23,7 @@ builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddScoped<ISpecRepository, SpecRepository>();
+builder.Services.AddScoped<ISpecDescrRepository, SpecDescrRepository>();
 builder.Services.AddSingleton<ISpecCache, SpecCache>();
 builder.Services.AddScoped<ISpecService, SpecService>();
 

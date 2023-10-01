@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace BlazorElectronics.Server.Services;
 
-public abstract class CachedService
+public abstract class CachedService 
 {
     readonly IDistributedCache MemoryCache;
 

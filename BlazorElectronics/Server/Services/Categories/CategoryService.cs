@@ -23,7 +23,7 @@ public class CategoryService : ICategoryService
         if ( dto != null )
             return new DtoResponse<Categories_DTO?>( dto, true, "Success. Retrieved Categories_DTO from cache." );
 
-        IEnumerable<Category>? models = await _repository.GetCategories();
+        IEnumerable<Category>? models = await _repository.GetAll();
 
         if ( models == null )
             return new DtoResponse<Categories_DTO?>( null, false, "Failed to retrieve Categories_DTO from cache, and Categories from repository!" );

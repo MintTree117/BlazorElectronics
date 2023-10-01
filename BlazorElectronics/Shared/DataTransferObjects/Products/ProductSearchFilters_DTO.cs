@@ -6,7 +6,6 @@ public sealed class ProductSearchFilters_DTO
     public int Rows { get; set; } = 1;
 
     public string? SearchText { get; set; }
-    public string? Category { get; set; }
 
     public int MinPrice { get; set; } = -1;
     public int MaxPrice { get; set; } = -1;

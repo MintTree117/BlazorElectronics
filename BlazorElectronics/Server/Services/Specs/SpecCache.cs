@@ -17,9 +17,9 @@ public sealed class SpecCache : CachedService, ISpecCache
         .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
         .SetAbsoluteExpiration( TimeSpan.FromHours( 5.0 ) );
 
-    ISpecRepository _repository;
+    ISpecDescrRepository _descrRepository;
 
-    public SpecCache( IDistributedCache cache, ISpecRepository repository ) : base( cache ) { _repository = repository; }
+    public SpecCache( IDistributedCache cache, ISpecDescrRepository descrRepository ) : base( cache ) { _descrRepository = descrRepository; }
 
     public async Task<CachedSpecDescrs?> GetSpecDescrs() { return await GetFromCache<CachedSpecDescrs>( CACHE_KEY_SPECS ); }
     public async Task<CachedSpecLookups?> GetSpecLookups() { return await GetFromCache<CachedSpecLookups>( CACHE_KEY_LOOKUP_VALUES ); }

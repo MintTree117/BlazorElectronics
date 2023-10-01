@@ -9,14 +9,16 @@ namespace BlazorElectronics.Server.Services.Specs;
 public class SpecService : ISpecService
 {
     readonly ISpecCache _cache;
-    readonly ISpecRepository _repository;
+    readonly ISpecDescrRepository _descrRepository;
+    readonly ISpecLookupRepository _lookupRepository;
     readonly ICategoryService _categoryService;
 
-    public SpecService( ISpecCache cache, ISpecRepository repository, ICategoryService categoryService )
+    public SpecService( ISpecCache cache, ISpecLookupRepository lookupRepository, ISpecDescrRepository descrRepository, ICategoryService categoryService )
     {
         _cache = cache;
-        _repository = repository;
+        _descrRepository = descrRepository;
         _categoryService = categoryService;
+        _lookupRepository = lookupRepository;
     }
 
     public async Task<DtoResponse<SpecFilters_DTO>> GetSpecFilters( string categoryUrl )
@@ -68,7 +70,7 @@ public class SpecService : ISpecService
         if ( cachedItems != null )
             return cachedItems;
 
-        IEnumerable<SpecDescr>? models = await _repository.GetSpecDescrs();
+        IEnumerable<SpecDescr>? models = await _descrRepository.GetAll();
 
         if ( models == null )
             return null;
@@ -85,7 +87,7 @@ public class SpecService : ISpecService
         if ( cachedItems != null )
             return cachedItems;
 
-        IEnumerable<SpecLookup>? models = await _repository.GetSpecLookups();
+        IEnumerable<SpecLookup>? models = await _lookupRepository.GetAll();
 
         if ( models == null )
             return null;
