@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "1o6iHdsNdwYqIvjLv3EBErYrO8K9LV0OBQK0z77oLJU=",
+  "Hash": "t5yo3I/eG6MfhcZSItv3OiAzc6AmhlfzIh25BPQbcXc=",
   "Source": "BlazorElectronics.Server",
   "BasePath": "_content/BlazorElectronics.Server",
   "Mode": "Default",
@@ -7254,12 +7254,12 @@
       "OriginalItemSpec": "wwwroot/icon-192.png"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/test.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/default.jpg",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Project",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/test.jpg",
+      "RelativePath": "Images/default.jpg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -7268,7 +7268,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/test.jpg"
+      "OriginalItemSpec": "wwwroot/Images/default.jpg"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/index.html",

@@ -1,14 +1,15 @@
 @using BlazorElectronics.Shared.DataTransferObjects.Products
 @using BlazorElectronics.Client.Services.Products
+@using BlazorElectronics.Shared
 @inject IProductServiceClient ProductServiceClient;
 @implements IDisposable;
 
-@if ( ProductServiceClient.Products is not { Count: > 0 } ) {
+@if ( _productSearch == null ) {
     <span>Loading Products...</span>
 }
 else {
     <ul class="list-unstyled">
-        @foreach ( Product_DTO product in ProductServiceClient.Products ) {
+        @foreach ( Product_DTO product in _productSearch.Products ) {
             <li class="pl-item my-3">
                 <div class="pl-item-img-wrapper mr-2">
                     <a href="/Product/@product.Id">
@@ -26,6 +27,20 @@ else {
 }
 
 @code {
-    protected override void OnInitialized() { ProductServiceClient.ProductsChanged += StateHasChanged; }
-    public void Dispose() { ProductServiceClient.ProductsChanged -= StateHasChanged; }
+    ProductSearch_DTO? _productSearch;
+    
+    protected override void OnInitialized()
+    {
+        ProductServiceClient.ProductSearchChanged += OnProductsChange;
+    }
+    public void Dispose()
+    {
+        ProductServiceClient.ProductSearchChanged -= OnProductsChange;
+    }
+
+    void OnProductsChange( ServiceResponse<ProductSearch_DTO?> productSearch  )
+    {
+        _productSearch = productSearch.Data;
+        StateHasChanged();
+    }
 }

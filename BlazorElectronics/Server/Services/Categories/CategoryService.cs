@@ -15,67 +15,91 @@ public class CategoryService : ICategoryService
         _cache = cache;
         _repository = repository;
     }
-    
-    public async Task<DtoResponse<Categories_DTO?>> GetCategories()
-    {
-        Categories_DTO? dto = await _cache.Get();
 
-        if ( dto != null )
-            return new DtoResponse<Categories_DTO?>( dto, true, "Success. Retrieved Categories_DTO from cache." );
+    public async Task<ServiceResponse<Categories_DTO?>> GetCategoriesDto()
+    {
+        ServiceResponse<CategoryMeta?> meta = await GetCategoryMeta();
+
+        if ( meta.Data == null )
+            return new ServiceResponse<Categories_DTO?>( meta.Message );
+
+        Categories_DTO dto = await MapMetaToDto( meta.Data );
+
+        return new ServiceResponse<Categories_DTO?>( dto, true, "Successfully got categories dto." );
+    }
+    public async Task<ServiceResponse<int>> GetCategoryIdFromUrl( string url )
+    {
+        ServiceResponse<CategoryMeta?> serviceResponse = await GetCategoryMeta();
+
+        if ( serviceResponse.Data == null || !serviceResponse.IsSuccessful() )
+            return new ServiceResponse<int>( serviceResponse.Message );
+
+        return !serviceResponse.Data.CategoryIdsByUrl.TryGetValue( url, out int id ) 
+            ? new ServiceResponse<int>( "Invalid Category Url!" ) 
+            : new ServiceResponse<int>( id, true, "Successfully validated category id by url." );
+    }
+
+    async Task<ServiceResponse<CategoryMeta?>> GetCategoryMeta()
+    {
+        CategoryMeta? meta = await _cache.Get();
+
+        if ( meta != null )
+            return new ServiceResponse<CategoryMeta?>( meta, true, "Success. Retrieved Category Meta from cache." );
 
         IEnumerable<Category>? models = await _repository.GetAll();
 
         if ( models == null )
-            return new DtoResponse<Categories_DTO?>( null, false, "Failed to retrieve Categories_DTO from cache, and Categories from repository!" );
+            return new ServiceResponse<CategoryMeta?>( null, false, "Failed to retrieve Category Meta from cache, and Categories from repository!" );
 
-        dto = await MapModelsToDtos( models );
-        await _cache.Set( dto );
-        
-        return new DtoResponse<Categories_DTO?>( dto, true, "Successfully retrieved Categories from repository, mapped to DTO, and cached." );
+        meta = await MapModelsToMeta( models );
+        await _cache.Set( meta );
+
+        return new ServiceResponse<CategoryMeta?>( meta, true, "Successfully retrieved Category Meta from repository, mapped to DTO, and cached." );
     }
-    public async Task<DtoResponse<int>> GetCategoryIdFromUrl( string url )
+    static async Task<CategoryMeta> MapModelsToMeta( IEnumerable<Category> categories )
     {
-        DtoResponse<Categories_DTO?> dtoResponse = await GetCategories();
-
-        if ( !dtoResponse.IsSuccessful() )
-            return new DtoResponse<int>( dtoResponse.Message );
-
-        if ( !dtoResponse.Data!.CategoryIdsByUrl.TryGetValue( url, out int id ) )
-            return new DtoResponse<int>( "Invalid Category Url!" );
-
-        return new DtoResponse<int>( id, true, "Successfully validated category id by url." );
-    }
-    static async Task<Categories_DTO> MapModelsToDtos( IEnumerable<Category> categories )
-    {
-        var dto = new Categories_DTO();
+        var meta = new CategoryMeta();
 
         await Task.Run( () =>
         {
             foreach ( Category c in categories )
             {
-                if ( dto.CategoriesById.ContainsKey( c.CategoryId ) )
+                if ( meta.CategoriesById.ContainsKey( c.CategoryId ) )
                     continue;
-                
+
+                if ( string.IsNullOrEmpty( c.CategoryName ) || string.IsNullOrEmpty( c.CategoryUrl ) )
+                    continue;
+
                 var categoryDTO = new Category_DTO {
                     Id = c.CategoryId,
-                    Name = c.CategoryName ?? string.Empty,
-                    Url = c.CategoryUrl ?? string.Empty,
+                    Name = c.CategoryName,
+                    Url = c.CategoryUrl,
                     ImageUrl = c.CategoryImageUrl ?? string.Empty,
-                    IsPrimary = c.IsPrimaryCategory
                 };
+
                 foreach ( CategorySub cs in c.SubCategories )
-                {
-                    categoryDTO.SubCategories.Add( new CategorySub_DTO {
-                        CategoryId = cs.CategoryId,
-                        PrimaryCategoryId = cs.PrimaryCategoryId
-                    } );
-                }
-                
-                dto.CategoriesById.Add( categoryDTO.Id, categoryDTO );
-                dto.CategoryIdsByUrl.Add( categoryDTO.Name, categoryDTO.Id );
+                    categoryDTO.SubCategoryIds.Add( cs.CategoryId );
+
+                meta.CategoriesById.Add( categoryDTO.Id, categoryDTO );
+                meta.CategoryIdsByUrl.Add( categoryDTO.Url, categoryDTO.Id );
+
+                if ( c.IsPrimaryCategory )
+                    meta.PrimaryCategoryIds.Add( c.CategoryId );
             }
         } );
 
+        return meta;
+    }
+    static async Task<Categories_DTO> MapMetaToDto( CategoryMeta meta )
+    {
+        var dto = new Categories_DTO();
+
+        await Task.Run( () =>
+        {
+            dto.CategoriesById = meta.CategoriesById;
+            dto.PrimaryCategoryIds = meta.PrimaryCategoryIds;
+        } );
+        
         return dto;
     }
 }

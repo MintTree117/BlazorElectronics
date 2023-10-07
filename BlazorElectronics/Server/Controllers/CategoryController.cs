@@ -17,9 +17,9 @@ public class CategoryController : ControllerBase
     }
     
     [HttpGet("categories")]
-    public async Task<ActionResult<DtoResponse<Categories_DTO>>> GetCategories()
+    public async Task<ActionResult<ServiceResponse<Categories_DTO>>> GetCategories()
     {
-        DtoResponse<Categories_DTO?> response = await _categoryService.GetCategories();
+        ServiceResponse<Categories_DTO?> response = await _categoryService.GetCategoriesDto();
         return Ok( response );
     }
 }

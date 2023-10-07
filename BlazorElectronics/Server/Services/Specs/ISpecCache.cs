@@ -4,9 +4,9 @@ namespace BlazorElectronics.Server.Services.Specs;
 
 public interface ISpecCache
 {
-    Task<CachedSpecDescrs?> GetSpecDescrs();
-    Task<CachedSpecLookups?> GetSpecLookups();
+    Task<CachedSpecDescrs?> GetSpecDescrs( int categoryId );
+    Task<CachedSpecLookups?> GetSpecLookups( int categoryId );
 
-    Task CacheSpecDescrs( CachedSpecDescrs dto );
-    Task CacheSpecLookups( CachedSpecLookups dto );
+    Task CacheSpecDescrs( CachedSpecDescrs dto, int categoryId );
+    Task CacheSpecLookups( CachedSpecLookups dto, int categoryId );
 }

@@ -1,13 +1,17 @@
 namespace BlazorElectronics.Shared;
 
-public sealed class DtoResponse<T>
+public sealed class ServiceResponse<T>
 {
-    public DtoResponse( string? message )
+    public ServiceResponse()
+    {
+        
+    }
+    public ServiceResponse( string? message )
     {
         Success = false;
         Message = message ?? DtoUtility.GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
-    public DtoResponse( DtoResponse<T> response )
+    public ServiceResponse( ServiceResponse<T> response )
     {
         Data = response.Data;
         
@@ -19,19 +23,19 @@ public sealed class DtoResponse<T>
         if ( string.IsNullOrEmpty( Message ) )
             Message = Success ? DtoUtility.GetDefaultMessage( DtoDefaultMessage.SUCCESS ) : DtoUtility.GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
-    public DtoResponse( T? data, bool success, string message )
+    public ServiceResponse( T? data, bool success, string message )
     {
         Data = data;
         Success = success;
         Message = message;
     }
-    public DtoResponse( T? data, bool success, DtoDefaultMessage defaultMessage )
+    public ServiceResponse( T? data, bool success, DtoDefaultMessage defaultMessage )
     {
         Data = data;
         Success = success;
         Message = DtoUtility.GetDefaultMessage( defaultMessage );
     }
-    public DtoResponse( T? data, bool success, string? recievedMessage, DtoDefaultMessage defaultMessage )
+    public ServiceResponse( T? data, bool success, string? recievedMessage, DtoDefaultMessage defaultMessage )
     {
         Data = data;
         Success = success;

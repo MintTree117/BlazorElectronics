@@ -5,6 +5,6 @@ namespace BlazorElectronics.Server.Services.Categories;
 
 public interface ICategoryService
 {
-    Task<DtoResponse<Categories_DTO?>> GetCategories();
-    Task<DtoResponse<int>> GetCategoryIdFromUrl( string url );
+    Task<ServiceResponse<Categories_DTO?>> GetCategoriesDto();
+    Task<ServiceResponse<int>> GetCategoryIdFromUrl( string url );
 }

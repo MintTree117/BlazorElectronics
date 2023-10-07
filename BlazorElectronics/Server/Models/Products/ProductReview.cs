@@ -5,7 +5,6 @@ public sealed class ProductReview
     public int ReviewId { get; set; }
     public int ProductId { get; set; }
     public int UserId { get; set; }
-    
     public int ReviewScore { get; set; }
     public string ReviewBody { get; set; } = string.Empty;
 }

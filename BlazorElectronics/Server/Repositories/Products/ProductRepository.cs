@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
+using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
@@ -33,7 +34,7 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
 
     public ProductRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public override async Task<IEnumerable<Product>> GetAll()
+    public override async Task<IEnumerable<Product>?> GetAll()
     {
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
         
@@ -54,7 +55,7 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
             splitOn: PRODUCT_ID_COLUMN,
             commandType: CommandType.StoredProcedure );
     }
-    public override Task<Product> GetById( int id ) { throw new NotImplementedException(); }
+    public override Task<Product?> GetById( int id ) { throw new NotImplementedException(); }
     public async Task<string> TEST_GET_QUERY_STRING( int categoryId, ValidatedSearchFilters searchFilters )
     {
         var productQuery = new StringBuilder();
@@ -63,15 +64,14 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
         await BuildProductSearchQuery( categoryId, searchFilters, productQuery, countQuery );
         return productQuery.ToString();
     }
-    public async Task<(IEnumerable<Product>?, int)?> SearchProducts( int categoryId, ValidatedSearchFilters searchFilters )
+    public async Task<ProductSearch?> SearchProducts( int categoryId, ValidatedSearchFilters searchFilters )
     {
         var productQuery = new StringBuilder();
         var countQuery = new StringBuilder();
 
         DynamicParameters dynamicParams = await BuildProductSearchQuery( categoryId, searchFilters, productQuery, countQuery );
 
-        await using SqlConnection connection = _dbContext.CreateConnection();
-        await connection.OpenAsync();
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
 
         Task<IEnumerable<Product>?> productTask = ExecuteSearchProducts( connection, productQuery.ToString(), dynamicParams );
         Task<int> countTask = CountProducts( connection, countQuery.ToString(), dynamicParams );
@@ -81,7 +81,10 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
         if ( productTask.Result == null || countTask.Result < 0 )
             return null;
 
-        return ( productTask.Result, countTask.Result );
+        return new ProductSearch {
+            Products = productTask.Result,
+            Count = countTask.Result
+        };
     }
 
     async Task<DynamicParameters> BuildProductSearchQuery( int categoryId, ValidatedSearchFilters filters, StringBuilder productQuery, StringBuilder countQuery )
@@ -96,12 +99,15 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
             // SHARED
             var sharedSQL = new StringBuilder();
             sharedSQL.Append( $" FROM {PRODUCTS_TABLE} p" );
+            sharedSQL.Append( $" LEFT JOIN {PRODUCT_CATEGORIES_TABLE} pc" );
+            sharedSQL.Append( $" ON p.{PRODUCT_ID_COLUMN} = pc.{PRODUCT_ID_COLUMN}" );
             sharedSQL.Append( $" LEFT JOIN {PRODUCT_VARIANTS_TABLE} pv" );
             sharedSQL.Append( $" ON p.{PRODUCT_ID_COLUMN} = pv.{PRODUCT_ID_COLUMN}" );
             sharedSQL.Append( $" WHERE 1=1" );
 
             // CATEGORY
-            sharedSQL.Append( $@" AND p.{CATEGORY_ID_COLUMN} = @categoryId" );
+            sharedSQL.Append( $@" AND pc.{CATEGORY_ID_COLUMN} = @categoryId" );
+            paramDictionary.Add( "@categoryId", categoryId );
 
             // SEARCH TEXT
             if ( !string.IsNullOrEmpty( filters.SearchText ) ) {

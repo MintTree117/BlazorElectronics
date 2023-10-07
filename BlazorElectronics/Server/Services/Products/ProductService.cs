@@ -1,5 +1,4 @@
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Server.Models.Specs;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Specs;
@@ -29,70 +28,72 @@ public class ProductService : IProductService
         _productDetailsRepository = productDetailsRepository;
     }
     
-    public async Task<DtoResponse<string?>> TestGetQueryString( string categoryUrl, ProductSearchFilters_DTO filters )
+    public async Task<ServiceResponse<string?>> TestGetQueryString( string categoryUrl, ProductSearchFilters_DTO filters )
     {
-        DtoResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( categoryUrl );
+        ServiceResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( categoryUrl );
+        
         if ( !categoryResult.IsSuccessful() )
-            return new DtoResponse<string?>( categoryResult.Message );
+            return new ServiceResponse<string?>( categoryResult.Message );
 
         int categoryId = categoryResult.Data;
         
         string query = await _productRepository.TEST_GET_QUERY_STRING( categoryId, new ValidatedSearchFilters() );
-        return new DtoResponse<string?>( query, true, "Test query" );
+        return new ServiceResponse<string?>( query, true, "Test query" );
     }
-    public async Task<DtoResponse<Products_DTO?>> GetProducts()
+    public async Task<ServiceResponse<Products_DTO?>> GetProducts()
     {
         IEnumerable<Product> models = await _productRepository.GetAll();
-
+        
         if ( models == null )
-            return new DtoResponse<Products_DTO?>( "Failed to retrieve Products from repository!" );
-
+            return new ServiceResponse<Products_DTO?>( "Failed to retrieve Products from repository!" );
+        
         Products_DTO productsDto = await MapProductsToDto( models );
         
-        return new DtoResponse<Products_DTO?>( productsDto, true, "Successfully retrieved product Dto's from repository." );
+        return new ServiceResponse<Products_DTO?>( productsDto, true, "Successfully retrieved product Dto's from repository." );
     }
-    public async Task<DtoResponse<ProductSearch_DTO?>> SearchProducts( string categoryUrl, ProductSearchFilters_DTO? searchFiltersDTO )
+    public async Task<ServiceResponse<ProductSearch_DTO?>> SearchProducts( string categoryUrl, ProductSearchFilters_DTO? searchFiltersDTO )
     {
-        DtoResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( categoryUrl );
+        ServiceResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( categoryUrl );
+        
         if ( !categoryResult.IsSuccessful() )
-            return new DtoResponse<ProductSearch_DTO?>( categoryResult.Message );
+            return new ServiceResponse<ProductSearch_DTO?>( categoryResult.Message );
 
         int categoryId = categoryResult.Data;
         var filters = new ValidatedSearchFilters();
 
         if ( searchFiltersDTO != null )
-            filters = await GetValidatedSearchFilters( categoryId, searchFiltersDTO );
+            filters = await GetValidatedSearchFilters( categoryId, searchFiltersDTO, _specService );
 
-        (IEnumerable<Product>?, int)? models = await _productRepository.SearchProducts( categoryId, filters );
+        ProductSearch? model = await _productRepository.SearchProducts( categoryId, filters );
 
-        if ( models?.Item1 == null || models.Value.Item2 < 0 )
-            return new DtoResponse<ProductSearch_DTO?>( null, false, "Failed to retrieve ProductSearch from repository!" );
+        if ( model == null )
+            return new ServiceResponse<ProductSearch_DTO?>( null, false, "Failed to retrieve ProductSearch from repository!" );
 
-        ProductSearch_DTO? dto = await MapProductSearchToDto( models );
-
-        return new DtoResponse<ProductSearch_DTO?>( dto, true, "Successfully retrieved ProductSearch from repository." );
+        ProductSearch_DTO? dto = await MapProductSearchToDto( model );
+        return new ServiceResponse<ProductSearch_DTO?>( dto, true, "Successfully retrieved ProductSearch from repository." );
     }
-    public async Task<DtoResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
         ProductDetails_DTO? dto = await _cache.GetProductDetails( productId );
 
         if ( dto != null )
-            return new DtoResponse<ProductDetails_DTO?>( dto, true, "Success. Retrieved ProductDetails_DTO from cache." );
+            return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Success. Retrieved ProductDetails_DTO from cache." );
 
         ProductDetails? model = await _productDetailsRepository.GetById( productId );
 
         if ( model == null )
-            return new DtoResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve ProductDetails_DTO from cache, and ProductDetails from repository!" );
+            return new ServiceResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve ProductDetails_DTO from cache, and ProductDetails from repository!" );
 
         dto = await MapProductDetailsToDto( model );
         await _cache.CacheProductDetails( dto );
 
-        return new DtoResponse<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, mapped to DTO, and cached." );
+        return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, mapped to DTO, and cached." );
     }
-    
-    async Task<ValidatedSearchFilters> GetValidatedSearchFilters( int categoryId, ProductSearchFilters_DTO searchFiltersDTO )
+
+    static async Task<ValidatedSearchFilters> GetValidatedSearchFilters( int categoryId, ProductSearchFilters_DTO searchFiltersDTO, ISpecService specService )
     {
         var validatedFilters = new ValidatedSearchFilters();
+        
         // BASE
         validatedFilters.Page = Math.Max( searchFiltersDTO.Page, 0 );
         validatedFilters.Rows = Math.Max( searchFiltersDTO.Rows, 0 );
@@ -102,23 +103,18 @@ public class ProductService : IProductService
         validatedFilters.MinRating = searchFiltersDTO.MinRating < 0 ? null : Math.Max( searchFiltersDTO.MinRating, 0 );
         validatedFilters.MaxRating = searchFiltersDTO.MaxRating < 0 ? null : Math.Max( searchFiltersDTO.MaxRating, 0 );
         validatedFilters.SearchText = string.IsNullOrEmpty( searchFiltersDTO.SearchText ) ? null : searchFiltersDTO.SearchText;
+        
         // NO SPECS
         if ( searchFiltersDTO.SpecFilters == null )
             return validatedFilters;
+        
         // HAS SPECS
-        Task<DtoResponse<CachedSpecDescrs?>> specsTask = null; //_specService.GetSpecsDTO();
-        Task<DtoResponse<SpecValues_DTO?>> lookupsTask = null; //_specService.GetSpecLookupsDTO();
-
-        await Task.WhenAll( specsTask, lookupsTask );
-
-        if ( specsTask.Result.Data == null || !specsTask.Result.Success )
-            return validatedFilters;
-        if ( lookupsTask.Result.Data == null || !lookupsTask.Result.Success )
+        ServiceResponse<SpecFilters_DTO> specsTask = await specService.GetSpecFilters( categoryId );
+        if ( !specsTask.Success || specsTask.Data == null )
             return validatedFilters;
 
-        CachedSpecDescrs? specs = specsTask.Result.Data;
-        SpecValues_DTO? lookups = lookupsTask.Result.Data;
-
+        SpecFilters_DTO? filters = specsTask.Data;
+        
         await Task.Run( () =>
         {
             foreach ( ProductSpecFilter_DTO specFilterDTO in searchFiltersDTO.SpecFilters )
@@ -127,136 +123,110 @@ public class ProductService : IProductService
                     continue;
                 if ( specFilterDTO.SpecValue == null )
                     continue;
-                if ( !specs.IdsByName.TryGetValue( specFilterDTO.SpecName, out int specId ) )
+                if ( !filters.IndicesByName.TryGetValue( specFilterDTO.SpecName, out int specIndex ) )
                     continue;
-                if ( !specs.SpecsById.TryGetValue( specId, out Spec_DTO? spec ) || spec == null )
+                if ( specIndex < 0 || specIndex >= filters.Filters.Count )
                     continue;
-                //if ( validatedFilters.Category != null && !spec.SpecCategoryIds.Contains( validatedFilters.Category.Value ) )
-                    //continue;
-                //if ( !Enum.IsDefined( typeof( SpecFilterType ), specFilterDTO.FilterType ) )
-                    //continue;
-                /*
-                var specType = ( SpecType ) specs.SpecsById[ specId ].SpecType;
-                
-                if (specType == SpecType.Lookup && !ValidateSpecLookup( specId,  ) )
-                
-                if ( specFilterDTO.SpecType == ( int ) SpecType.Lookup && !ValidateSpecLookup( specId, specFilterDTO, lookups ) )
-                    continue;
-                if ( !ValidateSpecLookup( specId, specFilterDTO, lookups ) )
-                    continue;
+
+                SpecFilter_DTO filter = filters.Filters[ specIndex ];
+
                 validatedFilters.LookupSpecFilters.Add( new ProductSpecFilter {
+                    SpecId = filter.Id,
                     SpecName = specFilterDTO.SpecName,
                     SpecValue = specFilterDTO.SpecValue,
-                    DataType = ( SpecDataType ) specFilterDTO.DataType,
-                    FilterType = ( SpecFilterType ) specFilterDTO.FilterType,
-                    SpecType = ( SpecType ) specFilterDTO.SpecType
-                } );*/
+                } );
             }
         } );
 
         return validatedFilters;
     }
-    static async Task<Products_DTO> MapProductsToDto( IEnumerable<Product>? models )
+    static async Task<Products_DTO> MapProductsToDto( IEnumerable<Product> models )
     {
         var dto = new Products_DTO();
 
         await Task.Run( () =>
         {
             foreach ( Product p in models )
-            {
-                var productDto = new Product_DTO {
-                    Id = p.ProductId,
-                    Title = p.ProductName,
-                    Thumbnail = p.ProductThumbnail,
-                    Rating = p.ProductRating
-                };
-                foreach ( ProductVariant v in p.ProductVariants )
-                {
-                    productDto.Variants.Add( new ProductVariant_DTO {
-                        VariantId = v.VariantId,
-                        VariantName = v.VariantName,
-                        Price = v.VariantPriceMain,
-                        SalePrice = v.VariantPriceSale
-                    } );
-                }
-                dto.Products.Add( productDto );
-            }
+                dto.Products.Add( MapProductToDto( p ) );
         } );
         
         return dto;
     }
-    static async Task<ProductSearch_DTO> MapProductSearchToDto( (IEnumerable<Product>?, int)? model )
+    static async Task<ProductSearch_DTO> MapProductSearchToDto( ProductSearch model )
     {
         var dto = new ProductSearch_DTO();
+
+        await Task.Run( () =>
+        {
+            foreach ( Product p in model.Products! )
+                dto.Products.Add( MapProductToDto( p ) );
+            dto.NumResults = model.Count;
+        } );
 
         return dto;
     }
     static async Task<ProductDetails_DTO> MapProductDetailsToDto( ProductDetails productDetails )
     {
-        var DTO = new ProductDetails_DTO {
-            ProductId = productDetails.Product.ProductId,
-            ProductName = productDetails.Product.ProductName,
-            ProductDescription = productDetails.ProductDescription.DescriptionBody
+        var dto = new ProductDetails_DTO();
+
+        await Task.Run( () =>
+        {
+            dto.ProductId = productDetails.Product.ProductId;
+            dto.ProductName = productDetails.Product.ProductName;
+
+            if ( productDetails.ProductDescription != null )
+            {
+                dto.ProductDescription = productDetails.ProductDescription.Description ?? "No description!";
+            }
+
+            foreach ( ProductVariant variant in productDetails.Product.ProductVariants )
+            {
+                dto.ProductVariants.Add( new ProductVariant_DTO {
+                    VariantId = variant.VariantId,
+                    VariantName = variant.VariantName ?? "No name!",
+                    Price = variant.VariantPriceMain,
+                    SalePrice = variant.VariantPriceSale,
+                } );
+            }
+
+            foreach ( ProductImage image in productDetails.ProductImages )
+            {
+                dto.ProductImages.Add( new ProductImage_DTO {
+                    Url = image.ImageUrl,
+                    Variant = image.ProductVariantId
+                } );
+            }
+
+            foreach ( ProductReview review in productDetails.ProductReviews )
+            {
+                dto.ProductReviews.Add( new ProductReview_DTO {
+                    Rating = review.ReviewScore,
+                    Review = review.ReviewBody,
+                    User = review.UserId
+                } );
+            }
+        } );
+
+        return dto;
+    }
+    static Product_DTO MapProductToDto( Product p )
+    {
+        var productDto = new Product_DTO {
+            Id = p.ProductId,
+            Title = p.ProductName,
+            Thumbnail = p.ProductThumbnail,
+            Rating = p.ProductRating
         };
-
-        foreach ( ProductVariant variant in productDetails.Product.ProductVariants ) {
-            DTO.ProductVariants.Add( new ProductVariant_DTO {
-                VariantId = variant.VariantId,
-                VariantName = variant.VariantName,
-                Price = variant.VariantPriceMain,
-                SalePrice = variant.VariantPriceSale,
-            } );
-        }
-
-        foreach ( ProductImage image in productDetails.ProductImages ) {
-            DTO.ProductImages.Add( new ProductImage_DTO {
-                Url = image.ImageUrl,
-                Variant = image.ProductVariantId
-            } );
-        }
-
-        foreach ( ProductReview review in productDetails.ProductReviews ) {
-            DTO.ProductReviews.Add( new ProductReview_DTO {
-                Rating = review.ReviewScore,
-                Review = review.ReviewBody,
-                User = review.UserId
-            } );
-        }
-
-        return DTO;
-    }
-    
-    static bool ValidateSpecLookup( int specId, ProductSpecFilter_DTO specFilterDTO, Dictionary<int, Dictionary<int, object>> specValueLookup )
-    {
-        return false;
-        /*if ( specFilterDTO.SpecType != ( int ) SpecType.Lookup )
-            return true;
-        
-        if (specValueLookup.TryGetValue( specFilterDTO. ))
-        
-        return specValueLookup.StaticValuesBySpecId.TryGetValue( specId, out Dictionary<int, object>? values )
-               && values.Any( o => specFilterDTO.SpecValue == o );*/
-
-        return false;
-    }
-    static bool ValidateSpecFilterValue( Spec_DTO specDto, int valueId, object value, SpecValues_DTO lookups )
-    {
-        /*if ( specDto.SpecType == ( int ) SpecType.Lookup )
+        foreach ( ProductVariant v in p.ProductVariants )
         {
-            if ( !lookups.LookupValuesBySpecId.TryGetValue( specDto.Id, out Dictionary<int, object>? values ) )
-                return false;
-            if ( !values.TryGetValue( valueId, out object? staticValue ) )
-                return false;
-            return value == staticValue;
+            productDto.Variants.Add( new ProductVariant_DTO {
+                VariantId = v.VariantId,
+                VariantName = v.VariantName ?? "No name!",
+                Price = v.VariantPriceMain,
+                SalePrice = v.VariantPriceSale
+            } );
         }
-        else
-        {
-            if ( !lookups.DynamicLimitsBySpecId.TryGetValue( specDto.Id, out Dictionary<int, SpecDynamicValueLimits_DTO>? limits ) )
-                return false;
-            if ( !limits.TryGetValue( valueId, out SpecDynamicValueLimits_DTO? limit ) )
-                return false;
-            return false;
-        }*/
-        return false;
+
+        return productDto;
     }
 }

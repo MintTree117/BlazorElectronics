@@ -21,30 +21,35 @@ public class SpecService : ISpecService
         _lookupRepository = lookupRepository;
     }
 
-    public async Task<DtoResponse<SpecFilters_DTO>> GetSpecFilters( string categoryUrl )
+    public async Task<ServiceResponse<SpecFilters_DTO>> GetSpecFilters( string categoryUrl )
     {
-        Task<DtoResponse<int>> categoryTask = _categoryService.GetCategoryIdFromUrl( categoryUrl );
-        Task<CachedSpecDescrs?> descrsTask = GetSpecDescrs();
-        Task<CachedSpecLookups?> lookupsTask = GetSpecLookups();
-
-        await Task.WhenAll( categoryTask, descrsTask, lookupsTask );
-
+        Task<ServiceResponse<int>> categoryTask = _categoryService.GetCategoryIdFromUrl( categoryUrl );
+        
         if ( !categoryTask.Result.Success )
-            return new DtoResponse<SpecFilters_DTO>( null, false, "Invalid Category!" );
+            return new ServiceResponse<SpecFilters_DTO>( null, false, "Invalid Category!" );
+
+        return await GetSpecFilters( categoryTask.Result.Data );
+    }
+    public async Task<ServiceResponse<SpecFilters_DTO>> GetSpecFilters( int categoryId )
+    {
+        Task<CachedSpecDescrs?> descrsTask = GetSpecDescrs( categoryId );
+        Task<CachedSpecLookups?> lookupsTask = GetSpecLookups( categoryId );
+
+        await Task.WhenAll( descrsTask, lookupsTask );
 
         if ( descrsTask.Result == null )
-            return new DtoResponse<SpecFilters_DTO>( null, false, "Failed to get SpecDescrs from cache and repository!" );
+            return new ServiceResponse<SpecFilters_DTO>( null, false, "Failed to get SpecDescrs from cache and repository!" );
 
         if ( lookupsTask.Result == null )
-            return new DtoResponse<SpecFilters_DTO>( null, false, "Failed to get SpecDescrs from cache and repository!" );
+            return new ServiceResponse<SpecFilters_DTO>( null, false, "Failed to get SpecDescrs from cache and repository!" );
 
         CachedSpecDescrs? descrs = descrsTask.Result;
         CachedSpecLookups? lookups = lookupsTask.Result;
 
         var filterDtos = new List<SpecFilter_DTO>();
 
-        if ( !descrs.IdsByCategoryId.TryGetValue( categoryTask.Result.Data, out List<int>? specIds ) )
-            return new DtoResponse<SpecFilters_DTO>( null, false, "Invalid Category!" );
+        if ( !descrs.IdsByCategoryId.TryGetValue( categoryId, out List<int>? specIds ) )
+            return new ServiceResponse<SpecFilters_DTO>( null, false, "Invalid Category!" );
 
         foreach ( int id in specIds )
         {
@@ -60,40 +65,40 @@ public class SpecService : ISpecService
             } );
         }
 
-        return new DtoResponse<SpecFilters_DTO>( new SpecFilters_DTO { Filters = filterDtos }, true, "Successfully retired filters dto." );
+        return new ServiceResponse<SpecFilters_DTO>( new SpecFilters_DTO { Filters = filterDtos }, true, "Successfully retired filters dto." );
     }
 
-    async Task<CachedSpecDescrs?> GetSpecDescrs()
+    async Task<CachedSpecDescrs?> GetSpecDescrs( int categoryId )
     {
-        CachedSpecDescrs? cachedItems = await _cache.GetSpecDescrs();
+        CachedSpecDescrs? cachedItems = await _cache.GetSpecDescrs( categoryId );
 
         if ( cachedItems != null )
             return cachedItems;
 
-        IEnumerable<SpecDescr>? models = await _descrRepository.GetAll();
+        IEnumerable<SpecDescr>? models = await _descrRepository.GetByCategory( categoryId );
 
         if ( models == null )
             return null;
 
         cachedItems = await MapDescrModels( models );
-        await _cache.CacheSpecDescrs( cachedItems );
+        await _cache.CacheSpecDescrs( cachedItems, categoryId );
         
         return cachedItems;
     }
-    async Task<CachedSpecLookups?> GetSpecLookups()
+    async Task<CachedSpecLookups?> GetSpecLookups( int categoryId )
     {
-        CachedSpecLookups? cachedItems = await _cache.GetSpecLookups();
+        CachedSpecLookups? cachedItems = await _cache.GetSpecLookups( categoryId );
 
         if ( cachedItems != null )
             return cachedItems;
 
-        IEnumerable<SpecLookup>? models = await _lookupRepository.GetAll();
+        IEnumerable<SpecLookup>? models = await _lookupRepository.GetByCategory( categoryId );
 
         if ( models == null )
             return null;
 
         cachedItems = await MapLookupModels( models );
-        await _cache.CacheSpecLookups( cachedItems );
+        await _cache.CacheSpecLookups( cachedItems, categoryId );
 
         return cachedItems;
     }

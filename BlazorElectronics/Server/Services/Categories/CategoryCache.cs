@@ -9,11 +9,11 @@ public sealed class CategoryCache : CachedService, ICategoryCache
 
     public CategoryCache( IDistributedCache memoryCache ) : base( memoryCache ) { }
 
-    public async Task<Categories_DTO?> Get()
+    public async Task<Models.Categories.CategoryMeta?> Get()
     {
-        return await GetFromCache<Categories_DTO>( CACHE_KEY_CATEGORIES );
+        return await GetFromCache<Models.Categories.CategoryMeta>( CACHE_KEY_CATEGORIES );
     }
-    public async Task Set( Categories_DTO dto )
+    public async Task Set( Models.Categories.CategoryMeta dto )
     {
         await Cache( CACHE_KEY_CATEGORIES, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )

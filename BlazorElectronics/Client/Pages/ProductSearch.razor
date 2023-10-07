@@ -9,18 +9,7 @@
 @using System.Reflection
 @using System.Text
 
-@if ( ProductServiceClient.Products == null )
-{
-    <span>Awaiting Products...</span>
-}
-else if ( ProductServiceClient.Products.Count <= 0 )
-{
-    <span>No Products Found!</span>
-}
-else
-{
-    
-}
+<ProductList></ProductList>
 
 @code {
     [Parameter]
@@ -29,11 +18,7 @@ else
     protected override async Task OnParametersSetAsync()
     {
         ProductSearchFilters_DTO filters = MapFilterQueryParamters( NavigationManager );
-
-        await ProductServiceClient.GetProductsTEST( NavigationManager.Uri );
-
-        if ( ProductServiceClient.Products == null )
-            return;
+        await ProductServiceClient.SearchProducts( filters );
     }
 
     static ProductSearchFilters_DTO MapFilterQueryParamters( NavigationManager navManager )

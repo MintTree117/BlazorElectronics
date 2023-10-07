@@ -1,14 +1,15 @@
 using BlazorElectronics.Server.Models.Specs;
 using BlazorElectronics.Server.Repositories.Specs;
-using BlazorElectronics.Shared.DataTransferObjects.Specs;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace BlazorElectronics.Server.Services.Specs;
 
 public sealed class SpecCache : CachedService, ISpecCache
 {
-    const string CACHE_KEY_SPECS = "Specs";
-    const string CACHE_KEY_LOOKUP_VALUES = "LookupValues";
+    const string CACHE_KEY_DESCRS = "Descrs";
+    const string CACHE_KEY_LOOKUPS = "Lookups";
+
+    HashSet<int> CategoryKeys = new();
 
     readonly DistributedCacheEntryOptions _specsCacheEntryOptions = new DistributedCacheEntryOptions()
         .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
@@ -17,21 +18,29 @@ public sealed class SpecCache : CachedService, ISpecCache
         .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
         .SetAbsoluteExpiration( TimeSpan.FromHours( 5.0 ) );
 
-    ISpecDescrRepository _descrRepository;
+    public SpecCache( IDistributedCache cache ) : base( cache ) { }
 
-    public SpecCache( IDistributedCache cache, ISpecDescrRepository descrRepository ) : base( cache ) { _descrRepository = descrRepository; }
-
-    public async Task<CachedSpecDescrs?> GetSpecDescrs() { return await GetFromCache<CachedSpecDescrs>( CACHE_KEY_SPECS ); }
-    public async Task<CachedSpecLookups?> GetSpecLookups() { return await GetFromCache<CachedSpecLookups>( CACHE_KEY_LOOKUP_VALUES ); }
-    public async Task CacheSpecDescrs( CachedSpecDescrs dto )
+    public async Task<CachedSpecDescrs?> GetSpecDescrs( int categoryId )
     {
-        await Cache( CACHE_KEY_SPECS, dto, new DistributedCacheEntryOptions()
+        string key = $"{CACHE_KEY_DESCRS}{categoryId}";
+        return await GetFromCache<CachedSpecDescrs>( key );
+    }
+    public async Task<CachedSpecLookups?> GetSpecLookups( int categoryId )
+    {
+        string key = $"{CACHE_KEY_LOOKUPS}{categoryId}";
+        return await GetFromCache<CachedSpecLookups>( key );
+    }
+    public async Task CacheSpecDescrs( CachedSpecDescrs dto, int categoryId )
+    {
+        string key = $"{CACHE_KEY_DESCRS}{categoryId}";
+        await Cache( key, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
             .SetAbsoluteExpiration( TimeSpan.FromDays( 1 ) ) );
     }
-    public async Task CacheSpecLookups( CachedSpecLookups dto )
+    public async Task CacheSpecLookups( CachedSpecLookups dto, int categoryId )
     {
-        await Cache( CACHE_KEY_LOOKUP_VALUES, dto, new DistributedCacheEntryOptions()
+        string key = $"{CACHE_KEY_LOOKUPS}{categoryId}";
+        await Cache( key, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
             .SetAbsoluteExpiration( TimeSpan.FromDays( 1 ) ) );
     }

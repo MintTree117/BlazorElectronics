@@ -8,6 +8,6 @@ public abstract class DapperRepository<T> : IDapperRepository<T> where T : class
 
     protected DapperRepository( DapperContext dapperContext ) { _dbContext = dapperContext; }
 
-    public abstract Task<IEnumerable<T>> GetAll();
-    public abstract Task<T> GetById( int id );
+    public abstract Task<IEnumerable<T>?> GetAll();
+    public abstract Task<T?> GetById( int id );
 }

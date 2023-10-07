@@ -13,8 +13,8 @@
       "PackagePath": "staticwebassets/BlazorElectronics.Client.styles.css"
     },
     {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/test.jpg",
-      "PackagePath": "staticwebassets/Images/test.jpg"
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/default.jpg",
+      "PackagePath": "staticwebassets/Images/default.jpg"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",

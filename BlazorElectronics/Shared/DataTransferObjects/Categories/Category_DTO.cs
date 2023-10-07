@@ -6,6 +6,5 @@ public sealed class Category_DTO
     public string Name { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
-    public bool IsPrimary { get; set; } = false;
-    public List<CategorySub_DTO> SubCategories { get; set; } = new();
+    public List<int> SubCategoryIds { get; set; } = new();
 }

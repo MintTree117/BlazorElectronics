@@ -17,9 +17,9 @@ public class SpecFilterController : ControllerBase
     }
     
     [HttpGet("SpecFilters")]
-    public async Task<ActionResult<DtoResponse<SpecFilters_DTO>>> GetSpecFilters( string categoryUrl )
+    public async Task<ActionResult<ServiceResponse<SpecFilters_DTO>>> GetSpecFilters( string categoryUrl )
     {
-        DtoResponse<SpecFilters_DTO> response = await _specService.GetSpecFilters( categoryUrl );
+        ServiceResponse<SpecFilters_DTO> response = await _specService.GetSpecFilters( categoryUrl );
         return Ok( response );
     }
 }

@@ -1,15 +1,25 @@
 @page "/product/{id:int}"
 @using BlazorElectronics.Client.Services.Products
+@using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.DataTransferObjects.Products
 @inject IProductServiceClient ProductServiceClient;
 
-@if ( _productDetails == null ) {
-    <span>@message</span>
+@if ( !_loaded || _productDetails == null )
+{
+    <span>@_message</span>
 }
 else {
-    <div class="product-details media">
-        <div class="media-img-wrapper mr-2">
-            <img class="media-img" src="" alt="@_productDetails.ProductName"/>
+    <span>Loaded Product</span>
+    <div class="product-details">
+        <div class="pd-img-wrapper mr-2">
+            @if ( _productDetails.ProductImages.Count <= 0 )
+            {
+                <span>No Images Found!</span>
+            }
+            else
+            {
+                <img class="pd-img" src="@_productDetails.ProductImages[ 0 ]" alt="@_productDetails.ProductName"/>   
+            }
         </div>
         <div class="media-body">
             <h2 class="mb-0">@_productDetails.ProductName</h2>
@@ -18,24 +28,27 @@ else {
                 $100.00
             </h4>
         </div>
-    </div>    
+    </div>
 }
 
 @code {
-    ProductDetails_DTO? _productDetails;
-    string? message;
+    ProductDetails_DTO? _productDetails = null;
+    string? _message;
+    bool _loaded = false;
     
     [Parameter]
     public int Id { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        message = "Loading Product Details...";
-        await ProductServiceClient.GetProductDetails( Id );
+        _message = "Loading Product Details...";
 
-        if ( ProductServiceClient.ProductDetails == null )
-            message = "Failed to load Product Details!";
-        else 
-            _productDetails = ProductServiceClient.ProductDetails;
+        ServiceResponse<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
+        _loaded = true;
+
+        if ( response.Data == null || !response.Success )
+            _message = response.Message;
+        else
+            _productDetails = response.Data;
     }
 }
