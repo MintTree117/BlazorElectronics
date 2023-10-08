@@ -22,16 +22,53 @@ public class ProductController : ControllerBase
         ServiceResponse<string?> response = await _productService.TestGetQueryString( categoryUrl, searchFilters );
         return Ok( response );
     }
+    [HttpGet( "search-suggestions/{searchText}" )]
+    public async Task<ActionResult<ServiceResponse<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( string searchText )
+    {
+        ServiceResponse<ProductSearchSuggestions_DTO?> response = await _productService.GetProductSearchSuggestions( searchText );
+        return Ok( response );
+    }
     [HttpGet( "products" )]
     public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetAllProducts()
     {
         ServiceResponse<Products_DTO?> response = await _productService.GetProducts();
         return Ok( response );
     }
-    [HttpGet( "{categoryUrl}" )]
-    public async Task<ActionResult<ServiceResponse<ProductSearch_DTO>>> SearchProducts( string categoryUrl, [FromQuery] ProductSearchFilters_DTO? filters )
+    
+    [HttpGet( "search-category-text/{categoryUrl}/{searchText}" )]
+    public async Task<ActionResult<ServiceResponse<ProductSearch_DTO>>> SearchProductsByCategoryAndText( string categoryUrl, string searchText, [FromQuery] ProductSearchFilters_DTO? filters )
     {
-        ServiceResponse<ProductSearch_DTO?> response = await _productService.SearchProducts( categoryUrl, filters );
+        filters ??= new ProductSearchFilters_DTO();
+        filters.CategoryUrl = categoryUrl;
+        filters.SearchText = searchText;
+        
+        ServiceResponse<ProductSearch_DTO?> response = await _productService.SearchProducts( filters );
+        return Ok( response );
+    }
+    [HttpGet( "search-category/{categoryUrl}" )]
+    public async Task<ActionResult<ServiceResponse<ProductSearch_DTO>>> SearchProductsByCategory( string categoryUrl, [FromQuery] ProductSearchFilters_DTO? filters )
+    {
+        filters ??= new ProductSearchFilters_DTO();
+        filters.CategoryUrl = categoryUrl;
+        
+        ServiceResponse<ProductSearch_DTO?> response = await _productService.SearchProducts( filters );
+        return Ok( response );
+    }
+    [HttpGet( "search-text/{searchText}" )]
+    public async Task<ActionResult<ServiceResponse<ProductSearch_DTO>>> SearchProductsByText( string searchText, [FromQuery] ProductSearchFilters_DTO? filters )
+    {
+        filters ??= new ProductSearchFilters_DTO();
+        filters.SearchText = searchText;
+
+        ServiceResponse<ProductSearch_DTO?> response = await _productService.SearchProducts( filters );
+        return Ok( response );
+    }
+
+
+    [HttpGet( "search" )]
+    public async Task<ActionResult<ServiceResponse<ProductSearch_DTO>>> SearchProducts( [FromQuery] ProductSearchFilters_DTO? filters )
+    {
+        ServiceResponse<ProductSearch_DTO?> response = await _productService.SearchProducts( filters );
         return Ok( response );
     }
     [HttpGet( "details/{productId:int}" )]

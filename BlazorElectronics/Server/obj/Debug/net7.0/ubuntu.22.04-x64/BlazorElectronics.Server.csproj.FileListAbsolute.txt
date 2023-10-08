@@ -33,6 +33,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.JSInterop.WebAssembly.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.SqlServer.Server.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.Win32.SystemEvents.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Newtonsoft.Json.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/System.Configuration.ConfigurationManager.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/System.Drawing.Common.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/System.IdentityModel.Tokens.Jwt.dll
@@ -383,4 +384,3 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.genruntimeconfig.cache
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Newtonsoft.Json.dll

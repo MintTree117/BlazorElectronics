@@ -6,10 +6,9 @@
 
 @if ( !_loaded || _productDetails == null )
 {
-    <span>@_message</span>
+    <span>@_serverMessage</span>
 }
 else {
-    <span>Loaded Product</span>
     <div class="product-details">
         <div class="pd-img-wrapper mr-2">
             @if ( _productDetails.ProductImages.Count <= 0 )
@@ -18,37 +17,72 @@ else {
             }
             else
             {
-                <img class="pd-img" src="@_productDetails.ProductImages[ 0 ]" alt="@_productDetails.ProductName"/>   
+                <img class="pd-img" src="@_productDetails.ProductImages[ 0 ].Url" alt="@_productDetails.ProductName"/>
             }
         </div>
         <div class="media-body">
             <h2 class="mb-0">@_productDetails.ProductName</h2>
             <p>@_productDetails.ProductDescription</p>
-            <h4 class="price">
-                $100.00
-            </h4>
+            @if ( _productDetails.ProductVariants.Count > 1 )
+            {
+                <div>
+                    <select class="form-control" @bind="_currentVariantId">
+                        @foreach ( ProductVariant_DTO v in _productDetails.ProductVariants )
+                        {
+                            <option value="@v.VariantId">@v.VariantName</option>
+                        }
+                    </select>
+                </div>
+            }
+            @if ( GetSelectedVariant() != null )
+            {
+                if ( GetSelectedVariant().Price > GetSelectedVariant().SalePrice )
+                {
+                    <h6 class="text-muted">
+                        $@GetSelectedVariant().Price
+                    </h6>
+                }
+                <h4 class="price">
+                    $@GetSelectedVariant().Price
+                </h4>
+            }
         </div>
     </div>
 }
 
 @code {
-    ProductDetails_DTO? _productDetails = null;
-    string? _message;
+    string? _serverMessage;
     bool _loaded = false;
-    
+
+    ProductDetails_DTO? _productDetails = null;
+    int _currentVariantId = 1;
+
     [Parameter]
     public int Id { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        _message = "Loading Product Details...";
+        _serverMessage = "Loading Product Details...";
 
         ServiceResponse<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
         _loaded = true;
 
         if ( response.Data == null || !response.Success )
-            _message = response.Message;
-        else
-            _productDetails = response.Data;
+        {
+            _serverMessage = response.Message;
+            return;
+        }
+        
+        _productDetails = response.Data;
+
+        if ( _productDetails.ProductVariants.Count > 0 )
+        {
+            _currentVariantId = _productDetails.ProductVariants[ 0 ].VariantId;
+        }
+    }
+
+    ProductVariant_DTO GetSelectedVariant()
+    {
+        return _productDetails!.ProductVariants.FirstOrDefault( v => v.VariantId == _currentVariantId )!;
     }
 }

@@ -49,19 +49,20 @@
     bool _loadedCategories = false;
     bool _collapseNavMenu = true;
     string? _categoryMessage;
-    string? NavMenuCssClass => _collapseNavMenu
-        ? "collapse"
-        : null;
+    string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
     Categories_DTO? _categories;
-    
+
     protected override async Task OnInitializedAsync()
     {
         _categories = await CategoryServiceClient.GetCategories();
         _loadedCategories = true;
 
         if ( _categories == null )
+        {
             _categoryMessage = "Failed to load categories!";
+            return;
+        }
     }
 
     void ToggleNavMenu() { _collapseNavMenu = !_collapseNavMenu; }

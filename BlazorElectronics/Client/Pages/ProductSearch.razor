@@ -1,5 +1,6 @@
-@page "/products/{category}"
-@page "/products/"
+@page "/{category}/search/{searchText}"
+@page "/search/{searchText}"
+@page "/{category}"
 @inject IProductServiceClient ProductServiceClient;
 @inject NavigationManager NavigationManager;
 @using BlazorElectronics.Client.Services.Products
@@ -10,15 +11,37 @@
 @using System.Text
 
 <ProductList></ProductList>
+<span></span>
 
 @code {
     [Parameter]
     public string? Category { get; set; }
+    [Parameter]
+    public string? SearchText { get; set; }
+
+    string exceptionMessage = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
         ProductSearchFilters_DTO filters = MapFilterQueryParamters( NavigationManager );
-        await ProductServiceClient.SearchProducts( filters );
+
+        try
+        {
+            if ( Category != null && SearchText != null )
+                await ProductServiceClient.SearchProductsByCategoryAndText( Category, SearchText, filters );
+            else if ( Category != null )
+                await ProductServiceClient.SearchProductsByCategory( Category, filters );
+            else if ( SearchText != null )
+                await ProductServiceClient.SearchProductsByText( SearchText, filters );
+            else throw new Exception( "No valid input parameters provided for product search!" );
+        }
+        catch ( Exception e )
+        {
+            exceptionMessage = e.Message;
+        }
+        
+
+        
     }
 
     static ProductSearchFilters_DTO MapFilterQueryParamters( NavigationManager navManager )

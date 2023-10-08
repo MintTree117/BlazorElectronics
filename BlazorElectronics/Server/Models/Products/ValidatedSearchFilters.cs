@@ -5,6 +5,7 @@ public sealed class ValidatedSearchFilters
     public int Page { get; set; } = 0;
     public int Rows { get; set; } = 1;
 
+    public int? CategoryId { get; set; }
     public string? SearchText { get; set; }
 
     public int? MinPrice { get; set; }

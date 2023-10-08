@@ -1,6 +1,7 @@
 @using BlazorElectronics.Shared.DataTransferObjects.Products
 @using BlazorElectronics.Client.Services.Products
 @using BlazorElectronics.Shared
+@using System.Globalization
 @inject IProductServiceClient ProductServiceClient;
 @implements IDisposable;
 
@@ -12,13 +13,16 @@ else {
         @foreach ( Product_DTO product in _productSearch.Products ) {
             <li class="pl-item my-3">
                 <div class="pl-item-img-wrapper mr-2">
-                    <a href="/Product/@product.Id">
+                    <a href="/product/@product.Id">
                         <img class="pl-item-img" src="@product.Thumbnail" alt="@product.Title"/>
                     </a>
                 </div>
                 <div class="pl-item-body">
                     <a href="/Product/@product.Id">
                         <h4 class="mb-0">@product.Title</h4>
+                        <h5 class="price">
+                            @GetPrice( product )
+                        </h5>
                     </a>
                 </div>
             </li>
@@ -42,5 +46,17 @@ else {
     {
         _productSearch = productSearch.Data;
         StateHasChanged();
+    }
+    string GetPrice( Product_DTO product )
+    {
+        switch ( product.Variants.Count )
+        {
+            case <= 0: return "No Price Found!";
+            case 1: return product.Variants[ 0 ].Price.ToString( CultureInfo.InvariantCulture );
+            default:{
+                decimal minPrice = product.Variants.Min( v => v.Price );
+                return $"Starting at {minPrice}";
+            }
+        }
     }
 }

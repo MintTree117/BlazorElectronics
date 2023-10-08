@@ -4,7 +4,6 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
-using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
@@ -13,6 +12,7 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
     const string PRODUCT_ID_COLUMN = "ProductId";
     const string PRODUCT_NAME_COLUMN = "ProductName";
     const string PRODUCT_RATING_COLUMN = "ProductRating";
+    const string PRODUCT_DESCRIPTION_COLUMN = "Description";
     const string VARIANT_ID_COLUMN = "VariantId";
     const string VARIANT_PRICE_MAIN_COLUMN = "VariantPriceMain";
     const string VARIANT_PRICE_SALE_COLUMN = "VariantPriceSale";
@@ -30,6 +30,7 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
 
     const string STORED_PROCEDURE_COUNT_PRODUCTS_ALL = "Count_Products";
     const string STORED_PROCEDURE_COUNT_PRODUCTS_SEARCH = "Count_ProductsSearch";
+    const string STORED_PROCEDURE_GET_NAMES_BY_SEARCH_TEXT = "Get_ProductNamesBySearchText";
     const string STORED_PROCEDURE_GET_PRODUCTS = "Get_Products";
 
     public ProductRepository( DapperContext dapperContext ) : base( dapperContext ) { }
@@ -61,15 +62,22 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
         var productQuery = new StringBuilder();
         var countQuery = new StringBuilder();
 
-        await BuildProductSearchQuery( categoryId, searchFilters, productQuery, countQuery );
+        await BuildProductSearchQuery( searchFilters, productQuery, countQuery );
         return productQuery.ToString();
     }
-    public async Task<ProductSearch?> SearchProducts( int categoryId, ValidatedSearchFilters searchFilters )
+    public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText )
+    {
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+        var searchParam = new { SearchText = searchText };
+        return await connection.QueryAsync<string>( 
+            STORED_PROCEDURE_GET_NAMES_BY_SEARCH_TEXT, searchParam, commandType: CommandType.StoredProcedure );
+    }
+    public async Task<ProductSearch?> SearchProducts( ValidatedSearchFilters searchFilters )
     {
         var productQuery = new StringBuilder();
         var countQuery = new StringBuilder();
 
-        DynamicParameters dynamicParams = await BuildProductSearchQuery( categoryId, searchFilters, productQuery, countQuery );
+        DynamicParameters dynamicParams = await BuildProductSearchQuery( searchFilters, productQuery, countQuery );
 
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
 
@@ -87,7 +95,7 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
         };
     }
 
-    async Task<DynamicParameters> BuildProductSearchQuery( int categoryId, ValidatedSearchFilters filters, StringBuilder productQuery, StringBuilder countQuery )
+    async Task<DynamicParameters> BuildProductSearchQuery( ValidatedSearchFilters filters, StringBuilder productQuery, StringBuilder countQuery )
     {
         var paramDictionary = new Dictionary<string, object>();
         
@@ -103,39 +111,57 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
             sharedSQL.Append( $" ON p.{PRODUCT_ID_COLUMN} = pc.{PRODUCT_ID_COLUMN}" );
             sharedSQL.Append( $" LEFT JOIN {PRODUCT_VARIANTS_TABLE} pv" );
             sharedSQL.Append( $" ON p.{PRODUCT_ID_COLUMN} = pv.{PRODUCT_ID_COLUMN}" );
+            
+            // SEARCH TEXT
+            if ( !string.IsNullOrEmpty( filters.SearchText ) )
+            {
+                sharedSQL.Append( $" LEFT JOIN {PRODUCT_DESCRIPTIONS_TABLE} pd" );
+                sharedSQL.Append( $" ON p.{PRODUCT_ID_COLUMN} = pd.{PRODUCT_ID_COLUMN}" );
+            }
+            
             sharedSQL.Append( $" WHERE 1=1" );
-
+            
             // CATEGORY
-            sharedSQL.Append( $@" AND pc.{CATEGORY_ID_COLUMN} = @categoryId" );
-            paramDictionary.Add( "@categoryId", categoryId );
-
+            if ( filters.CategoryId != null )
+            {
+                sharedSQL.Append( $@" AND pc.{CATEGORY_ID_COLUMN} = @categoryId" );
+                paramDictionary.Add( "@categoryId", filters.CategoryId.Value );   
+            }
+            
             // SEARCH TEXT
             if ( !string.IsNullOrEmpty( filters.SearchText ) ) {
-                sharedSQL.Append( $@" AND p.{PRODUCT_NAME_COLUMN} LIKE @searchText" );
+                
+                sharedSQL.Append( $@" AND (p.{PRODUCT_NAME_COLUMN} LIKE @searchText" );
+                sharedSQL.Append( $@" OR pd.{PRODUCT_DESCRIPTION_COLUMN} LIKE @searchText)" );
                 paramDictionary.Add( "@searchText", $"%{filters.SearchText}%" );
             }
 
             // RATING
-            if ( filters.MinRating != null ) {
+            if ( filters.MinRating != null )
+            {
                 sharedSQL.Append( $@" AND p.{PRODUCT_RATING_COLUMN} >= @minRating" );
                 paramDictionary.Add( "@minRating", filters.MinRating );
             }
-            if ( filters.MaxRating != null ) {
+            if ( filters.MaxRating != null )
+            {
                 sharedSQL.Append( $@" AND p.{PRODUCT_RATING_COLUMN} <= @maxRating" );
                 paramDictionary.Add( "@maxRating", filters.MaxRating );
             }
-            
+
             // VARIANT PRICE SUBQUERY
             sharedSQL.Append( $" AND p.{PRODUCT_ID_COLUMN} IN (" );
             sharedSQL.Append( $" SELECT DISTINCT pvQUERY.{PRODUCT_ID_COLUMN}" );
             sharedSQL.Append( $" FROM {PRODUCT_VARIANTS_TABLE} pvQUERY" );
             sharedSQL.Append( $" WHERE 1=1" );
-            if ( filters.MinPrice != null ) {
+            
+            if ( filters.MinPrice != null )
+            {
                 sharedSQL.Append( $@" AND pvQUERY.{VARIANT_PRICE_MAIN_COLUMN} >= @minPrice" );
                 sharedSQL.Append( $@" OR pvQUERY.{VARIANT_PRICE_SALE_COLUMN} >= @minPrice" );
                 paramDictionary.Add( "@minPrice", filters.MinPrice );
             }
-            if ( filters.MaxPrice != null ) {
+            if ( filters.MaxPrice != null )
+            {
                 sharedSQL.Append( $@" AND pvQUERY.{VARIANT_PRICE_MAIN_COLUMN} <= @maxPrice" );
                 sharedSQL.Append( $@" OR pvQUERY.{VARIANT_PRICE_SALE_COLUMN} <= @maxPrice" );
                 paramDictionary.Add( "@maxPrice", filters.MaxPrice );
@@ -143,27 +169,30 @@ public sealed class ProductRepository : DapperRepository<Product>, IProductRepos
             sharedSQL.Append( $" )" );
 
             // LOOKUP SPECS SUBQUERY
-            if ( filters.LookupSpecFilters.Count > 0 ) {
+            if ( filters.LookupSpecFilters.Count > 0 )
+            {
                 sharedSQL.Append( $" AND EXISTS (SELECT 1 FROM {PRODUCT_SPECS_LOOKUP_TABLE} psl" );
                 sharedSQL.Append( $" WHERE p.{PRODUCT_ID_COLUMN} = psl.{PRODUCT_ID_COLUMN}" );
-                for ( int i = 0; i < filters.LookupSpecFilters.Count; i++ ) {
+                for ( int i = 0; i < filters.LookupSpecFilters.Count; i++ )
+                {
                     var paramName = "@LookupSpecFilter" + i;
                     sharedSQL.Append( $" AND psl.{filters.LookupSpecFilters[ i ].SpecName} = {paramName}" );
                     paramDictionary.Add( paramName, filters.LookupSpecFilters[ i ].SpecValue );
                 }
-                sharedSQL.Append( ")" );   
+                sharedSQL.Append( ")" );
             }
-
             // RAW SPECS SUBQUERY
-            if ( filters.RawSpecFilters.Count > 0 ) {
+            if ( filters.RawSpecFilters.Count > 0 )
+            {
                 sharedSQL.Append( $" AND EXISTS (SELECT 1 FROM {PRODUCT_SPECS_RAW_TABLE} psr" );
                 sharedSQL.Append( $" WHERE p.{PRODUCT_ID_COLUMN} = psr.{PRODUCT_ID_COLUMN}" );
-                for ( int i = 0; i < filters.RawSpecFilters.Count; i++ ) {
+                for ( int i = 0; i < filters.RawSpecFilters.Count; i++ )
+                {
                     var paramName = "@RawSpecFilter" + i;
                     sharedSQL.Append( $" AND psr.{filters.RawSpecFilters[ i ].SpecName} = {paramName}" );
                     paramDictionary.Add( paramName, filters.RawSpecFilters[ i ].SpecValue );
                 }
-                sharedSQL.Append( ")" );   
+                sharedSQL.Append( ")" );
             }
 
             // ROW COUNT

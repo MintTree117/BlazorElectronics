@@ -44,6 +44,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1Byb2R1Y3RMaXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Shared/ProductSearchBar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1Byb2R1Y3RTZWFyY2hCYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Shared/SurveyPrompt.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1N1cnZleVByb21wdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

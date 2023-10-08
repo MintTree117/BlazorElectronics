@@ -7,6 +7,7 @@ public interface IProductService
 {
     Task<ServiceResponse<string?>> TestGetQueryString( string categoryUrl, ProductSearchFilters_DTO filters );
     Task<ServiceResponse<Products_DTO?>> GetProducts();
-    Task<ServiceResponse<ProductSearch_DTO?>> SearchProducts( string categoryUrl, ProductSearchFilters_DTO? searchFilters );
+    Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
+    Task<ServiceResponse<ProductSearch_DTO?>> SearchProducts( ProductSearchFilters_DTO? searchFilters );
     Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId );
 }
