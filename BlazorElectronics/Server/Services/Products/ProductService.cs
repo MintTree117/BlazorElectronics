@@ -28,16 +28,18 @@ public class ProductService : IProductService
         _productDetailsRepository = productDetailsRepository;
     }
     
-    public async Task<ServiceResponse<string?>> TestGetQueryString( string categoryUrl, ProductSearchFilters_DTO filters )
+    public async Task<ServiceResponse<string?>> TestGetQueryString( ProductSearchFilters_DTO filters )
     {
-        ServiceResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( categoryUrl );
+        ServiceResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( filters.CategoryUrl );
         
         if ( !categoryResult.IsSuccessful() )
             return new ServiceResponse<string?>( categoryResult.Message );
 
         int categoryId = categoryResult.Data;
+
+        ValidatedSearchFilters validatedFilters = await GetValidatedSearchFilters( categoryId, filters, _specService );
         
-        string query = await _productRepository.TEST_GET_QUERY_STRING( categoryId, new ValidatedSearchFilters() );
+        string query = await _productRepository.TEST_GET_QUERY_STRING( validatedFilters );
         return new ServiceResponse<string?>( query, true, "Test query" );
     }
     public async Task<ServiceResponse<Products_DTO?>> GetProducts()
@@ -119,6 +121,7 @@ public class ProductService : IProductService
         validatedFilters.MinRating = searchFiltersDTO.MinRating < 0 ? null : Math.Max( searchFiltersDTO.MinRating, 0 );
         validatedFilters.MaxRating = searchFiltersDTO.MaxRating < 0 ? null : Math.Max( searchFiltersDTO.MaxRating, 0 );
         validatedFilters.SearchText = string.IsNullOrEmpty( searchFiltersDTO.SearchText ) ? null : searchFiltersDTO.SearchText;
+        validatedFilters.CategoryId = categoryId;
         
         // NO SPECS
         if ( searchFiltersDTO.SpecFilters == null || categoryId == null )

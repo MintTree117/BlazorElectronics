@@ -9,9 +9,10 @@
 @using System.Collections.Specialized
 @using System.Reflection
 @using System.Text
+@using BlazorElectronics.Shared
 
+<span>@debugMessage</span>
 <ProductList></ProductList>
-<span></span>
 
 @code {
     [Parameter]
@@ -19,31 +20,32 @@
     [Parameter]
     public string? SearchText { get; set; }
 
-    string exceptionMessage = string.Empty;
+    string debugMessage = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
         ProductSearchFilters_DTO filters = MapFilterQueryParamters( NavigationManager );
 
-        try
+        if ( Category != null && SearchText != null )
         {
-            if ( Category != null && SearchText != null )
-                await ProductServiceClient.SearchProductsByCategoryAndText( Category, SearchText, filters );
-            else if ( Category != null )
-                await ProductServiceClient.SearchProductsByCategory( Category, filters );
-            else if ( SearchText != null )
-                await ProductServiceClient.SearchProductsByText( SearchText, filters );
-            else throw new Exception( "No valid input parameters provided for product search!" );
+            debugMessage = "cat and text";
+            await ProductServiceClient.SearchProductsByCategoryAndText( Category, SearchText, filters );
         }
-        catch ( Exception e )
+        else if ( Category != null )
         {
-            exceptionMessage = e.Message;
+            debugMessage = "cat" + Category;
+            await ProductServiceClient.SearchProductsByCategory( Category, filters );
         }
-        
+        else if ( SearchText != null )
+        {
+            debugMessage = "text";
+            await ProductServiceClient.SearchProductsByText( SearchText, filters );
+        }
+        else throw new Exception( "No valid input parameters provided for product search!" );
 
-        
+        StateHasChanged();
     }
-
+    
     static ProductSearchFilters_DTO MapFilterQueryParamters( NavigationManager navManager )
     {
         Uri uri = navManager.ToAbsoluteUri( navManager.Uri );

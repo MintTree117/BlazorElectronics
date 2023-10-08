@@ -16,10 +16,23 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
-    [HttpGet( "searchQuery/{categoryUrl}" )]
-    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchFilters_DTO searchFilters )
+    [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
+    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchFilters_DTO? searchFilters )
     {
-        ServiceResponse<string?> response = await _productService.TestGetQueryString( categoryUrl, searchFilters );
+        searchFilters ??= new ProductSearchFilters_DTO();
+        searchFilters.CategoryUrl = categoryUrl;
+        searchFilters.SearchText = searchText;
+
+        ServiceResponse<string?> response = await _productService.TestGetQueryString( searchFilters );
+        return Ok( response );
+    }
+    [HttpGet( "searchQuery/{categoryUrl}" )]
+    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchFilters_DTO? searchFilters )
+    {
+        searchFilters ??= new ProductSearchFilters_DTO();
+        searchFilters.CategoryUrl = categoryUrl;
+        
+        ServiceResponse<string?> response = await _productService.TestGetQueryString( searchFilters );
         return Ok( response );
     }
     [HttpGet( "search-suggestions/{searchText}" )]

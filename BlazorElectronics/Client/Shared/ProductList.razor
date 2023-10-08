@@ -5,8 +5,8 @@
 @inject IProductServiceClient ProductServiceClient;
 @implements IDisposable;
 
-@if ( _productSearch == null ) {
-    <span>Loading Products...</span>
+@if ( !_loadedData || _productSearch == null ) {
+    <span>@_serverMessage</span>
 }
 else {
     <ul class="list-unstyled">
@@ -31,6 +31,9 @@ else {
 }
 
 @code {
+    bool _loadedData = false;
+    string _serverMessage = "Loading Products...";
+
     ProductSearch_DTO? _productSearch;
     
     protected override void OnInitialized()
@@ -42,9 +45,36 @@ else {
         ProductServiceClient.ProductSearchChanged -= OnProductsChange;
     }
 
-    void OnProductsChange( ServiceResponse<ProductSearch_DTO?> productSearch  )
+    void OnProductsChange( ServiceResponse<ProductSearch_DTO?>? productSearch  )
     {
+        StateHasChanged();
+        
+        if ( productSearch == null )
+        {
+            _productSearch = null;
+            _serverMessage = "Failed to load products! No server message received.";
+            StateHasChanged();
+            return;
+        }
+
+        if ( productSearch.Data == null || !productSearch.Success )
+        {
+            _productSearch = null;
+            _serverMessage = productSearch.Message ?? "Failed to load products! No server message received.";
+            StateHasChanged();
+            return;
+        }
+
+        if ( productSearch.Data.Products.Count <= 0 )
+        {
+            _productSearch = null;
+            _serverMessage = "No products found!";
+            StateHasChanged();
+            return;
+        }
+        
         _productSearch = productSearch.Data;
+        _loadedData = true;
         StateHasChanged();
     }
     string GetPrice( Product_DTO product )
