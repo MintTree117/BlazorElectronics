@@ -4,7 +4,6 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
-using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 

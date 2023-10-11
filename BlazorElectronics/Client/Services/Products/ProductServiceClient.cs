@@ -49,7 +49,7 @@ public class ProductServiceClient : IProductServiceClient
     }
     public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
-        string url = $"{PRODUCT_DETAILS_URL}{productId}";
+        string url = $"{PRODUCT_DETAILS_URL}/{productId}";
         var serverResponse = await _http.GetFromJsonAsync<ServiceResponse<ProductDetails_DTO?>>( url );
         return serverResponse ?? new ServiceResponse<ProductDetails_DTO?>( null, false, SERVER_RESPONSE_MESSAGE_NULL );
     }

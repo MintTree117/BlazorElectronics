@@ -13,18 +13,25 @@ public class ProductService : IProductService
     readonly IProductCache _cache;
     readonly IProductRepository _productRepository;
     readonly IProductDetailsRepository _productDetailsRepository;
+    readonly IProductFeaturedRepository _productFeaturedRepository;
 
     readonly ICategoryService _categoryService;
     readonly ISpecService _specService;
 
     const int MAX_PRODUCT_LIST_ROWS = 100;
 
-    public ProductService( IProductCache cache, IProductRepository productRepository, IProductDetailsRepository productDetailsRepository, ICategoryService categoryService, ISpecService specService )
+    public ProductService( 
+        IProductCache cache, 
+        IProductRepository productRepository, 
+        IProductDetailsRepository productDetailsRepository, 
+        ICategoryService categoryService, ISpecService specService, 
+        IProductFeaturedRepository productFeaturedRepository )
     {
         _cache = cache;
         _productRepository = productRepository;
         _categoryService = categoryService;
         _specService = specService;
+        _productFeaturedRepository = productFeaturedRepository;
         _productDetailsRepository = productDetailsRepository;
     }
     
@@ -52,6 +59,23 @@ public class ProductService : IProductService
         Products_DTO productsDto = await MapProductsToDto( models );
         
         return new ServiceResponse<Products_DTO?>( productsDto, true, "Successfully retrieved product Dto's from repository." );
+    }
+    public async Task<ServiceResponse<ProductsFeatured_DTO?>> GetFeaturedProducts()
+    {
+        ProductsFeatured_DTO? dto = await _cache.GetFeaturedProducts();
+
+        if ( dto != null )
+            return new ServiceResponse<ProductsFeatured_DTO?>( dto, true, "Success. Retrieved FeaturedProducts_DTO from cache." );
+
+        IEnumerable<ProductFeatured>? models = await _productFeaturedRepository.GetAll();
+
+        if ( models == null )
+            return new ServiceResponse<ProductsFeatured_DTO?>( null, false, "Failed to retrieve FeaturedProducts_DTO from cache, and ProductDetails from repository!" );
+
+        dto = await MapFeaturedProductsToDto( models );
+        await _cache.CacheFeaturedProducts( dto );
+
+        return new ServiceResponse<ProductsFeatured_DTO?>( dto, true, "Successfully retrieved FeaturedProducts_DTO from repository, mapped to DTO, and cached." );
     }
     public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText )
     {
@@ -184,6 +208,25 @@ public class ProductService : IProductService
             Suggestions = suggestionList
         };
     }
+    static async Task<ProductsFeatured_DTO> MapFeaturedProductsToDto( IEnumerable<ProductFeatured> models )
+    {
+        var dtos = new List<ProductFeatured_DTO>();
+
+        await Task.Run( () =>
+        {
+            foreach ( ProductFeatured f in models )
+            {
+                dtos.Add( new ProductFeatured_DTO {
+                    ProductId = f.ProductId,
+                    ImageUrl = f.FeatureImageUrl
+                } );
+            }
+        } );
+
+        return new ProductsFeatured_DTO {
+            FeaturedProducts = dtos
+        };
+    }
     static async Task<ProductSearch_DTO> MapProductSearchToDto( ProductSearch model )
     {
         var dto = new ProductSearch_DTO();
@@ -204,7 +247,7 @@ public class ProductService : IProductService
         await Task.Run( () =>
         {
             dto.ProductId = productDetails.Product.ProductId;
-            dto.ProductName = productDetails.Product.ProductName;
+            dto.ProductTitle = productDetails.Product.ProductName;
 
             if ( productDetails.ProductDescription != null )
             {

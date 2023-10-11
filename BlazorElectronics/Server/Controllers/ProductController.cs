@@ -1,3 +1,4 @@
+using BlazorElectronics.Server.Models.Products;
 using Microsoft.AspNetCore.Mvc;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Shared;
@@ -14,6 +15,13 @@ public class ProductController : ControllerBase
     public ProductController( IProductService productService )
     {
         _productService = productService;
+    }
+
+    [HttpGet( "featured" )]
+    public async Task<ActionResult<ServiceResponse<ProductsFeatured_DTO>>> GetFeaturedProducts()
+    {
+        ServiceResponse<ProductsFeatured_DTO?> response = await _productService.GetFeaturedProducts();
+        return Ok( response );
     }
 
     [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
