@@ -35,13 +35,14 @@
 
     protected override async Task OnAfterRenderAsync( bool firstRender )
     {
-        if ( firstRender )
-            await _searchInputElement.FocusAsync();
+        //if ( firstRender )
+            //await _searchInputElement.FocusAsync();
     }
 
     void SearchProducts()
     {
-        NavigationManager.NavigateTo( $"search/{_searchText}" );
+        string url = ProductService.GetProductSearchUrl();
+        NavigationManager.NavigateTo( url );
     }
     async Task HandleSearch( KeyboardEventArgs args )
     {

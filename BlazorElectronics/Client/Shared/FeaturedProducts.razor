@@ -1,0 +1,96 @@
+@using BlazorElectronics.Client.Services.Products
+@using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.DataTransferObjects.Products
+@inject IProductServiceClient ProductService
+@inject IJSRuntime JsRuntime
+
+<h2>Featured Products</h2>
+@if ( !_loaded )
+{
+    <span>Loading Featured Products...</span>
+}
+else if ( _featuredProducts == null )
+{
+    <span>@_serverMessage</span>
+}
+else
+{
+    <div id="featured-products-carousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @for ( int i = 0; i < _featuredProducts.Count; i++ )
+            {
+                <button
+                    type="button"
+                    data-bs-target="#featured-products-carousel"
+                    data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"
+                    aria-current="@(i == 0 ? "true" : "false")"
+                    aria-label="Slide @i">
+                </button>
+            }
+        </div>
+        <div class="carousel-inner">
+            @foreach ( ProductFeatured_DTO p in _featuredProducts )
+            {
+                <div class="carousel-item @(p == _featuredProducts.First() ? "active" : "")">
+                    <img class="d-block w-100" src="@p.ImageUrl" alt="@p.ProductId"/>
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}
+
+@code {
+    bool _isCarouselInitialized = false;
+    bool _loaded = false;
+    string? _serverMessage;
+    string _exceptionMessage = string.Empty;
+    List<ProductFeatured_DTO>? _featuredProducts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ServiceResponse<ProductsFeatured_DTO?>? response = await ProductService.GetFeaturedProducts();
+        _loaded = true;
+
+        if ( response == null )
+        {
+            _serverMessage = "Server response is null!";
+        }
+        else if ( response.Data == null || !response.Success )
+        {
+            _serverMessage = response.Message ?? "Service response failed without a message!";
+        }
+        else
+        {
+            _featuredProducts = response.Data.FeaturedProducts;
+        }
+    }
+    protected override async Task OnAfterRenderAsync( bool firstRender )
+    {
+        try
+        {
+            if ( firstRender )
+                await JsRuntime.InvokeVoidAsync( "startCarousel" );
+        }
+        catch ( Exception e )
+        {
+            _exceptionMessage = e.Message;
+        }
+    }
+
+    async Task InitializeCarousel()
+    {
+        if ( !_isCarouselInitialized )
+        {
+            await JsRuntime.InvokeVoidAsync( "startCarousel" );
+            _isCarouselInitialized = true;
+        }
+    }
+}

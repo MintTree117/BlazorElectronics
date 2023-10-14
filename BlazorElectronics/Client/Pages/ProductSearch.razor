@@ -1,18 +1,17 @@
 @page "/{category}/search/{searchText}"
 @page "/search/{searchText}"
 @page "/{category}"
-@inject IProductServiceClient ProductServiceClient;
+@inject IProductServiceClient ProductService;
 @inject NavigationManager NavigationManager;
 @using BlazorElectronics.Client.Services.Products
 @using BlazorElectronics.Shared.DataTransferObjects.Products
-@using System.Web
 @using System.Collections.Specialized
 @using System.Reflection
 @using System.Text
-@using BlazorElectronics.Shared
+@using System.Web
 
-<span>@debugMessage</span>
 <ProductList></ProductList>
+<span>_@_debugMessage</span>
 
 @code {
     [Parameter]
@@ -20,39 +19,39 @@
     [Parameter]
     public string? SearchText { get; set; }
 
-    string debugMessage = string.Empty;
+    string _debugMessage = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
-        ProductSearchFilters_DTO filters = MapFilterQueryParamters( NavigationManager );
+        Uri uri = NavigationManager.ToAbsoluteUri( NavigationManager.Uri );
+        NameValueCollection queryParameters = HttpUtility.ParseQueryString( uri.Query );
+
+        ProductSearchRequest_DTO request = MapSearchQueryParameters( queryParameters );
 
         if ( Category != null && SearchText != null )
         {
-            debugMessage = "cat and text";
-            await ProductServiceClient.SearchProductsByCategoryAndText( Category, SearchText, filters );
+            _debugMessage = "cat and text";
+            await ProductService.SearchProductsByCategoryAndText( Category, SearchText, request );
         }
         else if ( Category != null )
         {
-            debugMessage = "cat" + Category;
-            await ProductServiceClient.SearchProductsByCategory( Category, filters );
+            _debugMessage = request.ToString();
+            await ProductService.SearchProductsByCategory( Category, request );
         }
         else if ( SearchText != null )
         {
-            debugMessage = "text";
-            await ProductServiceClient.SearchProductsByText( SearchText, filters );
+            _debugMessage = "text";
+            await ProductService.SearchProductsByText( SearchText, request );
         }
         else throw new Exception( "No valid input parameters provided for product search!" );
 
         StateHasChanged();
     }
-    
-    static ProductSearchFilters_DTO MapFilterQueryParamters( NavigationManager navManager )
+
+    ProductSearchRequest_DTO MapSearchQueryParameters( NameValueCollection queryParameters )
     {
-        Uri uri = navManager.ToAbsoluteUri( navManager.Uri );
-        NameValueCollection queryParameters = HttpUtility.ParseQueryString( uri.Query );
-        
-        var filtersDTO = new ProductSearchFilters_DTO();
-        Type type = typeof( ProductSearchFilters_DTO );
+        var filtersDTO = new ProductSearchRequest_DTO();
+        Type type = typeof( ProductSearchRequest_DTO );
 
         foreach ( string? key in queryParameters.AllKeys )
         {

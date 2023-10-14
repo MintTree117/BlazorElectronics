@@ -2,7 +2,8 @@
 @using BlazorElectronics.Client.Services.Products
 @using BlazorElectronics.Shared
 @using System.Globalization
-@inject IProductServiceClient ProductServiceClient;
+@inject IProductServiceClient ProductService;
+@inject NavigationManager NavigationManager;
 @implements IDisposable;
 
 @if ( !_loadedData || _productSearch == null ) {
@@ -27,25 +28,36 @@ else {
                 </div>
             </li>
         }
-    </ul>   
+    </ul>
+    //@for ( int i = 1; i < _productSearch.Pages; i++ )
+    //{
+        //int index = i;
+        //<button @onclick="() => { ChangeSearchPage( index ); }"></button>
+    //}
 }
 
 @code {
     bool _loadedData = false;
     string _serverMessage = "Loading Products...";
 
-    ProductSearch_DTO? _productSearch;
+    ProductSearchResults_DTO? _productSearch;
     
     protected override void OnInitialized()
     {
-        ProductServiceClient.ProductSearchChanged += OnProductsChange;
+        ProductService.ProductSearchChanged += OnProductsChange;
     }
     public void Dispose()
     {
-        ProductServiceClient.ProductSearchChanged -= OnProductsChange;
+        ProductService.ProductSearchChanged -= OnProductsChange;
     }
 
-    void OnProductsChange( ServiceResponse<ProductSearch_DTO?>? productSearch  )
+    void ChangeSearchPage( int page )
+    {
+        ProductService.UpdateProductSearchPage( page );
+        string url = ProductService.GetProductSearchUrl();
+        NavigationManager.NavigateTo( url );
+    }
+    void OnProductsChange( ServiceResponse<ProductSearchResults_DTO?>? productSearch  )
     {
         StateHasChanged();
         

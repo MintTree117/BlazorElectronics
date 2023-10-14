@@ -36,7 +36,7 @@
 @code {
     bool _loadedCategories = false;
     bool _collapseNavMenu = true;
-    string? _categoryMessage;
+    string _categoryMessage = "Loading Categories...";
     string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
     Categories_DTO? _categories;
@@ -51,11 +51,6 @@
             _categoryMessage = "Failed to load categories!";
             return;
         }
-    }
-
-    void NavigateToProductSearch()
-    {
-        
     }
     void ToggleNavMenu() { _collapseNavMenu = !_collapseNavMenu; }
 }

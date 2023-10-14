@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "YtLDqqHvC7hXkDtl4gQ38MLq0kW7822TXuZDsywyxy/0Z8fPdwZXaSLN9e7o+NEPcZkZ3ejI75GJPPYEigYsTg==",
+  "dgSpecHash": "PHVPHDwps0KWdMoaau2agaJHMtv5opB/TVYHRT2sRNLyHDWInRcyrRlVuF23XHGvAHZ5j+foVjkYKGUKuYwLfA==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/BlazorElectronics.Client.csproj",
   "expectedPackageFiles": [
+    "/home/martin/.nuget/packages/bootstrap/5.3.2/bootstrap.5.3.2.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.aspnetcore.authorization/7.0.11/microsoft.aspnetcore.authorization.7.0.11.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.aspnetcore.components/7.0.11/microsoft.aspnetcore.components.7.0.11.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.aspnetcore.components.analyzers/7.0.11/microsoft.aspnetcore.components.analyzers.7.0.11.nupkg.sha512",

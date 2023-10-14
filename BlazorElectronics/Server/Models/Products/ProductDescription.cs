@@ -4,5 +4,5 @@ public sealed class ProductDescription
 {
     public int DescriptionId { get; set; }
     public int ProductId { get; set; }
-    public string? Description { get; set; }
+    public string? DescriptionBody { get; set; }
 }

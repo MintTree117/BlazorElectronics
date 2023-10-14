@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/BlazorElectronics.Client.props" />
+</Project>

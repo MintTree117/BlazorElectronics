@@ -5,10 +5,10 @@ namespace BlazorElectronics.Server.Services.Products;
 
 public interface IProductService
 {
-    Task<ServiceResponse<string?>> TestGetQueryString( ProductSearchFilters_DTO filters );
+    Task<ServiceResponse<string?>> TestGetQueryString( ProductSearchRequest_DTO request );
     Task<ServiceResponse<Products_DTO?>> GetProducts();
     Task<ServiceResponse<ProductsFeatured_DTO?>> GetFeaturedProducts();
     Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
-    Task<ServiceResponse<ProductSearch_DTO?>> SearchProducts( ProductSearchFilters_DTO? searchFilters );
+    Task<ServiceResponse<ProductSearchResults_DTO?>> SearchProducts( ProductSearchRequest_DTO? searchRequestDto );
     Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

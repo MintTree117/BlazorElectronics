@@ -5,7 +5,7 @@ namespace BlazorElectronics.Server.Models.Products;
 [Serializable]
 public sealed class ProductVariant
 {
-    public int ProductVariantId { get; set; }
+    public int VariantId_VariantsUnion { get; set; }
     public int VariantId { get; set; }
     public int ProductId { get; set; }
     public string? VariantName { get; set; }
