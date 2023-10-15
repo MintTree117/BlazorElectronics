@@ -1,7 +1,19 @@
 namespace BlazorElectronics.Shared;
 
+public enum DtoDefaultMessage
+{
+    NULL,
+    FAILURE,
+    SUCCESS
+}
+
 public sealed class ServiceResponse<T>
 {
+    const string MESSAGE_RESPONSE_ERROR = "Failed to produce a proper response message!";
+    const string MESSAGE_RESPONSE_NULL = "Service response is null!";
+    const string MESSAGE_RESPONSE_FAILURE = "Service returned failure without a message!";
+    const string MESSAGE_RESPONSE_SUCCESS = "Service returned success without a message!";
+    
     public ServiceResponse()
     {
         
@@ -9,7 +21,7 @@ public sealed class ServiceResponse<T>
     public ServiceResponse( string? message )
     {
         Success = false;
-        Message = message ?? DtoUtility.GetDefaultMessage( DtoDefaultMessage.FAILURE );
+        Message = message ?? GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
     public ServiceResponse( ServiceResponse<T> response )
     {
@@ -21,7 +33,7 @@ public sealed class ServiceResponse<T>
         
         Message = response.Message;
         if ( string.IsNullOrEmpty( Message ) )
-            Message = Success ? DtoUtility.GetDefaultMessage( DtoDefaultMessage.SUCCESS ) : DtoUtility.GetDefaultMessage( DtoDefaultMessage.FAILURE );
+            Message = Success ? GetDefaultMessage( DtoDefaultMessage.SUCCESS ) : GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
     public ServiceResponse( T? data, bool success, string message )
     {
@@ -33,13 +45,13 @@ public sealed class ServiceResponse<T>
     {
         Data = data;
         Success = success;
-        Message = DtoUtility.GetDefaultMessage( defaultMessage );
+        Message = GetDefaultMessage( defaultMessage );
     }
     public ServiceResponse( T? data, bool success, string? recievedMessage, DtoDefaultMessage defaultMessage )
     {
         Data = data;
         Success = success;
-        Message = recievedMessage ?? DtoUtility.GetDefaultMessage( defaultMessage );
+        Message = recievedMessage ?? GetDefaultMessage( defaultMessage );
     }
 
     public bool IsSuccessful()
@@ -50,4 +62,14 @@ public sealed class ServiceResponse<T>
     public bool Success { get; set; }
     public string? Message { get; set; }
     public T? Data { get; set; }
+
+    static string GetDefaultMessage( DtoDefaultMessage defaultMessage )
+    {
+        return defaultMessage switch {
+            DtoDefaultMessage.NULL => MESSAGE_RESPONSE_NULL,
+            DtoDefaultMessage.FAILURE => MESSAGE_RESPONSE_FAILURE,
+            DtoDefaultMessage.SUCCESS => MESSAGE_RESPONSE_SUCCESS,
+            _ => MESSAGE_RESPONSE_ERROR
+        };
+    }
 }

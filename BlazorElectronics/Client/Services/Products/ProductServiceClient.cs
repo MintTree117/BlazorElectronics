@@ -1,7 +1,8 @@
 using System.Net.Http.Json;
 using System.Text;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DataTransferObjects.Products;
+using BlazorElectronics.Shared.DtosInbound.Products;
+using BlazorElectronics.Shared.DtosOutbound.Products;
 
 namespace BlazorElectronics.Client.Services.Products;
 
@@ -40,7 +41,7 @@ public class ProductServiceClient : IProductServiceClient
     public void UpdateProductSearchResultsCount( int count )
     {
         SearchRequest ??= new ProductSearchRequest_DTO();
-        SearchRequest.Rows = count;
+        SearchRequest.NumberOfResults = count;
     }
     public string GetProductSearchUrl()
     {
@@ -49,7 +50,7 @@ public class ProductServiceClient : IProductServiceClient
         var urlBuilder = new StringBuilder();
 
         urlBuilder.Append( $"?page={SearchRequest.Page}" );
-        urlBuilder.Append( $"&rows={SearchRequest.Rows}" );
+        urlBuilder.Append( $"&rows={SearchRequest.NumberOfResults}" );
 
         if ( SearchRequest.MinPrice != null )
             urlBuilder.Append( $"&minPrice={SearchRequest.MinPrice.Value}" );

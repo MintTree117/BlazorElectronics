@@ -1,4 +1,4 @@
-using BlazorElectronics.Shared.DataTransferObjects.Products;
+using BlazorElectronics.Shared.DtosOutbound.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
 

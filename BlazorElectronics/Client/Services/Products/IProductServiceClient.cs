@@ -1,5 +1,6 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DataTransferObjects.Products;
+using BlazorElectronics.Shared.DtosInbound.Products;
+using BlazorElectronics.Shared.DtosOutbound.Products;
 
 namespace BlazorElectronics.Client.Services.Products;
 

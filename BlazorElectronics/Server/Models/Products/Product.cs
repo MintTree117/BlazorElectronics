@@ -4,8 +4,8 @@ namespace BlazorElectronics.Server.Models.Products;
 public sealed class Product
 {
     public int ProductId { get; set; }
-    public string ProductName { get; set; } = string.Empty;
-    public string ProductThumbnail { get; set; } = string.Empty;
+    public string ProductTitle { get; set; } = string.Empty;
     public int ProductRating { get; set; }
+    public string ProductThumbnail { get; set; } = string.Empty;
     public List<ProductVariant> ProductVariants { get; set; } = new();
 }

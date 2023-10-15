@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DataTransferObjects.Products;
+using BlazorElectronics.Shared.DtosInbound.Products;
+using BlazorElectronics.Shared.DtosOutbound.Products;
 
 namespace BlazorElectronics.Server.Controllers;
 
@@ -30,7 +31,7 @@ public class ProductController : ControllerBase
         searchRequest.CategoryUrl = categoryUrl;
         searchRequest.SearchText = searchText;
 
-        ServiceResponse<string?> response = await _productService.TestGetQueryString( searchRequest );
+        ServiceResponse<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
         return Ok( response );
     }
     [HttpGet( "searchQuery/{categoryUrl}" )]
@@ -39,7 +40,7 @@ public class ProductController : ControllerBase
         searchRequest ??= new ProductSearchRequest_DTO();
         searchRequest.CategoryUrl = categoryUrl;
         
-        ServiceResponse<string?> response = await _productService.TestGetQueryString( searchRequest );
+        ServiceResponse<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
         return Ok( response );
     }
     [HttpGet( "search-suggestions/{searchText}" )]
@@ -51,7 +52,7 @@ public class ProductController : ControllerBase
     [HttpGet( "products" )]
     public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetAllProducts()
     {
-        ServiceResponse<Products_DTO?> response = await _productService.GetProducts();
+        ServiceResponse<Products_DTO?> response = await _productService.GetAllProducts();
         return Ok( response );
     }
     
@@ -62,7 +63,7 @@ public class ProductController : ControllerBase
         filters.CategoryUrl = categoryUrl;
         filters.SearchText = searchText;
         
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.SearchProducts( filters );
+        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
         return Ok( response );
     }
     [HttpGet( "search-category/{categoryUrl}" )]
@@ -71,7 +72,7 @@ public class ProductController : ControllerBase
         filters ??= new ProductSearchRequest_DTO();
         filters.CategoryUrl = categoryUrl;
         
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.SearchProducts( filters );
+        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
         return Ok( response );
     }
     [HttpGet( "search-text/{searchText}" )]
@@ -80,7 +81,7 @@ public class ProductController : ControllerBase
         filters ??= new ProductSearchRequest_DTO();
         filters.SearchText = searchText;
 
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.SearchProducts( filters );
+        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
         return Ok( response );
     }
 
@@ -88,7 +89,7 @@ public class ProductController : ControllerBase
     [HttpGet( "search" )]
     public async Task<ActionResult<ServiceResponse<ProductSearchResults_DTO>>> SearchProducts( [FromQuery] ProductSearchRequest_DTO? filters )
     {
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.SearchProducts( filters );
+        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
         return Ok( response );
     }
     [HttpGet( "details/{productId:int}" )]

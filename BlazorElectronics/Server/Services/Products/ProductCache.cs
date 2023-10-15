@@ -1,4 +1,4 @@
-using BlazorElectronics.Shared.DataTransferObjects.Products;
+using BlazorElectronics.Shared.DtosOutbound.Products;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace BlazorElectronics.Server.Services.Products;
@@ -27,7 +27,7 @@ public sealed class ProductCache : CachedService, IProductCache
     }
     public async Task CacheProductDetails( ProductDetails_DTO dto )
     {
-        string key = $"{CACHE_KEY_PRODUCT_DETAILS}{dto.ProductId}";
+        string key = $"{CACHE_KEY_PRODUCT_DETAILS}{dto.Id}";
         await Cache( key, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
             .SetAbsoluteExpiration( TimeSpan.FromDays( 1 ) ) );

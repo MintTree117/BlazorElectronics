@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Models.Products;
 
-public sealed class ValidatedSearchRequest
+public sealed class ProductSearchRequest
 {
     public int Page { get; set; } = 0;
     public int Rows { get; set; } = 10;
@@ -13,6 +13,6 @@ public sealed class ValidatedSearchRequest
     public int? MinRating { get; set; }
     public int? MaxRating { get; set; }
 
-    public List<ProductSpecFilter> LookupSpecFilters { get; set; } = new();
-    public List<ProductSpecFilter> RawSpecFilters { get; set; } = new();
+    public List<ProductSpecFilter>? LookupSpecFilters { get; set; }
+    public List<ProductSpecFilter>? RawSpecFilters { get; set; }
 }

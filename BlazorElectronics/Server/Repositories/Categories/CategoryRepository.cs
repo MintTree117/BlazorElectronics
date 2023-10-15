@@ -8,17 +8,17 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 
 public class CategoryRepository : DapperRepository<Category>, ICategoryRepository
 {
-    const string CATEGORY_ID_COLUMN = "CategoryId";
-    const string CATEGORY_SUB_ID_COLUMN = "CategorySubId";
+    const string STORED_PROCEDURE_GET_CATEGORY_BY_ID = "Get_CategoryById";
     const string STORED_PROCEDURE_GET_CATEGORIES = "Get_Categories";
 
     public CategoryRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public override async Task<IEnumerable<Category>> GetAll()
+    public override async Task<IEnumerable<Category>?> GetAll()
     {
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
-
+        
         var categoryDictionary = new Dictionary<int, Category>();
+        const string splitOnColumns = $"{SqlConsts.COLUMN_CATEGORY_ID},{SqlConsts.COLUMN_CATEGORY_SUB_ID}";
 
         IEnumerable<Category>? categories = await connection.QueryAsync<Category, CategorySub, Category>
         ( STORED_PROCEDURE_GET_CATEGORIES,
@@ -33,10 +33,14 @@ public class CategoryRepository : DapperRepository<Category>, ICategoryRepositor
                     category.SubCategories.Add( categorySub );
                 return categoryEntry;
             },
-            splitOn: $"{CATEGORY_ID_COLUMN},{CATEGORY_SUB_ID_COLUMN}",
+            splitOn: splitOnColumns,
             commandType: CommandType.StoredProcedure );
 
         return categories;
     }
-    public override Task<Category> GetById( int id ) { throw new NotImplementedException(); }
+    public override async Task<Category?> GetById( int id )
+    {
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+        return await connection.QuerySingleAsync<Category?>( STORED_PROCEDURE_GET_CATEGORY_BY_ID, id, commandType: CommandType.StoredProcedure );
+    }
 }

@@ -1,15 +1,12 @@
 @using BlazorElectronics.Client.Services.Products
 @using BlazorElectronics.Shared
-@using BlazorElectronics.Shared.DataTransferObjects.Products
+@using BlazorElectronics.Shared.DtosOutbound.Products
 @inject IProductServiceClient ProductService
 @inject IJSRuntime JsRuntime
 
 <h2>Featured Products</h2>
-@if ( !_loaded )
-{
-    <span>Loading Featured Products...</span>
-}
-else if ( _featuredProducts == null )
+
+@if ( !_loaded || _featuredProducts == null )
 {
     <span>@_serverMessage</span>
 }
@@ -56,28 +53,20 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        _serverMessage = "Loading Featured Products...";
+        
         ServiceResponse<ProductsFeatured_DTO?>? response = await ProductService.GetFeaturedProducts();
         _loaded = true;
 
-        if ( response == null )
-        {
-            _serverMessage = "Server response is null!";
-        }
-        else if ( response.Data == null || !response.Success )
-        {
-            _serverMessage = response.Message ?? "Service response failed without a message!";
-        }
-        else
-        {
-            _featuredProducts = response.Data.FeaturedProducts;
-        }
+        if ( response == null ) _serverMessage = "Server response is null!";
+        else if ( response.Data == null || !response.Success ) _serverMessage = response.Message ?? "Service response failed without a message!";
+        else _featuredProducts = response.Data.FeaturedProducts;
     }
     protected override async Task OnAfterRenderAsync( bool firstRender )
     {
         try
         {
-            if ( firstRender )
-                await JsRuntime.InvokeVoidAsync( "startCarousel" );
+            await JsRuntime.InvokeVoidAsync( "startCarousel" );
         }
         catch ( Exception e )
         {

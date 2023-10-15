@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared.DataTransferObjects.Products;
+namespace BlazorElectronics.Shared.DtosOutbound.Products;
 
 public sealed class ProductSpec_DTO
 {

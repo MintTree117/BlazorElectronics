@@ -4,11 +4,11 @@
 @inject IProductServiceClient ProductService;
 @inject NavigationManager NavigationManager;
 @using BlazorElectronics.Client.Services.Products
-@using BlazorElectronics.Shared.DataTransferObjects.Products
 @using System.Collections.Specialized
 @using System.Reflection
 @using System.Text
 @using System.Web
+@using BlazorElectronics.Shared.DtosInbound.Products
 
 <ProductList></ProductList>
 <span>_@_debugMessage</span>
@@ -30,17 +30,14 @@
 
         if ( Category != null && SearchText != null )
         {
-            _debugMessage = "cat and text";
             await ProductService.SearchProductsByCategoryAndText( Category, SearchText, request );
         }
         else if ( Category != null )
         {
-            _debugMessage = request.ToString();
             await ProductService.SearchProductsByCategory( Category, request );
         }
         else if ( SearchText != null )
         {
-            _debugMessage = "text";
             await ProductService.SearchProductsByText( SearchText, request );
         }
         else throw new Exception( "No valid input parameters provided for product search!" );

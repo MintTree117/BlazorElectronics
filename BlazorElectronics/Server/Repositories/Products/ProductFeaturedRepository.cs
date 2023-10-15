@@ -1,13 +1,14 @@
 using System.Data;
+using Microsoft.Data.SqlClient;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
 using Dapper;
-using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
 public class ProductFeaturedRepository : DapperRepository<ProductFeatured>, IProductFeaturedRepository
 {
+    const string STORED_PROCEDURE_GET_FEATURED_PRODUCT_BY_ID = "Get_FeaturedProductById";
     const string STORED_PROCEDURE_GET_FEATURED_PRODUCTS = "Get_FeaturedProducts";
     
     public ProductFeaturedRepository( DapperContext dapperContext ) : base( dapperContext ) { }
@@ -19,6 +20,7 @@ public class ProductFeaturedRepository : DapperRepository<ProductFeatured>, IPro
     }
     public override async Task<ProductFeatured?> GetById( int id )
     {
-        throw new NotImplementedException();
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+        return await connection.QuerySingleAsync<ProductFeatured>( STORED_PROCEDURE_GET_FEATURED_PRODUCT_BY_ID, id, commandType: CommandType.StoredProcedure );
     }
 }

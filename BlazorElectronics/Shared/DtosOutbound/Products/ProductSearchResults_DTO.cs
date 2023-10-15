@@ -1,8 +1,7 @@
-namespace BlazorElectronics.Shared.DataTransferObjects.Products;
+namespace BlazorElectronics.Shared.DtosOutbound.Products;
 
 public sealed class ProductSearchResults_DTO
 {
-    public List<ProductAndVariantsDto> ProductsWithVariants { get; set; } = new();
     public List<Product_DTO> Products { get; set; } = new();
     public int Pages { get; set; }
     public int CurrentPage { get; set; }

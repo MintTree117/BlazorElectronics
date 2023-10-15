@@ -17,4 +17,23 @@
         <ProjectReference Include="..\Shared\BlazorElectronics.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Pages\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Pages\Home\FeaturedProducts.razor" />
+      <AdditionalFiles Include="Pages\Home\Index.razor" />
+      <AdditionalFiles Include="Pages\ProductDetails\ProductDetails.razor" />
+      <AdditionalFiles Include="Pages\ProductSearch\ProductList.razor" />
+      <AdditionalFiles Include="Pages\ProductSearch\ProductSearch.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="RazorComponents\ProductDetails\ProductDetails.razor" />
+      <_ContentIncludedByDefault Remove="RazorComponents\Counter.razor" />
+      <_ContentIncludedByDefault Remove="RazorComponents\FetchData.razor" />
+      <_ContentIncludedByDefault Remove="RazorComponents\SurveyPrompt.razor" />
+    </ItemGroup>
+
 </Project>
