@@ -20,6 +20,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductFeaturedRepository, ProductFeaturedRepository>();
+builder.Services.AddScoped<IProductDealsRepository, ProductDealsRepository>();
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();

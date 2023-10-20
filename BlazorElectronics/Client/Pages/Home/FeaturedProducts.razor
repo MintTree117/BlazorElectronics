@@ -5,45 +5,47 @@
 @inject IProductServiceClient ProductService
 @inject IJSRuntime JsRuntime
 
-<h2>Featured Products</h2>
-
 @if ( !_loaded || _featuredProducts == null )
 {
     <span>@_serverMessage</span>
 }
 else
 {
-    <div id="featured-products-carousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            @for ( int i = 0; i < _featuredProducts.Count; i++ )
-            {
-                <button
-                    type="button"
-                    data-bs-target="#featured-products-carousel"
-                    data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"
-                    aria-current="@(i == 0 ? "true" : "false")"
-                    aria-label="Slide @i">
-                </button>
-            }
-        </div>
-        <div class="carousel-inner">
-            @foreach ( ProductFeatured_DTO p in _featuredProducts )
-            {
-                <div class="carousel-item @(p == _featuredProducts.First() ? "active" : "")">
-                    <img class="d-block w-100" src="@p.ImageUrl" alt="@p.ProductId"/>
-                </div>
-            }
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-        <div class="category-list-container">
-            <CategoryList></CategoryList>
+    <div class="container-fluid featured-products-container">
+        <div id="featured-products-carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                @for ( int i = 0; i < _featuredProducts.Count; i++ )
+                {
+                    <button
+                        type="button"
+                        data-bs-target="#featured-products-carousel"
+                        data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"
+                        aria-current="@(i == 0 ? "true" : "false")"
+                        aria-label="Slide @i">
+                    </button>
+                }
+            </div>
+            <div class="carousel-inner">
+                @foreach ( ProductFeatured_DTO p in _featuredProducts )
+                {
+                    <div class="carousel-item fp-carousel-item @(p == _featuredProducts.First() ? "active" : "")">
+                        <img class="d-block w-100 fp-carousel-item-img" src="@p.ImageUrl" alt="@p.ProductId"/>
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+            <div class="category-list-container">
+                <CategoryList></CategoryList>
+            </div>
+            <div class="featured-products-fade">
+            </div>
         </div>
     </div>
 }

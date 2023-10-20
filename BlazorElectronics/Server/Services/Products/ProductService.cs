@@ -15,6 +15,7 @@ public class ProductService : IProductService
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductDetailsRepository _productDetailsRepository;
     readonly IProductFeaturedRepository _productFeaturedRepository;
+    readonly IProductDealsRepository _productDealsRepository;
 
     readonly ICategoryService _categoryService;
     readonly ISpecService _specService;
@@ -26,13 +27,15 @@ public class ProductService : IProductService
         IProductSearchRepository productSearchRepository, 
         IProductDetailsRepository productDetailsRepository, 
         ICategoryService categoryService, ISpecService specService, 
-        IProductFeaturedRepository productFeaturedRepository )
+        IProductFeaturedRepository productFeaturedRepository, 
+        IProductDealsRepository productDealsRepository )
     {
         _cache = cache;
         _productSearchRepository = productSearchRepository;
         _categoryService = categoryService;
         _specService = specService;
         _productFeaturedRepository = productFeaturedRepository;
+        _productDealsRepository = productDealsRepository;
         _productDetailsRepository = productDetailsRepository;
     }
     
@@ -79,6 +82,24 @@ public class ProductService : IProductService
         await _cache.CacheFeaturedProducts( dto );
 
         return new ServiceResponse<ProductsFeatured_DTO?>( dto, true, "Successfully retrieved FeaturedProducts_DTO from repository, mapped to DTO, and cached." );
+    }
+    public async Task<ServiceResponse<Products_DTO?>> GetTopDeals()
+    {
+        Products_DTO? dto = await _cache.GetTopDeals();
+
+        if ( dto != null )
+            return new ServiceResponse<Products_DTO?>( dto, true, "Success. Retrieved Top Deals from cache." );
+
+        IEnumerable<Product>? models = await _productDealsRepository.GetAll();
+
+        if ( models == null )
+            return new ServiceResponse<Products_DTO?>( null, false, "Failed to retrieve Top Deals from cache, and ProductDetails from repository!" );
+
+        dto = await MapProductsToDto( models );
+        await _cache.CacheTopDeals( dto );
+
+        return new ServiceResponse<Products_DTO?>( dto, true, "Successfully retrieved Top Deals from repository, mapped to DTO, and cached." );
+
     }
     public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetTextSearchSuggestions( string searchText )
     {

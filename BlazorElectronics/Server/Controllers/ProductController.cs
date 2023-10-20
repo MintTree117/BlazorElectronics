@@ -23,6 +23,12 @@ public class ProductController : ControllerBase
         ServiceResponse<ProductsFeatured_DTO?> response = await _productService.GetFeaturedProducts();
         return Ok( response );
     }
+    [HttpGet( "deals" )]
+    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetTopDeals()
+    {
+        ServiceResponse<Products_DTO?> response = await _productService.GetTopDeals();
+        return Ok( response );
+    }
 
     [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
     public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest_DTO? searchRequest )

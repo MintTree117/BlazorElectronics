@@ -1,18 +1,22 @@
 /* FEATURED PRODUCTS */
 
-.featured-products-carousel {
-    margin: 0 auto 2em;
-    max-width: 450px;
-    height: 430px;
+.featured-products-container {
+    max-height: 800px;
+    overflow: clip;
+    border-radius: 5px;
 }
 
-.carousel-image {
+.fp-carousel-item {
     width: 100%;
     height: 100%;
+    max-height: 800px;
+    overflow: clip;
 }
 
-.fp-carousel-item, .fp-carousel-image-container {
-    height: 100%;
+.fp-carousel-item-img {
+    height: 700px;
+    max-height: 700px;
+    overflow: clip;
 }
 
 .category-list-container {
@@ -23,6 +27,16 @@
     height: 100%;
     z-index: 10;
     background-color: #9aa5b5;
-    background-image: linear-gradient(to bottom left, #9aa5b5, #6d7682);
+    background-image: linear-gradient(to bottom left, #b3bbc7, #6c7075);
     font-size: .9rem;
+}
+
+.featured-products-fade {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 11;
+    background-image: linear-gradient(to top, rgba(80, 80, 80, 0.7) 2%, rgba(80, 80, 80, 0.6) 4%, rgba(80, 80, 80, 0.4) 6%, rgba(80, 80, 80, 0.2) 8%, rgba(80, 80, 80, 0) 10% );
+    pointer-events: none;
 }
