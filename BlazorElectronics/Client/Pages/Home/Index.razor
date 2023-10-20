@@ -1,4 +1,26 @@
 ﻿@page "/"
+@using BlazorElectronics.Client.Services.Products
+@inject IProductServiceClient ProductService
 
 <PageTitle>BlazorElectronics</PageTitle>
 <FeaturedProducts></FeaturedProducts>
+
+<span>@_debugMessage</span>
+
+@code
+{
+    string _debugMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ProductService.ClearSearchRequest();
+        }
+        catch ( Exception e )
+        {
+            _debugMessage = e.Message;
+        }
+
+    }
+}

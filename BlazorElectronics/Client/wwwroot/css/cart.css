@@ -1,0 +1,21 @@
+.container {
+    padding: 6px;
+}
+
+.cart-item-image {
+    width: 100px;
+    height: 100px;
+    max-height: 150px;
+    max-width: 150px;
+    text-align: center;
+    padding: 6px;
+}
+
+.cart-item-name {
+    padding: 6px;
+}
+
+.cart-item-price {
+    font-weight: 600;
+    text-align: right;
+}

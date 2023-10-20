@@ -197,6 +197,10 @@
       "PackagePath": "staticwebassets/Images/CpuIntelDefault.jpg"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/DefaultThumbnail.jpg",
+      "PackagePath": "staticwebassets/Images/DefaultThumbnail.jpg"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/default.jpg",
       "PackagePath": "staticwebassets/Images/default.jpg"
     },
@@ -223,6 +227,22 @@
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/bootstrap/bootstrap.min.css.map",
       "PackagePath": "staticwebassets/css/bootstrap/bootstrap.min.css.map"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/cart.css",
+      "PackagePath": "staticwebassets/css/cart.css"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/categorylist.css",
+      "PackagePath": "staticwebassets/css/categorylist.css"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/home.css",
+      "PackagePath": "staticwebassets/css/home.css"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/nav.css",
+      "PackagePath": "staticwebassets/css/nav.css"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/open-iconic/FONT-LICENSE",

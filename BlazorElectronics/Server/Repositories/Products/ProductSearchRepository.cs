@@ -29,7 +29,7 @@ public sealed class ProductSearchRepository : DapperRepository<Product>, IProduc
     const string CTE_FILTERED_PRODUCTS = "FilteredProducts_CTE";
     const string CTE_PRODUCT_VARIANTS = "ProductVariants_CTE";
 
-    const string STORED_PROCEDURE_GET_NAMES_BY_SEARCH_TEXT = "Get_ProductNamesBySearchText";
+    const string STORED_PROCEDURE_GET_NAMES_BY_SEARCH_TEXT = "Get_ProductSearchSuggestions";
     const string STORED_PROCEDURE_GET_ALL_PRODUCTS = "Get_AllProducts";
     const string STORED_PROCEDURE_GET_PRODUCT_BY_ID = "Get_ProductById";
 
@@ -103,20 +103,20 @@ public sealed class ProductSearchRepository : DapperRepository<Product>, IProduc
         DynamicParameters dynamicParams = await BuildProductSearchQuery( searchRequest, productQuery, countQuery );
 
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
+        
+        Task<IEnumerable<Product>?> productTask = ExecuteProductSearch( connection, productQuery.ToString(), dynamicParams );
+        Task<int> countTask = ExecuteSearchCount( connection, countQuery.ToString(), dynamicParams );
 
-        Task<IEnumerable<Product>?> productTask = ExecuteSearchProducts( connection, productQuery.ToString(), dynamicParams );
-        //Task<int> countTask = CountProducts( connection, countQuery.ToString(), dynamicParams );
-
-        await Task.WhenAll( productTask );
+        await Task.WhenAll( productTask, countTask );
 
         if ( productTask.Result == null )
             return null;
 
         return new ProductSearch {
             Products = productTask.Result,
-            //TotalSearchCount = countTask.Result
-            //QueryRows = dynamicParams.Get<int>( QUERY_PARAM_QUERY_ROWS ),
-            //QueryOffset = dynamicParams.Get<int>( QUERY_PARAM_QUERY_OFFSET )
+            TotalSearchCount = countTask.Result,
+            QueryRows = dynamicParams.Get<int>( QUERY_PARAM_QUERY_ROWS ),
+            QueryOffset = dynamicParams.Get<int>( QUERY_PARAM_QUERY_OFFSET )
         };
     }
 
@@ -126,59 +126,62 @@ public sealed class ProductSearchRepository : DapperRepository<Product>, IProduc
 
         await Task.Run( () =>
         {
+            var firstHalf = new StringBuilder();
+            var secondHalf = new StringBuilder();
+
             // FILTER PRODUCTS CTE
-            productQuery.Append( $" WITH {CTE_FILTERED_PRODUCTS} AS (" );
-            productQuery.Append( $" SELECT" );
-            productQuery.Append( $" p.{SqlConsts.COLUMN_PRODUCT_ID} AS {COLUMN_ALIAS_PRODUCT_ID}," );
-            productQuery.Append( $" p.{SqlConsts.COLUMN_PRODUCT_TITLE}," );
-            productQuery.Append( $" p.{SqlConsts.COLUMN_PRODUCT_RATING}," );
-            productQuery.Append( $" p.{SqlConsts.COLUMN_PRODUCT_THUMBNAIL}" );
-            productQuery.Append( $" FROM {SqlConsts.TABLE_PRODUCTS} p" );
+            firstHalf.Append( $" WITH {CTE_FILTERED_PRODUCTS} AS (" );
+            firstHalf.Append( $" SELECT" );
+            firstHalf.Append( $" p.{SqlConsts.COLUMN_PRODUCT_ID} AS {COLUMN_ALIAS_PRODUCT_ID}," );
+            firstHalf.Append( $" p.{SqlConsts.COLUMN_PRODUCT_TITLE}," );
+            firstHalf.Append( $" p.{SqlConsts.COLUMN_PRODUCT_RATING}," );
+            firstHalf.Append( $" p.{SqlConsts.COLUMN_PRODUCT_THUMBNAIL}" );
+            firstHalf.Append( $" FROM {SqlConsts.TABLE_PRODUCTS} p" );
 
             if ( request.CategoryId != null )
             {
-                productQuery.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_CATEGORIES} pc" );
-                productQuery.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = pc.{SqlConsts.COLUMN_PRODUCT_ID}" );
+                firstHalf.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_CATEGORIES} pc" );
+                firstHalf.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = pc.{SqlConsts.COLUMN_PRODUCT_ID}" );
             }
             if ( !string.IsNullOrEmpty( request.SearchText ) )
             {
-                productQuery.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_DESCRIPTIONS} pd" );
-                productQuery.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = pd.{SqlConsts.COLUMN_PRODUCT_ID}" );
+                firstHalf.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_DESCRIPTIONS} pd" );
+                firstHalf.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = pd.{SqlConsts.COLUMN_PRODUCT_ID}" );
             }
             if ( request.LookupSpecFilters is { Count: > 0 } )
             {
-                productQuery.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_SPECS_LOOKUP} psl" );
-                productQuery.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = psl.{SqlConsts.COLUMN_PRODUCT_ID}" );
-                productQuery.Append( $" LEFT JOIN {SqlConsts.TABLE_SPECS_LOOKUP} sl" );
-                productQuery.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = sl.{SqlConsts.COLUMN_PRODUCT_ID}" );
+                firstHalf.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_SPECS_LOOKUP} psl" );
+                firstHalf.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = psl.{SqlConsts.COLUMN_PRODUCT_ID}" );
+                firstHalf.Append( $" LEFT JOIN {SqlConsts.TABLE_SPECS_LOOKUP} sl" );
+                firstHalf.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = sl.{SqlConsts.COLUMN_PRODUCT_ID}" );
             }
             if ( request.RawSpecFilters is { Count: > 0 } )
             {
-                productQuery.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_SPECS_RAW} psr" );
-                productQuery.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = psr.{SqlConsts.COLUMN_PRODUCT_ID}" );
+                firstHalf.Append( $" LEFT JOIN {SqlConsts.TABLE_PRODUCT_SPECS_RAW} psr" );
+                firstHalf.Append( $" ON p.{SqlConsts.COLUMN_PRODUCT_ID} = psr.{SqlConsts.COLUMN_PRODUCT_ID}" );
             }
 
-            productQuery.Append( $" WHERE 1=1" );
+            firstHalf.Append( $" WHERE 1=1" );
 
             if ( request.CategoryId != null )
             {
-                productQuery.Append( $@" AND pc.{SqlConsts.COLUMN_CATEGORY_ID} = {QUERY_PARAM_CATEGORY_ID}" );
+                firstHalf.Append( $@" AND pc.{SqlConsts.COLUMN_CATEGORY_ID} = {QUERY_PARAM_CATEGORY_ID}" );
                 paramDictionary.Add( QUERY_PARAM_CATEGORY_ID, request.CategoryId.Value );
             }
             if ( !string.IsNullOrEmpty( request.SearchText ) )
             {
-                productQuery.Append( $@" AND (p.{SqlConsts.COLUMN_PRODUCT_TITLE} LIKE {QUERY_PARAM_SEARCH_TEXT}" );
-                productQuery.Append( $@" OR pd.{SqlConsts.COLUMN_PRODUCT_DESCR_BODY} LIKE {QUERY_PARAM_SEARCH_TEXT})" );
+                firstHalf.Append( $@" AND (p.{SqlConsts.COLUMN_PRODUCT_TITLE} LIKE {QUERY_PARAM_SEARCH_TEXT}" );
+                firstHalf.Append( $@" OR pd.{SqlConsts.COLUMN_PRODUCT_DESCR_BODY} LIKE {QUERY_PARAM_SEARCH_TEXT})" );
                 paramDictionary.Add( QUERY_PARAM_SEARCH_TEXT, $"%{request.SearchText}%" );
             }
             if ( request.MinRating != null )
             {
-                productQuery.Append( $@" AND p.{SqlConsts.COLUMN_PRODUCT_RATING} >= {QUERY_PARAM_MIN_RATING}" );
+                firstHalf.Append( $@" AND p.{SqlConsts.COLUMN_PRODUCT_RATING} >= {QUERY_PARAM_MIN_RATING}" );
                 paramDictionary.Add( QUERY_PARAM_MIN_RATING, request.MinRating );
             }
             if ( request.MaxRating != null )
             {
-                productQuery.Append( $@" AND p.{SqlConsts.COLUMN_PRODUCT_RATING} <= {QUERY_PARAM_MAX_RATING}" );
+                firstHalf.Append( $@" AND p.{SqlConsts.COLUMN_PRODUCT_RATING} <= {QUERY_PARAM_MAX_RATING}" );
                 paramDictionary.Add( QUERY_PARAM_MAX_RATING, request.MaxRating );
             }
             if ( request.LookupSpecFilters is { Count: > 0 } ) { }
@@ -188,67 +191,76 @@ public sealed class ProductSearchRepository : DapperRepository<Product>, IProduc
                 for ( int i = 0; i < request.RawSpecFilters.Count; i++ )
                 {
                     string rawParamName = QUERY_PARAM_SPEC_FILTER_RAW + i;
-                    productQuery.Append( $@" AND psr.{request.RawSpecFilters[ i ].SpecName} = {rawParamName}" );
+                    firstHalf.Append( $@" AND psr.{request.RawSpecFilters[ i ].SpecName} = {rawParamName}" );
                     paramDictionary.Add( rawParamName, request.RawSpecFilters[ i ].SpecValue );
                 }
             }
 
-            productQuery.Append( ")," );
+            firstHalf.Append( ")," );
 
             // PRODUCT VARIANTS CTE
-            productQuery.Append( $" {CTE_PRODUCT_VARIANTS} AS (" );
-            productQuery.Append( $" SELECT" );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_PRODUCT_ID} AS {COLUMN_ALIAS_PRODUCT_ID}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID_PRIMARY}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_NAME}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE}" );
-            productQuery.Append( $" FROM {SqlConsts.TABLE_PRODUCT_VARIANTS} pv" );
-            productQuery.Append( $" )" );
+            firstHalf.Append( $" {CTE_PRODUCT_VARIANTS} AS (" );
+            firstHalf.Append( $" SELECT" );
+            firstHalf.Append( $" pv.{SqlConsts.COLUMN_PRODUCT_ID} AS {COLUMN_ALIAS_PRODUCT_ID}," );
+            firstHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID_PRIMARY}," );
+            firstHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID}," );
+            firstHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_NAME}," );
+            firstHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN}," );
+            firstHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE}" );
+            firstHalf.Append( $" FROM {SqlConsts.TABLE_PRODUCT_VARIANTS} pv" );
+            firstHalf.Append( $" )" );
 
             // PRODUCT VARIANTS QUERY SELECTION
-            productQuery.Append( $" SELECT" );
+            firstHalf.Append( $" SELECT" );
+
+            countQuery.Append( firstHalf );
+            countQuery.Append( $" COUNT(*) OVER () AS TotalCount," );
+
+            productQuery.Append( firstHalf );
             productQuery.Append( $" f.{COLUMN_ALIAS_PRODUCT_ID} AS {SqlConsts.COLUMN_PRODUCT_ID}," );
             productQuery.Append( $" f.{SqlConsts.COLUMN_PRODUCT_TITLE}," );
             productQuery.Append( $" f.{SqlConsts.COLUMN_PRODUCT_RATING}," );
             productQuery.Append( $" f.{SqlConsts.COLUMN_PRODUCT_THUMBNAIL}," );
-            productQuery.Append( $" (" );
-            productQuery.Append( $" SELECT" );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID_PRIMARY}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_NAME}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN}," );
-            productQuery.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE}" );
-            productQuery.Append( $" FROM {CTE_PRODUCT_VARIANTS} pv" );
-            productQuery.Append( $" WHERE f.{COLUMN_ALIAS_PRODUCT_ID} = pv.{COLUMN_ALIAS_PRODUCT_ID}" );
-            productQuery.Append( $" FOR XML PATH('{XML_VARIANT_DATA}'), ROOT('{XML_VARIANT_DATA_ROOT}'), TYPE" );
-            productQuery.Append( $" ) AS Variant" );
-            productQuery.Append( $" FROM {CTE_FILTERED_PRODUCTS} f" );
+
+            secondHalf.Append( $" (" );
+            secondHalf.Append( $" SELECT" );
+            secondHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID_PRIMARY}," );
+            secondHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_ID}," );
+            secondHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_NAME}," );
+            secondHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN}," );
+            secondHalf.Append( $" pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE}" );
+            secondHalf.Append( $" FROM {CTE_PRODUCT_VARIANTS} pv" );
+            secondHalf.Append( $" WHERE f.{COLUMN_ALIAS_PRODUCT_ID} = pv.{COLUMN_ALIAS_PRODUCT_ID}" );
+            secondHalf.Append( $" FOR XML PATH('{XML_VARIANT_DATA}'), ROOT('{XML_VARIANT_DATA_ROOT}'), TYPE" );
+            secondHalf.Append( $" ) AS Variant" );
+            secondHalf.Append( $" FROM {CTE_FILTERED_PRODUCTS} f" );
 
             // PRODUCT VARIANTS QUERY CONDITIONS
-            productQuery.Append( $" WHERE EXISTS (" );
-            productQuery.Append( $" SELECT *" );
-            productQuery.Append( $" FROM {CTE_PRODUCT_VARIANTS} pv" );
-            productQuery.Append( $" WHERE f.{COLUMN_ALIAS_PRODUCT_ID} = pv.{COLUMN_ALIAS_PRODUCT_ID}" );
+            secondHalf.Append( $" WHERE EXISTS (" );
+            secondHalf.Append( $" SELECT *" );
+            secondHalf.Append( $" FROM {CTE_PRODUCT_VARIANTS} pv" );
+            secondHalf.Append( $" WHERE f.{COLUMN_ALIAS_PRODUCT_ID} = pv.{COLUMN_ALIAS_PRODUCT_ID}" );
 
             if ( request.MinPrice != null || request.MaxPrice != null )
             {
                 if ( request.MinPrice != null )
                 {
-                    productQuery.Append( $@" AND (pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN} >= {QUERY_PARAM_MIN_PRICE}" );
-                    productQuery.Append( $@" OR pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE} >= {QUERY_PARAM_MIN_PRICE})" );
+                    secondHalf.Append( $@" AND (pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN} >= {QUERY_PARAM_MIN_PRICE}" );
+                    secondHalf.Append( $@" OR pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE} >= {QUERY_PARAM_MIN_PRICE})" );
                     paramDictionary.Add( QUERY_PARAM_MIN_PRICE, request.MinPrice.Value );
                 }
                 if ( request.MaxPrice != null )
                 {
-                    productQuery.Append( $@" AND (pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN} <= {QUERY_PARAM_MAX_PRICE}" );
-                    productQuery.Append( $@" OR pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE} <= {QUERY_PARAM_MAX_PRICE})" );
+                    secondHalf.Append( $@" AND (pv.{SqlConsts.COLUMN_VARIANT_PRICE_MAIN} <= {QUERY_PARAM_MAX_PRICE}" );
+                    secondHalf.Append( $@" OR pv.{SqlConsts.COLUMN_VARIANT_PRICE_SALE} <= {QUERY_PARAM_MAX_PRICE})" );
                     paramDictionary.Add( QUERY_PARAM_MAX_PRICE, request.MaxPrice.Value );
                 }
             }
 
-            productQuery.Append( $" )" );
+            secondHalf.Append( $" )" );
+
+            countQuery.Append( secondHalf );
+            productQuery.Append( secondHalf );
 
             // FINAL PAGINATION
             productQuery.Append( $" ORDER BY f.{COLUMN_ALIAS_PRODUCT_ID}" );
@@ -260,14 +272,22 @@ public sealed class ProductSearchRepository : DapperRepository<Product>, IProduc
 
         return new DynamicParameters( paramDictionary );
     }
-    static async Task<int> CountProducts( SqlConnection connection, string dynamicQuery, DynamicParameters dynamicParams )
+    static async Task<int> ExecuteSearchCount( SqlConnection connection, string dynamicQuery, DynamicParameters dynamicParams )
     {
-        return await connection.QuerySingleAsync<int>( dynamicQuery, dynamicParams, commandType: CommandType.Text );
+        try
+        {
+            return await connection.QueryFirstAsync<int>( dynamicQuery, dynamicParams, commandType: CommandType.Text );
+        }
+        catch ( Exception e )
+        {
+            return 0;
+        }
+        
     }
-    static async Task<IEnumerable<Product>?> ExecuteSearchProducts( SqlConnection connection, string dynamicQuery, DynamicParameters dynamicParams )
+    static async Task<IEnumerable<Product>?> ExecuteProductSearch( SqlConnection connection, string dynamicQuery, DynamicParameters dynamicParams )
     {
         var productDictionary = new Dictionary<int, Product>();
-
+        
         await connection.QueryAsync<Product, string, Product>
         ( dynamicQuery, ( product, variantXml ) =>
             {

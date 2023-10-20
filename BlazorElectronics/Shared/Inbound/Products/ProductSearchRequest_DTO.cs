@@ -2,7 +2,7 @@ namespace BlazorElectronics.Shared.DtosInbound.Products;
 
 public sealed class ProductSearchRequest_DTO
 {
-    public int Page { get; set; } = 0;
+    public int Page { get; set; } = 1;
     public int NumberOfResults { get; set; } = 5;
 
     public string? CategoryUrl { get; set; }

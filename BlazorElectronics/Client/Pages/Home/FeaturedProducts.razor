@@ -1,6 +1,7 @@
 @using BlazorElectronics.Client.Services.Products
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.DtosOutbound.Products
+@using BlazorElectronics.Client.Shared
 @inject IProductServiceClient ProductService
 @inject IJSRuntime JsRuntime
 
@@ -41,6 +42,9 @@ else
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
         </button>
+        <div class="category-list-container">
+            <CategoryList></CategoryList>
+        </div>
     </div>
 }
 

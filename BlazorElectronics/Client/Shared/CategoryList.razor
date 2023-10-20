@@ -1,0 +1,43 @@
+@using BlazorElectronics.Shared.DataTransferObjects.Categories
+@using BlazorElectronics.Client.Services.Categories
+@inject ICategoryServiceClient CategoryService
+
+<div class="category-list">
+    @if ( !_loadedCategories || _categories == null )
+    {
+        <span>@_categoryMessage</span>
+    }
+    else
+    {
+        <ul class="nav flex-column">
+            @foreach ( int categoryId in _categories.PrimaryCategoryIds )
+            {
+                <li class="nav-item px-3">
+                    <a class="nav-link category-nav-link" href="@_categories.CategoriesById[ categoryId ]">
+                        @_categories.CategoriesById[ categoryId ].Name
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code 
+{
+    bool _loadedCategories = false;
+    string _categoryMessage = "Loading Categories...";
+
+    Categories_DTO? _categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await CategoryService.GetCategories();
+        _loadedCategories = true;
+
+        if ( _categories == null )
+        {
+            _categoryMessage = "Failed to load categories!";
+            return;
+        }
+    }
+}

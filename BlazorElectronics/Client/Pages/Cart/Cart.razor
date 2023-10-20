@@ -1,0 +1,78 @@
+@page "/cart"
+@using BlazorElectronics.Client.Services.Cart
+@using BlazorElectronics.Shared.Mutual
+@inject ICartService CartService
+
+<PageTitle>Shopping Cart</PageTitle>
+
+<h3>Shopping Cart</h3>
+
+@if ( _cart == null || _cart.Items.Count <= 0 )
+{
+    <span>@_serverMessage</span>
+}
+else
+{
+    <div class="cart-container">
+        @foreach ( CartItem_DTO item in _cart.Items )
+        {
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col cart-item-image">
+                        <img src="@item.ProductThumbnail" alt="@item.ProductTitle" class="image-fluid">
+                    </div>
+                    <div class="col cart-item-name">
+                        <h5>
+                            <a href="/product/@item.ProductId">@item.ProductTitle</a>
+                            <span>@item.VariantName</span>
+                        </h5>
+                    </div>
+                    <div class="col cart-item-price">
+                        @if ( item.HasSale() )
+                        {
+                            <h6 class="text-muted">
+                                $@item.MainPrice
+                            </h6>
+                            <h4 class="price">
+                                $@item.SalePrice
+                            </h4>
+                        }
+                        else
+                        {
+                            <h4 class="price">
+                                $@item.MainPrice
+                            </h4>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="cart-total-price">
+            Total: @_cart.GetTotalPrice()
+        </div>
+    </div>
+}
+
+@code 
+{
+    string _serverMessage = string.Empty;
+    Cart_DTO? _cart = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cart = await CartService.GetItemsFromLocalStorage();
+
+        if ( _cart == null || _cart.Items.Count <= 0 )
+        {
+            _serverMessage = "Your cart is empty.";
+            return;
+        }
+
+        _cart = await CartService.GetItemsFromServer();
+        
+        if ( _cart == null || _cart.Items.Count <= 0 )
+        {
+            _serverMessage = "Your cart is empty.";
+        }
+    }
+}

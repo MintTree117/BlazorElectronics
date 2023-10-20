@@ -3,6 +3,7 @@
 @page "/{category}"
 @inject IProductServiceClient ProductService;
 @inject NavigationManager NavigationManager;
+@implements IDisposable
 @using BlazorElectronics.Client.Services.Products
 @using System.Collections.Specialized
 @using System.Reflection
@@ -10,8 +11,9 @@
 @using System.Web
 @using BlazorElectronics.Shared.DtosInbound.Products
 
-<ProductList></ProductList>
 <span>_@_debugMessage</span>
+<span>@_nullSearch</span>
+<ProductList></ProductList>
 
 @code {
     [Parameter]
@@ -20,7 +22,23 @@
     public string? SearchText { get; set; }
 
     string _debugMessage = string.Empty;
+    string _nullSearch = string.Empty;
 
+
+    protected override void OnInitialized()
+    {
+        ProductService.ProductSearchNullabillityTest += NullTest;
+    }
+    public void Dispose()
+    {
+        ProductService.ProductSearchNullabillityTest -= NullTest;
+    }
+
+    void NullTest( string s )
+    {
+        _nullSearch = s;
+    }
+    
     protected override async Task OnParametersSetAsync()
     {
         Uri uri = NavigationManager.ToAbsoluteUri( NavigationManager.Uri );
@@ -30,14 +48,18 @@
 
         if ( Category != null && SearchText != null )
         {
+            ProductService.UpdateSearchCategory( Category );
+            ProductService.UpdateSearchText( SearchText );
             await ProductService.SearchProductsByCategoryAndText( Category, SearchText, request );
         }
         else if ( Category != null )
         {
+            ProductService.UpdateSearchCategory( Category );
             await ProductService.SearchProductsByCategory( Category, request );
         }
         else if ( SearchText != null )
         {
+            ProductService.UpdateSearchText( SearchText );
             await ProductService.SearchProductsByText( SearchText, request );
         }
         else throw new Exception( "No valid input parameters provided for product search!" );

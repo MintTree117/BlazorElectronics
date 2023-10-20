@@ -2,7 +2,11 @@
 @using BlazorElectronics.Client.Services.Products
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.DtosOutbound.Products
+@using BlazorElectronics.Client.Services.Cart
+@using BlazorElectronics.Shared.DtosInbound.Products
+@using BlazorElectronics.Shared.Mutual
 @inject IProductServiceClient ProductServiceClient
+@inject ICartService CartService
 
 @if ( !_loaded || _productDetails == null )
 {
@@ -32,6 +36,20 @@ else {
                     <span>No Product Variants Found!</span>
                 }
 
+                <!-- Display Variant Selection -->
+                @if ( _productDetails.Variants.Count > 1 )
+                {
+                    <div>
+                        <select class="form-control" @bind="_currentVariantId">
+                            @foreach ( ProductVariant_DTO v in _productDetails.Variants )
+                            {
+                                <option value="@v.Id">@v.Name</option>
+                            }
+                        </select>
+                    </div>
+                }
+            </div>
+            <div class="pd-pricing">
                 <!-- Display Selected Variant Price -->
                 @if ( variant.SalePrice > 0 && variant.SalePrice < variant.Price )
                 {
@@ -48,20 +66,10 @@ else {
                         $@variant.Price
                     </h4>
                 }
-
-                <!-- Display Variant Selection -->
-                @if ( _productDetails.Variants.Count > 1 )
-                {
-                    <div>
-                        <select class="form-control" @bind="_currentVariantId">
-                            @foreach ( ProductVariant_DTO v in _productDetails.Variants )
-                            {
-                                <option value="@v.Id">@v.Name</option>
-                            }
-                        </select>
-                    </div>
-                }
             </div>
+            <button class="btn btn-primary" @onclick="AddToCart">
+                <i class="oi oi-cart">&nbsp;&nbsp;&nbsp;Add to Cart</i>
+            </button>
         </div>
         
         <!-- Display Product Details Content -->
@@ -107,5 +115,20 @@ else {
     {
         variant = _productDetails!.Variants.FirstOrDefault( v => v.Id == _currentVariantId )!;
         return variant != null;
+    }
+
+    async Task AddToCart()
+    {
+        if ( !GetSelectedVariant( out ProductVariant_DTO variant ) )
+            return;
+
+        var cartItem = new CartItem_DTO {
+            ProductId = _productDetails!.Id,
+            ProductTitle = _productDetails.Title,
+            VariantId = variant.Id,
+            VariantName = variant.Name
+        };
+
+        await CartService.AddToCart( cartItem );
     }
 }

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "sovQuTBt+HLgwIi/gvKAECBaM5TEOKcNgAaTUjC4x3lH+U0CNssjHqAcBBxZdWxndmX5XmXl/zjJHhAn+2DbZg==",
+  "dgSpecHash": "qNAr3DeI/XOcorCFd9bEAA7pzJZpI7o+3OmN+Kt4TLUayRe9Pa4EneWkdrBALXfOQfRD38JN0gfhpKTgJWBEvQ==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/BlazorElectronics.Server.csproj",
   "expectedPackageFiles": [
     "/home/martin/.nuget/packages/azure.core/1.25.0/azure.core.1.25.0.nupkg.sha512",
     "/home/martin/.nuget/packages/azure.identity/1.7.0/azure.identity.1.7.0.nupkg.sha512",
+    "/home/martin/.nuget/packages/blazored.localstorage/4.4.0/blazored.localstorage.4.4.0.nupkg.sha512",
     "/home/martin/.nuget/packages/bootstrap/5.3.2/bootstrap.5.3.2.nupkg.sha512",
     "/home/martin/.nuget/packages/dapper/2.0.151/dapper.2.0.151.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.aspnetcore.authorization/7.0.11/microsoft.aspnetcore.authorization.7.0.11.nupkg.sha512",

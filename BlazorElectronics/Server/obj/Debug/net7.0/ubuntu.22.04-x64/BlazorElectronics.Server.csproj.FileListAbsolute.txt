@@ -17,6 +17,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Azure.Core.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Azure.Identity.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Blazored.LocalStorage.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Dapper.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.WebAssembly.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.WebAssembly.Server.dll

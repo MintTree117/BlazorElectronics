@@ -80,7 +80,7 @@ public class ProductService : IProductService
 
         return new ServiceResponse<ProductsFeatured_DTO?>( dto, true, "Successfully retrieved FeaturedProducts_DTO from repository, mapped to DTO, and cached." );
     }
-    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText )
+    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetTextSearchSuggestions( string searchText )
     {
         IEnumerable<string>? result = await _productSearchRepository.GetSearchSuggestions( searchText );
 
@@ -238,8 +238,9 @@ public class ProductService : IProductService
                 dto.Products.Add( MapProductToDto( p ) );
             
             dto.TotalMatches = model.TotalSearchCount;
-            dto.Rows = model.QueryRows;
-            dto.Offset = model.QueryOffset;
+            dto.TotalPages = model.TotalSearchCount / model.QueryRows;
+            dto.ItemsPerPage = model.QueryRows;
+            dto.CurrentPage = model.QueryOffset + 1;
         } );
 
         return dto;

@@ -9,6 +9,7 @@ namespace BlazorElectronics.Client.Services.Products;
 public class ProductServiceClient : IProductServiceClient
 {
     public event Action<ServiceResponse<ProductSearchResults_DTO?>?>? ProductSearchChanged;
+    public event Action<string>? ProductSearchNullabillityTest;
 
     public ProductSearchRequest_DTO? SearchRequest { get; set; }
 
@@ -26,29 +27,67 @@ public class ProductServiceClient : IProductServiceClient
     {
         _http = http;
     }
-
-    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>?> GetProductSearchSuggestions( string searchText )
+    
+    public void ClearSearchRequest()
     {
-        string url = $"{PRODUCT_SEARCH_SUGGESTIONS_URL}{searchText}";
-        return await _http.GetFromJsonAsync<ServiceResponse<ProductSearchSuggestions_DTO?>>( url );
+        SearchRequest = null;
     }
+    public void UpdateSearchCategory( string url )
+    {
+        SearchRequest ??= new ProductSearchRequest_DTO();
+        SearchRequest.CategoryUrl = url;
 
-    public void UpdateProductSearchPage( int page )
+        if ( SearchRequest == null )
+            ProductSearchNullabillityTest?.Invoke( "On Category" );
+    }
+    public void UpdateSearchText( string text )
+    {
+        SearchRequest ??= new ProductSearchRequest_DTO();
+        SearchRequest.SearchText = text;
+
+        if ( SearchRequest == null )
+            ProductSearchNullabillityTest?.Invoke( "On Text" );
+    }
+    public void UpdateSearchPage( int page )
     {
         SearchRequest ??= new ProductSearchRequest_DTO();
         SearchRequest.Page = page;
+
+        if ( SearchRequest == null )
+            ProductSearchNullabillityTest?.Invoke( "On Page" );
     }
-    public void UpdateProductSearchResultsCount( int count )
+    public void UpdateSearchResultsCount( int count )
     {
         SearchRequest ??= new ProductSearchRequest_DTO();
         SearchRequest.NumberOfResults = count;
+
+        if ( SearchRequest == null )
+            ProductSearchNullabillityTest?.Invoke( "On Count" );
     }
-    public string GetProductSearchUrl()
+    public string? GetProductSearchUrl()
     {
+        if ( SearchRequest == null )
+            ProductSearchNullabillityTest?.Invoke( "On Search" );
+        
         SearchRequest ??= new ProductSearchRequest_DTO();
         
         var urlBuilder = new StringBuilder();
 
+        if ( string.IsNullOrEmpty( SearchRequest.CategoryUrl ) && string.IsNullOrEmpty( SearchRequest.SearchText ) )
+            return null;
+
+        if ( !string.IsNullOrEmpty( SearchRequest.CategoryUrl ) )
+        {
+            urlBuilder.Append( $"/{SearchRequest.CategoryUrl}/" );
+
+            if ( !string.IsNullOrEmpty( SearchRequest.SearchText ) )
+                urlBuilder.Append( $"{SearchRequest.SearchText}/" );
+        }
+        else if ( !string.IsNullOrEmpty( SearchRequest.SearchText ) )
+        {
+            urlBuilder.Append( $"/{SearchRequest.SearchText}/" );
+        }
+        
         urlBuilder.Append( $"?page={SearchRequest.Page}" );
         urlBuilder.Append( $"&rows={SearchRequest.NumberOfResults}" );
 
@@ -73,7 +112,12 @@ public class ProductServiceClient : IProductServiceClient
         
         return urlBuilder.ToString();
     }
-
+    
+    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>?> GetProductSearchSuggestions( string searchText )
+    {
+        string url = $"{PRODUCT_SEARCH_SUGGESTIONS_URL}{searchText}";
+        return await _http.GetFromJsonAsync<ServiceResponse<ProductSearchSuggestions_DTO?>>( url );
+    }
     public async Task<ServiceResponse<ProductsFeatured_DTO?>?> GetFeaturedProducts()
     {
         var result = await _http.GetFromJsonAsync<ServiceResponse<ProductsFeatured_DTO?>>( "api/Product/featured" );

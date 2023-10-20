@@ -1,9 +1,8 @@
 using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Specs;
-using BlazorElectronics.Server.Services;
+using BlazorElectronics.Server.Services.Cart;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Specs;
@@ -29,6 +28,10 @@ builder.Services.AddSingleton<ISpecCache, SpecCache>();
 builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
 builder.Services.AddScoped<ISpecDescrRepository, SpecDescrRepository>();
 builder.Services.AddScoped<ISpecService, SpecService>();
+
+builder.Services.AddScoped<IProductCartRepository, ProductCartRepository>();
+
+builder.Services.AddScoped<ICartService, CartService>();
 
 WebApplication app = builder.Build();
 

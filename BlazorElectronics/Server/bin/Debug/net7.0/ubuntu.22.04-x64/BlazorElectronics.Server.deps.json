@@ -1315,6 +1315,17 @@
           }
         }
       },
+      "Blazored.LocalStorage/4.4.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.Web": "7.0.11"
+        },
+        "runtime": {
+          "lib/net7.0/Blazored.LocalStorage.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "bootstrap/5.3.2": {},
       "Dapper/2.0.151": {
         "runtime": {
@@ -1768,6 +1779,7 @@
       "BlazorElectronics.Client/1.0.0": {
         "dependencies": {
           "BlazorElectronics.Shared": "1.0.0",
+          "Blazored.LocalStorage": "4.4.0",
           "Microsoft.AspNetCore.Components.WebAssembly": "7.0.11",
           "Newtonsoft.Json": "13.0.3",
           "bootstrap": "5.3.2"
@@ -1812,6 +1824,13 @@
       "sha512": "sha512-eHEiCO/8+MfNc9nH5dVew/+FvxdaGrkRL4OMNwIz0W79+wtJyEoeRlXJ3SrXhoy9XR58geBYKmzMR83VO7bcAw==",
       "path": "azure.identity/1.7.0",
       "hashPath": "azure.identity.1.7.0.nupkg.sha512"
+    },
+    "Blazored.LocalStorage/4.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zuXZB4/WW3Pr1761peemffdkjt09lbOP1wAkSDTKl7BTbA9V5e8LxS6MNfmyHW+BJzXrNDq90E2Y+AfIfnIbWQ==",
+      "path": "blazored.localstorage/4.4.0",
+      "hashPath": "blazored.localstorage.4.4.0.nupkg.sha512"
     },
     "bootstrap/5.3.2": {
       "type": "package",

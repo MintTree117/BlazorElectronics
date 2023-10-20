@@ -46,7 +46,7 @@ public class ProductController : ControllerBase
     [HttpGet( "search-suggestions/{searchText}" )]
     public async Task<ActionResult<ServiceResponse<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( string searchText )
     {
-        ServiceResponse<ProductSearchSuggestions_DTO?> response = await _productService.GetProductSearchSuggestions( searchText );
+        ServiceResponse<ProductSearchSuggestions_DTO?> response = await _productService.GetTextSearchSuggestions( searchText );
         return Ok( response );
     }
     [HttpGet( "products" )]

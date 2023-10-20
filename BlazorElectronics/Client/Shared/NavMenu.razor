@@ -1,49 +1,36 @@
-﻿@using BlazorElectronics.Client.Services.Categories
 @using BlazorElectronics.Shared.DataTransferObjects.Categories
-@inject ICategoryServiceClient CategoryServiceClient;
+@using BlazorElectronics.Client.Services.Categories
+@inject ICategoryServiceClient CategoryService
+@inject NavigationManager NavManager
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">BlazorElectronics</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="nav-sidebar @NavMenuCssClass">
+        <CategoryList></CategoryList>
     </div>
-</div>
+    <div class="top-nav">
+        <button class="btn btn-info" onclick="@ToggleNavMenu">
+            <i class="oi oi-menu"></i>
+        </button>
+        <button class="btn btn-primary home-brand" onclick="@GoToHome">
+            Blazor Electronics
+        </button>
+        <ProductSearchBar></ProductSearchBar>
+        <CartCounter></CartCounter>
+    </div>
+</nav>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-            @if ( !_loadedCategories || _categories == null ) {
-                <span>@_categoryMessage</span>
-            }
-            else {
-                @foreach ( int i in _categories.PrimaryCategoryIds ) {
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="@_categories.CategoriesById[ i ].Url">
-                            @_categories.CategoriesById[ i ].Name
-                        </NavLink>
-                    </div>
-                }
-            }
-        </div>
-    </nav>
-</div>
-
-@code {
+@code 
+{
     bool _loadedCategories = false;
     bool _collapseNavMenu = true;
     string _categoryMessage = "Loading Categories...";
-    string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+    string? NavMenuCssClass => _collapseNavMenu ? "nav-sidebar-hide" : "";
 
     Categories_DTO? _categories;
 
     protected override async Task OnInitializedAsync()
     {
-        _categories = await CategoryServiceClient.GetCategories();
+        _categories = await CategoryService.GetCategories();
         _loadedCategories = true;
 
         if ( _categories == null )
@@ -52,5 +39,13 @@
             return;
         }
     }
-    void ToggleNavMenu() { _collapseNavMenu = !_collapseNavMenu; }
+    void ToggleNavMenu()
+    {
+        _collapseNavMenu = !_collapseNavMenu;
+        StateHasChanged();
+    }
+    void GoToHome()
+    {
+        NavManager.NavigateTo( "" );
+    }
 }

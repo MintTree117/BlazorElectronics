@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "PHVPHDwps0KWdMoaau2agaJHMtv5opB/TVYHRT2sRNLyHDWInRcyrRlVuF23XHGvAHZ5j+foVjkYKGUKuYwLfA==",
+  "dgSpecHash": "Cd4/K/sSez87K72KdstTh1M/wWqHpV2dsKXZA5jH1umIsoT1l122VLoQVzb3+i6cpXzJIt/EUiaeQ6Vsco7UYg==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/BlazorElectronics.Client.csproj",
   "expectedPackageFiles": [
+    "/home/martin/.nuget/packages/blazored.localstorage/4.4.0/blazored.localstorage.4.4.0.nupkg.sha512",
     "/home/martin/.nuget/packages/bootstrap/5.3.2/bootstrap.5.3.2.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.aspnetcore.authorization/7.0.11/microsoft.aspnetcore.authorization.7.0.11.nupkg.sha512",
     "/home/martin/.nuget/packages/microsoft.aspnetcore.components/7.0.11/microsoft.aspnetcore.components.7.0.11.nupkg.sha512",

@@ -1,0 +1,24 @@
+.category-list {
+    padding: 10px;
+}
+
+.category-nav-link {
+    color: black;
+    position: relative;
+}
+
+.category-nav-link::after {
+    speak: never;
+    font-style: normal;
+    font-weight: 200;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: '\25B8';
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+}

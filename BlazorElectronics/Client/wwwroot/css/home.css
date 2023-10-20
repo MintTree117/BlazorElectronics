@@ -1,0 +1,28 @@
+/* FEATURED PRODUCTS */
+
+.featured-products-carousel {
+    margin: 0 auto 2em;
+    max-width: 450px;
+    height: 430px;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 100%;
+}
+
+.fp-carousel-item, .fp-carousel-image-container {
+    height: 100%;
+}
+
+.category-list-container {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 200px;
+    height: 100%;
+    z-index: 10;
+    background-color: #9aa5b5;
+    background-image: linear-gradient(to bottom left, #9aa5b5, #6d7682);
+    font-size: .9rem;
+}

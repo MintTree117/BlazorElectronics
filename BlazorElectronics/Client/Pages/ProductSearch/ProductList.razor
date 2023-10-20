@@ -29,11 +29,13 @@ else {
             </li>
         }
     </ul>
-    //@for ( int i = 1; i < _productSearch.Pages; i++ )
-    //{
-        //int index = i;
-        //<button @onclick="() => { ChangeSearchPage( index ); }"></button>
-    //}
+    <div>
+        @for ( int i = 1; i <= _productSearch.TotalPages; i++ )
+        {
+            int index = i;
+            <button type="button" class="btn @(index == _productSearch.CurrentPage ? "btn-primary" : "btn-secondary")" @onclick="() => { ChangeSearchPage( index ); }">@index</button>
+        }
+    </div>
 }
 
 @code {
@@ -53,9 +55,10 @@ else {
 
     void ChangeSearchPage( int page )
     {
-        ProductService.UpdateProductSearchPage( page );
-        string url = ProductService.GetProductSearchUrl();
-        NavigationManager.NavigateTo( url );
+        ProductService.UpdateSearchPage( page );
+        string? url = ProductService.GetProductSearchUrl();
+
+        NavigationManager.NavigateTo( string.IsNullOrEmpty( url ) ? "/" : url );
     }
     void OnProductsChange( ServiceResponse<ProductSearchResults_DTO?>? productSearch  )
     {
