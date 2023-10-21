@@ -6,16 +6,33 @@
 @inject ISyncLocalStorageService LocalStorage
 @implements IDisposable
 
+<span>@message</span>
 <a href="cart" class="btn btn-info">
-    <span class="badge"><i class="oi oi-cart"></i>@GetCartItemsCount()</span>
+    <span class="badge"><i class="oi oi-cart"></i>@_cartCount</span>
 </a>
 
 @code 
 {
-    int GetCartItemsCount()
+    string message = string.Empty;
+    int _cartCount = 0;
+    
+    async Task<int> GetCartItemsCount()
     {
-        var cart = LocalStorage.GetItem<List<CartItem_DTO>>( "cart" );
-        return cart?.Count ?? 0;
+        Cart_DTO? cart = await CartService.GetItemsFromLocalStorage();
+        return cart?.Items.Count ?? 0;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _cartCount = await GetCartItemsCount();
+            StateHasChanged();
+        }
+        catch ( Exception e )
+        {
+            message = e.Message;
+        }
     }
 
     protected override void OnInitialized()

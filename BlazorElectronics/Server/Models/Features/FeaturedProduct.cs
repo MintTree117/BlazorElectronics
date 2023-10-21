@@ -1,6 +1,6 @@
-namespace BlazorElectronics.Server.Models.Products;
+namespace BlazorElectronics.Server.Models.Features;
 
-public sealed class ProductFeatured
+public sealed class FeaturedProduct
 {
     public int FeatureId { get; set; }
     public int ProductId { get; set; }

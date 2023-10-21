@@ -3,15 +3,35 @@
 @inject ICategoryServiceClient CategoryService
 @inject NavigationManager NavManager
 
-<nav class="navbar navbar-dark bg-dark main-nav">
+<nav class="navbar navbar-dark bg-dark main-nav main-container">
     <div class="nav-sidebar @NavMenuCssClass">
-        <CategoryList></CategoryList>
+        <div class="nav-sidebar-inner">
+            <div class="nav-sidebar-column nav-sidebar-left">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="">Top Deals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="">Clearance</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="nav-sidebar-column nav-sidebar-right">
+                <ul class="nav flex-column">
+                    <li class="nav-item nav-link nav-sidebar-all-products-title">
+                        All Products
+                    </li>
+                </ul>
+                <CategoryList></CategoryList>
+            </div>
+        </div>
     </div>
     <div class="top-nav">
         <button class="btn btn-info" onclick="@ToggleNavMenu">
             <i class="oi oi-menu"></i>
         </button>
-        <button class="btn btn-primary home-brand" onclick="@GoToHome">
+        <button class="btn btn-primary logo-button" onclick="@GoToHome">
+            <img src="Images/logo.png" alt="Blazor"/>
             Blazor Electronics
         </button>
         <ProductSearchBar></ProductSearchBar>

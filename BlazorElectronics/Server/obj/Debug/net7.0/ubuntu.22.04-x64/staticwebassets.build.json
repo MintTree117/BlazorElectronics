@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "mA+W1RnE15+IlX50t7gUrdJcBsDh0zY9kbudbIfk4PA=",
+  "Hash": "gYH1/1mwzgDzOg+XsBueoDaKUGUFTLqDUBhp66j5+Gc=",
   "Source": "BlazorElectronics.Server",
   "BasePath": "_content/BlazorElectronics.Server",
   "Mode": "Default",
@@ -8221,6 +8221,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/Images/featuredproduct3.png"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/logo.png",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Project",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "Images/logo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/Images/logo.png"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/index.html",

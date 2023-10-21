@@ -1,9 +1,11 @@
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories.Categories;
+using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Specs;
 using BlazorElectronics.Server.Services.Cart;
 using BlazorElectronics.Server.Services.Categories;
+using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Specs;
 
@@ -18,9 +20,12 @@ builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+builder.Services.AddSingleton<IFeaturesCache, FeaturesCache>();
+builder.Services.AddScoped<IFeaturesService, FeaturesService>();
+builder.Services.AddScoped<IFeaturedProductsRepository, FeaturedProductsRepository>();
+builder.Services.AddScoped<IFeaturedDealsRepository, FeaturedDealsRepository>();
+
 builder.Services.AddSingleton<IProductCache, ProductCache>();
-builder.Services.AddScoped<IProductFeaturedRepository, ProductFeaturedRepository>();
-builder.Services.AddScoped<IProductDealsRepository, ProductDealsRepository>();
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();

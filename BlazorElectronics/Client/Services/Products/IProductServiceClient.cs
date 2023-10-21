@@ -1,6 +1,7 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Outbound.Features;
 
 namespace BlazorElectronics.Client.Services.Products;
 
@@ -17,8 +18,7 @@ public interface IProductServiceClient
     void UpdateSearchPage( int page );
     void UpdateSearchResultsCount( int count );
     string? GetProductSearchUrl();
-
-    Task<ServiceResponse<ProductsFeatured_DTO?>?> GetFeaturedProducts();
+    
     Task SearchProductsByCategory( string categoryUrl, ProductSearchRequest_DTO? filters );
     Task SearchProductsByText( string searchText, ProductSearchRequest_DTO? filters );
     Task SearchProductsByCategoryAndText( string categoryUrl, string searchText, ProductSearchRequest_DTO? filters );

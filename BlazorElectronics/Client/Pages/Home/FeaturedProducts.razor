@@ -2,7 +2,9 @@
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.DtosOutbound.Products
 @using BlazorElectronics.Client.Shared
-@inject IProductServiceClient ProductService
+@using BlazorElectronics.Shared.Outbound.Features
+@using BlazorElectronics.Client.Services.Features
+@inject IFeaturesServiceClient FeaturesService
 @inject IJSRuntime JsRuntime
 
 @if ( !_loaded || _featuredProducts == null )
@@ -11,7 +13,7 @@
 }
 else
 {
-    <div class="container-fluid featured-products-container">
+    <div class="featured-products-container">
         <div id="featured-products-carousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 @for ( int i = 0; i < _featuredProducts.Count; i++ )
@@ -26,7 +28,7 @@ else
                 }
             </div>
             <div class="carousel-inner">
-                @foreach ( ProductFeatured_DTO p in _featuredProducts )
+                @foreach ( FeaturedProduct_DTO p in _featuredProducts )
                 {
                     <div class="carousel-item fp-carousel-item @(p == _featuredProducts.First() ? "active" : "")">
                         <img class="d-block w-100 fp-carousel-item-img" src="@p.ImageUrl" alt="@p.ProductId"/>
@@ -50,18 +52,19 @@ else
     </div>
 }
 
-@code {
+@code 
+{
     bool _isCarouselInitialized = false;
     bool _loaded = false;
     string? _serverMessage;
     string _exceptionMessage = string.Empty;
-    List<ProductFeatured_DTO>? _featuredProducts;
+    List<FeaturedProduct_DTO>? _featuredProducts;
 
     protected override async Task OnInitializedAsync()
     {
         _serverMessage = "Loading Featured Products...";
         
-        ServiceResponse<ProductsFeatured_DTO?>? response = await ProductService.GetFeaturedProducts();
+        ServiceResponse<FeaturedProducts_DTO?>? response = await FeaturesService.GetFeaturedProducts();
         _loaded = true;
 
         if ( response == null ) _serverMessage = "Server response is null!";

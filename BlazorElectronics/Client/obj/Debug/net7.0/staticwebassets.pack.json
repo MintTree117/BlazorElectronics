@@ -217,6 +217,10 @@
       "PackagePath": "staticwebassets/Images/featuredproduct3.png"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/logo.png",
+      "PackagePath": "staticwebassets/Images/logo.png"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",
       "PackagePath": "staticwebassets/css/app.css"
     },

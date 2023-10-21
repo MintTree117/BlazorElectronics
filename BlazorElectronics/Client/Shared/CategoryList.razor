@@ -12,8 +12,8 @@
         <ul class="nav flex-column">
             @foreach ( int categoryId in _categories.PrimaryCategoryIds )
             {
-                <li class="nav-item px-3">
-                    <a class="nav-link category-nav-link" href="@_categories.CategoriesById[ categoryId ]">
+                <li class="nav-item">
+                    <a class="nav-link category-nav-link" href="@_categories.CategoriesById[ categoryId ].Url">
                         @_categories.CategoriesById[ categoryId ].Name
                     </a>
                 </li>

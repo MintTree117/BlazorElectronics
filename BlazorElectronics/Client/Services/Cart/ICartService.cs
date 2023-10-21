@@ -9,4 +9,5 @@ public interface ICartService
     Task AddToCart( CartItem_DTO item );
     Task<Cart_DTO> GetItemsFromLocalStorage();
     Task<Cart_DTO?> GetItemsFromServer();
+    Task RemoveItemFromCart( int productId, int variantId );
 }

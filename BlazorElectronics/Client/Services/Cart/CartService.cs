@@ -52,11 +52,26 @@ public class CartService : ICartService
         var serverCart = await response.Content.ReadFromJsonAsync<ServiceResponse<Cart_DTO?>?>();
         return serverCart?.Data;
     }
+    public async Task RemoveItemFromCart( int productId, int variantId )
+    {
+        Cart_DTO cart = await GetCartFromStorage();
+        
+        if ( cart == null )
+            return;
+
+        CartItem_DTO? cartItem = cart.Items.Find( x => x.ProductId == productId && x.VariantId == variantId );
+
+        if ( cartItem != null )
+        {
+            cart.Items.Remove( cartItem );
+            await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
+            OnChange?.Invoke();
+        }
+            
+    }
 
     async Task<Cart_DTO> GetCartFromStorage()
     {
-        return new Cart_DTO {
-            Items = await _localStorage.GetItemAsync<List<CartItem_DTO>>( CART_STORAGE_KEY ) ?? new List<CartItem_DTO>()
-        };
+        return await _localStorage.GetItemAsync<Cart_DTO>( CART_STORAGE_KEY ) ?? new Cart_DTO();
     }
 }

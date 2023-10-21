@@ -3,6 +3,7 @@ using System.Text;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Outbound.Features;
 
 namespace BlazorElectronics.Client.Services.Products;
 
@@ -117,11 +118,6 @@ public class ProductServiceClient : IProductServiceClient
     {
         string url = $"{PRODUCT_SEARCH_SUGGESTIONS_URL}{searchText}";
         return await _http.GetFromJsonAsync<ServiceResponse<ProductSearchSuggestions_DTO?>>( url );
-    }
-    public async Task<ServiceResponse<ProductsFeatured_DTO?>?> GetFeaturedProducts()
-    {
-        var result = await _http.GetFromJsonAsync<ServiceResponse<ProductsFeatured_DTO?>>( "api/Product/featured" );
-        return result;
     }
     public async Task SearchProductsByCategory( string categoryUrl, ProductSearchRequest_DTO? filters )
     {
