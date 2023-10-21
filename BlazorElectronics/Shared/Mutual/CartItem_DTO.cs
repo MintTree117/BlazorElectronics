@@ -9,7 +9,7 @@ public sealed class CartItem_DTO
     public string? VariantName { get; set; }
     public decimal MainPrice { get; set; }
     public decimal? SalePrice { get; set; }
-    public int Quantity { get; set; }
+    public int Quantity { get; set; } = 1;
 
     public decimal GetRealPrice()
     {

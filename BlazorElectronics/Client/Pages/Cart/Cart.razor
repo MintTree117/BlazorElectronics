@@ -24,22 +24,23 @@ else
                     <a href="/product/@item.ProductId">@item.ProductTitle</a>
                 </h5>
                 <span>@item.VariantName</span>
+                <input class="form-control input-quantity" type="number" value="@item.Quantity" @onchange="@(async ( ChangeEventArgs e ) => { await UpdateQuantity( e, item ); })" min="1" />
                 <button class="btn btn-danger" @onclick="async () => { await RemoveFromCart( item.ProductId, item.VariantId ); }">Remove</button>
             </div>
             <div class="cart-item-price">
                 @if ( item.HasSale() )
                 {
                     <h6 class="text-muted">
-                        $@item.MainPrice
+                        $@(item.MainPrice * item.Quantity)
                     </h6>
                     <h4 class="price">
-                        $@item.SalePrice
+                        $@(item.SalePrice * item.Quantity)
                     </h4>
                 }
                 else
                 {
                     <h4 class="price">
-                        $@item.MainPrice
+                        $@(item.MainPrice * item.Quantity)
                     </h4>
                 }
             </div>
@@ -82,5 +83,13 @@ else
         {
             _serverMessage = "Your cart is empty.";
         }
+    }
+
+    async Task UpdateQuantity( ChangeEventArgs e, CartItem_DTO item )
+    {
+        item.Quantity = int.Parse( e.Value?.ToString() ?? "1" );
+        if ( item.Quantity < 1 )
+            item.Quantity = 1;
+        await CartService.UpdateItemQuantity( item );
     }
 }

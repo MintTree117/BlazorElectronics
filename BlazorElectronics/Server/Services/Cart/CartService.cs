@@ -1,7 +1,6 @@
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound.Cart;
 using BlazorElectronics.Shared.Mutual;
 
@@ -48,7 +47,8 @@ public class CartService : ICartService
                 VariantId = variantData.VariantId,
                 VariantName = variantData.VariantName,
                 MainPrice = variantData.VariantPriceMain,
-                SalePrice = variantData.VariantPriceSale
+                SalePrice = variantData.VariantPriceSale,
+                Quantity = clientItems.Items.Find( x => x.ProductId == p.ProductId && x.VariantId == variantData.VariantId )!.Quantity
             } );
         }
 

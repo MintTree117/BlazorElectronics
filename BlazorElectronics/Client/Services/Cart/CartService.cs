@@ -8,7 +8,7 @@ namespace BlazorElectronics.Client.Services.Cart;
 
 public class CartService : ICartService
 {
-    public event Action? OnChange;
+    public event Action<int>? OnChange;
 
     const string CART_STORAGE_KEY = "cart";
     readonly ILocalStorageService _localStorage;
@@ -19,13 +19,39 @@ public class CartService : ICartService
         _localStorage = localStorage;
         _http = http;
     }
-    
+
     public async Task AddToCart( CartItem_DTO item )
     {
         Cart_DTO cart = await GetCartFromStorage();
-        cart.Items.Add( item );
+
+        CartItem_DTO? sameItem = cart.Items.Find( x => x.ProductId == item.ProductId && x.VariantId == item.VariantId );
+        
+        if ( sameItem == null )
+        {
+            cart.Items.Add( item );   
+        }
+        else
+        {
+            sameItem.Quantity += item.Quantity;
+        }
+        
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
-        OnChange?.Invoke();
+        OnChange?.Invoke( cart.Items.Count );
+    }
+    public async Task UpdateItemQuantity( CartItem_DTO item )
+    {
+        Cart_DTO cart = await GetCartFromStorage();
+
+        if ( cart == null )
+            return;
+
+        CartItem_DTO? cartItem = cart.Items.Find( x => x.ProductId == item.ProductId && x.VariantId == item.VariantId );
+
+        if ( cartItem != null )
+        {
+            cartItem.Quantity = item.Quantity;
+            await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
+        }
     }
     public async Task<Cart_DTO> GetItemsFromLocalStorage()
     {
@@ -44,7 +70,8 @@ public class CartService : ICartService
         {
             cartIds.Items.Add( new CartItemId {
                 ProductId = item.ProductId,
-                VariantId = item.VariantId
+                VariantId = item.VariantId,
+                Quantity = item.Quantity
             } );
         }
         
@@ -65,9 +92,8 @@ public class CartService : ICartService
         {
             cart.Items.Remove( cartItem );
             await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
-            OnChange?.Invoke();
+            OnChange?.Invoke( cart.Items.Count );
         }
-            
     }
 
     async Task<Cart_DTO> GetCartFromStorage()

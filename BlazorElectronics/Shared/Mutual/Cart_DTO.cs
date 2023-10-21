@@ -6,6 +6,6 @@ public sealed class Cart_DTO
 
     public decimal GetTotalPrice()
     {
-        return Items.Sum( item => item.GetRealPrice() );
+        return Items.Sum( item => item.GetRealPrice() * item.Quantity );
     }
 }

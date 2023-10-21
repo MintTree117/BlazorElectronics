@@ -3,7 +3,6 @@
 @using BlazorElectronics.Shared.DtosInbound.Products
 @using BlazorElectronics.Shared.Mutual
 @inject ICartService CartService
-@inject ISyncLocalStorageService LocalStorage
 @implements IDisposable
 
 <span>@message</span>
@@ -37,11 +36,17 @@
 
     protected override void OnInitialized()
     {
-        CartService.OnChange += StateHasChanged;
+        CartService.OnChange += OnCartChange;
     }
 
     public void Dispose()
     {
-        CartService.OnChange -= StateHasChanged;
+        CartService.OnChange -= OnCartChange;
+    }
+
+    void OnCartChange( int count )
+    {
+        _cartCount = count;
+        StateHasChanged();
     }
 }
