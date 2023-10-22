@@ -62,6 +62,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdFNlYXJjaC9Qcm9kdWN0RmlsdGVycy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/UserLogin/UserLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlckxvZ2luL1VzZXJMb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/UserRegistration/UserRegistration.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlclJlZ2lzdHJhdGlvbi9Vc2VyUmVnaXN0cmF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Shared/CartCounter.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NhcnRDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -76,6 +84,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Shared/ProductSearchBar.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1Byb2R1Y3RTZWFyY2hCYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Shared/UserButton.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1VzZXJCdXR0b24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/_Imports.razor]

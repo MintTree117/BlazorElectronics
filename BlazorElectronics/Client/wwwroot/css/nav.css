@@ -34,6 +34,19 @@
     flex-grow: 1;
 }
 
+.show-user-menu {
+    display: block;
+}
+
+.dropdown-item:hover {
+    background-color: white;
+}
+
+.cart-counter {
+    display: flex;
+    flex-direction: row;
+}
+
 .oi {
     width: 2rem;
     font-size: 1.1rem;

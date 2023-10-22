@@ -43,4 +43,8 @@ public class CategoryRepository : DapperRepository<Category>, ICategoryRepositor
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
         return await connection.QuerySingleAsync<Category?>( STORED_PROCEDURE_GET_CATEGORY_BY_ID, id, commandType: CommandType.StoredProcedure );
     }
+    public override Task Insert( Category item )
+    {
+        throw new NotImplementedException();
+    }
 }

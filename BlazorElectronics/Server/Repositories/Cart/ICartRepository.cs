@@ -1,8 +1,8 @@
 using BlazorElectronics.Server.Models.Products;
 
-namespace BlazorElectronics.Server.Repositories.Products;
+namespace BlazorElectronics.Server.Repositories.Cart;
 
-public interface IProductCartRepository : IDapperRepository<Product>
+public interface ICartRepository : IDapperRepository<Product>
 {
     Task<IEnumerable<Product>?> GetCartItems( List<int> productIds, List<int> variantIds );
 }

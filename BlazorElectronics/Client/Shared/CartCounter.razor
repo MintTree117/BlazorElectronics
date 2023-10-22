@@ -3,12 +3,12 @@
 @using BlazorElectronics.Shared.DtosInbound.Products
 @using BlazorElectronics.Shared.Mutual
 @inject ICartService CartService
+@inject NavigationManager NavManager;
 @implements IDisposable
 
-<span>@message</span>
-<a href="cart" class="btn btn-info">
-    <span class="badge"><i class="oi oi-cart"></i>@_cartCount</span>
-</a>
+<button class="btn btn-info cart-counter" @onclick="GoToCart">
+    <span class="badge"> <i class="oi oi-cart"></i>@_cartCount</span>
+</button>
 
 @code 
 {
@@ -33,17 +33,18 @@
             message = e.Message;
         }
     }
-
     protected override void OnInitialized()
     {
         CartService.OnChange += OnCartChange;
     }
-
     public void Dispose()
     {
         CartService.OnChange -= OnCartChange;
     }
-
+    void GoToCart()
+    {
+        NavManager.NavigateTo( "cart" );
+    }
     void OnCartChange( int count )
     {
         _cartCount = count;

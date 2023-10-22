@@ -1,0 +1,52 @@
+@page "/login"
+@using BlazorElectronics.Shared.Inbound.Users
+@using BlazorElectronics.Client.Services.Users
+@using Blazored.LocalStorage
+@using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Outbound.Users
+@inject IUserServiceClient UserService
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavManager
+
+<PageTitle>Login</PageTitle>
+
+<h3>UserLogin</h3>
+
+<EditForm Model="_loginRequest" OnValidSubmit="@( async ()=> await HandleLogin() )">
+    <DataAnnotationsValidator/>
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText class="form-control" id="email" @bind-Value="_loginRequest.Email"/>
+        <ValidationMessage For="@(()=> _loginRequest.Email)"/>
+    </div>
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <InputText class="form-control" id="password" @bind-Value="_loginRequest.Password" type="password"/>
+        <ValidationMessage For="@(()=> _loginRequest.Password)"/>
+    </div>
+    <button class="btn btn-primary" type="submit">Login</button>
+</EditForm>
+<div class="text-danger">
+    <span>@_errorMessage</span>
+</div>
+
+@code 
+{
+    UserLoginRequest_DTO _loginRequest = new();
+    string _errorMessage = string.Empty;
+
+    async Task HandleLogin()
+    {
+        ServiceResponse<UserLoginResponse_DTO?> result = await UserService.Login( _loginRequest );
+
+        if ( !result.Success )
+        {
+            _errorMessage = result.Message!;
+            return;
+        }
+
+        _errorMessage = string.Empty;
+        await LocalStorage.SetItemAsync( "authenticationToken", result.Data!.JsonToken );
+        NavManager.NavigateTo( "" );
+    }
+}

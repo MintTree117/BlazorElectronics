@@ -5,15 +5,15 @@ using BlazorElectronics.Server.Models.Products;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace BlazorElectronics.Server.Repositories.Products;
+namespace BlazorElectronics.Server.Repositories.Cart;
 
-public class ProductCartRepository : DapperRepository<Product>, IProductCartRepository
+public class CartRepository : DapperRepository<Product>, ICartRepository
 {
     const string QUERY_PARAM_PRODUCT_ID_LIST = "@ProductIdList";
     const string QUERY_PARAM_VARIANT_ID_LIST = "@VariantIdList";
     const string STORED_PROCEDURE_GET_CART_PRODUCTS_BY_ID = "Get_CartProducts";
 
-    public ProductCartRepository( DapperContext dapperContext ) : base( dapperContext ) { }
+    public CartRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
     public async Task<IEnumerable<Product>?> GetCartItems( List<int> productIds, List<int> variantIds )
     {
@@ -66,6 +66,10 @@ public class ProductCartRepository : DapperRepository<Product>, IProductCartRepo
         throw new NotImplementedException();
     }
     public override Task<Product?> GetById( int id )
+    {
+        throw new NotImplementedException();
+    }
+    public override Task Insert( Product item )
     {
         throw new NotImplementedException();
     }

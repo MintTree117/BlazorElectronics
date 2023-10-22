@@ -87,6 +87,10 @@ public sealed class ProductSearchRepository : DapperRepository<Product>, IProduc
 
         return productDictionary[ id ];
     }
+    public override Task Insert( Product item )
+    {
+        throw new NotImplementedException();
+    }
 
     public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText )
     {

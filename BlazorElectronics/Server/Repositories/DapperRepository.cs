@@ -10,4 +10,5 @@ public abstract class DapperRepository<T> : IDapperRepository<T> where T : class
 
     public abstract Task<IEnumerable<T>?> GetAll();
     public abstract Task<T?> GetById( int id );
+    public abstract Task Insert( T item );
 }

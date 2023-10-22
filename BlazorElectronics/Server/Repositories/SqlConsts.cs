@@ -27,4 +27,10 @@ public static class SqlConsts
     
     public const string COLUMN_CATEGORY_ID = "CategoryId";
     public const string COLUMN_CATEGORY_SUB_ID = "CategoryId";
+
+    public const string COLUMN_USER_NAME = "Username";
+    public const string COLUMN_USER_EMAIL = "Email";
+    public const string COLUMN_USER_HASH = "PasswordHash";
+    public const string COLUMN_USER_SALT = "PasswordSalt";
+    public const string COLUMN_USER_DATE = "DateCreated";
 }

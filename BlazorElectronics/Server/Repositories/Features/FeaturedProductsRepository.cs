@@ -23,4 +23,8 @@ public class FeaturedProductsRepository : DapperRepository<FeaturedProduct>, IFe
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
         return await connection.QuerySingleAsync<FeaturedProduct>( STORED_PROCEDURE_GET_FEATURED_PRODUCT_BY_ID, id, commandType: CommandType.StoredProcedure );
     }
+    public override Task Insert( FeaturedProduct item )
+    {
+        throw new NotImplementedException();
+    }
 }

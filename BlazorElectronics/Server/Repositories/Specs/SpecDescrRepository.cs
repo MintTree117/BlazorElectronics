@@ -41,6 +41,10 @@ public class SpecDescrRepository : DapperRepository<SpecDescr>, ISpecDescrReposi
         return specs;
     }
     public override Task<SpecDescr?> GetById( int id ) { throw new NotImplementedException(); }
+    public override Task Insert( SpecDescr item )
+    {
+        throw new NotImplementedException();
+    }
     public async Task<IEnumerable<SpecDescr>> GetByCategory( int categoryId )
     {
         await using SqlConnection connection = await _dbContext.GetOpenConnection();

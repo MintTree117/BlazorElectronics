@@ -50,4 +50,8 @@ public class FeaturedDealsRepository : DapperRepository<FeaturedDeal>, IFeatured
         await using SqlConnection connection = await _dbContext.GetOpenConnection();
         return await connection.QueryFirstAsync<FeaturedDeal>( STORED_PROCEDURE_GET_FEATURED_DEAL_BY_ID, commandType: CommandType.StoredProcedure );
     }
+    public override Task Insert( FeaturedDeal item )
+    {
+        throw new NotImplementedException();
+    }
 }

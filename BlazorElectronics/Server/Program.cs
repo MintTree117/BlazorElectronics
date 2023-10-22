@@ -1,13 +1,16 @@
 using BlazorElectronics.Server.DbContext;
+using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Specs;
+using BlazorElectronics.Server.Repositories.Users;
 using BlazorElectronics.Server.Services.Cart;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Specs;
+using BlazorElectronics.Server.Services.Users;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
@@ -35,9 +38,11 @@ builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
 builder.Services.AddScoped<ISpecDescrRepository, SpecDescrRepository>();
 builder.Services.AddScoped<ISpecService, SpecService>();
 
-builder.Services.AddScoped<IProductCartRepository, ProductCartRepository>();
-
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 WebApplication app = builder.Build();
 

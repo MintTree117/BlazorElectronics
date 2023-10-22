@@ -22,6 +22,10 @@ public class SpecLookupRepository : DapperRepository<SpecLookup>, ISpecLookupRep
         return await connection.QueryAsync<SpecLookup>( STORED_PROCEDURE_GET, commandType: CommandType.StoredProcedure );
     }
     public override async Task<SpecLookup?> GetById( int id ) { throw new NotImplementedException(); }
+    public override Task Insert( SpecLookup item )
+    {
+        throw new NotImplementedException();
+    }
     public async Task<IEnumerable<SpecLookup>> GetByCategory( int categoryId )
     {
         await using SqlConnection connection = await _dbContext.GetOpenConnection();

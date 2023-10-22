@@ -50,4 +50,8 @@ public class ProductDetailsRepository : DapperRepository<ProductDetails>, IProdu
 
         return productDetails;
     }
+    public override Task Insert( ProductDetails item )
+    {
+        throw new NotImplementedException();
+    }
 }

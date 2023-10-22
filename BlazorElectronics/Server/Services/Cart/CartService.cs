@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Models.Products;
+using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Inbound.Cart;
@@ -8,9 +9,9 @@ namespace BlazorElectronics.Server.Services.Cart;
 
 public class CartService : ICartService
 {
-    readonly IProductCartRepository _cartRepository;
+    readonly ICartRepository _cartRepository;
     
-    public CartService( IProductCartRepository cartRepository )
+    public CartService( ICartRepository cartRepository )
     {
         _cartRepository = cartRepository;
     }
