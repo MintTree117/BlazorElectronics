@@ -11,6 +11,8 @@ using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Server.Services.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
@@ -44,6 +46,18 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddAuthentication( JwtBearerDefaults.AuthenticationScheme )
+    .AddJwtBearer( options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey( System.Text.Encoding.UTF8.GetBytes(
+                builder.Configuration.GetSection( "AppSettings:Token" ).Value! ) ),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    } );
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -63,6 +77,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

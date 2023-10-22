@@ -39,4 +39,16 @@ public class UserServiceClient : IUserServiceClient
             return new ServiceResponse<UserLoginResponse_DTO?>( null, false, e.Message );
         }
     }
+    public async Task<ServiceResponse<bool>> ChangePassword( UserChangePassword_DTO request )
+    {
+        try
+        {
+            HttpResponseMessage result = await _http.PostAsJsonAsync( "api/User/change-password", request.Password );
+            return ( await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>() )!;
+        }
+        catch ( Exception e )
+        {
+            return new ServiceResponse<bool>( false, false, e.Message );
+        }
+    }
 }

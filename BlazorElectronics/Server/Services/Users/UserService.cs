@@ -79,7 +79,25 @@ public class UserService : IUserService
             Message = $"Successfully validated and logged in user {user.Username}"
         };
     }
-    
+    public async Task<ServiceResponse<bool>> ChangePassword( int userId, string newPassword )
+    {
+        User? user = await _userRepository.GetById( userId );
+
+        if ( user == null )
+            return new ServiceResponse<bool>( false, false, "User not found!" );
+
+        CreatePasswordHash( newPassword, out byte[] hash, out byte[] salt );
+
+        user.PasswordHash = hash;
+        user.PasswordSalt = salt;
+
+        bool success = await _userRepository.UpdateUserPassword( userId, hash, salt );
+
+        return success 
+            ? new ServiceResponse<bool>( success, success, $"Successfully updated password for user {user.Username}" ) 
+            : new ServiceResponse<bool>( success, success, $"Failed to update password for user {user.Username}" );
+    }
+
     static void CreatePasswordHash( string password, out byte[] hash, out byte[] salt )
     {
         var hmac = new HMACSHA512();

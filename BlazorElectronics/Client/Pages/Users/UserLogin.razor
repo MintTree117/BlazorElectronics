@@ -4,8 +4,12 @@
 @using Blazored.LocalStorage
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.Outbound.Users
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Web
+@using System.Collections.Specialized
 @inject IUserServiceClient UserService
 @inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavManager
 
 <PageTitle>Login</PageTitle>
@@ -34,6 +38,17 @@
 {
     UserLoginRequest_DTO _loginRequest = new();
     string _errorMessage = string.Empty;
+    string _returnUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
+        NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
+        string? returnUrl = queryString.Get( "returnUrl" );
+
+        if ( !string.IsNullOrEmpty( returnUrl ) )
+            _returnUrl = returnUrl;
+    }
 
     async Task HandleLogin()
     {
@@ -46,7 +61,9 @@
         }
 
         _errorMessage = string.Empty;
-        await LocalStorage.SetItemAsync( "authenticationToken", result.Data!.JsonToken );
-        NavManager.NavigateTo( "" );
+        
+        await LocalStorage.SetItemAsync( "authToken", result.Data!.JsonToken );
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        NavManager.NavigateTo( _returnUrl );
     }
 }

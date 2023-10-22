@@ -14,7 +14,9 @@ public class UserRepository : DapperRepository<User>, IUserRepository
     const string STORED_PROCEDURE_GET_USER_BY_EMAIL = "Get_UserByEmail";
     const string STORED_PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserByNameOrEmail";
     const string STORED_PROCEDURE_INSERT_NEW_USER = "Insert_NewUser";
+    const string STORED_PROCEDURE_UPDATE_PASSWORD = "Update_UserPassword";
 
+    const string QUERY_PARAM_USER_ID = "@Id";
     const string QUERY_PARAM_USER_NAME = "@Username";
     const string QUERY_PARAM_USER_EMAIL = "@Email";
     const string QUERY_PARAM_USER_HASH = "@Hash";
@@ -29,7 +31,20 @@ public class UserRepository : DapperRepository<User>, IUserRepository
     }
     public override async Task<User?> GetById( int id )
     {
-        throw new NotImplementedException();
+        var dynamicParams = new DynamicParameters();
+        dynamicParams.Add( QUERY_PARAM_USER_ID, id );
+        
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+
+        try
+        {
+            return await connection.QueryFirstAsync<User>( STORED_PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+        }
+        catch
+        {
+            return null;
+        }
+
     }
     public override async Task Insert( User item )
     {
@@ -98,5 +113,24 @@ public class UserRepository : DapperRepository<User>, IUserRepository
             UsernameExists = user.Username == username,
             EmailExists = user.Email == email
         };
+    }
+    public async Task<bool> UpdateUserPassword( int id, byte[] hash, byte[] salt )
+    {
+        var dynamicParams = new DynamicParameters();
+        dynamicParams.Add( QUERY_PARAM_USER_ID, id );
+        dynamicParams.Add( QUERY_PARAM_USER_HASH, hash );
+        dynamicParams.Add( QUERY_PARAM_USER_SALT, salt );
+        
+        await using SqlConnection connection = await _dbContext.GetOpenConnection();
+
+        try
+        {
+            await connection.ExecuteAsync( STORED_PROCEDURE_UPDATE_PASSWORD, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -1,3 +1,9 @@
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavManager
+
 <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle user-button"
             @onclick="ToggleUserMenu"
@@ -5,12 +11,17 @@
         <i class="oi oi-person"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right @_userMenuCssClass">
-        <a class="dropdown-item" href="login">
-            Login
-        </a>
-        <a class="dropdown-item" href="registration">
-            Register
-        </a>
+        <AuthorizeView>
+            <Authorized>
+                <a class="dropdown-item" href="profile">Profile</a>
+                <hr/>
+                <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
+            </Authorized>
+            <NotAuthorized>
+                <a class="dropdown-item" href="login?returnUrl=@NavManager.ToBaseRelativePath( NavManager.Uri )">Login</a>
+                <a class="dropdown-item" href="registration">Register</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>
 
@@ -28,5 +39,11 @@
     {
         await Task.Delay( 200 );
         _showUserMenu = false;
+    }
+    async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync( "authToken" );
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        NavManager.NavigateTo( "" );
     }
 }

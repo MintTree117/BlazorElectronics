@@ -8,4 +8,5 @@ public interface IUserServiceClient
 {
     Task<ServiceResponse<int>> Register( UserRegister_DTO request );
     Task<ServiceResponse<UserLoginResponse_DTO?>> Login( UserLoginRequest_DTO request );
+    Task<ServiceResponse<bool>> ChangePassword( UserChangePassword_DTO request );
 }

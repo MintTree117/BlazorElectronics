@@ -8,4 +8,5 @@ public interface IUserService
 {
     Task<ServiceResponse<int>> RegisterUser( UserRegister_DTO newUser );
     Task<ServiceResponse<UserLoginResponse_DTO?>> LogUserIn( string email, string password );
+    Task<ServiceResponse<bool>> ChangePassword( int userId, string newPassword );
 }

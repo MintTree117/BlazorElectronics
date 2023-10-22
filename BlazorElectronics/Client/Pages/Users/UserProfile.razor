@@ -1,0 +1,41 @@
+@page "/profile"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using BlazorElectronics.Client.Services.Users
+@using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Inbound.Users
+@inject IUserServiceClient UserService
+@attribute [Authorize]
+
+<AuthorizeView>
+    <h3>Welcome <i>@context.User.Identity?.Name</i>.</h3>
+</AuthorizeView>
+
+<h5>Change Password</h5>
+
+<EditForm Model="_request" OnValidSubmit="@(async () => await ChangePassword() )">
+    <div class="mb-3">
+        <label for="password">New Password</label>
+        <InputText class="form-control" id="password" @bind-Value="_request.Password" type="password"/>
+        <ValidationMessage For="@(()=> _request.Password)"/>
+    </div>
+    <div class="mb-3">
+        <label for="confirm-password">Confirm New Password</label>
+        <InputText class="form-control" id="confirm-password" @bind-Value="_request.ConfirmPassword" type="password"/>
+        <ValidationMessage For="@(()=> _request.ConfirmPassword)"/>
+    </div>
+    <button class="btn btn-primary" type="submit">Apply</button>
+</EditForm>
+<span>@_message</span>
+
+@code 
+{
+    UserChangePassword_DTO _request = new();
+    string _message = string.Empty;
+
+    async Task ChangePassword()
+    {
+        ServiceResponse<bool> result = await UserService.ChangePassword( _request );
+        _message = result.Message ??= "Failed to change password; not response message!";
+    }
+}

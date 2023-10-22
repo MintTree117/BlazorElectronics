@@ -1,7 +1,10 @@
+using System.Security.Claims;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Inbound.Users;
 using BlazorElectronics.Shared.Outbound.Users;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
@@ -47,6 +50,21 @@ public class UserController : ControllerBase
     public async Task<ActionResult<ServiceResponse<UserLoginResponse_DTO>>> Login( UserLoginRequest_DTO loginRequest )
     {
         ServiceResponse<UserLoginResponse_DTO> response = await _userService.LogUserIn( loginRequest.Email, loginRequest.Password );
+
+        if ( !response.Success )
+            return BadRequest( response );
+        return Ok( response );
+    }
+
+    [HttpPost( "change-password" ), Authorize]
+    public async Task<ActionResult<ServiceResponse<bool>>> ChangePassword( [FromBody] string newPassword )
+    {
+        string? userId = User.FindFirstValue( ClaimTypes.NameIdentifier );
+
+        if ( string.IsNullOrEmpty( userId ) )
+            return BadRequest( new ServiceResponse<bool>( false, false, "User doesn't exist!" ) );
+
+        ServiceResponse<bool> response = await _userService.ChangePassword( int.Parse( userId ), newPassword );
 
         if ( !response.Success )
             return BadRequest( response );
