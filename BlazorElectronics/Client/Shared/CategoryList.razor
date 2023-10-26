@@ -1,5 +1,7 @@
 @using BlazorElectronics.Shared.DataTransferObjects.Categories
 @using BlazorElectronics.Client.Services.Categories
+@using BlazorElectronics.Shared
+
 @inject ICategoryServiceClient CategoryService
 
 <div class="category-list">
@@ -31,13 +33,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _categories = await CategoryService.GetCategories();
+        ServiceResponse<Categories_DTO?> response = await CategoryService.GetCategories();
         _loadedCategories = true;
 
-        if ( _categories == null )
+        if ( !response.Success )
         {
-            _categoryMessage = "Failed to load categories!";
+            _categoryMessage = response.Message!;
             return;
         }
+
+        _categories = response.Data;
     }
 }

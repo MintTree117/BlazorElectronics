@@ -6,7 +6,8 @@
 @using BlazorElectronics.Shared.DtosInbound.Products
 @using BlazorElectronics.Shared.Mutual
 @inject IProductServiceClient ProductServiceClient
-@inject ICartService CartService
+@inject ICartServiceClient CartService
+@implements IDisposable
 
 @if ( !_loaded || _productDetails == null )
 {
@@ -79,8 +80,11 @@ else {
     </div>
 }
 
+<span>@_cartMessage</span>
+
 @code {
     string _serverMessage = "Loading Product Details...";
+    string _cartMessage = string.Empty;
     bool _loaded = false;
 
     ProductDetails_DTO? _productDetails = null;
@@ -90,6 +94,14 @@ else {
     [Parameter]
     public int Id { get; set; }
 
+    public void Dispose()
+    {
+        CartService.PostErrorEvent -= OnCartError;
+    }
+    protected override void OnInitialized()
+    {
+        CartService.PostErrorEvent += OnCartError;
+    }
     protected override async Task OnParametersSetAsync()
     {
         _serverMessage = "Loading Product Details...";
@@ -110,17 +122,13 @@ else {
             _currentVariantId = _productDetails.Variants[ 0 ].Id;
         }
     }
-
-    bool GetSelectedVariant( out ProductVariant_DTO variant )
-    {
-        variant = _productDetails!.Variants.FirstOrDefault( v => v.Id == _currentVariantId )!;
-        return variant != null;
-    }
-
     async Task AddToCart()
     {
         if ( !GetSelectedVariant( out ProductVariant_DTO variant ) )
-            return;
+        {
+            OnCartError( "Failed to get variant!" );
+            return;   
+        }
 
         var cartItem = new CartItem_DTO {
             ProductId = _productDetails!.Id,
@@ -130,5 +138,15 @@ else {
         };
 
         await CartService.AddToCart( cartItem );
+    }
+    bool GetSelectedVariant( out ProductVariant_DTO variant )
+    {
+        variant = _productDetails!.Variants.FirstOrDefault( v => v.Id == _currentVariantId )!;
+        return variant != null;
+    }
+    void OnCartError( string message )
+    {
+        _cartMessage = message;
+        StateHasChanged();
     }
 }

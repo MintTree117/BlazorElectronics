@@ -1,41 +1,70 @@
 @page "/profile"
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Authorization
+
+@using System.Collections.Specialized
+@using System.Web
 @using BlazorElectronics.Client.Services.Users
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.Inbound.Users
+
 @inject IUserServiceClient UserService
-@attribute [Authorize]
+@inject NavigationManager NavManager
 
-<AuthorizeView>
-    <h3>Welcome <i>@context.User.Identity?.Name</i>.</h3>
-</AuthorizeView>
+@if ( !_loaded )
+{
+    <h3>Awaiting authorization...</h3>
+}
+else if ( !_isAuthorized )
+{
+    <h3>You are not authorized to be here!</h3>
+}
+else
+{
+    <h5>Change Password</h5>
 
-<h5>Change Password</h5>
-
-<EditForm Model="_request" OnValidSubmit="@(async () => await ChangePassword() )">
-    <div class="mb-3">
-        <label for="password">New Password</label>
-        <InputText class="form-control" id="password" @bind-Value="_request.Password" type="password"/>
-        <ValidationMessage For="@(()=> _request.Password)"/>
-    </div>
-    <div class="mb-3">
-        <label for="confirm-password">Confirm New Password</label>
-        <InputText class="form-control" id="confirm-password" @bind-Value="_request.ConfirmPassword" type="password"/>
-        <ValidationMessage For="@(()=> _request.ConfirmPassword)"/>
-    </div>
-    <button class="btn btn-primary" type="submit">Apply</button>
-</EditForm>
-<span>@_message</span>
+    <EditForm Model="_request" OnValidSubmit="@(async () => await ChangePassword() )">
+        <div class="mb-3">
+            <label for="password">New Password</label>
+            <InputText class="form-control" id="password" @bind-Value="_request.Password" type="password"/>
+            <ValidationMessage For="@(() => _request.Password)"/>
+        </div>
+        <div class="mb-3">
+            <label for="confirm-password">Confirm New Password</label>
+            <InputText class="form-control" id="confirm-password" @bind-Value="_request.ConfirmPassword" type="password"/>
+            <ValidationMessage For="@(() => _request.ConfirmPassword)"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Apply</button>
+    </EditForm>
+    <span>@_message</span>
+}
 
 @code 
 {
-    UserChangePassword_DTO _request = new();
+    readonly UserChangePasswordRequest _request = new();
     string _message = string.Empty;
+    bool _loaded = false;
+    bool _isAuthorized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
+        NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
+        string? returnUrl = queryString.Get( "returnUrl" );
+        
+        ServiceResponse<bool> response = await UserService.AuthorizeUser();
+        _loaded = true;
+        _isAuthorized = response.Data;
+        StateHasChanged();
+
+        if ( !_isAuthorized )
+        {
+            await Task.Delay( 3000 );
+            NavManager.NavigateTo( string.IsNullOrWhiteSpace( returnUrl ) ? "" : returnUrl );
+        }
+    }
 
     async Task ChangePassword()
     {
         ServiceResponse<bool> result = await UserService.ChangePassword( _request );
-        _message = result.Message ??= "Failed to change password; not response message!";
+        _message = result.Message ??= "Failed to change password; no response message!";
     }
 }

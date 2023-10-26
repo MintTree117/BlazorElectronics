@@ -1,8 +1,12 @@
 @page "/registration"
+
 @using BlazorElectronics.Shared.Inbound.Users
 @using BlazorElectronics.Client.Services.Users
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Outbound.Users
+
 @inject IUserServiceClient UserService
+@inject NavigationManager NavManager
 
 <PageTitle>Register</PageTitle>
 
@@ -38,27 +42,30 @@
 
 @code 
 {
-    UserRegister_DTO _user = new();
+    readonly UserRegisterRequest _user = new();
     string _serverMessage = string.Empty;
     string _messageCssClass = "text-danger";
 
     async Task HandleRegistration()
     {
-        ServiceResponse<int>? result = await UserService.Register( _user );
+        ServiceResponse<UserLoginResponse?> response = await UserService.Register( _user );
 
-        if ( result == null )
+        if ( response == null )
         {
             _serverMessage = $"Failed to register user {_user.Username}; service response is null!";
             return;
         }
 
-        if ( !result.Success )
+        if ( !response.Success )
         {
-            _serverMessage = result.Message ??= $"Failed to register user {_user.Username}; service response message is empty!";
+            _serverMessage = response.Message ??= $"Failed to register user {_user.Username}; service response message is empty!";
             return;
         }
         
         _messageCssClass = "text-success";
-        _serverMessage = result.Message ??= $"Successfully registered user {_user.Username}";
+        _serverMessage = response.Message ??= $"Successfully registered user {_user.Username}";
+
+        await Task.Delay( 3000 );
+        NavManager.NavigateTo( "profile" );
     }
 }

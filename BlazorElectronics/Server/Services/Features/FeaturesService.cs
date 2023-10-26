@@ -7,14 +7,12 @@ namespace BlazorElectronics.Server.Services.Features;
 
 public class FeaturesService : IFeaturesService
 {
-    readonly IFeaturedProductsRepository _featuredProductsRepository;
-    readonly IFeaturedDealsRepository _featuredDealsRepository;
+    readonly IFeaturesRepository _featuresRepository;
     readonly IFeaturesCache _cache;
 
-    public FeaturesService( IFeaturedProductsRepository featuredProductsRepository, IFeaturedDealsRepository featuredDealsRepository, IFeaturesCache cache )
+    public FeaturesService( IFeaturesRepository featuresRepository, IFeaturesCache cache )
     {
-        _featuredProductsRepository = featuredProductsRepository;
-        _featuredDealsRepository = featuredDealsRepository;
+        _featuresRepository = featuresRepository;
         _cache = cache;
     }
     public async Task<ServiceResponse<FeaturedProducts_DTO?>> GetFeaturedProducts()
@@ -24,7 +22,7 @@ public class FeaturesService : IFeaturesService
         if ( dto != null )
             return new ServiceResponse<FeaturedProducts_DTO?>( dto, true, "Success. Retrieved FeaturedProducts_DTO from cache." );
 
-        IEnumerable<FeaturedProduct>? models = await _featuredProductsRepository.GetAll();
+        IEnumerable<FeaturedProduct>? models = await _featuresRepository.GetFeaturedProducts();
 
         if ( models == null )
             return new ServiceResponse<FeaturedProducts_DTO?>( null, false, "Failed to retrieve FeaturedProducts_DTO from cache, and ProductDetails from repository!" );
@@ -34,22 +32,22 @@ public class FeaturesService : IFeaturesService
 
         return new ServiceResponse<FeaturedProducts_DTO?>( dto, true, "Successfully retrieved FeaturedProducts_DTO from repository, mapped to DTO, and cached." );
     }
-    public async Task<ServiceResponse<FeaturesDeals_DTO?>> GetFeaturedDeals()
+    public async Task<ServiceResponse<FeaturedDeals_DTO?>> GetFeaturedDeals()
     {
-        FeaturesDeals_DTO? dto = await _cache.GetFeaturedDeals();
+        FeaturedDeals_DTO? dto = await _cache.GetFeaturedDeals();
 
         if ( dto != null )
-            return new ServiceResponse<FeaturesDeals_DTO?>( dto, true, "Success. Retrieved Top Deals from cache." );
+            return new ServiceResponse<FeaturedDeals_DTO?>( dto, true, "Success. Retrieved Top Deals from cache." );
 
-        IEnumerable<FeaturedDeal>? models = await _featuredDealsRepository.GetAll();
+        IEnumerable<FeaturedDeal>? models = await _featuresRepository.GetFeaturedDeals();
 
         if ( models == null )
-            return new ServiceResponse<FeaturesDeals_DTO?>( null, false, "Failed to retrieve Top Deals from cache, and ProductDetails from repository!" );
+            return new ServiceResponse<FeaturedDeals_DTO?>( null, false, "Failed to retrieve Top Deals from cache, and ProductDetails from repository!" );
 
         dto = await MapFeaturedDealsToDto( models );
         await _cache.CacheFeaturedDeals( dto );
 
-        return new ServiceResponse<FeaturesDeals_DTO?>( dto, true, "Successfully retrieved Top Deals from repository, mapped to DTO, and cached." );
+        return new ServiceResponse<FeaturedDeals_DTO?>( dto, true, "Successfully retrieved Top Deals from repository, mapped to DTO, and cached." );
 
     }
     static async Task<FeaturedProducts_DTO> MapFeaturedProductsToDto( IEnumerable<FeaturedProduct> models )
@@ -71,7 +69,7 @@ public class FeaturesService : IFeaturesService
             FeaturedProducts = dtos
         };
     }
-    static async Task<FeaturesDeals_DTO> MapFeaturedDealsToDto( IEnumerable<FeaturedDeal> models )
+    static async Task<FeaturedDeals_DTO> MapFeaturedDealsToDto( IEnumerable<FeaturedDeal> models )
     {
         var deals = new List<FeaturedDeal_DTO>();
 
@@ -91,7 +89,7 @@ public class FeaturesService : IFeaturesService
             }
         } );
         
-        return new FeaturesDeals_DTO {
+        return new FeaturedDeals_DTO {
             Deals = deals
         };
     }

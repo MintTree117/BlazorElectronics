@@ -1,10 +1,12 @@
 @using BlazorElectronics.Client.Services.Cart
-@using Blazored.LocalStorage
 @using BlazorElectronics.Shared.DtosInbound.Products
 @using BlazorElectronics.Shared.Mutual
-@inject ICartService CartService
-@inject NavigationManager NavManager;
+@using Blazored.LocalStorage
+
 @implements IDisposable
+
+@inject ICartServiceClient CartService
+@inject NavigationManager NavManager;
 
 <button class="btn btn-info cart-counter" @onclick="GoToCart">
     <span class="badge"> <i class="oi oi-cart"></i>@_cartCount</span>
@@ -12,26 +14,13 @@
 
 @code 
 {
-    string message = string.Empty;
+    string _message = string.Empty;
     int _cartCount = 0;
-    
-    async Task<int> GetCartItemsCount()
-    {
-        Cart_DTO? cart = await CartService.GetItemsFromLocalStorage();
-        return cart?.Items.Count ?? 0;
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            _cartCount = await GetCartItemsCount();
-            StateHasChanged();
-        }
-        catch ( Exception e )
-        {
-            message = e.Message;
-        }
+        _cartCount = await CartService.GetCartItemsCount();
+        StateHasChanged();
     }
     protected override void OnInitialized()
     {

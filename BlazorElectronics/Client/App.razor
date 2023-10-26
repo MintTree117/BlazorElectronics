@@ -1,15 +1,8 @@
 ﻿@using BlazorElectronics.Client.Shared
-@using Microsoft.AspNetCore.Components.Authorization;
 
-<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof( App ).Assembly">
+<Router AppAssembly="@typeof( App ).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof( MainLayout )">
-                <NotAuthorized>
-                    <h3>Whoops! You're not allowed to see this page.</h3>
-                    <h5>Please <a href="login">login</a> or <a href="register">create an account.</a></h5>
-                </NotAuthorized>
-            </AuthorizeRouteView>
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof( MainLayout )"/>
             <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
         </Found>
         <NotFound>
@@ -19,4 +12,3 @@
             </LayoutView>
         </NotFound>
     </Router>
-</CascadingAuthenticationState>

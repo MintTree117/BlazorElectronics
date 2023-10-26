@@ -1,73 +1,77 @@
-using System.Security.Claims;
+using System.Net;
+using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Inbound.Users;
-using BlazorElectronics.Shared.Outbound.Users;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
 
-[Route( "api/[controller]" )]
-[ApiController]
 public class UserController : ControllerBase
 {
-    readonly IUserService _userService;
+    protected readonly IUserAccountService UserAccountService;
+    protected readonly ISessionService SessionService;
     
-    public UserController( IUserService userService )
+    public UserController( IUserAccountService userAccountService, ISessionService sessionService )
     {
-        _userService = userService;
+        UserAccountService = userAccountService;
+        SessionService = sessionService;
     }
 
-    [HttpGet( "test-register" )]
-    public async Task<ActionResult<ServiceResponse<int>>> TestRegister()
+    protected sealed class ValidatedIdAndSession
     {
-        var request = new UserRegister_DTO {
-            Username = "TestUser",
-            Email = "martygrof3708@gmail.com",
-            Password = "123456",
-            ConfirmPassword = "123456"
-        };
-        ServiceResponse<int> response = await _userService.RegisterUser( request );
-
-        if ( !response.Success )
-            return BadRequest( response );
-        return Ok( response );
+        public ValidatedIdAndSession( int userId, string token )
+        {
+            UserId = userId;
+            SessionToken = token;
+        }
+        
+        public int UserId { get; set; }
+        public string? SessionToken { get; set; }
     }
 
-    [HttpPost( "register" )]
-    public async Task<ActionResult<ServiceResponse<int>>> Register( [FromBody] UserRegister_DTO request )
+    protected async Task<ServiceResponse<ValidatedIdAndSession>> ValidateUserSession( SessionApiRequest request, string ipAddress )
     {
-        ServiceResponse<int> response = await _userService.RegisterUser( request );
+        ServiceResponse<int> idResponse = await UserAccountService.ValidateUserId( request.Username );
 
-        if ( !response.Success )
-            return BadRequest( response );
-        return Ok( response );
+        if ( !idResponse.Success )
+            return new ServiceResponse<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate UserId for {request.Username}!" );
+
+        ServiceResponse<string?> sessionResponse = await SessionService.GetExistingSession( idResponse.Data, request.SessionToken, ipAddress! );
+
+        return !sessionResponse.Success 
+            ? new ServiceResponse<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate Session for {request.Username}!" ) 
+            : new ServiceResponse<ValidatedIdAndSession>( new ValidatedIdAndSession( idResponse.Data, sessionResponse.Data! ), true, $"Successfully validated session for {request.Username}." );
     }
 
-    [HttpPost( "login" )]
-    public async Task<ActionResult<ServiceResponse<UserLoginResponse_DTO>>> Login( UserLoginRequest_DTO loginRequest )
+    protected bool ValidateApiRequest( SessionApiRequest? apiRequest, out string? ipAddress, out string message )
     {
-        ServiceResponse<UserLoginResponse_DTO> response = await _userService.LogUserIn( loginRequest.Email, loginRequest.Password );
+        ipAddress = null;
+        message = "Failed to validate request!";
 
-        if ( !response.Success )
-            return BadRequest( response );
-        return Ok( response );
+        if ( apiRequest == null )
+        {
+            message = "Api request is null!";
+            return false;
+        }
+
+        if ( GetRequestIpAddress( out ipAddress ) )
+            return true;
+
+        message = "Failed to validate ip address for request!";
+        return false;
+
     }
-
-    [HttpPost( "change-password" ), Authorize]
-    public async Task<ActionResult<ServiceResponse<bool>>> ChangePassword( [FromBody] string newPassword )
+    protected bool GetRequestIpAddress( out string? ipAddress )
     {
-        string? userId = User.FindFirstValue( ClaimTypes.NameIdentifier );
+        ipAddress = null;
 
-        if ( string.IsNullOrEmpty( userId ) )
-            return BadRequest( new ServiceResponse<bool>( false, false, "User doesn't exist!" ) );
+        IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
 
-        ServiceResponse<bool> response = await _userService.ChangePassword( int.Parse( userId ), newPassword );
+        if ( address == null )
+            return false;
 
-        if ( !response.Success )
-            return BadRequest( response );
-        return Ok( response );
+        ipAddress = address.ToString();
+
+        return !string.IsNullOrEmpty( ipAddress );
     }
 }

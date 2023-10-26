@@ -6,5 +6,5 @@ namespace BlazorElectronics.Server.Services.Features;
 public interface IFeaturesService
 {
     Task<ServiceResponse<FeaturedProducts_DTO?>> GetFeaturedProducts();
-    Task<ServiceResponse<FeaturesDeals_DTO?>> GetFeaturedDeals();
+    Task<ServiceResponse<FeaturedDeals_DTO?>> GetFeaturedDeals();
 }

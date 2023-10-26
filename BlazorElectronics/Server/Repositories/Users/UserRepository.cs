@@ -1,4 +1,5 @@
 using System.Data;
+using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Users;
 using Dapper;
@@ -6,14 +7,13 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Repositories.Users;
 
-public class UserRepository : DapperRepository<User>, IUserRepository
+public class UserRepository : DapperRepository, IUserRepository
 {
-    const string STORED_PROCEDURE_GET_ALL_USERS = "Get_AllUsers";
     const string STORED_PROCEDURE_GET_USER_BY_ID = "Get_UserById";
     const string STORED_PROCEDURE_GET_USER_BY_USERNAME = "Get_UserByUsername";
     const string STORED_PROCEDURE_GET_USER_BY_EMAIL = "Get_UserByEmail";
     const string STORED_PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserByNameOrEmail";
-    const string STORED_PROCEDURE_INSERT_NEW_USER = "Insert_NewUser";
+    const string STORED_PROCEDURE_ADD_USER = "Add_User";
     const string STORED_PROCEDURE_UPDATE_PASSWORD = "Update_UserPassword";
 
     const string QUERY_PARAM_USER_ID = "@Id";
@@ -22,56 +22,45 @@ public class UserRepository : DapperRepository<User>, IUserRepository
     const string QUERY_PARAM_USER_HASH = "@Hash";
     const string QUERY_PARAM_USER_SALT = "@Salt";
     const string QUERY_PARAM_USER_DATE = "@Date";
-    
+
     public UserRepository( DapperContext dapperContext ) : base( dapperContext ) { }
-    
-    public override async Task<IEnumerable<User>?> GetAll()
-    {
-        throw new NotImplementedException();
-    }
-    public override async Task<User?> GetById( int id )
+
+    public async Task<User?> GetById( int id )
     {
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( QUERY_PARAM_USER_ID, id );
         
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
-
         try
         {
-            return await connection.QueryFirstAsync<User>( STORED_PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+            await using SqlConnection? connection = await _dbContext.GetOpenConnection();
+            return await connection.QuerySingleAsync<User>( STORED_PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure );
         }
-        catch
+        catch( SqlException e )
         {
-            return null;
+            throw new RepositoryException( e.Message, e );
         }
-
-    }
-    public override async Task Insert( User item )
-    {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_NAME, item.Username );
-        dynamicParams.Add( QUERY_PARAM_USER_EMAIL, item.Email );
-        dynamicParams.Add( QUERY_PARAM_USER_HASH, item.PasswordHash );
-        dynamicParams.Add( QUERY_PARAM_USER_SALT, item.PasswordSalt );
-        dynamicParams.Add( QUERY_PARAM_USER_DATE, item.DateCreated );
-        
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
-        await connection.ExecuteAsync( STORED_PROCEDURE_INSERT_NEW_USER, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+        catch ( Exception e )
+        {
+            throw new RepositoryException( e.Message, e );
+        }
     }
     public async Task<User?> GetByUsername( string username )
     {
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( QUERY_PARAM_USER_NAME, username );
 
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
-        
         try
         {
-            return await connection.QueryFirstAsync<User>( STORED_PROCEDURE_GET_USER_BY_USERNAME, dynamicParams, commandType: CommandType.StoredProcedure );
+            await using SqlConnection? connection = await _dbContext.GetOpenConnection();
+            return await connection.QuerySingleAsync<User>( STORED_PROCEDURE_GET_USER_BY_USERNAME, dynamicParams, commandType: CommandType.StoredProcedure );
         }
-        catch
+        catch ( SqlException e )
         {
-            return null;
+            throw new RepositoryException( e.Message, e );
+        }
+        catch ( Exception e )
+        {
+            throw new RepositoryException( e.Message, e );
         }
     }
     public async Task<User?> GetByEmail( string email )
@@ -79,58 +68,134 @@ public class UserRepository : DapperRepository<User>, IUserRepository
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( QUERY_PARAM_USER_EMAIL, email );
 
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
-
         try
         {
-            return await connection.QueryFirstAsync<User>( STORED_PROCEDURE_GET_USER_BY_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+            await using SqlConnection? connection = await _dbContext.GetOpenConnection();
+            return await connection.QuerySingleAsync<User>( STORED_PROCEDURE_GET_USER_BY_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
         }
-        catch
+        catch ( SqlException e )
         {
-            return null;
+            throw new RepositoryException( e.Message, e );
+        }
+        catch ( Exception e )
+        {
+            throw new RepositoryException( e.Message, e );
         }
     }
-    public async Task<UserExists> CheckIfUserExists( string username, string email )
+    public async Task<UserExists?> CheckIfUserExists( string username, string email )
     {
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( QUERY_PARAM_USER_NAME, username );
         dynamicParams.Add( QUERY_PARAM_USER_EMAIL, email );
-
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
-
-        User? user = null;
-
+        
         try
         {
-            user = await connection.QueryFirstAsync<User>( STORED_PROCEDURE_GET_USER_BY_NAME_OR_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+            await using SqlConnection? connection = await _dbContext.GetOpenConnection();
+            var user = await connection.QuerySingleAsync<User>( STORED_PROCEDURE_GET_USER_BY_NAME_OR_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+            return new UserExists {
+                UsernameExists = user.Username == username,
+                EmailExists = user.Email == email
+            };
         }
-        catch
+        catch ( SqlException e )
         {
-            return new UserExists();
+            throw new RepositoryException( e.Message, e );
         }
-
-        return new UserExists {
-            UsernameExists = user.Username == username,
-            EmailExists = user.Email == email
-        };
+        catch ( Exception e )
+        {
+            throw new RepositoryException( e.Message, e );
+        }
     }
     public async Task<bool> UpdateUserPassword( int id, byte[] hash, byte[] salt )
     {
+        SqlConnection? connection = null;
+        DbTransaction? transaction = null;
+        
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( QUERY_PARAM_USER_ID, id );
         dynamicParams.Add( QUERY_PARAM_USER_HASH, hash );
         dynamicParams.Add( QUERY_PARAM_USER_SALT, salt );
-        
-        await using SqlConnection connection = await _dbContext.GetOpenConnection();
 
         try
         {
+            connection = await _dbContext.GetOpenConnection();
+            transaction = await connection!.BeginTransactionAsync();
+        }
+        catch ( SqlException e )
+        {
+            await HandleConnectionTransactionDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+        catch ( Exception e )
+        {
+            await HandleConnectionTransactionDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+        
+        try
+        {
             await connection.ExecuteAsync( STORED_PROCEDURE_UPDATE_PASSWORD, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+            await transaction.CommitAsync();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
             return true;
         }
-        catch
+        catch ( SqlException e )
         {
-            return false;
+            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+        catch ( Exception e )
+        {
+            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+    }
+    public async Task<User?> AddUser( User user )
+    {
+        SqlConnection? connection = null;
+        DbTransaction? transaction = null;
+        
+        var dynamicParams = new DynamicParameters();
+        dynamicParams.Add( QUERY_PARAM_USER_NAME, user.Username );
+        dynamicParams.Add( QUERY_PARAM_USER_EMAIL, user.Email );
+        dynamicParams.Add( QUERY_PARAM_USER_HASH, user.PasswordHash );
+        dynamicParams.Add( QUERY_PARAM_USER_SALT, user.PasswordSalt );
+        dynamicParams.Add( QUERY_PARAM_USER_DATE, user.DateCreated );
+
+        try
+        {
+            connection = await _dbContext.GetOpenConnection();
+            transaction = await connection!.BeginTransactionAsync();
+        }
+        catch ( SqlException e )
+        {
+            await HandleConnectionTransactionDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+        catch ( Exception e )
+        {
+            await HandleConnectionTransactionDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+        
+        try
+        {
+            User? insertedUser = await connection.QuerySingleAsync<User>( STORED_PROCEDURE_ADD_USER, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+            await transaction.CommitAsync();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
+            return insertedUser;
+        }
+        catch ( SqlException e )
+        {
+            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
+            throw GetRepositoryException( e );
+        }
+        catch ( Exception e )
+        {
+            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
+            throw GetRepositoryException( e );
         }
     }
 }

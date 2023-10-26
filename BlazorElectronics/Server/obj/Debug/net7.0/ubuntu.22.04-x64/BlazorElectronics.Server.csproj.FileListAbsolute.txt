@@ -5,9 +5,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/BrowserDebugHost.runtimeconfig.json
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/BrowserDebugProxy.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.CSharp.dll
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.CSharp.Scripting.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.dll
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.Scripting.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Newtonsoft.Json.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.staticwebassets.runtime.json
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server
@@ -19,6 +17,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Azure.Identity.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Blazored.LocalStorage.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Dapper.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authorization.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Authorization.dll
@@ -385,4 +384,5 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.genruntimeconfig.cache
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.CSharp.Scripting.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.Scripting.dll

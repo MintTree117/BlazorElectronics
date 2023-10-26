@@ -3,12 +3,12 @@ using System.Text;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
-using BlazorElectronics.Shared.Outbound.Features;
 
 namespace BlazorElectronics.Client.Services.Products;
 
 public class ProductServiceClient : IProductServiceClient
 {
+    public event Action<string>? ExceptionEvent;
     public event Action<ServiceResponse<ProductSearchResults_DTO?>?>? ProductSearchChanged;
     public event Action<string>? ProductSearchNullabillityTest;
 
@@ -114,34 +114,83 @@ public class ProductServiceClient : IProductServiceClient
         return urlBuilder.ToString();
     }
     
-    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>?> GetProductSearchSuggestions( string searchText )
+    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText )
     {
         string url = $"{PRODUCT_SEARCH_SUGGESTIONS_URL}{searchText}";
-        return await _http.GetFromJsonAsync<ServiceResponse<ProductSearchSuggestions_DTO?>>( url );
+
+        try
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<ProductSearchSuggestions_DTO?>>( url );
+
+            if ( response == null )
+                return new ServiceResponse<ProductSearchSuggestions_DTO?>( null, false, "Service response is null!" );
+
+            return !response.Success
+                ? new ServiceResponse<ProductSearchSuggestions_DTO?>( null, false, response.Message ??= "Failed to retrieve Search Suggestions; message is null!" )
+                : response;
+        }
+        catch ( Exception e )
+        {
+            return new ServiceResponse<ProductSearchSuggestions_DTO?>( null, false, e.Message );
+        }
     }
     public async Task SearchProductsByCategory( string categoryUrl, ProductSearchRequest_DTO? filters )
     {
-        string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
-        string url = $"{PRODUCT_SEARCH_CATEGORY_URL}/{categoryUrl}{queryString}";
-        await SearchProducts( url );
+        try
+        {
+            string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
+            string url = $"{PRODUCT_SEARCH_CATEGORY_URL}/{categoryUrl}{queryString}";
+            await SearchProducts( url );
+        }
+        catch ( Exception e )
+        {
+            ExceptionEvent?.Invoke( e.Message );
+        }
     }
     public async Task SearchProductsByText( string searchText, ProductSearchRequest_DTO? filters )
     {
-        string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
-        string url = $"{PRODUCT_SEARCH_TEXT_URL}/{searchText}{queryString}";
-        await SearchProducts( url );
+        try
+        {
+            string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
+            string url = $"{PRODUCT_SEARCH_TEXT_URL}/{searchText}{queryString}";
+            await SearchProducts( url );   
+        }
+        catch ( Exception e )
+        {
+            ExceptionEvent?.Invoke( e.Message );
+        }
     }
     public async Task SearchProductsByCategoryAndText( string categoryUrl, string searchText, ProductSearchRequest_DTO? filters )
     {
-        string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
-        string url = $"{PRODUCT_SEARCH_CATEGORY_TEXT_URL}/{categoryUrl}/{searchText}{queryString}";
-        await SearchProducts( url );
+        try
+        {
+            string queryString = $"?filters={Uri.EscapeDataString( Newtonsoft.Json.JsonConvert.SerializeObject( filters ) )}";
+            string url = $"{PRODUCT_SEARCH_CATEGORY_TEXT_URL}/{categoryUrl}/{searchText}{queryString}";
+            await SearchProducts( url );   
+        }
+        catch ( Exception e )
+        {
+            ExceptionEvent?.Invoke( e.Message );
+        }
     }
     public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
-        string url = $"{PRODUCT_DETAILS_URL}/{productId}";
-        var serverResponse = await _http.GetFromJsonAsync<ServiceResponse<ProductDetails_DTO?>>( url );
-        return serverResponse ?? new ServiceResponse<ProductDetails_DTO?>( null, false, SERVER_RESPONSE_MESSAGE_NULL );
+        try
+        {
+            string url = $"{PRODUCT_DETAILS_URL}/{productId}";
+            var response = await _http.GetFromJsonAsync<ServiceResponse<ProductDetails_DTO?>>( url );
+
+            if ( response == null )
+                return new ServiceResponse<ProductDetails_DTO?>( null, false, "Service response is null!" );
+
+            return !response.Success
+                ? new ServiceResponse<ProductDetails_DTO?>( null, false, response.Message ??= "Failed to retrieve Product Details; message is null!" )
+                : response;
+        }
+        catch ( Exception e )
+        {
+            return new ServiceResponse<ProductDetails_DTO?>( null, false, e.Message );
+        }
     }
     
     async Task SearchProducts( string url )

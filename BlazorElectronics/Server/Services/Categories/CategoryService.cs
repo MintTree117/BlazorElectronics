@@ -46,7 +46,7 @@ public class CategoryService : ICategoryService
         if ( meta != null )
             return new ServiceResponse<CategoryMeta?>( meta, true, "Success. Retrieved Category Meta from cache." );
 
-        IEnumerable<Category>? models = await _repository.GetAll();
+        IEnumerable<Category>? models = await _repository.GetCategories();
 
         if ( models == null )
             return new ServiceResponse<CategoryMeta?>( null, false, "Failed to retrieve Category Meta from cache, and Categories from repository!" );

@@ -18,10 +18,7 @@ builder.Services.AddScoped( sp => new HttpClient { BaseAddress = new Uri( builde
 builder.Services.AddScoped<IFeaturesServiceClient, FeaturesServiceClient>();
 builder.Services.AddScoped<ICategoryServiceClient, CategoryServiceClient>();
 builder.Services.AddScoped<IProductServiceClient, ProductServiceClient>();
-builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartServiceClient, CartServiceClient>();
 builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
-builder.Services.AddOptions();
-builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 await builder.Build().RunAsync();

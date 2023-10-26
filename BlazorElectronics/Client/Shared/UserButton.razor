@@ -1,7 +1,11 @@
 @using Blazored.LocalStorage
+@using BlazorElectronics.Client.Services.Users
 @using Microsoft.AspNetCore.Components.Authorization
+
+@implements IDisposable
+
+@inject IUserServiceClient UserService
 @inject ILocalStorageService LocalStorage
-@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavManager
 
 <div class="dropdown">
@@ -11,30 +15,35 @@
         <i class="oi oi-person"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right @_userMenuCssClass">
-        <AuthorizeView>
-            <Authorized>
-                <a class="dropdown-item" href="profile">Profile</a>
-                <hr/>
-                <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
-            </Authorized>
-            <NotAuthorized>
-                <a class="dropdown-item" href="login?returnUrl=@NavManager.ToBaseRelativePath( NavManager.Uri )">Login</a>
-                <a class="dropdown-item" href="registration">Register</a>
-            </NotAuthorized>
-        </AuthorizeView>
+        @if ( _isAuthorized )
+        {
+            <a class="dropdown-item" href="profile">Profile</a>
+            <hr/>
+            <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
+        }
+        else
+        {
+            <a class="dropdown-item" href="login?returnUrl=@NavManager.ToBaseRelativePath( NavManager.Uri )">Login</a>
+            <a class="dropdown-item" href="registration">Register</a>
+        }
     </div>
 </div>
 
 @code 
 {
+    bool _isAuthorized = false;
     bool _showUserMenu = false;
     string? _userMenuCssClass => _showUserMenu ? "show-user-menu" : null;
 
-    void ToggleUserMenu()
+    protected override void OnInitialized()
     {
-        _showUserMenu = !_showUserMenu;
-        StateHasChanged();
+        UserService.AuthorizationChanged += HandleAuthorizationChange;
     }
+    public void Dispose()
+    {
+        UserService.AuthorizationChanged -= HandleAuthorizationChange;
+    }
+    
     async Task HideUserMenu()
     {
         await Task.Delay( 200 );
@@ -42,8 +51,18 @@
     }
     async Task Logout()
     {
-        await LocalStorage.RemoveItemAsync( "authToken" );
-        await AuthStateProvider.GetAuthenticationStateAsync();
+        await UserService.Logout();
         NavManager.NavigateTo( "" );
+    }
+    
+    void ToggleUserMenu()
+    {
+        _showUserMenu = !_showUserMenu;
+        StateHasChanged();
+    }
+    void HandleAuthorizationChange( bool isAuthorized )
+    {
+        _isAuthorized = isAuthorized;
+        StateHasChanged();
     }
 }

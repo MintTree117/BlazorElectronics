@@ -15,12 +15,38 @@ public class FeaturesServiceClient : IFeaturesServiceClient
     
     public async Task<ServiceResponse<FeaturedProducts_DTO?>?> GetFeaturedProducts()
     {
-        var result = await _http.GetFromJsonAsync<ServiceResponse<FeaturedProducts_DTO?>>( "api/Features/products" );
-        return result;
+        try
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<FeaturedProducts_DTO?>>( "api/Features/products" );
+
+            if ( response == null )
+                return new ServiceResponse<FeaturedProducts_DTO?>( null, false, "Service response is null!" );
+            
+            return !response.Success 
+                ? new ServiceResponse<FeaturedProducts_DTO?>( null, false, response.Message ??= "Failed to retrieve Featured Products; message is null!" ) 
+                : response;
+        }
+        catch ( Exception e )
+        {
+            return new ServiceResponse<FeaturedProducts_DTO?>( null, false, e.Message );
+        }
     }
-    public async Task<ServiceResponse<FeaturesDeals_DTO?>?> GetFeaturedDeals()
+    public async Task<ServiceResponse<FeaturedDeals_DTO?>?> GetFeaturedDeals()
     {
-        var result = await _http.GetFromJsonAsync<ServiceResponse<FeaturesDeals_DTO?>>( "api/Features/deals" );
-        return result;
+        try
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<FeaturedDeals_DTO?>>( "api/Features/deals" );
+
+            if ( response == null )
+                return new ServiceResponse<FeaturedDeals_DTO?>( null, false, "Service response is null!" );
+            
+            return !response.Success 
+                ? new ServiceResponse<FeaturedDeals_DTO?>( null, false, response.Message ??= "Failed to retrieve Featured Deals; message is null!" ) 
+                : response;
+        }
+        catch ( Exception e )
+        {
+            return new ServiceResponse<FeaturedDeals_DTO?>( null, false, e.Message );
+        }
     }
 }

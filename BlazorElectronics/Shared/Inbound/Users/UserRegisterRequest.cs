@@ -2,8 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BlazorElectronics.Shared.Inbound.Users;
 
-public sealed class UserRegister_DTO
+public sealed class UserRegisterRequest
 {
+    public SessionApiRequest? ApiRequest { get; set; }
+    
     [Required, StringLength(25, MinimumLength = 6)]
     public string Username { get; set; } = string.Empty;
     [Required, EmailAddress]

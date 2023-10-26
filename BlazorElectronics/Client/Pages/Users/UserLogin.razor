@@ -1,15 +1,15 @@
 @page "/login"
-@using BlazorElectronics.Shared.Inbound.Users
-@using BlazorElectronics.Client.Services.Users
-@using Blazored.LocalStorage
-@using BlazorElectronics.Shared
-@using BlazorElectronics.Shared.Outbound.Users
-@using Microsoft.AspNetCore.Components.Authorization
+
 @using System.Web
 @using System.Collections.Specialized
+@using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Outbound.Users
+@using BlazorElectronics.Shared.Inbound.Users
+@using BlazorElectronics.Client.Services.Users
+@using BlazorElectronics.Client.Services.Cart
+
 @inject IUserServiceClient UserService
-@inject ILocalStorageService LocalStorage
-@inject AuthenticationStateProvider AuthStateProvider
+@inject ICartServiceClient CartService
 @inject NavigationManager NavManager
 
 <PageTitle>Login</PageTitle>
@@ -36,7 +36,8 @@
 
 @code 
 {
-    UserLoginRequest_DTO _loginRequest = new();
+    readonly UserLoginRequest _loginRequest = new();
+    
     string _errorMessage = string.Empty;
     string _returnUrl = string.Empty;
 
@@ -52,18 +53,23 @@
 
     async Task HandleLogin()
     {
-        ServiceResponse<UserLoginResponse_DTO?> result = await UserService.Login( _loginRequest );
+        _errorMessage = string.Empty;
+        
+        ServiceResponse<UserLoginResponse?> response = await UserService.Login( _loginRequest );
 
-        if ( !result.Success )
+        if ( !response.Success )
         {
-            _errorMessage = result.Message!;
+            _errorMessage = response.Message!;
             return;
         }
 
-        _errorMessage = string.Empty;
+        if ( response.Data == null )
+        {
+            _errorMessage = "Null session data!";
+            return;
+        }
         
-        await LocalStorage.SetItemAsync( "authToken", result.Data!.JsonToken );
-        await AuthStateProvider.GetAuthenticationStateAsync();
+        await CartService.PostCartToServer( true );
         NavManager.NavigateTo( _returnUrl );
     }
 }

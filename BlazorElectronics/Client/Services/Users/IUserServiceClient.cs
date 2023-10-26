@@ -6,7 +6,11 @@ namespace BlazorElectronics.Client.Services.Users;
 
 public interface IUserServiceClient
 {
-    Task<ServiceResponse<int>> Register( UserRegister_DTO request );
-    Task<ServiceResponse<UserLoginResponse_DTO?>> Login( UserLoginRequest_DTO request );
-    Task<ServiceResponse<bool>> ChangePassword( UserChangePassword_DTO request );
+    event Action<bool> AuthorizationChanged;
+    
+    Task<ServiceResponse<UserLoginResponse?>> Register( UserRegisterRequest request );
+    Task<ServiceResponse<UserLoginResponse?>> Login( UserLoginRequest request );
+    Task<ServiceResponse<bool>> Logout();
+    Task<ServiceResponse<bool>> AuthorizeUser();
+    Task<ServiceResponse<bool>> ChangePassword( UserChangePasswordRequest request );
 }

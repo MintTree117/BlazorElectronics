@@ -23,9 +23,9 @@ public class FeaturesController : ControllerBase
         return Ok( response );
     }
     [HttpGet( "deals" )]
-    public async Task<ActionResult<ServiceResponse<FeaturesDeals_DTO>>> GetTopDeals()
+    public async Task<ActionResult<ServiceResponse<FeaturedDeals_DTO>>> GetTopDeals()
     {
-        ServiceResponse<FeaturesDeals_DTO?> response = await _featuresService.GetFeaturedDeals();
+        ServiceResponse<FeaturedDeals_DTO?> response = await _featuresService.GetFeaturedDeals();
         return Ok( response );
     }
 }

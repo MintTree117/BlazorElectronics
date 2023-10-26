@@ -2,6 +2,7 @@ namespace BlazorElectronics.Shared.Mutual;
 
 public sealed class CartItem_DTO
 {
+    public int UserId { get; set; }
     public int ProductId { get; set; }
     public string? ProductTitle { get; set; }
     public string? ProductThumbnail { get; set; }

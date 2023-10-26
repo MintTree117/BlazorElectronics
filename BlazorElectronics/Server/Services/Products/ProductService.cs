@@ -1,4 +1,3 @@
-using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
@@ -26,9 +25,8 @@ public class ProductService : IProductService
         IProductCache cache, 
         IProductSearchRepository productSearchRepository, 
         IProductDetailsRepository productDetailsRepository, 
-        ICategoryService categoryService, ISpecService specService, 
-        IFeaturedProductsRepository featuredProductsRepository, 
-        IFeaturedDealsRepository featuredDealsRepository )
+        ICategoryService categoryService, ISpecService specService,
+        IFeaturesRepository featuresRepository )
     {
         _cache = cache;
         _productSearchRepository = productSearchRepository;
@@ -53,7 +51,7 @@ public class ProductService : IProductService
     }
     public async Task<ServiceResponse<Products_DTO?>> GetAllProducts()
     {
-        IEnumerable<Product>? models = await _productSearchRepository.GetAll();
+        IEnumerable<Product>? models = await _productSearchRepository.GetAllProducts();
         
         if ( models == null )
             return new ServiceResponse<Products_DTO?>( "Failed to retrieve Products from repository!" );
@@ -110,7 +108,7 @@ public class ProductService : IProductService
         if ( dto != null )
             return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Success. Retrieved ProductDetails_DTO from cache." );
 
-        ProductDetails? model = await _productDetailsRepository.GetById( productId );
+        ProductDetails? model = await _productDetailsRepository.GetProductDetailsById( productId );
 
         if ( model == null )
             return new ServiceResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve ProductDetails_DTO from cache, and ProductDetails from repository!" );

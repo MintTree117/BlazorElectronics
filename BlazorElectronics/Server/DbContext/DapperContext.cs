@@ -14,7 +14,7 @@ public class DapperContext
     }
 
     public SqlConnection CreateConnection() => new SqlConnection( _connectionString );
-    public async Task<SqlConnection> GetOpenConnection()
+    public async Task<SqlConnection?> GetOpenConnection()
     {
         var connection = new SqlConnection( _connectionString );
         await connection.OpenAsync();

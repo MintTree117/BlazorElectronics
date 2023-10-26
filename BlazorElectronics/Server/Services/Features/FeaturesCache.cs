@@ -14,9 +14,9 @@ public class FeaturesCache : CachedService, IFeaturesCache
     {
         return await GetFromCache<FeaturedProducts_DTO>( CACHE_KEY_FEATURED_PRODUCTS );
     }
-    public async Task<FeaturesDeals_DTO?> GetFeaturedDeals()
+    public async Task<FeaturedDeals_DTO?> GetFeaturedDeals()
     {
-        return await GetFromCache<FeaturesDeals_DTO>( CACHE_KEY_FEATURED_DEALS );
+        return await GetFromCache<FeaturedDeals_DTO>( CACHE_KEY_FEATURED_DEALS );
     }
     public async Task CacheFeaturedProducts( FeaturedProducts_DTO dto )
     {
@@ -24,7 +24,7 @@ public class FeaturesCache : CachedService, IFeaturesCache
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
             .SetAbsoluteExpiration( TimeSpan.FromDays( 1 ) ) );
     }
-    public async Task CacheFeaturedDeals( FeaturesDeals_DTO dto )
+    public async Task CacheFeaturedDeals( FeaturedDeals_DTO dto )
     {
         await Cache( CACHE_KEY_FEATURED_DEALS, dto, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
