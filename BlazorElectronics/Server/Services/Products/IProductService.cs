@@ -1,14 +1,14 @@
-using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Inbound.Products;
+using BlazorElectronics.Shared.Mutual;
 
 namespace BlazorElectronics.Server.Services.Products;
 
 public interface IProductService
 {
-    Task<ServiceResponse<string?>> GetProductSearchQueryString( ProductSearchRequest_DTO request );
-    Task<ServiceResponse<Products_DTO?>> GetAllProducts();
-    Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetTextSearchSuggestions( string searchText );
-    Task<ServiceResponse<ProductSearchResults_DTO?>> GetProductSearch( ProductSearchRequest_DTO searchRequestDto );
-    Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId );
+    Task<Reply<string?>> GetProductSearchQueryString( ProductSearchRequest request );
+    Task<Reply<Products_DTO?>> GetAllProducts();
+    Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request );
+    Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap idMap, ProductSearchRequest? request );
+    Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

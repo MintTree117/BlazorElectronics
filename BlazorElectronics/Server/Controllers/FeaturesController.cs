@@ -17,15 +17,17 @@ public class FeaturesController : ControllerBase
     }
 
     [HttpGet( "products" )]
-    public async Task<ActionResult<ServiceResponse<FeaturedProducts_DTO>>> GetFeaturedProducts()
+    public async Task<ActionResult<Reply<FeaturedProducts_DTO>>> GetFeaturedProducts()
     {
-        ServiceResponse<FeaturedProducts_DTO?> response = await _featuresService.GetFeaturedProducts();
-        return Ok( response );
+        //Reply<FeaturedProducts_DTO?> response = await _featuresService.GetFeaturedProducts();
+        //return Ok( response );
+        return Ok();
     }
     [HttpGet( "deals" )]
-    public async Task<ActionResult<ServiceResponse<FeaturedDeals_DTO>>> GetTopDeals()
+    public async Task<ActionResult<Reply<FeaturedDeals_DTO>>> GetTopDeals()
     {
-        ServiceResponse<FeaturedDeals_DTO?> response = await _featuresService.GetFeaturedDeals();
-        return Ok( response );
+        //Reply<FeaturedDeals_DTO?> response = await _featuresService.GetFeaturedDeals();
+        //return Ok( response );
+        return Ok();
     }
 }

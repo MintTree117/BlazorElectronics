@@ -33,7 +33,7 @@ public class CartServiceClient : ICartServiceClient
         if ( localCart == null )
             return;
 
-        ServiceResponse<bool> authorizeResponse = await _userService.AuthorizeUser();
+        Reply<bool> authorizeResponse = await _userService.AuthorizeUser();
 
         if ( !authorizeResponse.Data )
             return;
@@ -43,7 +43,7 @@ public class CartServiceClient : ICartServiceClient
         try
         {
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( "api/Cart/post", cartIds );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ServiceResponse<Cart_DTO?>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<Cart_DTO?>>();
 
             if ( serviceResponse == null )
             {
@@ -63,17 +63,17 @@ public class CartServiceClient : ICartServiceClient
             PostErrorEvent?.Invoke( e.Message );
         }
     }
-    public async Task<ServiceResponse<Cart_DTO?>> GetCart()
+    public async Task<Reply<Cart_DTO?>> GetCart()
     {
-        ServiceResponse<bool> authorizeResponse = await _userService.AuthorizeUser();
+        Reply<bool> authorizeResponse = await _userService.AuthorizeUser();
 
         if ( !authorizeResponse.Data )
         {
             Cart_DTO localCart = await GetCartFromStorage();
-            return new ServiceResponse<Cart_DTO?>( localCart, true, "Got cart from local storage." );
+            return new Reply<Cart_DTO?>( localCart, true, "Got cart from local storage." );
         }
 
-        ServiceResponse<Cart_DTO?> serverResponse = await GetCartFromServer();
+        Reply<Cart_DTO?> serverResponse = await GetCartFromServer();
 
         if ( !serverResponse.Success )
             return serverResponse;
@@ -87,7 +87,7 @@ public class CartServiceClient : ICartServiceClient
         cart.AddOrUpdateQuantity( item );
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
 
-        ServiceResponse<bool> authorizeResponse = await _userService.AuthorizeUser();
+        Reply<bool> authorizeResponse = await _userService.AuthorizeUser();
 
         if ( !authorizeResponse.Data )
         {
@@ -103,7 +103,7 @@ public class CartServiceClient : ICartServiceClient
                 Quantity = item.Quantity
             };
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( "api/Cart/insert", dto );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<bool>>();
 
             if ( serviceResponse == null )
             {
@@ -133,7 +133,7 @@ public class CartServiceClient : ICartServiceClient
         
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
 
-        ServiceResponse<bool> authorizeResponse = await _userService.AuthorizeUser();
+        Reply<bool> authorizeResponse = await _userService.AuthorizeUser();
 
         if ( !authorizeResponse.Data )
         {
@@ -149,7 +149,7 @@ public class CartServiceClient : ICartServiceClient
                 Quantity = item.Quantity
             };
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( "api/Cart/remove", dto );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<bool>>();
 
             if ( serviceResponse == null )
             {
@@ -179,7 +179,7 @@ public class CartServiceClient : ICartServiceClient
         sameItem!.Quantity = item.Quantity;
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
 
-        ServiceResponse<bool> authorizeResponse = await _userService.AuthorizeUser();
+        Reply<bool> authorizeResponse = await _userService.AuthorizeUser();
 
         if ( !authorizeResponse.Data )
             return;
@@ -193,7 +193,7 @@ public class CartServiceClient : ICartServiceClient
             };
             
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( "api/Cart/update-quantity", dto );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<bool>>();
 
             if ( serviceResponse == null )
             {
@@ -210,7 +210,7 @@ public class CartServiceClient : ICartServiceClient
     }
     public async Task<int> GetCartItemsCount()
     {
-        ServiceResponse<bool> authorizeResponse = await _userService.AuthorizeUser();
+        Reply<bool> authorizeResponse = await _userService.AuthorizeUser();
         
         if ( !authorizeResponse.Data )
         {
@@ -220,7 +220,7 @@ public class CartServiceClient : ICartServiceClient
 
         try
         {
-            var response = await _http.GetFromJsonAsync<ServiceResponse<int>>( "api/Cart/count" );
+            var response = await _http.GetFromJsonAsync<Reply<int>>( "api/Cart/count" );
             return response is not { Success: true } 
                 ? 0 
                 : response.Data;
@@ -232,22 +232,22 @@ public class CartServiceClient : ICartServiceClient
         }
     }
     
-    async Task<ServiceResponse<Cart_DTO?>> GetCartFromServer()
+    async Task<Reply<Cart_DTO?>> GetCartFromServer()
     {
         try
         {
-            var response = await _http.GetFromJsonAsync<ServiceResponse<Cart_DTO?>>( "api/Cart/products" );
+            var response = await _http.GetFromJsonAsync<Reply<Cart_DTO?>>( "api/Cart/products" );
 
             if ( response == null )
-                return new ServiceResponse<Cart_DTO?>( null, false, "Service response is null!" );
+                return new Reply<Cart_DTO?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new ServiceResponse<Cart_DTO?>( null, false, response.Message ??= "Failed to retrieve Cart; message is null!" )
+                ? new Reply<Cart_DTO?>( null, false, response.Message ??= "Failed to retrieve Cart; message is null!" )
                 : response;
         }
         catch ( Exception e )
         {
-            return new ServiceResponse<Cart_DTO?>( null, false, e.Message );
+            return new Reply<Cart_DTO?>( null, false, e.Message );
         }
     }
     async Task<Cart_DTO> GetCartFromStorage()

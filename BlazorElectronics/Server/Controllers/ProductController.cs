@@ -1,8 +1,9 @@
+using BlazorElectronics.Server.Services.Categories;
 using Microsoft.AspNetCore.Mvc;
 using BlazorElectronics.Server.Services.Products;
-using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Inbound.Products;
+using BlazorElectronics.Shared.Mutual;
 
 namespace BlazorElectronics.Server.Controllers;
 
@@ -11,84 +12,112 @@ namespace BlazorElectronics.Server.Controllers;
 public class ProductController : ControllerBase
 {
     readonly IProductService _productService;
+    readonly ICategoryService _categoryService;
     
-    public ProductController( IProductService productService )
+    public ProductController( IProductService productService, ICategoryService categoryService )
     {
         _productService = productService;
-    }
-
-    [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
-    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest_DTO? searchRequest )
-    {
-        searchRequest ??= new ProductSearchRequest_DTO();
-        searchRequest.CategoryUrl = categoryUrl;
-        searchRequest.SearchText = searchText;
-
-        ServiceResponse<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
-        return Ok( response );
-    }
-    [HttpGet( "searchQuery/{categoryUrl}" )]
-    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchRequest_DTO? searchRequest )
-    {
-        searchRequest ??= new ProductSearchRequest_DTO();
-        searchRequest.CategoryUrl = categoryUrl;
-        
-        ServiceResponse<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
-        return Ok( response );
-    }
-    [HttpGet( "search-suggestions/{searchText}" )]
-    public async Task<ActionResult<ServiceResponse<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( string searchText )
-    {
-        ServiceResponse<ProductSearchSuggestions_DTO?> response = await _productService.GetTextSearchSuggestions( searchText );
-        return Ok( response );
-    }
-    [HttpGet( "products" )]
-    public async Task<ActionResult<ServiceResponse<Products_DTO>>> GetAllProducts()
-    {
-        ServiceResponse<Products_DTO?> response = await _productService.GetAllProducts();
-        return Ok( response );
+        _categoryService = categoryService;
     }
     
-    [HttpGet( "search-category-text/{categoryUrl}/{searchText}" )]
-    public async Task<ActionResult<ServiceResponse<ProductSearchResults_DTO>>> SearchProductsByCategoryAndText( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest_DTO? filters )
+    // TESTING
+    [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
+    public async Task<ActionResult<Reply<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest? searchRequest )
     {
-        filters ??= new ProductSearchRequest_DTO();
-        filters.CategoryUrl = categoryUrl;
-        filters.SearchText = searchText;
+        /*searchRequest ??= new ProductSearchFilters();
+
+        Reply<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
+        return Ok( response );*/
+
+        return BadRequest();
+    }
+    [HttpGet( "searchQuery/{categoryUrl}" )]
+    public async Task<ActionResult<Reply<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchRequest? searchRequest )
+    {
+        /*if ( searchRequest == null )
+            return BadRequest( new Reply<Products_DTO>( "Search request is null!" ) );
+
+        Reply<int> categoryResponse = await _categoryService.GetCategoryIdMapFromUrl( categoryUrl );
+
+        if ( !categoryResponse.Success )
+            return BadRequest( new Reply<Products_DTO>( "Invalid category!" ) );
+
+        Reply<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
+        return Ok( response );*/
+        return BadRequest();
+    }
+    // END TESTING 
+
+    [HttpGet( "all" )]
+    public async Task<ActionResult<Reply<Products_DTO>>> GetAllProducts()
+    {
+        Reply<Products_DTO?> reply = await _productService.GetAllProducts();
+        return Ok( reply );
+    }
+
+    [HttpPost( "search-suggestions" )]
+    public async Task<ActionResult<Reply<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )
+    {
+        Reply<bool> validateReply = await ValidateSearchSuggestionRequest( request );
+
+        if ( !validateReply.Data )
+            return BadRequest( new Reply<ProductSearchSuggestions_DTO>( validateReply.Message ) );
         
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
-        return Ok( response );
+        return Ok( await _productService.GetProductSuggestions( request ) );
     }
-    [HttpGet( "search-category/{categoryUrl}" )]
-    public async Task<ActionResult<ServiceResponse<ProductSearchResults_DTO>>> SearchProductsByCategory( string categoryUrl, [FromQuery] ProductSearchRequest_DTO? filters )
+    [HttpGet( "search/{primaryUrl}" )]
+    public async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, [FromQuery] ProductSearchRequest? filters )
     {
-        filters ??= new ProductSearchRequest_DTO();
-        filters.CategoryUrl = categoryUrl;
-        
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
-        return Ok( response );
+        return await GetProductSearchResponse( filters, primaryUrl );
     }
-    [HttpGet( "search-text/{searchText}" )]
-    public async Task<ActionResult<ServiceResponse<ProductSearchResults_DTO>>> SearchProductsByText( string searchText, [FromQuery] ProductSearchRequest_DTO? filters )
+    [HttpGet( "search/{primaryUrl}/{secondaryUrl}" )]
+    public async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, [FromQuery] ProductSearchRequest? filters )
     {
-        filters ??= new ProductSearchRequest_DTO();
-        filters.SearchText = searchText;
-
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
-        return Ok( response );
+        return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl );
     }
-
-
-    [HttpGet( "search" )]
-    public async Task<ActionResult<ServiceResponse<ProductSearchResults_DTO>>> SearchProducts( [FromQuery] ProductSearchRequest_DTO? filters )
+    [HttpGet( "search/{primaryUrl}/{secondaryUrl}/{tertiaryUrl}" )]
+    public async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, string tertiaryUrl, [FromQuery] ProductSearchRequest? filters )
     {
-        ServiceResponse<ProductSearchResults_DTO?> response = await _productService.GetProductSearch( filters );
-        return Ok( response );
+        return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl, tertiaryUrl );
     }
     [HttpGet( "details/{productId:int}" )]
-    public async Task<ActionResult<ServiceResponse<ProductDetails_DTO?>>> GetProductDetails( int productId )
+    public async Task<ActionResult<Reply<ProductDetails_DTO?>>> GetProductDetails( int productId )
     {
-        ServiceResponse<ProductDetails_DTO?> response = await _productService.GetProductDetails( productId );
-        return Ok( response );
+        return Ok( await _productService.GetProductDetails( productId ) );
+    }
+
+    async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> GetProductSearchResponse( ProductSearchRequest? request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    {
+        Reply<CategoryIdMap?> categoryReply = await ValidateCategoryUrls( primaryUrl, secondaryUrl, tertiaryUrl );
+
+        if ( !categoryReply.Success )
+            return BadRequest( categoryReply.Message );
+
+        return Ok( await _productService.GetProductSearch( categoryReply.Data!, request ) );
+    }
+    async Task<Reply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
+    {
+        if ( string.IsNullOrEmpty( request.SearchText ) )
+            return new Reply<bool>( "SearchText is empty!" );
+
+        if ( request.SearchText.Length > 64 )
+            request.SearchText.Remove( 63 );
+
+        Reply<bool> categoryReply = await _categoryService.ValidateCategoryIdMap( request.CategoryIdMap );
+
+        return categoryReply.Success
+            ? new Reply<bool>( categoryReply.Message )
+            : new Reply<bool>( true, true, categoryReply.Message! );
+    }
+    async Task<Reply<CategoryIdMap?>> ValidateCategoryUrls( string? primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    {
+        if ( string.IsNullOrEmpty( primaryUrl ) )
+            return new Reply<CategoryIdMap?>( "Invalid CategoryUrl!" );
+
+        Reply<CategoryIdMap?> categoryReply = await _categoryService.GetCategoryIdMapFromUrl( primaryUrl, secondaryUrl, tertiaryUrl );
+
+        return categoryReply.Success
+            ? new Reply<CategoryIdMap?>( categoryReply.Data!, true, categoryReply.Message! )
+            : new Reply<CategoryIdMap?>( categoryReply.Message );
     }
 }

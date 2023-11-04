@@ -1,170 +1,150 @@
+using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
-using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Specs;
-using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DataTransferObjects.Specs;
-using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Inbound.Products;
+using BlazorElectronics.Shared.Mutual;
 
 namespace BlazorElectronics.Server.Services.Products;
 
-public class ProductService : IProductService
+public class ProductService : Service, IProductService
 {
     readonly IProductCache _cache;
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductDetailsRepository _productDetailsRepository;
-
-    readonly ICategoryService _categoryService;
-    readonly ISpecService _specService;
+    readonly ISpecLookupService _specLookupService;
 
     const int MAX_PRODUCT_LIST_ROWS = 100;
+    const int MAX_SEARCH_TEXT_LENGTH = 64;
+    const int MAX_FILTER_ID_LENGTH = 8;
 
     public ProductService( 
         IProductCache cache, 
         IProductSearchRepository productSearchRepository, 
-        IProductDetailsRepository productDetailsRepository, 
-        ICategoryService categoryService, ISpecService specService,
-        IFeaturesRepository featuresRepository )
+        IProductDetailsRepository productDetailsRepository,
+        ISpecLookupService specLookupService )
     {
         _cache = cache;
         _productSearchRepository = productSearchRepository;
-        _categoryService = categoryService;
-        _specService = specService;
+        _specLookupService = specLookupService;
         _productDetailsRepository = productDetailsRepository;
     }
-    
-    public async Task<ServiceResponse<string?>> GetProductSearchQueryString( ProductSearchRequest_DTO request )
+
+    public Task<Reply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
     {
-        ServiceResponse<int> categoryResult = await _categoryService.GetCategoryIdFromUrl( request.CategoryUrl! );
-        
-        if ( !categoryResult.IsSuccessful() )
-            return new ServiceResponse<string?>( categoryResult.Message );
-
-        int categoryId = categoryResult.Data;
-
-        ProductSearchRequest productRequest = await GetValidatedSearchRequest( categoryId, request, _specService );
-        
-        string query = await _productSearchRepository.GetProductSearchQueryString( productRequest );
-        return new ServiceResponse<string?>( query, true, "Test query" );
+        throw new NotImplementedException();
     }
-    public async Task<ServiceResponse<Products_DTO?>> GetAllProducts()
+    public async Task<Reply<Products_DTO?>> GetAllProducts()
     {
-        IEnumerable<Product>? models = await _productSearchRepository.GetAllProducts();
-        
-        if ( models == null )
-            return new ServiceResponse<Products_DTO?>( "Failed to retrieve Products from repository!" );
+        /*Task<IEnumerable<Product>?> repoFunction = _productSearchRepository.GetAllProducts();
+        Reply<IEnumerable<Product>?> repositoryReply = await ExecuteIoCall( async () => await repoFunction );
 
-        return new ServiceResponse<Products_DTO?> {
-            Data = await MapProductsToDto( models ),
+        if ( !repositoryReply.Success )
+            return new Reply<Products_DTO?>( repositoryReply.Message );
+        
+        return new Reply<Products_DTO?> {
+            Data = await MapProductsToDto( repositoryReply.Data! ),
             Success = true,
             Message = "Successfully retrieved product Dto's from repository."
-        };
+        };*/
+
+        return null;
     }
-    public async Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetTextSearchSuggestions( string searchText )
+    public async Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
-        IEnumerable<string>? result = await _productSearchRepository.GetSearchSuggestions( searchText );
+        Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.Tier, request.CategoryIdMap.CategoryId );
+        Reply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
-        if ( result == null )
-            return new ServiceResponse<ProductSearchSuggestions_DTO?>( null, false, "Failed to find any matching results!" );
+        if ( !repoReply.Success )
+            return new Reply<ProductSearchSuggestions_DTO?>( repoReply.Message );
 
-        return new ServiceResponse<ProductSearchSuggestions_DTO?> {
-            Data = await MapSearchSuggestionsToDto( result ),
+        return new Reply<ProductSearchSuggestions_DTO?> {
+            Data = await MapSearchSuggestionsToDto( repoReply.Data! ),
             Success = true,
             Message = "Found matching results."
         };
     }
-    public async Task<ServiceResponse<ProductSearchResults_DTO?>> GetProductSearch( ProductSearchRequest_DTO searchRequestDto )
+    public async Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap categoryIdMap, ProductSearchRequest? request )
     {
-        int? categoryId = null;
+        Reply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
+
+        if ( !validateReply.Success )
+            return new Reply<ProductSearchResults_DTO?>( validateReply.Message );
+
+        Task<ProductSearch?> repoFunction = _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data! );
+        Reply<ProductSearch?> repoReply = await ExecuteIoCall( async () => await repoFunction );
+
+        if ( !repoReply.Success )
+            return new Reply<ProductSearchResults_DTO?>( repoReply.Message );
         
-        if ( searchRequestDto.CategoryUrl != null )
-        {
-            ServiceResponse<int> categoryIdResponse = await _categoryService.GetCategoryIdFromUrl( searchRequestDto.CategoryUrl );
-
-            if ( !categoryIdResponse.IsSuccessful() )
-                return new ServiceResponse<ProductSearchResults_DTO?>( categoryIdResponse.Message );
-            
-            categoryId = categoryIdResponse.Data;
-        }
-        
-        ProductSearchRequest request = await GetValidatedSearchRequest( categoryId, searchRequestDto, _specService );
-        ProductSearch? model = await _productSearchRepository.GetProductSearch( request );
-
-        if ( model == null )
-            return new ServiceResponse<ProductSearchResults_DTO?>( null, false, "Failed to retrieve ProductSearch from repository!" );
-
-        return new ServiceResponse<ProductSearchResults_DTO?> {
-            Data = await MapProductSearchToDto( model ),
+        return new Reply<ProductSearchResults_DTO?> {
+            Data = await MapProductSearchToDto( repoReply.Data! ),
             Success = true,
             Message = "Successfully retrieved ProductSearch from repository."
         };
     }
-    public async Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
-        ProductDetails_DTO? dto = await _cache.GetProductDetails( productId );
+        Task<ProductDetails_DTO?> cacheFetchFunction = _cache.GetProductDetails( productId );
+        var cacheFetchResult = ExecuteIoCall( async () => await cacheFetchFunction );
+        
+        
+        ProductDetails_DTO? dto;
 
-        if ( dto != null )
-            return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Success. Retrieved ProductDetails_DTO from cache." );
+        try
+        {
+            dto = await _cache.GetProductDetails( productId );
+            if ( dto != null )
+                return new Reply<ProductDetails_DTO?>( dto, true, "Successfully got Product Details from cache." );
+        }
+        catch ( ServiceException e )
+        {
+            return new Reply<ProductDetails_DTO?>( e.Message );
+        }
 
-        ProductDetails? model = await _productDetailsRepository.GetProductDetailsById( productId );
+        ProductDetails? model;
 
-        if ( model == null )
-            return new ServiceResponse<ProductDetails_DTO?>( null, false, "Failed to retrieve ProductDetails_DTO from cache, and ProductDetails from repository!" );
+        try
+        {
+            model = await _productDetailsRepository.GetProductDetailsById( productId );
+        }
+        catch ( ServiceException e )
+        {
+            return new Reply<ProductDetails_DTO?>( e.Message );
+        }
 
-        dto = await MapProductDetailsToDto( model );
-        await _cache.CacheProductDetails( dto );
+        dto = await MapProductDetailsToDto( model! );
 
-        return new ServiceResponse<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, mapped to DTO, and cached." );
+        try
+        {
+            await _cache.CacheProductDetails( dto );
+        }
+        catch ( ServiceException e )
+        {
+            return new Reply<ProductDetails_DTO?>( dto, true, $"Successfully retrieved ProductDetails from repository, but failed to cache with message: {e.Message}" );
+        } 
+
+        return new Reply<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, and cached." );
     }
 
-    static async Task<ProductSearchRequest> GetValidatedSearchRequest( int? categoryId, ProductSearchRequest_DTO searchRequestDto, ISpecService specService )
+    static async Task<Reply<ProductSearchRequest>> GetValidatedProductSearchRequest( ProductSearchRequest? request )
     {
-        var validatedFilters = new ProductSearchRequest 
-        {
-            Page = Math.Max( searchRequestDto.Page, 0 ),
-            Rows = Math.Clamp( searchRequestDto.NumberOfResults, 0, MAX_PRODUCT_LIST_ROWS ),
-            MinPrice = searchRequestDto.MinPrice == null ? null : Math.Max( searchRequestDto.MinPrice.Value, 0 ),
-            MaxPrice = searchRequestDto.MaxPrice == null ? null : Math.Max( searchRequestDto.MaxPrice.Value, 0 ),
-            MinRating = searchRequestDto.MinRating == null ? null : Math.Max( searchRequestDto.MinRating.Value, 0 ),
-            MaxRating = searchRequestDto.MaxRating == null ? null : Math.Max( searchRequestDto.MaxRating.Value, 0 ),
-            SearchText = string.IsNullOrEmpty( searchRequestDto.SearchText ) ? null : searchRequestDto.SearchText,
-            CategoryId = categoryId
-        };
-        
-        if ( searchRequestDto.SpecFilters == null || categoryId == null )
-            return validatedFilters;
-        
-        ServiceResponse<SpecFilters_DTO> specsResponse = await specService.GetSpecFilters( categoryId.Value );
-        if ( !specsResponse.Success || specsResponse.Data == null )
-            return validatedFilters;
-        
-        SpecFilters_DTO? filters = specsResponse.Data;
-        validatedFilters.LookupSpecFilters = new List<ProductSpecFilter>();
-        
-        await Task.Run( () =>
-        {
-            foreach ( ProductSpecFilter_DTO specFilterDTO in searchRequestDto.SpecFilters )
-            {
-                if ( string.IsNullOrEmpty( specFilterDTO.SpecName ) )
-                    continue;
-                if ( specFilterDTO.SpecValue == null )
-                    continue;
-                if ( !filters.IndicesByName.TryGetValue( specFilterDTO.SpecName, out int specIndex ) )
-                    continue;
-                if ( specIndex < 0 || specIndex >= filters.Filters.Count )
-                    continue;
-                
-                validatedFilters.LookupSpecFilters.Add( new ProductSpecFilter {
-                    SpecId = filters.Filters[ specIndex ].Id,
-                    SpecName = specFilterDTO.SpecName,
-                    SpecValue = specFilterDTO.SpecValue,
-                } );
-            }
-        } );
+        if ( request == null )
+            return new Reply<ProductSearchRequest>( new ProductSearchRequest(), true, "Validated Search Request." );
 
-        return validatedFilters;
+        request.Page = Math.Max( request.Page, 0 );
+        request.Rows = Math.Clamp( request.Rows, 0, MAX_PRODUCT_LIST_ROWS );
+        request.MinPrice = request.MinPrice == null ? null : Math.Max( request.MinPrice.Value, 0 );
+        request.MaxPrice = request.MaxPrice == null ? null : Math.Max( request.MaxPrice.Value, 0 );
+        request.MinRating = request.MinRating == null ? null : Math.Max( request.MinRating.Value, 0 );
+        request.MaxRating = request.MaxRating == null ? null : Math.Max( request.MaxRating.Value, 0 );
+        request.SearchText = request.SearchText;
+
+        if ( request.SearchText?.Length > MAX_SEARCH_TEXT_LENGTH )
+            request.SearchText.Remove( MAX_SEARCH_TEXT_LENGTH - 1 );
+        
+        return null;
     }
     static async Task<Products_DTO> MapProductsToDto( IEnumerable<Product> models )
     {
@@ -275,4 +255,13 @@ public class ProductService : IProductService
 
         return productDto;
     }
+
+    static void ValidateProductSearchRequestBooks()
+    {
+        
+    }
+    static void ValidateProductSearchRequestSoftware() { }
+    static void ValidateProductSearchRequestGames() { }
+    static void ValidateProductSearchRequestMoviesTv() { }
+    static void ValidateProductSearchRequestCourses() { }
 }

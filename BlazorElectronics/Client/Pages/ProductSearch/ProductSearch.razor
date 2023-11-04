@@ -1,15 +1,18 @@
-@page "/{category}/search/{searchText}"
-@page "/search/{searchText}"
-@page "/{category}"
-@inject IProductServiceClient ProductService;
-@inject NavigationManager NavigationManager;
-@implements IDisposable
+@page "/{primary}/{secondary}/{tertiary}"
+@page "/{primary}/{secondary}"
+@page "/{primary}"
+@page "/search"
+
 @using BlazorElectronics.Client.Services.Products
 @using System.Collections.Specialized
 @using System.Reflection
 @using System.Text
 @using System.Web
-@using BlazorElectronics.Shared.DtosInbound.Products
+@using BlazorElectronics.Shared.Inbound.Products
+
+@inject IProductServiceClient ProductService;
+@inject NavigationManager NavigationManager;
+@implements IDisposable
 
 <span>_@_debugMessage</span>
 <span>@_nullSearch</span>
@@ -17,14 +20,15 @@
 
 @code {
     [Parameter]
-    public string? Category { get; set; }
+    public string? Primary { get; set; }
     [Parameter]
-    public string? SearchText { get; set; }
-
+    public string? Secondary { get; set; }
+    [Parameter]
+    public string? Tertiary { get; set; }
+    
     string _debugMessage = string.Empty;
     string _nullSearch = string.Empty;
-
-
+    
     protected override void OnInitialized()
     {
         ProductService.ProductSearchNullabillityTest += NullTest;
@@ -44,33 +48,17 @@
         Uri uri = NavigationManager.ToAbsoluteUri( NavigationManager.Uri );
         NameValueCollection queryParameters = HttpUtility.ParseQueryString( uri.Query );
 
-        ProductSearchRequest_DTO request = MapSearchQueryParameters( queryParameters );
-
-        if ( Category != null && SearchText != null )
-        {
-            ProductService.UpdateSearchCategory( Category );
-            ProductService.UpdateSearchText( SearchText );
-            await ProductService.SearchProductsByCategoryAndText( Category, SearchText, request );
-        }
-        else if ( Category != null )
-        {
-            ProductService.UpdateSearchCategory( Category );
-            await ProductService.SearchProductsByCategory( Category, request );
-        }
-        else if ( SearchText != null )
-        {
-            ProductService.UpdateSearchText( SearchText );
-            await ProductService.SearchProductsByText( SearchText, request );
-        }
-        else throw new Exception( "No valid input parameters provided for product search!" );
-
+        ProductSearchRequest filters = MapSearchQueryParameters( queryParameters );
+        
+        await ProductService.SearchProductsByCategory( filters, Primary, Secondary, Tertiary );
+        
         StateHasChanged();
     }
 
-    ProductSearchRequest_DTO MapSearchQueryParameters( NameValueCollection queryParameters )
+    ProductSearchRequest MapSearchQueryParameters( NameValueCollection queryParameters )
     {
-        var filtersDTO = new ProductSearchRequest_DTO();
-        Type type = typeof( ProductSearchRequest_DTO );
+        var filtersDTO = new ProductSearchRequest();
+        Type type = typeof( ProductSearchRequest );
 
         foreach ( string? key in queryParameters.AllKeys )
         {
@@ -103,10 +91,10 @@
                 continue;
             }
 
-            filtersDTO.SpecFilters.Add( new ProductSpecFilter_DTO {
+            /*filtersDTO.SpecFilters.Add( new ProductSpecFilter_DTO {
                 SpecName = key,
                 SpecValue = Convert.ChangeType( stringValue, typeof( object ) )
-            } );
+            } );*/
         }
 
         return filtersDTO;

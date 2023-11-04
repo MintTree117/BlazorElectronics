@@ -3,7 +3,6 @@
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.DtosOutbound.Products
 @using BlazorElectronics.Client.Services.Cart
-@using BlazorElectronics.Shared.DtosInbound.Products
 @using BlazorElectronics.Shared.Mutual
 @inject IProductServiceClient ProductServiceClient
 @inject ICartServiceClient CartService
@@ -106,7 +105,7 @@ else {
     {
         _serverMessage = "Loading Product Details...";
 
-        ServiceResponse<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
+        Reply<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
         _loaded = true;
 
         if ( response.Data == null || !response.Success )

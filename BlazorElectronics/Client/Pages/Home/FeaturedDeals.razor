@@ -65,7 +65,7 @@ else
     {
         _serverMessage = "Loading top deals...";
 
-        ServiceResponse<FeaturedDeals_DTO?>? response = await FeaturesService.GetFeaturedDeals();
+        Reply<FeaturedDeals_DTO?>? response = await FeaturesService.GetFeaturedDeals();
         _isLoaded = true;
         
         if ( response == null )

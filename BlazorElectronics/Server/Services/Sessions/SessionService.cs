@@ -13,7 +13,7 @@ public class SessionService : ISessionService
         _sessionRepository = sessionRepository;
     }
 
-    public async Task<ServiceResponse<string?>> CreateNewSession( int userId, string ipAddress )
+    public async Task<Reply<string?>> CreateNewSession( int userId, string ipAddress )
     {
         var session = new UserSession {
             UserId = userId,
@@ -27,29 +27,45 @@ public class SessionService : ISessionService
         session.Hash = hash;
         session.Salt = salt;
 
-        session = await _sessionRepository.CreateSession( session );
-
-        return session == null 
-            ? new ServiceResponse<string?>( null, false, $"Failed to create session for user {userId}!" ) 
-            : new ServiceResponse<string?>( token, true, $"Successfully created new session for user {userId}." );
+        try
+        {
+            await _sessionRepository.CreateSession( session );
+        }
+        catch ( ServiceException e )
+        {
+            return new Reply<string?>( e.Message );
+        }
+        
+        return new Reply<string?>( token, true, $"Successfully created new session for user {userId}." );
     }
-    public async Task<ServiceResponse<string?>> GetExistingSession( int userId, string sessionToken, string ipAddress )
+    public async Task<Reply<string?>> GetExistingSession( int userId, string sessionToken, string ipAddress )
     {
-        UserSession? session = await _sessionRepository.GetSession( userId, ipAddress );
+        UserSession? session;
 
-        if ( session == null )
-            return new ServiceResponse<string?>( null, false, $"Failed to get session for User {userId}!" );
+        try
+        {
+            session = await _sessionRepository.GetSession( userId, ipAddress );
+        }
+        catch ( ServiceException e )
+        {
+            return new Reply<string?>( e.Message );
+        }
 
         if ( !VerifySessionToken( sessionToken, session.Hash, session.Salt ) )
-            return new ServiceResponse<string?>( null, false, $"Failed to validate session for User {userId}!" );
+            return new Reply<string?>( null, false, $"Failed to validate session for User {userId}!" );
 
         session.LastActivityDate = DateTime.Now;
 
-        bool updated = await _sessionRepository.UpdateSession( session );
-        
-        return !updated 
-            ? new ServiceResponse<string?>( null, false, $"Failed to update session for User {userId}!" ) 
-            : new ServiceResponse<string?>( sessionToken, true, $"Successfully retrieved session for user {userId}." );
+        try
+        {
+            await _sessionRepository.UpdateSession( session );
+        }
+        catch ( ServiceException e )
+        {
+            return new Reply<string?>( e.Message );
+        }
+
+        return new Reply<string?>( sessionToken, true, $"Successfully retrieved session for user {userId}." );
     }
 
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )

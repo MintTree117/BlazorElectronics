@@ -1,6 +1,6 @@
 using BlazorElectronics.Server.Services.Categories;
-using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DataTransferObjects.Categories;
+using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Outbound.Categories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
@@ -17,9 +17,21 @@ public class CategoryController : ControllerBase
     }
     
     [HttpGet("categories")]
-    public async Task<ActionResult<ServiceResponse<Categories_DTO>>> GetCategories()
+    public async Task<ActionResult<Reply<CategoriesResponse>>> GetCategories()
     {
-        ServiceResponse<Categories_DTO?> response = await _categoryService.GetCategoriesDto();
+        Reply<CategoriesResponse?> response = await _categoryService.GetCategories();
         return Ok( response );
+    }
+    [HttpGet( "main-descriptions" )]
+    public async Task<ActionResult<Reply<List<string?>>>> GetMainDescriptions()
+    {
+        Reply<List<string?>?> response = await _categoryService.GetMainDescriptions();
+        return Ok( response );
+    }
+    [HttpPost( "get-description" )]
+    public async Task<ActionResult<Reply<string?>>> GetDescription( [FromBody] CategoryIdMap idMap )
+    {
+        Reply<string?> reply = await _categoryService.GetDescription( idMap );
+        return Ok( reply );
     }
 }

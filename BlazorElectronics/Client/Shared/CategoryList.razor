@@ -1,6 +1,6 @@
-@using BlazorElectronics.Shared.DataTransferObjects.Categories
 @using BlazorElectronics.Client.Services.Categories
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Outbound.Categories
 
 @inject ICategoryServiceClient CategoryService
 
@@ -12,11 +12,11 @@
     else
     {
         <ul class="nav flex-column">
-            @foreach ( int categoryId in _categories.PrimaryCategoryIds )
+            @foreach ( PrimaryCategoryResponse p in _categories.PrimaryCategories.Values )
             {
                 <li class="nav-item">
-                    <a class="nav-link category-nav-link" href="@_categories.CategoriesById[ categoryId ].Url">
-                        @_categories.CategoriesById[ categoryId ].Name
+                    <a class="nav-link category-nav-link" href="@p.Url">
+                        @p.Name
                     </a>
                 </li>
             }
@@ -29,11 +29,11 @@
     bool _loadedCategories = false;
     string _categoryMessage = "Loading Categories...";
 
-    Categories_DTO? _categories;
+    CategoriesResponse? _categories;
 
     protected override async Task OnInitializedAsync()
     {
-        ServiceResponse<Categories_DTO?> response = await CategoryService.GetCategories();
+        Reply<CategoriesResponse?> response = await CategoryService.GetCategories();
         _loadedCategories = true;
 
         if ( !response.Success )

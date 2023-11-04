@@ -1,17 +1,16 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DtosInbound.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
-using BlazorElectronics.Shared.Outbound.Features;
+using BlazorElectronics.Shared.Inbound.Products;
 
 namespace BlazorElectronics.Client.Services.Products;
 
 public interface IProductServiceClient
 {
     event Action<string>? ExceptionEvent;
-    event Action<ServiceResponse<ProductSearchResults_DTO?>?>? ProductSearchChanged;
+    event Action<Reply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
     event Action<string>? ProductSearchNullabillityTest;
     
-    ProductSearchRequest_DTO? SearchRequest { get; set; }
+    ProductSearchRequest? SearchRequest { get; set; }
 
     void ClearSearchRequest();
     void UpdateSearchCategory( string url );
@@ -20,9 +19,7 @@ public interface IProductServiceClient
     void UpdateSearchResultsCount( int count );
     string? GetProductSearchUrl();
     
-    Task SearchProductsByCategory( string categoryUrl, ProductSearchRequest_DTO? filters );
-    Task SearchProductsByText( string searchText, ProductSearchRequest_DTO? filters );
-    Task SearchProductsByCategoryAndText( string categoryUrl, string searchText, ProductSearchRequest_DTO? filters );
-    Task<ServiceResponse<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
-    Task<ServiceResponse<ProductDetails_DTO?>> GetProductDetails( int productId );
+    Task SearchProductsByCategory( ProductSearchRequest filters, string primary, string? secondary = null, string? tertiary = null );
+    Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
+    Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

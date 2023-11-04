@@ -1,6 +1,6 @@
-@using BlazorElectronics.Shared.DataTransferObjects.Categories
 @using BlazorElectronics.Client.Services.Categories
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Outbound.Categories
 @inject ICategoryServiceClient CategoryService
 @inject NavigationManager NavManager
 
@@ -48,11 +48,11 @@
     string _categoryMessage = "Loading Categories...";
     string? NavMenuCssClass => _collapseNavMenu ? "nav-sidebar-hide" : "";
 
-    Categories_DTO? _categories;
+    CategoriesResponse? _categories;
 
     protected override async Task OnInitializedAsync()
     {
-        ServiceResponse<Categories_DTO?> response = await CategoryService.GetCategories();
+        Reply<CategoriesResponse?> response = await CategoryService.GetCategories();
         _loadedCategories = true;
 
         if ( !response.Success )

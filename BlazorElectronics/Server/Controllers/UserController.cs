@@ -29,18 +29,18 @@ public class UserController : ControllerBase
         public string? SessionToken { get; set; }
     }
 
-    protected async Task<ServiceResponse<ValidatedIdAndSession>> ValidateUserSession( SessionApiRequest request, string ipAddress )
+    protected async Task<Reply<ValidatedIdAndSession>> ValidateUserSession( SessionApiRequest request, string ipAddress )
     {
-        ServiceResponse<int> idResponse = await UserAccountService.ValidateUserId( request.Username );
+        Reply<int> idResponse = await UserAccountService.ValidateUserId( request.Username );
 
         if ( !idResponse.Success )
-            return new ServiceResponse<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate UserId for {request.Username}!" );
+            return new Reply<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate UserId for {request.Username}!" );
 
-        ServiceResponse<string?> sessionResponse = await SessionService.GetExistingSession( idResponse.Data, request.SessionToken, ipAddress! );
+        Reply<string?> sessionResponse = await SessionService.GetExistingSession( idResponse.Data, request.SessionToken, ipAddress! );
 
         return !sessionResponse.Success 
-            ? new ServiceResponse<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate Session for {request.Username}!" ) 
-            : new ServiceResponse<ValidatedIdAndSession>( new ValidatedIdAndSession( idResponse.Data, sessionResponse.Data! ), true, $"Successfully validated session for {request.Username}." );
+            ? new Reply<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate Session for {request.Username}!" ) 
+            : new Reply<ValidatedIdAndSession>( new ValidatedIdAndSession( idResponse.Data, sessionResponse.Data! ), true, $"Successfully validated session for {request.Username}." );
     }
 
     protected bool ValidateApiRequest( SessionApiRequest? apiRequest, out string? ipAddress, out string message )

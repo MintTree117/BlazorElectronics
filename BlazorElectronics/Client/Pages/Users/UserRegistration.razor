@@ -48,7 +48,7 @@
 
     async Task HandleRegistration()
     {
-        ServiceResponse<UserLoginResponse?> response = await UserService.Register( _user );
+        Reply<UserLoginResponse?> response = await UserService.Register( _user );
 
         if ( response == null )
         {

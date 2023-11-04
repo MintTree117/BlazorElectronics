@@ -1,8 +1,8 @@
 global using BlazorElectronics.Shared;
+using BlazorElectronics.Server.Caches.Products;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Server.Repositories.Categories;
-using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Sessions;
 using BlazorElectronics.Server.Repositories.Specs;
@@ -31,16 +31,15 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddSingleton<IFeaturesCache, FeaturesCache>();
 builder.Services.AddScoped<IFeaturesService, FeaturesService>();
-builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddSingleton<ISpecCache, SpecCache>();
+//builder.Services.AddSingleton<ISpecCache, SpecCache>();
 builder.Services.AddScoped<ISpecRepository, SpecRepository>();
-builder.Services.AddScoped<ISpecService, SpecService>();
+builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();

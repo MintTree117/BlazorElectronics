@@ -5,8 +5,8 @@ namespace BlazorElectronics.Server.Services.Users;
 
 public interface IUserAccountService
 {
-    Task<ServiceResponse<UserLogin?>> ValidateUserLogin( string email, string password );
-    Task<ServiceResponse<UserLogin?>> RegisterUser( UserRegisterRequest request );
-    Task<ServiceResponse<int>> ValidateUserId( string username );
-    Task<ServiceResponse<bool>> ChangePassword( int userId, string newPassword );
+    Task<Reply<UserLogin?>> ValidateUserLogin( string email, string password );
+    Task<Reply<UserLogin?>> RegisterUser( UserRegisterRequest request );
+    Task<Reply<int>> ValidateUserId( string username );
+    Task<Reply<bool>> ChangePassword( int userId, string newPassword );
 }

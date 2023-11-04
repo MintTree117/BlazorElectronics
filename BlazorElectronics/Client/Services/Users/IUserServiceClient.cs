@@ -8,9 +8,9 @@ public interface IUserServiceClient
 {
     event Action<bool> AuthorizationChanged;
     
-    Task<ServiceResponse<UserLoginResponse?>> Register( UserRegisterRequest request );
-    Task<ServiceResponse<UserLoginResponse?>> Login( UserLoginRequest request );
-    Task<ServiceResponse<bool>> Logout();
-    Task<ServiceResponse<bool>> AuthorizeUser();
-    Task<ServiceResponse<bool>> ChangePassword( UserChangePasswordRequest request );
+    Task<Reply<UserLoginResponse?>> Register( UserRegisterRequest request );
+    Task<Reply<UserLoginResponse?>> Login( UserLoginRequest request );
+    Task<Reply<bool>> Logout();
+    Task<Reply<bool>> AuthorizeUser();
+    Task<Reply<bool>> ChangePassword( UserChangePasswordRequest request );
 }

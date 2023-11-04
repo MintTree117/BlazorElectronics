@@ -1,9 +1,9 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.DataTransferObjects.Categories;
+using BlazorElectronics.Shared.Outbound.Categories;
 
 namespace BlazorElectronics.Client.Services.Categories;
 
 public interface ICategoryServiceClient
 {
-    Task<ServiceResponse<Categories_DTO?>> GetCategories();
+    Task<Reply<CategoriesResponse?>> GetCategories();
 }

@@ -9,47 +9,31 @@ namespace BlazorElectronics.Server.Repositories.Products;
 public class ProductDetailsRepository : DapperRepository, IProductDetailsRepository
 {
     const string STORED_PROCEDURE_GET_PRODUCT_DETAILS = "Get_ProductDetails";
+    const string QUERY_PARAM_PRODUCT_ID = "@ProductId";
+
+    public ProductDetailsRepository( DapperContext dapperContext )
+        : base( dapperContext ) { }
     
-    public ProductDetailsRepository( DapperContext dapperContext ) : base( dapperContext ) { }
-    
-    public async Task<ProductDetails?> GetProductDetailsById( int id )
+    public async Task<ProductDetails?> GetProductDetailsById( int productId )
     {
+        var dynamicParams = new DynamicParameters();
+        dynamicParams.Add( QUERY_PARAM_PRODUCT_ID, productId );
+
+        return await TryQueryAsync( GetProductDetailsQuery, dynamicParams );
+    }
+
+    static async Task<ProductDetails?> GetProductDetailsQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    {
+        SqlMapper.GridReader? result = await connection.QueryMultipleAsync( STORED_PROCEDURE_GET_PRODUCT_DETAILS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+
         var productDetails = new ProductDetails();
-        var parameters = new DynamicParameters( new { Id = id } );
-        const string splitOnColumns = $"{SqlConsts.COLUMN_PRODUCT_ID},{SqlConsts.COLUMN_PRODUCT_DESCRIPTION_ID_COLUMN},{SqlConsts.COLUMN_VARIANT_ID_PRIMARY},{SqlConsts.COLUMN_PRODUCT_IMAGE_ID},{SqlConsts.COLUMN_PRODUCT_REVIEW_ID}";
         
-        try
-        {
-            await using SqlConnection? connection = await _dbContext.GetOpenConnection();
-            await connection.QueryAsync<Product, ProductDescription, ProductVariant, ProductImage, ProductReview, ProductDetails>
-            ( STORED_PROCEDURE_GET_PRODUCT_DETAILS, ( product, description, variant, image, review ) =>
-                {
-                    productDetails.Product ??= product;
-
-                    if ( description != null )
-                        productDetails.ProductDescription = description;
-                    if ( variant != null )
-                        productDetails.Product.ProductVariants.Add( variant );
-                    if ( image != null )
-                        productDetails.ProductImages.Add( image );
-                    if ( review != null )
-                        productDetails.ProductReviews.Add( review );
-
-                    return productDetails;
-                },
-                parameters,
-                splitOn: splitOnColumns,
-                commandType: CommandType.StoredProcedure );
-
-            return productDetails;
-        }
-        catch ( SqlException e )
-        {
-            throw new RepositoryException( e.Message, e );
-        }
-        catch ( Exception e )
-        {
-            throw new RepositoryException( e.Message, e );
-        }
+        productDetails.Product = result.Read<Product>().FirstOrDefault();
+        productDetails.Product.ProductVariants = result.Read<ProductVariant>().ToList();
+        productDetails.ProductDescription = result.Read<ProductDescription>().FirstOrDefault();
+        productDetails.ProductImages = result.Read<ProductImage>().ToList();
+        productDetails.ProductReviews = result.Read<ProductReview>().ToList();
+        
+        return productDetails;
     }
 }

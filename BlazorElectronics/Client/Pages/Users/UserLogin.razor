@@ -55,7 +55,7 @@
     {
         _errorMessage = string.Empty;
         
-        ServiceResponse<UserLoginResponse?> response = await UserService.Login( _loginRequest );
+        Reply<UserLoginResponse?> response = await UserService.Login( _loginRequest );
 
         if ( !response.Success )
         {

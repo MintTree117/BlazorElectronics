@@ -64,7 +64,7 @@ else
     {
         _serverMessage = "Loading Featured Products...";
         
-        ServiceResponse<FeaturedProducts_DTO?>? response = await FeaturesService.GetFeaturedProducts();
+        Reply<FeaturedProducts_DTO?>? response = await FeaturesService.GetFeaturedProducts();
         _loaded = true;
 
         if ( response == null ) _serverMessage = "Server response is null!";
