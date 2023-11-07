@@ -50,15 +50,15 @@ public class SessionRepository : DapperRepository, ISessionRepository
         return await TryQueryTransactionAsync( UpdateSessionQuery, null );
     }
 
-    static async Task<UserSession?> GetSessionQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<UserSession?> GetSessionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QuerySingleAsync<UserSession?>( STORED_PROCEDURE_GET_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
     }
-    static async Task<UserSession?> CreateSessionQuery( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams )
+    static async Task<UserSession?> CreateSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QuerySingleAsync<UserSession?>( STORED_PROCEDURE_CREATE_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
     }
-    static async Task<bool> UpdateSessionQuery( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams )
+    static async Task<bool> UpdateSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         var result = await connection.QuerySingleAsync<UserSession?>( STORED_PROCEDURE_UPDATE_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
         return result != null;

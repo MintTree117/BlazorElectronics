@@ -204,9 +204,9 @@ public class CategoryService : ICategoryService
     static async Task<CategoriesResponse> MapModelToResponse( CategoriesModel model )
     {
         var response = new CategoriesResponse();
-        Dictionary<int, PrimaryCategoryResponse> primaryDtos = response.PrimaryCategories;
-        Dictionary<int, SecondaryCategoryResponse> secondaryDtos = response.SecondaryCategories;
-        Dictionary<int, TertiaryCategoryResponse> tertiaryDtos = response.TertiaryCategories;
+        Dictionary<short, PrimaryCategoryResponse> primaryDtos = response.PrimaryCategories;
+        Dictionary<short, SecondaryCategoryResponse> secondaryDtos = response.SecondaryCategories;
+        Dictionary<short, TertiaryCategoryResponse> tertiaryDtos = response.TertiaryCategories;
 
         await Task.Run( () =>
         {
@@ -269,9 +269,9 @@ public class CategoryService : ICategoryService
     static async Task<CategoryUrlMap> MapResponseToUrlMap( CategoriesResponse response )
     {
         var urlMap = new CategoryUrlMap();
-        Dictionary<string, int> primary = urlMap.PrimaryUrlMap;
-        Dictionary<string, Dictionary<int, int>> secondary = urlMap.SecondaryUrlMap;
-        Dictionary<string, Dictionary<int, int>> tertiary = urlMap.TertiaryUrlMap;
+        Dictionary<string, short> primary = urlMap.PrimaryUrlMap;
+        Dictionary<string, Dictionary<short, short>> secondary = urlMap.SecondaryUrlMap;
+        Dictionary<string, Dictionary<short, short>> tertiary = urlMap.TertiaryUrlMap;
 
         await Task.Run( () =>
         {
@@ -288,9 +288,9 @@ public class CategoryService : ICategoryService
                 if ( !response.PrimaryCategories.ContainsKey( s.ParentId ) )
                     continue;
 
-                if ( !secondary.TryGetValue( s.Url, out Dictionary<int, int>? secondaryMap ) )
+                if ( !secondary.TryGetValue( s.Url, out Dictionary<short, short>? secondaryMap ) )
                 {
-                    secondaryMap = new Dictionary<int, int>();
+                    secondaryMap = new Dictionary<short, short>();
                     secondary.Add( s.Url, secondaryMap );
                 }
 
@@ -302,12 +302,12 @@ public class CategoryService : ICategoryService
                 if ( !response.SecondaryCategories.TryGetValue( t.ParentId, out SecondaryCategoryResponse? secondaryCategory ) )
                     continue;
 
-                if ( !secondary.TryGetValue( secondaryCategory.Url, out Dictionary<int, int>? secondaryMap ) )
+                if ( !secondary.TryGetValue( secondaryCategory.Url, out Dictionary<short, short>? secondaryMap ) )
                     continue;
 
-                if ( !tertiary.TryGetValue( t.Url, out Dictionary<int, int>? tertiaryMap ) )
+                if ( !tertiary.TryGetValue( t.Url, out Dictionary<short, short>? tertiaryMap ) )
                 {
-                    tertiaryMap = new Dictionary<int, int>();
+                    tertiaryMap = new Dictionary<short, short>();
                     tertiary.Add( t.Url, tertiaryMap );
                 }
 

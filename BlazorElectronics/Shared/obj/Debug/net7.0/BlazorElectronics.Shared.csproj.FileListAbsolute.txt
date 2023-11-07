@@ -10,3 +10,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/refint/BlazorElectronics.Shared.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/ref/BlazorElectronics.Shared.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/bin/Debug/net7.0/Microsoft.Data.SqlClient.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/bin/Debug/net7.0/Microsoft.Data.SqlClient.pdb
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/bin/Debug/net7.0/Microsoft.Data.SqlClient.xml
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/obj/Debug/net7.0/BlazorElectronics.Shared.csproj.CopyComplete

@@ -1,6 +1,5 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Server.Models.Products;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -17,18 +16,18 @@ public class ProductSalesRepository : DapperRepository, IProductSalesRepository
     
     public async Task<IEnumerable<ProductSale>?> GetProductSalesFeatured()
     {
-        return await TryQueryAsync( GetProductSalesFeaturedQuery, null );
+        return await TryQueryAsync( GetProductSalesFeaturedQuery );
     }
     public async Task<IEnumerable<ProductSale>?> GetProductSales()
     {
-        return await TryQueryAsync( GetProductSalesQuery, null );
+        return await TryQueryAsync( GetProductSalesQuery );
     }
 
-    static async Task<IEnumerable<ProductSale>?> GetProductSalesFeaturedQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<ProductSale>?> GetProductSalesFeaturedQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QueryAsync<ProductSale>( STORED_PROCEDURE_GET_FEATURED_SALES, commandType: CommandType.StoredProcedure );
     }
-    static async Task<IEnumerable<ProductSale>?> GetProductSalesQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<ProductSale>?> GetProductSalesQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QueryAsync<ProductSale>( STORED_PROCEDURE_GET_SALES, commandType: CommandType.StoredProcedure );
     }

@@ -1,9 +1,11 @@
+using BlazorElectronics.Server.Dtos.Specs;
 using BlazorElectronics.Server.Services.Categories;
-using Microsoft.AspNetCore.Mvc;
 using BlazorElectronics.Server.Services.Products;
+using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Mutual;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
 
@@ -13,11 +15,13 @@ public class ProductController : ControllerBase
 {
     readonly IProductService _productService;
     readonly ICategoryService _categoryService;
+    readonly ISpecLookupService _specLookupService;
     
-    public ProductController( IProductService productService, ICategoryService categoryService )
+    public ProductController( IProductService productService, ICategoryService categoryService, ISpecLookupService specLookupService )
     {
         _productService = productService;
         _categoryService = categoryService;
+        _specLookupService = specLookupService;
     }
     
     // TESTING
@@ -86,14 +90,19 @@ public class ProductController : ControllerBase
         return Ok( await _productService.GetProductDetails( productId ) );
     }
 
-    async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> GetProductSearchResponse( ProductSearchRequest? request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> GetProductSearchResponse( ProductSearchRequest request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
         Reply<CategoryIdMap?> categoryReply = await ValidateCategoryUrls( primaryUrl, secondaryUrl, tertiaryUrl );
 
         if ( !categoryReply.Success )
             return BadRequest( categoryReply.Message );
 
-        return Ok( await _productService.GetProductSearch( categoryReply.Data!, request ) );
+        Reply<bool> specReply = await _specLookupService.ValidateProductSearchRequestSpecFilters( request.SpecFilters );
+
+        if ( !specReply.Success )
+            return Ok( specReply.Message );
+
+        return Ok( await _productService.GetProductSearch( categoryReply.Data!, request, new SpecLookupTableMetaDto() ) );
     }
     async Task<Reply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
     {

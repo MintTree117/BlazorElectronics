@@ -4,9 +4,9 @@ namespace BlazorElectronics.Server.Models.Categories;
 
 public sealed class CategoryUrlMap
 {
-    public Dictionary<string, int> PrimaryUrlMap { get; set; } = new();
-    public Dictionary<string, Dictionary<int, int>> SecondaryUrlMap { get; set; } = new();
-    public Dictionary<string, Dictionary<int, int>> TertiaryUrlMap { get; set; } = new();
+    public Dictionary<string, short> PrimaryUrlMap { get; set; } = new();
+    public Dictionary<string, Dictionary<short, short>> SecondaryUrlMap { get; set; } = new();
+    public Dictionary<string, Dictionary<short, short>> TertiaryUrlMap { get; set; } = new();
 
     public CategoryIdMap? GetCategoryIdMapFromUrl( List<string> urlCategories )
     {
@@ -20,37 +20,37 @@ public sealed class CategoryUrlMap
 
     CategoryIdMap? TryGetPrimaryTier( string primaryUrl )
     {
-        return PrimaryUrlMap.TryGetValue( primaryUrl, out int primaryId )
+        return PrimaryUrlMap.TryGetValue( primaryUrl, out short primaryId )
             ? new CategoryIdMap( 1, primaryId )
             : null;
     }
     CategoryIdMap? TryGetSecondaryTier( string primaryUrl, string secondaryUrl )
     {
-        if ( !PrimaryUrlMap.TryGetValue( primaryUrl, out int primaryId ) )
+        if ( !PrimaryUrlMap.TryGetValue( primaryUrl, out short primaryId ) )
             return null;
 
-        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out Dictionary<int, int>? secondaryMap ) )
+        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out Dictionary<short, short>? secondaryMap ) )
             return null;
 
-        return secondaryMap.TryGetValue( primaryId, out int secondaryId )
+        return secondaryMap.TryGetValue( primaryId, out short secondaryId )
             ? new CategoryIdMap( 2, secondaryId )
             : null;
     }
     CategoryIdMap? TryGetTertiaryTier( string primaryUrl, string secondaryUrl, string tertiaryUrl )
     {
-        if ( !PrimaryUrlMap.TryGetValue( primaryUrl, out int primaryId ) )
+        if ( !PrimaryUrlMap.TryGetValue( primaryUrl, out short primaryId ) )
             return null;
 
-        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out Dictionary<int, int>? secondaryMap ) )
+        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out Dictionary<short, short>? secondaryMap ) )
             return null;
 
-        if ( !secondaryMap.TryGetValue( primaryId, out int secondaryId ) )
+        if ( !secondaryMap.TryGetValue( primaryId, out short secondaryId ) )
             return null;
 
-        if ( !TertiaryUrlMap.TryGetValue( tertiaryUrl, out Dictionary<int, int>? tertiaryMap ) )
+        if ( !TertiaryUrlMap.TryGetValue( tertiaryUrl, out Dictionary<short, short>? tertiaryMap ) )
             return null;
 
-        return tertiaryMap.TryGetValue( secondaryId, out int tertiaryId )
+        return tertiaryMap.TryGetValue( secondaryId, out short tertiaryId )
             ? new CategoryIdMap( 3, tertiaryId )
             : null;
     }

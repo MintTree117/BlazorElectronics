@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Caches.Products;
+using BlazorElectronics.Server.Dtos.Specs;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Services.Specs;
@@ -8,7 +9,7 @@ using BlazorElectronics.Shared.Mutual;
 
 namespace BlazorElectronics.Server.Services.Products;
 
-public class ProductService : Service, IProductService
+public class ProductApiService : ApiService, IProductService
 {
     readonly IProductCache _cache;
     readonly IProductSearchRepository _productSearchRepository;
@@ -19,11 +20,13 @@ public class ProductService : Service, IProductService
     const int MAX_SEARCH_TEXT_LENGTH = 64;
     const int MAX_FILTER_ID_LENGTH = 8;
 
-    public ProductService( 
+    public ProductApiService(
+        ILogger logger,
         IProductCache cache, 
         IProductSearchRepository productSearchRepository, 
         IProductDetailsRepository productDetailsRepository,
         ISpecLookupService specLookupService )
+        : base( logger )
     {
         _cache = cache;
         _productSearchRepository = productSearchRepository;
@@ -65,14 +68,14 @@ public class ProductService : Service, IProductService
             Message = "Found matching results."
         };
     }
-    public async Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap categoryIdMap, ProductSearchRequest? request )
+    public async Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, SpecLookupTableMetaDto specMeta )
     {
         Reply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
 
         if ( !validateReply.Success )
             return new Reply<ProductSearchResults_DTO?>( validateReply.Message );
 
-        Task<ProductSearch?> repoFunction = _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data! );
+        Task<ProductSearch?> repoFunction = _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data!, specMeta );
         Reply<ProductSearch?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
         if ( !repoReply.Success )

@@ -6,14 +6,13 @@ public class ProductSearchRequest
     public int Rows { get; set; } = 10;
 
     public string? SearchText { get; set; } = null;
-
-    public bool? HasSale { get; set; } = null;
-
+    
+    public bool MustHaveSale { get; set; } = false;
+    
     public int? MinPrice { get; set; } = null;
     public int? MaxPrice { get; set; } = null;
     public int? MinRating { get; set; } = null;
     public int? MaxRating { get; set; } = null;
 
-    public Dictionary<int, List<int>>? GlobalDynamicFiltersInclude { get; set; }
-    public Dictionary<int, List<int>>? GlobalDynamicFiltersExclude { get; set; }
+    public ProductSearchRequestSpecFilters? SpecFilters { get; set; }
 }

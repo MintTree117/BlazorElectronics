@@ -4,13 +4,17 @@ namespace BlazorElectronics.Shared;
 
 public class ServiceException : Exception
 {
-    public ServiceException( string message, Exception exception )
+    public ServiceException( string message, Exception? exception )
         : base( CreateExceptionMessage( message, exception ), exception ) { }
     
-    static string CreateExceptionMessage( string message, Exception exception )
+    static string CreateExceptionMessage( string message, Exception? exception )
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine( message );
+
+        if ( exception == null )
+            return stringBuilder.ToString();
+        
         stringBuilder.AppendLine( "Exception Information:" );
         stringBuilder.AppendLine( $"Message: {exception.Message}" );
         stringBuilder.AppendLine( $"Source: {exception.Source}" );

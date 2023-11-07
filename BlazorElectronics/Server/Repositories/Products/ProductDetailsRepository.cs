@@ -22,7 +22,7 @@ public class ProductDetailsRepository : DapperRepository, IProductDetailsReposit
         return await TryQueryAsync( GetProductDetailsQuery, dynamicParams );
     }
 
-    static async Task<ProductDetails?> GetProductDetailsQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<ProductDetails?> GetProductDetailsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? result = await connection.QueryMultipleAsync( STORED_PROCEDURE_GET_PRODUCT_DETAILS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
 

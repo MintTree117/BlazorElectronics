@@ -18,8 +18,8 @@ public class FeatureRepository : DapperRepository, IFeatureRepository
         return await TryQueryAsync( GetFeaturesQuery );
     }
 
-    static async Task<IEnumerable<Feature>?> GetFeaturesQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<Feature>?> GetFeaturesQuery( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryAsync<Feature>( STORED_PROCEDURE_GET_FEATURES, commandType: CommandType.StoredProcedure );
+        return await connection.QueryAsync<Feature>( sql, STORED_PROCEDURE_GET_FEATURES, commandType: CommandType.StoredProcedure );
     }
 }

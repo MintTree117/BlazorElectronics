@@ -154,4 +154,43 @@ public class TEMP
 
         return new DynamicParameters( paramDictionary );
     }*/
+    
+    /*
+     *     static List<ProductVariant> ParseVariantData( string variantXml )
+    {
+        if ( string.IsNullOrEmpty( variantXml ) )
+            return new List<ProductVariant>();
+
+        XDocument doc = XDocument.Parse( variantXml );
+
+        if ( doc.Root == null )
+            return new List<ProductVariant>();
+
+        var variantsList = new List<ProductVariant>();
+
+        foreach ( XElement e in doc.Root.Elements( XML_VARIANT_DATA ) )
+        {
+            var variant = new ProductVariant();
+
+            if ( e.Element( COL_VARIANT_SUB_ID ) == null ||
+                 e.Element( COL_VARIANT_NAME ) == null ||
+                 e.Element( COL_VARIANT_PRICE_ORIGINAL ) == null ||
+                 e.Element( COL_VARIANT_PRICE_SALE ) == null )
+            {
+                variant.VariantName = "NULL VARIANT DATA!";
+                variantsList.Add( variant );
+                continue;
+            }
+
+            variant.VariantId = ( int ) e.Element( COL_VARIANT_SUB_ID )!;
+            variant.VariantName = ( string ) e.Element( COL_VARIANT_NAME )!;
+            variant.VariantPriceMain = ( decimal ) e.Element( COL_VARIANT_PRICE_ORIGINAL )!;
+            variant.VariantPriceSale = ( decimal ) e.Element( COL_VARIANT_PRICE_SALE )!;
+
+            variantsList.Add( variant );
+        }
+
+        return variantsList;
+    }
+     */
 }

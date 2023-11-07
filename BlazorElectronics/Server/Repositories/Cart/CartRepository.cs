@@ -26,7 +26,7 @@ public class CartRepository : DapperRepository, ICartRepository
     const string STORED_PROCEDURE_ADD_CART_ITEM = "Add_CartItem";
     const string STORED_PROCEDURE_UPDATE_CART_ITEM_QUANTITY = "Update_CartItemQuantity";
     const string STORED_PROCEDURE_REMOVE_CART_ITEM = "Remove_CartItem";
-    
+
     public CartRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
@@ -95,15 +95,15 @@ public class CartRepository : DapperRepository, ICartRepository
         return await TryQueryTransactionAsync( RemoveCartItemQuery, dynamicParams );
     }
 
-    static async Task<int?> CountCartItemsQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<int?> CountCartItemsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QuerySingleAsync<int>( STORED_PROCEDURE_COUNT_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
     }
-    static async Task<IEnumerable<CartItem>?> GetCartItemsQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<CartItem>?> GetCartItemsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QueryAsync<CartItem>( STORED_PROCEDURE_GET_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
     }
-    static async Task<IEnumerable<Product>?> GetCartProductsQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<Product>?> GetCartProductsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         var productDictionary = new Dictionary<int, Product>();
         
@@ -125,22 +125,22 @@ public class CartRepository : DapperRepository, ICartRepository
 
         return productDictionary.Values;
     }
-    static async Task<bool> AddCartItemsQuery( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams )
+    static async Task<bool> AddCartItemsQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         int result = await connection.ExecuteAsync( STORED_PROCEDURE_ADD_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
-    static async Task<bool> AddCartItemQuery( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams )
+    static async Task<bool> AddCartItemQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         int result = await connection.ExecuteAsync( STORED_PROCEDURE_ADD_CART_ITEM, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
-    static async Task<bool> UpdateCartItemQuantityQuery( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams )
+    static async Task<bool> UpdateCartItemQuantityQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         int result = await connection.ExecuteAsync( STORED_PROCEDURE_UPDATE_CART_ITEM_QUANTITY, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
-    static async Task<bool> RemoveCartItemQuery( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams )
+    static async Task<bool> RemoveCartItemQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         int result = await connection.ExecuteAsync( STORED_PROCEDURE_REMOVE_CART_ITEM, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;

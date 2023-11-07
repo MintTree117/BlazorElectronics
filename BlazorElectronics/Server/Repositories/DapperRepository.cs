@@ -10,10 +10,21 @@ public abstract class DapperRepository
     // TABLES PRODUCTS
     protected const string TABLE_PRODUCTS = "Products";
     protected const string TABLE_PRODUCT_CATEGORIES = "Product_Categories";
+    protected const string TABLE_PRODUCT_CATEGORIES_PRIMARY = "Product_Categories";
+    protected const string TABLE_PRODUCT_CATEGORIES_SECONDARY = "Product_Categories";
+    protected const string TABLE_PRODUCT_CATEGORIES_TERTIARY = "Product_Categories";
     protected const string TABLE_PRODUCT_DESCRIPTIONS = "Product_Descriptions";
     protected const string TABLE_PRODUCT_IMAGES = "Product_Images";
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
     protected const string TABLE_PRODUCT_VARIANTS = "Product_Variants";
+    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_INT = "";
+    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_STRING = "";
+    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_INT_CATEGORIES = "";
+    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_STRING_CATEGORIES = "";
+    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_INT_GLOBAL = "";
+    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_STRING_GLOBAL = "";
+    protected const string TABLE_DYNAMIC_SPECS_GLOBAL = "";
+    protected const string TABLE_DYNAMIC_SPECS_CATEGORIES = "";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
@@ -29,12 +40,7 @@ public abstract class DapperRepository
         { ProductSpecMainTableNameEnum.TVMOVIES, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_TvMovies" },
         { ProductSpecMainTableNameEnum.COURSES, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_Courses" },
     };
-    
-    const string TABLE_PATTERN_PRODUCT_SPECS_LOOKUP = "Product_Specs_Lookup";
-    protected const string TABLE_PRODUCT_SPECS_LOOKUP_LANGUAGES = TABLE_PATTERN_PRODUCT_SPECS_LOOKUP + "_Languages";
-    protected const string TABLE_PRODUCT_SPECS_LOOKUP_CONTENT_FLAGS = TABLE_PATTERN_PRODUCT_SPECS_LOOKUP + "_ContentFlags";
-    protected const string TABLE_PRODUCT_SPECS_LOOKUP_MEDIA_FORMATS = TABLE_PATTERN_PRODUCT_SPECS_LOOKUP + "_MediaFormats";
-    
+
     // COLUMNS CATEGORIES
     protected const string COL_CATEGORY_PRIMARY_ID = "PrimaryCategoryId";
     protected const string COL_CATEGORY_SECONDARY_ID = "SecondaryCategoryId";
@@ -57,6 +63,8 @@ public abstract class DapperRepository
     protected const string COL_PRODUCT_LAST_UPDATED = "LastUpdated";
     protected const string COL_PRODUCT_FILE_SIZE = "FileSize";
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
+    protected const string COL_PRODUCT_SPEC_EXPLICIT_VALUE = "ExplicitValue";
+    protected const string COL_PRODUCT_SPEC_DYNAMIC_ID = "DynamicSpecId";
     
     // COLUMNS PRODUCT VARIANTS
     protected const string COL_VARIANT_ID = "VariantId";
@@ -77,6 +85,7 @@ public abstract class DapperRepository
     protected const string COL_SOFTWARE_DEVELOPER_ID = "PublisherId";
     
     // COLUMNS GAMES
+    protected const string COL_GAMES_GAME_DEVELOPER_ID = "GameDeveloperId";
     protected const string COL_GAMES_ESRB_RATING = "EsrbRating";
     protected const string COL_GAMES_HAS_MULTIPLAYER = "HasMultiplayer";
     protected const string COL_GAMES_HAS_IN_GAME_PURCHASES = "HasInGamePurchases";
@@ -90,8 +99,10 @@ public abstract class DapperRepository
     
     // COLUMNS COURSES
     protected const string COL_COURSES_LECTURES = "NumLectures";
-    protected const string COL_COURSES_EFFOR = "Effor";
+    protected const string COL_COURSES_EFFORT = "Effor";
     protected const string COL_COURSES_DURATION = "Duration";
+    protected const string COL_COURSES_ACCREDATION = "Accredation";
+    protected const string COL_COURSES_CERTIFICATE = "Certificate";
     
     // COLUMNS USERS
     protected const string COL_USER_NAME = "Username";
@@ -112,10 +123,10 @@ public abstract class DapperRepository
         _dbContext = dapperContext;
     }
 
-    protected delegate Task<T?> DapperQueryDelegate<T>( SqlConnection connection, DynamicParameters? dynamicParams = null );
-    protected delegate Task<T?> DapperQueryTransactionDelegate<T>( SqlConnection connection, DbTransaction transaction, DynamicParameters? dynamicParams = null );
+    protected delegate Task<T?> DapperQueryDelegate<T>( SqlConnection connection, string? dynamicSql = null, DynamicParameters? dynamicParams = null );
+    protected delegate Task<T?> DapperQueryTransactionDelegate<T>( SqlConnection connection, DbTransaction transaction, string? dynamicSql = null, DynamicParameters? dynamicParams = null );
     
-    protected async Task<T?> TryQueryAsync<T>( DapperQueryDelegate<T> dapperQueryDelegate, DynamicParameters? dynamicParams = null )
+    protected async Task<T?> TryQueryAsync<T>( DapperQueryDelegate<T> dapperQueryDelegate, DynamicParameters? dynamicParams = null, string? dynamicSql = null )
     {
         int currentRetry = 0;
         
@@ -124,7 +135,7 @@ public abstract class DapperRepository
             try
             {
                 await using SqlConnection? connection = await _dbContext.GetOpenConnection();
-                return await dapperQueryDelegate.Invoke( connection, dynamicParams );
+                return await dapperQueryDelegate.Invoke( connection, dynamicSql, dynamicParams );
             }
             catch ( Exception ex ) when ( ex is TimeoutException )
             {
@@ -135,7 +146,7 @@ public abstract class DapperRepository
 
         return default;
     }
-    protected async Task<T?> TryQueryTransactionAsync<T>( DapperQueryTransactionDelegate<T> dapperQueryDelegate, DynamicParameters? dynamicParams = null )
+    protected async Task<T?> TryQueryTransactionAsync<T>( DapperQueryTransactionDelegate<T> dapperQueryDelegate, DynamicParameters? dynamicParams = null, string? dynamicSql = null )
     {
         SqlConnection connection = null;
         DbTransaction transaction = null;
@@ -167,7 +178,7 @@ public abstract class DapperRepository
         {
             try
             {
-                T? transactionResult = await dapperQueryDelegate.Invoke( connection!, transaction!, dynamicParams );
+                T? transactionResult = await dapperQueryDelegate.Invoke( connection!, transaction!, dynamicSql, dynamicParams );
                 await transaction!.CommitAsync();
                 await transaction.DisposeAsync();
                 await connection!.CloseAsync();

@@ -20,11 +20,11 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
     
     public async Task<CategoriesModel?> GetCategories()
     {
-        return await TryQueryAsync( GetCategoriesQuery, null );
+        return await TryQueryAsync( GetCategoriesQuery );
     }
     public async Task<IEnumerable<string?>?> GetPrimaryCategoryDescriptions()
     {
-        return await TryQueryAsync( GetPrimaryCategoryDescriptionsQuery, null );
+        return await TryQueryAsync( GetPrimaryCategoryDescriptionsQuery );
     }
     public async Task<string?> GetCategoryDescription( int categoryId, int categoryTier )
     {
@@ -35,7 +35,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         return await TryQueryAsync( GetDescriptionQuery, dynamicParams );
     }
 
-    static async Task<CategoriesModel?> GetCategoriesQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<CategoriesModel?> GetCategoriesQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         const string splitOnColumns = $"{COL_CATEGORY_PRIMARY_ID},{COL_CATEGORY_SECONDARY_ID},{COL_CATEGORY_TERTIARY_ID}";
 
@@ -77,11 +77,11 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
 
         return models;
     }
-    static async Task<IEnumerable<string?>?> GetPrimaryCategoryDescriptionsQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<string?>?> GetPrimaryCategoryDescriptionsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QueryAsync<string?>( STORED_PROCEDURE_GET_DESCRIPTIONS_PRIMARY, commandType: CommandType.StoredProcedure );
     }
-    static async Task<string?> GetDescriptionQuery( SqlConnection connection, DynamicParameters? dynamicParams )
+    static async Task<string?> GetDescriptionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QuerySingleAsync<string?>( STORED_PROCEDURE_GET_DESCRIPTION, commandType: CommandType.StoredProcedure );
     }

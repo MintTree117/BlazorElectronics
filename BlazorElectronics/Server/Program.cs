@@ -35,10 +35,10 @@ builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductService, ProductApiService>();
 
 //builder.Services.AddSingleton<ISpecCache, SpecCache>();
-builder.Services.AddScoped<ISpecRepository, SpecRepository>();
+builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
 builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();

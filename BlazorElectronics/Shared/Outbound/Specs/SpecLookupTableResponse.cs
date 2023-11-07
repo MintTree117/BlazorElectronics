@@ -2,8 +2,14 @@ namespace BlazorElectronics.Shared.Outbound.Specs;
 
 public sealed class SpecLookupTableResponse
 {
-    public int LookupTableId { get; set; }
-    public string TableName { get; set; } = string.Empty;
-    public string DisplayName { get; set; } = string.Empty;
-    public List<SpecLookupResponse> SpecLookups { get; set; } = new();
+    public SpecLookupTableResponse( int tableId, string diplayName, List<SpecLookupValueResponse> lookups )
+    {
+        TableId = tableId;
+        TableDisplayName = diplayName;
+        TableLookups = lookups;
+    }
+    
+    public int TableId { get; set; }
+    public string TableDisplayName { get; set; }
+    public List<SpecLookupValueResponse> TableLookups { get; set; }
 }

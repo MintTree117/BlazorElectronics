@@ -35,6 +35,12 @@ public sealed class Reply<T>
         if ( string.IsNullOrEmpty( Message ) )
             Message = Success ? GetDefaultMessage( DtoDefaultMessage.SUCCESS ) : GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
+    public Reply( T data )
+    {
+        Data = data;
+        Success = true;
+        Message = string.Empty;
+    }
     public Reply( T? data, bool success, string message )
     {
         Data = data;
