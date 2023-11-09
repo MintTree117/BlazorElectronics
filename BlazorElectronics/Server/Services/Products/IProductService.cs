@@ -10,6 +10,6 @@ public interface IProductService
     Task<Reply<string?>> GetProductSearchQueryString( ProductSearchRequest request );
     Task<Reply<Products_DTO?>> GetAllProducts();
     Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request );
-    Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? idMap, ProductSearchRequest? request, SpecLookupTableMetaDto specMeta );
+    Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? idMap, ProductSearchRequest? request, CachedSpecData specMeta );
     Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

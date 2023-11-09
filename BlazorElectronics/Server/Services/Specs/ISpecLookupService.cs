@@ -6,7 +6,7 @@ namespace BlazorElectronics.Server.Services.Specs;
 
 public interface ISpecLookupService
 {
-    Task<Reply<SpecLookupTableMetaDto?>> GetSpecLookupMeta();
-    Task<Reply<SpecLookupsResponse?>> GetSpecLookupsResponse( short? primaryCategoryId = null );
+    Task<Reply<CachedSpecData?>> GetSpecDataDto();
+    Task<Reply<SpecFiltersResponse?>> GetSpecFiltersResponse( short? primaryCategoryId = null );
     Task<Reply<bool>> ValidateProductSearchRequestSpecFilters( ProductSearchRequestSpecFilters specFilters, short? primaryCategoryId = null );
 }

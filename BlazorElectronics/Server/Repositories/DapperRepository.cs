@@ -17,14 +17,10 @@ public abstract class DapperRepository
     protected const string TABLE_PRODUCT_IMAGES = "Product_Images";
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
     protected const string TABLE_PRODUCT_VARIANTS = "Product_Variants";
-    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_INT = "";
-    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_STRING = "";
-    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_INT_CATEGORIES = "";
-    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_STRING_CATEGORIES = "";
-    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_INT_GLOBAL = "";
-    protected const string TABLE_PRODUCT_SPECS_EXPLICIT_STRING_GLOBAL = "";
-    protected const string TABLE_DYNAMIC_SPECS_GLOBAL = "";
-    protected const string TABLE_DYNAMIC_SPECS_CATEGORIES = "";
+    protected const string TABLE_PRODUCT_SPECS_FILTERS_INT = "";
+    protected const string TABLE_PRODUCT_SPECS_RAW_INT = "";
+    protected const string TABLE_PRODUCT_SPECS_RAW_STRING = "";
+    protected const string TABLE_PRODUCT_SPECS_RAW_BOOL = "";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
@@ -65,7 +61,11 @@ public abstract class DapperRepository
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
     protected const string COL_PRODUCT_SPEC_EXPLICIT_VALUE = "ExplicitValue";
     protected const string COL_PRODUCT_SPEC_DYNAMIC_ID = "DynamicSpecId";
-    
+
+    protected const string COL_SPEC_ID = "SpecId";
+    protected const string COL_FILTER_INT_ID = "FilterId";
+    protected const string COL_SPEC_VALUE_ID = "SpecValueId";
+
     // COLUMNS PRODUCT VARIANTS
     protected const string COL_VARIANT_ID = "VariantId";
     protected const string COL_VARIANT_SUB_ID = "VariantSubId";

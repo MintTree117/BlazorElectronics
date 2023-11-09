@@ -71,7 +71,7 @@ public class CategoryService : ICategoryService
 
         try
         {
-            string? descrReply = await _repository.GetCategoryDescription( idMap!.CategoryId, idMap.Tier );
+            string? descrReply = await _repository.GetCategoryDescription( idMap!.CategoryId, idMap.CategoryTier );
 
             return string.IsNullOrEmpty( descrReply )
                 ? new Reply<string?>( "Failed to retrieve CategoryDescription!" )
@@ -319,7 +319,7 @@ public class CategoryService : ICategoryService
     }
     static bool ValidateCategoryIdMap( CategoryIdMap map, CategoriesResponse categories )
     {
-        return map.Tier switch {
+        return map.CategoryTier switch {
             1 => categories.PrimaryCategories.ContainsKey( map.CategoryId ),
             2 => categories.SecondaryCategories.ContainsKey( map.CategoryId ),
             3 => categories.TertiaryCategories.ContainsKey( map.CategoryId ),

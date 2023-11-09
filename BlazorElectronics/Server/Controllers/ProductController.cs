@@ -97,12 +97,17 @@ public class ProductController : ControllerBase
         if ( !categoryReply.Success )
             return BadRequest( categoryReply.Message );
 
-        Reply<bool> specReply = await _specLookupService.ValidateProductSearchRequestSpecFilters( request.SpecFilters );
+        Reply<bool> validateSpecsReply = await _specLookupService.ValidateProductSearchRequestSpecFilters( request.SpecFilters );
 
-        if ( !specReply.Success )
-            return Ok( specReply.Message );
+        if ( !validateSpecsReply.Success )
+            return Ok( validateSpecsReply.Message );
 
-        return Ok( await _productService.GetProductSearch( categoryReply.Data!, request, new SpecLookupTableMetaDto() ) );
+        Reply<CachedSpecData?> specDataReply = await _specLookupService.GetSpecDataDto();
+
+        if ( !specDataReply.Success || specDataReply.Data is null )
+            return Ok( specDataReply.Message );
+
+        return Ok( await _productService.GetProductSearch( categoryReply.Data, request, specDataReply.Data ) );
     }
     async Task<Reply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
     {

@@ -20,18 +20,18 @@ public class SpecLookupController : ControllerBase
     }
 
     [HttpGet( "global" )]
-    public async Task<ActionResult<Reply<SpecLookupsResponse>>> GetSpecLookupsGlobal()
+    public async Task<ActionResult<Reply<SpecFiltersResponse>>> GetSpecLookupsGlobal()
     {
-        return Ok( await _specLookupService.GetSpecLookupsResponse() );
+        return Ok( await _specLookupService.GetSpecFiltersResponse() );
     }
     [HttpGet( "category/{primaryCategoryUrl}" )]
-    public async Task<ActionResult<Reply<SpecLookupsResponse>>> GetSpecLookupsCategory( string primaryCategoryUrl )
+    public async Task<ActionResult<Reply<SpecFiltersResponse>>> GetSpecLookupsCategory( string primaryCategoryUrl )
     {
         Reply<CategoryIdMap?> categoryResponse = await _categoryService.GetCategoryIdMapFromUrl( primaryCategoryUrl );
 
         if ( !categoryResponse.Success )
-            return BadRequest( new Reply<SpecLookupsResponse>( categoryResponse.Message ) );
+            return BadRequest( new Reply<SpecFiltersResponse>( categoryResponse.Message ) );
 
-        return Ok( await _specLookupService.GetSpecLookupsResponse( categoryResponse.Data!.CategoryId ) );
+        return Ok( await _specLookupService.GetSpecFiltersResponse( categoryResponse.Data!.CategoryId ) );
     }
 }

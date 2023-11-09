@@ -9,7 +9,7 @@ using BlazorElectronics.Shared.Mutual;
 
 namespace BlazorElectronics.Server.Services.Products;
 
-public class ProductApiService : ApiService, IProductService
+public class ProductService : ApiService, IProductService
 {
     readonly IProductCache _cache;
     readonly IProductSearchRepository _productSearchRepository;
@@ -20,7 +20,7 @@ public class ProductApiService : ApiService, IProductService
     const int MAX_SEARCH_TEXT_LENGTH = 64;
     const int MAX_FILTER_ID_LENGTH = 8;
 
-    public ProductApiService(
+    public ProductService(
         ILogger logger,
         IProductCache cache, 
         IProductSearchRepository productSearchRepository, 
@@ -56,7 +56,7 @@ public class ProductApiService : ApiService, IProductService
     }
     public async Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
-        Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.Tier, request.CategoryIdMap.CategoryId );
+        Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryTier, request.CategoryIdMap.CategoryId );
         Reply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
         if ( !repoReply.Success )
@@ -68,7 +68,7 @@ public class ProductApiService : ApiService, IProductService
             Message = "Found matching results."
         };
     }
-    public async Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, SpecLookupTableMetaDto specMeta )
+    public async Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, CachedSpecData specMeta )
     {
         Reply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
 

@@ -35,7 +35,7 @@ builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 builder.Services.AddSingleton<IProductCache, ProductCache>();
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
-builder.Services.AddScoped<IProductService, ProductApiService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 //builder.Services.AddSingleton<ISpecCache, SpecCache>();
 builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
