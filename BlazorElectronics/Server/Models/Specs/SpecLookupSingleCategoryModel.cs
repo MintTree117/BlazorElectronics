@@ -1,7 +1,7 @@
 namespace BlazorElectronics.Server.Models.Specs;
 
-public sealed class DynamicSpecTableCategoryModel
+public sealed class SpecLookupSingleCategoryModel
 {
-    public short DynamicTableId { get; set; }
+    public short SpecId { get; set; }
     public short PrimaryCategoryId { get; set; }
 }

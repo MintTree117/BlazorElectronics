@@ -2,9 +2,18 @@ namespace BlazorElectronics.Shared.Outbound.Categories;
 
 public sealed class TertiaryCategoryResponse
 {
-    public short ParentId { get; set; }
-    public short Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
+    public TertiaryCategoryResponse( short parentId, short id, string name, string url, string imageUrl )
+    {
+        ParentId = parentId;
+        Id = id;
+        Name = name;
+        Url = url;
+        ImageUrl = imageUrl;
+    }
+    
+    public short ParentId { get; }
+    public short Id { get; }
+    public string Name { get; }
+    public string Url { get; }
+    public string ImageUrl { get; }
 }

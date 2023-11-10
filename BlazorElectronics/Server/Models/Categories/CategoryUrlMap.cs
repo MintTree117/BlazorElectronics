@@ -4,10 +4,17 @@ namespace BlazorElectronics.Server.Models.Categories;
 
 public sealed class CategoryUrlMap
 {
-    public Dictionary<string, short> PrimaryUrlMap { get; set; } = new();
-    public Dictionary<string, Dictionary<short, short>> SecondaryUrlMap { get; set; } = new();
-    public Dictionary<string, Dictionary<short, short>> TertiaryUrlMap { get; set; } = new();
+    IReadOnlyDictionary<string, short> PrimaryUrlMap { get; set; }
+    IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> SecondaryUrlMap { get; set; }
+    IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> TertiaryUrlMap { get; set; }
 
+    public CategoryUrlMap( Dictionary<string, short> primary, Dictionary<string, IReadOnlyDictionary<short, short>> secondary, IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> tertiary )
+    {
+        PrimaryUrlMap = primary;
+        SecondaryUrlMap = secondary;
+        TertiaryUrlMap = tertiary;
+    }
+    
     public CategoryIdMap? GetCategoryIdMapFromUrl( List<string> urlCategories )
     {
         return urlCategories.Count switch {
@@ -29,7 +36,7 @@ public sealed class CategoryUrlMap
         if ( !PrimaryUrlMap.TryGetValue( primaryUrl, out short primaryId ) )
             return null;
 
-        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out Dictionary<short, short>? secondaryMap ) )
+        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out IReadOnlyDictionary<short, short>? secondaryMap ) )
             return null;
 
         return secondaryMap.TryGetValue( primaryId, out short secondaryId )
@@ -41,13 +48,13 @@ public sealed class CategoryUrlMap
         if ( !PrimaryUrlMap.TryGetValue( primaryUrl, out short primaryId ) )
             return null;
 
-        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out Dictionary<short, short>? secondaryMap ) )
+        if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out IReadOnlyDictionary<short, short>? secondaryMap ) )
             return null;
 
         if ( !secondaryMap.TryGetValue( primaryId, out short secondaryId ) )
             return null;
 
-        if ( !TertiaryUrlMap.TryGetValue( tertiaryUrl, out Dictionary<short, short>? tertiaryMap ) )
+        if ( !TertiaryUrlMap.TryGetValue( tertiaryUrl, out IReadOnlyDictionary<short, short>? tertiaryMap ) )
             return null;
 
         return tertiaryMap.TryGetValue( secondaryId, out short tertiaryId )

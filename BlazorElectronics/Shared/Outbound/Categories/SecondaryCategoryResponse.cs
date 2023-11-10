@@ -2,10 +2,20 @@ namespace BlazorElectronics.Shared.Outbound.Categories;
 
 public sealed class SecondaryCategoryResponse
 {
-    public short ParentId { get; set; }
-    public short Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
-    public HashSet<short> ChildCategories { get; set; } = new();
+    public SecondaryCategoryResponse( short parentId, short id, string name, string url, string imageUrl, HashSet<short> childCategories )
+    {
+        ParentId = parentId;
+        Id = id;
+        Name = name;
+        Url = url;
+        ImageUrl = imageUrl;
+        ChildCategories = childCategories;
+    }
+    
+    public short ParentId { get; }
+    public short Id { get; }
+    public string Name { get; }
+    public string Url { get; }
+    public string ImageUrl { get; }
+    public IReadOnlySet<short> ChildCategories { get; }
 }

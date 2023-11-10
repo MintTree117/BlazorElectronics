@@ -11,38 +11,45 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecLookupValuesModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMetaModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFiltersResponse.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupNameModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupValueModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupValuesModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupsModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/ProductController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/ProductController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/SpecLookupController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/SpecLookupController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/SpecLookupTableMetaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/SpecDataDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecLookup.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecLookups.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecTableCategory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecTableCategoryModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecTableMeta.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecTableMetaModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecValueModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/ExplicitProductSpecCategory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/RawSpecCategoryModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/ExplicitProductSpecName.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/RawSpecNameModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupDataModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupTableMetaModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/CategoryController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/CategoryController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/CachedSpecData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/CachedSpecData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/SpecDataDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/SpecDataDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Categories/CategoriesModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Categories/CategoriesModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Categories/CategoryUrlMap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Categories/CategoryUrlMap.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecLookupValuesModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecTableCategoryModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableCategoryModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecTableMetaModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/DynamicSpecValueModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/IntFilterModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/RawSpecCategoryModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupSingleCategoryModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/RawSpecNameModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMetaModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/StringSpecValueModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Categories/CategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Categories/CategoryRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Categories/ICategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Categories/ICategoryRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/DapperRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/DapperRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductSearchRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductSearchRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductSearchRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductSearchRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/ISpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/ISpecLookupRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/SpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/SpecLookupRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryCache.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/CategoryService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/IProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductApiService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecLookupService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/ISpecLookupService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/ICategoryCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/ICategoryCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/ICategoryService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Categories/ICategoryService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecLookupService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecLookupService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Products/ProductSearchRequestSpecFilters.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Products/ProductSearchRequestSpecFilters.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Mutual/CategoryIdMap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Mutual/CategoryIdMap.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecLookupTableResponse.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecLookupValueResponse.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecLookupsResponse.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/CategoriesResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/CategoriesResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/PrimaryCategoryResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/PrimaryCategoryResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/SecondaryCategoryResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/SecondaryCategoryResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/TertiaryCategoryResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Categories/TertiaryCategoryResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/FilterTableResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFilterTableResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/FilterValueResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFilterValueResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFiltersResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFiltersResponse.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -284,7 +291,9 @@
       <workItem from="1699474126570" duration="8927000" />
       <workItem from="1699484890381" duration="1000" />
       <workItem from="1699485059896" duration="871000" />
-      <workItem from="1699489422335" duration="3080000" />
+      <workItem from="1699489422335" duration="5436000" />
+      <workItem from="1699568635826" duration="9118000" />
+      <workItem from="1699581802537" duration="3212000" />
     </task>
     <servers />
   </component>

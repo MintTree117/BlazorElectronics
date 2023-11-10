@@ -10,17 +10,14 @@ public abstract class DapperRepository
     // TABLES PRODUCTS
     protected const string TABLE_PRODUCTS = "Products";
     protected const string TABLE_PRODUCT_CATEGORIES = "Product_Categories";
-    protected const string TABLE_PRODUCT_CATEGORIES_PRIMARY = "Product_Categories";
-    protected const string TABLE_PRODUCT_CATEGORIES_SECONDARY = "Product_Categories";
-    protected const string TABLE_PRODUCT_CATEGORIES_TERTIARY = "Product_Categories";
     protected const string TABLE_PRODUCT_DESCRIPTIONS = "Product_Descriptions";
     protected const string TABLE_PRODUCT_IMAGES = "Product_Images";
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
     protected const string TABLE_PRODUCT_VARIANTS = "Product_Variants";
-    protected const string TABLE_PRODUCT_SPECS_FILTERS_INT = "";
-    protected const string TABLE_PRODUCT_SPECS_RAW_INT = "";
-    protected const string TABLE_PRODUCT_SPECS_RAW_STRING = "";
-    protected const string TABLE_PRODUCT_SPECS_RAW_BOOL = "";
+    protected const string TABLE_PRODUCT_SPECS_INT_FILTERS = "Product_Specs_Explicit_Int_Filters";
+    protected const string TABLE_PRODUCT_SPECS_INT = "Product_Specs_Explicit_Int_Values";
+    protected const string TABLE_PRODUCT_SPECS_STRING = "Product_Specs_Explicit_String_Values";
+    protected const string TABLE_PRODUCT_SPECS_BOOL = "Specs_Explicit_Bool";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
@@ -59,8 +56,6 @@ public abstract class DapperRepository
     protected const string COL_PRODUCT_LAST_UPDATED = "LastUpdated";
     protected const string COL_PRODUCT_FILE_SIZE = "FileSize";
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
-    protected const string COL_PRODUCT_SPEC_EXPLICIT_VALUE = "ExplicitValue";
-    protected const string COL_PRODUCT_SPEC_DYNAMIC_ID = "DynamicSpecId";
 
     protected const string COL_SPEC_ID = "SpecId";
     protected const string COL_FILTER_INT_ID = "FilterId";

@@ -23,9 +23,9 @@ public class CategoryController : ControllerBase
         return Ok( response );
     }
     [HttpGet( "main-descriptions" )]
-    public async Task<ActionResult<Reply<List<string?>>>> GetMainDescriptions()
+    public async Task<ActionResult<Reply<IReadOnlyList<string?>>>> GetMainDescriptions()
     {
-        Reply<List<string?>?> response = await _categoryService.GetMainDescriptions();
+        Reply<IReadOnlyList<string>?> response = await _categoryService.GetMainDescriptions();
         return Ok( response );
     }
     [HttpPost( "get-description" )]

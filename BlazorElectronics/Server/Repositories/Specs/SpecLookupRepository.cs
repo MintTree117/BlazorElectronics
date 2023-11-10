@@ -14,36 +14,36 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
     public SpecLookupRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<SpecLookupMetaModel?> GetSpecLookupMeta()
+    public async Task<SpecLookupsModel?> GetSpecLookupMeta()
     {
         SqlMapper.GridReader? multi = await TryQueryAsync( GetSpecLookupTableMetaQuery );
 
         if ( multi is null )
             return null;
 
-        return new SpecLookupMetaModel
+        return new SpecLookupsModel
         {
             IntGlobalIds = await multi.ReadAsync() as IEnumerable<short>,
             StringGlobalIds = await multi.ReadAsync() as IEnumerable<short>,
             BoolGlobalIds = await multi.ReadAsync() as IEnumerable<short>,
             
-            IntCategories = await multi.ReadAsync() as IEnumerable<RawSpecCategoryModel>,
-            StringCategories = await multi.ReadAsync() as IEnumerable<RawSpecCategoryModel>,
-            BoolCategories = await multi.ReadAsync() as IEnumerable<RawSpecCategoryModel>,
+            IntCategories = await multi.ReadAsync() as IEnumerable<SpecLookupSingleCategoryModel>,
+            StringCategories = await multi.ReadAsync() as IEnumerable<SpecLookupSingleCategoryModel>,
+            BoolCategories = await multi.ReadAsync() as IEnumerable<SpecLookupSingleCategoryModel>,
             
-            IntNames = await multi.ReadAsync() as IEnumerable<RawSpecNameModel>,
-            StringNames = await multi.ReadAsync() as IEnumerable<RawSpecNameModel>,
-            BoolNames = await multi.ReadAsync() as IEnumerable<RawSpecNameModel>,
+            IntNames = await multi.ReadAsync() as IEnumerable<SpecLookupNameModel>,
+            StringNames = await multi.ReadAsync() as IEnumerable<SpecLookupNameModel>,
+            BoolNames = await multi.ReadAsync() as IEnumerable<SpecLookupNameModel>,
             
-            IntFilters = await multi.ReadAsync() as IEnumerable<IntFilterModel>,
-            StringValues = await multi.ReadAsync() as IEnumerable<StringSpecValueModel>,
+            IntFilters = await multi.ReadAsync() as IEnumerable<SpecLookupFilterModel>,
+            StringFilters = await multi.ReadAsync() as IEnumerable<SpecLookupFilterModel>,
             
-            DyanmicGlobalTableIds = await multi.ReadAsync() as IEnumerable<short>,
-            DynamicTableCategories = await multi.ReadAsync() as IEnumerable<DynamicSpecTableCategoryModel>,
-            DynamicTables = await multi.ReadAsync() as IEnumerable<DynamicSpecTableMetaModel>
+            MultiTablesGlobal = await multi.ReadAsync() as IEnumerable<short>,
+            MultiTableCategories = await multi.ReadAsync() as IEnumerable<SpecLookupMultiTableCategoryModel>,
+            MultiTables = await multi.ReadAsync() as IEnumerable<SpecLookupMultiTableModel>
         };
     }
-    public async Task<DynamicSpecLookupValuesModel?> GetSpecLookupData( Dictionary<short, string> dynamicTableNamesById )
+    public async Task<SpecLookupValuesModel?> GetSpecLookupData( Dictionary<short, string> dynamicTableNamesById )
     {
         Dictionary<short, string>.KeyCollection tableIds = dynamicTableNamesById.Keys;
 
@@ -53,16 +53,16 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         if ( multi is null )
             return null;
 
-        var specData = new DynamicSpecLookupValuesModel
+        var specData = new SpecLookupValuesModel
         {
-            DyanmicValuesByTableId = new Dictionary<int, IEnumerable<DynamicSpecValueModel>?>()
+            DyanmicValuesByTableId = new Dictionary<int, IEnumerable<SpecLookupValueModel>?>()
         };
 
         await Task.Run( () =>
         {
             foreach ( short tableId in tableIds )
             {
-                IEnumerable<DynamicSpecValueModel>? data = multi.Read<DynamicSpecValueModel>();
+                IEnumerable<SpecLookupValueModel>? data = multi.Read<SpecLookupValueModel>();
                 specData.DyanmicValuesByTableId.TryAdd( tableId, data );
             }
         } );

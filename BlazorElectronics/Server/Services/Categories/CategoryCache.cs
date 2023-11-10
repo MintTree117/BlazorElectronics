@@ -20,11 +20,11 @@ public sealed class CategoryCache : ServiceCache, ICategoryCache
 
     public CategoryCache( IDistributedCache memoryCache ) : base( memoryCache ) { }
 
-    public async Task<List<string?>?> GetPrimaryDescriptions()
+    public async Task<List<string>?> GetPrimaryDescriptions()
     {
         try
         {
-            return await GetFromCache<List<string?>>( CACHE_KEY_DESCRIPTIONS_PRIMARY );
+            return await GetFromCache<List<string>>( CACHE_KEY_DESCRIPTIONS_PRIMARY );
         }
         catch ( Exception e )
         {
@@ -54,7 +54,7 @@ public sealed class CategoryCache : ServiceCache, ICategoryCache
         }
     }
     
-    public async Task SetPrimaryDescriptions( List<string?> descriptions )
+    public async Task SetPrimaryDescriptions( List<string> descriptions )
     {
         try
         {

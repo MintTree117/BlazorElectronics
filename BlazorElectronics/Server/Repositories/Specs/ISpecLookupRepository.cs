@@ -4,6 +4,6 @@ namespace BlazorElectronics.Server.Repositories.Specs;
 
 public interface ISpecLookupRepository
 {
-    Task<SpecLookupMetaModel?> GetSpecLookupMeta();
-    Task<DynamicSpecLookupValuesModel?> GetSpecLookupData( Dictionary<short, string> dynamicTableNamesById );
+    Task<SpecLookupsModel?> GetSpecLookupMeta();
+    Task<SpecLookupValuesModel?> GetSpecLookupData( Dictionary<short, string> dynamicTableNamesById );
 }

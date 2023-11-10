@@ -1,8 +1,8 @@
 namespace BlazorElectronics.Shared.Outbound.Specs;
 
-public sealed class FilterTableResponse
+public sealed class SpecFilterTableResponse
 {
-    public FilterTableResponse( int id, string name, IReadOnlyList<string> values )
+    public SpecFilterTableResponse( int id, string name, IReadOnlyList<string> values )
     {
         Id = id;
         Name = name;

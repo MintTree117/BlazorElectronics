@@ -13,14 +13,14 @@ public sealed class SpecDataDto
     public Dictionary<short, HashSet<short>> IntIdsByCategory { get; set; } = new();
     public Dictionary<short, HashSet<short>> StringIdsByCategory { get; set; } = new();
     public Dictionary<short, HashSet<short>> BoolIdsByCategory { get; set; } = new();
-    
-    public Dictionary<short, List<string>> IntFilterValues { get; set; }
-    public Dictionary<short, List<string>> StringValues { get; set; }
 
-    public HashSet<short> DynamicGlobalTableIds { get; set; } = new();
-    public Dictionary<short, HashSet<short>> DynamicTableCategories { get; set; } = new();
-    public Dictionary<short, string> DynamicTableNames { get; set; } = new();
-    public Dictionary<short, string> DynamicDisplayNames { get; set; } = new();
-    public Dictionary<short, string> DynamicProductTableNames { get; set; } = new();
-    public Dictionary<short, List<string>> DynamicValuesByTable { get; set; } = new();
+    public Dictionary<short, List<string>> IntFilterNames { get; set; } = new();
+    public Dictionary<short, List<string>> StringFilterNames { get; set; } = new();
+
+    public HashSet<short> MultiGlobalTableIds { get; set; } = new();
+    public Dictionary<short, HashSet<short>> MultiTableCategories { get; set; } = new();
+    public Dictionary<short, string> MultiTableNames { get; set; } = new();
+    public Dictionary<short, string> MultiDisplayNames { get; set; } = new();
+    public Dictionary<short, string> MultiProductTableNames { get; set; } = new();
+    public Dictionary<short, List<string>> MultiValuesByTable { get; set; } = new();
 }

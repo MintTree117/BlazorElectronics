@@ -31,7 +31,7 @@ public class SpecLookupService : ApiService, ISpecLookupService
         if ( !dataReply.Success || dataReply.Data is null )
             return new Reply<SpecFiltersResponse?>( dataReply.Message );
         
-        SpecFiltersResponse filtersResponse = await MapCachedSpecDataToFilters( dataReply.Data, primaryCategoryId );
+        SpecFiltersResponse filtersResponse = await MapCachedSpecDataToFilterResponse( dataReply.Data, primaryCategoryId );
 
         return new Reply<SpecFiltersResponse?>( filtersResponse );
     }
@@ -56,13 +56,14 @@ public class SpecLookupService : ApiService, ISpecLookupService
                 intIdCategories = specData.IntIdsByCategory[ primaryCategoryId.Value ];
                 stringIdCategories = specData.StringIdsByCategory[ primaryCategoryId.Value ];
                 boolIdCategories = specData.BoolIdsByCategory[ primaryCategoryId.Value ];
-                dynamicTableCategories = specData.DynamicTablesByCategory[ primaryCategoryId.Value ];
+                dynamicTableCategories = specData.MultiTablesByCategory[ primaryCategoryId.Value ];
             }
 
-            ValidateFilterLookups( specFilters.IntFilterIds, specData.IntGlobalIds, intIdCategories );
-            ValidateFilterLookups( specFilters.StringSpecIds, specData.StringGlobalIds, stringIdCategories );
-            ValidateFilterLookups( specFilters.BoolSpecIds, specData.BoolGlobalIds, boolIdCategories );
-            ValidateFilterLookups( specFilters.DynamicSpecsIncludeIdsByTable, specData.DynamicGlobalTableIds, dynamicTableCategories );
+            ValidateSpecLookupFiltersRequest( specFilters.IntFilters, specData.IntGlobalIds, intIdCategories );
+            ValidateSpecLookupFiltersRequest( specFilters.StringFilters, specData.StringGlobalIds, stringIdCategories );
+            ValidateSpecLookupFiltersRequest( specFilters.BoolFilters, specData.BoolGlobalIds, boolIdCategories );
+            ValidateSpecLookupFiltersRequest( specFilters.MultiIncludes, specData.MultiGlobalTableIds, dynamicTableCategories );
+            ValidateSpecLookupFiltersRequest( specFilters.MultiExcludes, specData.MultiGlobalTableIds, dynamicTableCategories );
         } );
 
         return new Reply<bool>( true );
@@ -74,194 +75,92 @@ public class SpecLookupService : ApiService, ISpecLookupService
         if ( _cachedSpecData is not null && _cachedSpecData.IsValid( MAX_HOURS_BEFORE_CACHE_INVALIDATION ) )
             return new Reply<CachedSpecData?>( _cachedSpecData );
 
-        Reply<SpecLookupMetaModel?> metaReply = await GetSpecLookupMetaModel();
+        Reply<SpecLookupsModel?> metaReply = await GetSpecLookupMetaModel();
 
         if ( !metaReply.Success || metaReply.Data is null )
             return new Reply<CachedSpecData?>( metaReply.Message );
 
-        SpecDataDto dto = await MapSpecMetaToDto( metaReply.Data );
+        SpecDataDto dto = await MapSpecDataModelToDto( metaReply.Data );
 
-        Reply<DynamicSpecLookupValuesModel?> valuesReply = await GetDynamicSpecLookupValuesModel( dto.DynamicTableNames );
+        Reply<SpecLookupValuesModel?> valuesReply = await GetDynamicSpecLookupValuesModel( dto.MultiTableNames );
 
         if ( !valuesReply.Success || valuesReply.Data?.DyanmicValuesByTableId is null )
             return new Reply<CachedSpecData?>( valuesReply.Message );
 
-        await MapDynamicSpecValues( valuesReply.Data.DyanmicValuesByTableId, dto.DynamicValuesByTable );
+        await MapMultiSpecValues( valuesReply.Data.DyanmicValuesByTableId, dto.MultiValuesByTable );
 
         _cachedSpecData = new CachedSpecData( dto );
         return new Reply<CachedSpecData?>( _cachedSpecData );
     }
-    async Task<Reply<SpecLookupMetaModel?>> GetSpecLookupMetaModel()
+    async Task<Reply<SpecLookupsModel?>> GetSpecLookupMetaModel()
     {
-        SpecLookupMetaModel? metaModel;
+        SpecLookupsModel? metaModel;
 
         try
         {
             metaModel = await _repository.GetSpecLookupMeta();
 
             if ( metaModel is null )
-                return new Reply<SpecLookupMetaModel?>( NO_DATA_FOUND_MESSAGE );
+                return new Reply<SpecLookupsModel?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             _logger.LogError( e, e.Message );
-            return new Reply<SpecLookupMetaModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new Reply<SpecLookupsModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        return new Reply<SpecLookupMetaModel?>( metaModel );
+        return new Reply<SpecLookupsModel?>( metaModel );
     }
-    async Task<Reply<DynamicSpecLookupValuesModel?>> GetDynamicSpecLookupValuesModel( Dictionary<short, string> dynamicTableNamesById )
+    async Task<Reply<SpecLookupValuesModel?>> GetDynamicSpecLookupValuesModel( Dictionary<short, string> dynamicTableNamesById )
     {
-        DynamicSpecLookupValuesModel? valuesModel;
+        SpecLookupValuesModel? valuesModel;
 
         try
         {
             valuesModel = await _repository.GetSpecLookupData( dynamicTableNamesById );
 
             if ( valuesModel?.DyanmicValuesByTableId is null )
-                return new Reply<DynamicSpecLookupValuesModel?>( NO_DATA_FOUND_MESSAGE );
+                return new Reply<SpecLookupValuesModel?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             _logger.LogError( e, e.Message );
-            return new Reply<DynamicSpecLookupValuesModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new Reply<SpecLookupValuesModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        return new Reply<DynamicSpecLookupValuesModel?>( valuesModel );
+        return new Reply<SpecLookupValuesModel?>( valuesModel );
     }
-    static async Task<SpecDataDto> MapSpecMetaToDto( SpecLookupMetaModel metaModel )
+    
+    // MAP SPEC DATA
+    static async Task<SpecDataDto> MapSpecDataModelToDto( SpecLookupsModel metaModel )
     {
         var dto = new SpecDataDto();
 
         await Task.Run( () =>
         {
             MapGlobalSpecCategories( metaModel.IntGlobalIds, dto.IntGlobalIds );
-            MapGlobalSpecCategories( metaModel.StringGlobalIds, dto.IntGlobalIds );
+            MapGlobalSpecCategories( metaModel.StringGlobalIds, dto.StringGlobalIds );
             MapGlobalSpecCategories( metaModel.BoolGlobalIds, dto.BoolGlobalIds );
             
-            MapRawSpecCategories( metaModel.IntCategories, dto.IntIdsByCategory );
-            MapRawSpecCategories( metaModel.StringCategories, dto.StringIdsByCategory );
-            MapRawSpecCategories( metaModel.BoolCategories, dto.BoolIdsByCategory );
+            MapSingleSpecCategories( metaModel.IntCategories, dto.IntIdsByCategory );
+            MapSingleSpecCategories( metaModel.StringCategories, dto.StringIdsByCategory );
+            MapSingleSpecCategories( metaModel.BoolCategories, dto.BoolIdsByCategory );
             
-            MapRawSpecNames( metaModel.IntNames, dto.IntNames );
-            MapRawSpecNames( metaModel.StringNames, dto.StringNames );
-            MapRawSpecNames( metaModel.BoolNames, dto.BoolNames );
-            
-            MapStringSpecValues( metaModel.StringValues, dto.StringValues );
-            MapIntSpecFilters( metaModel.IntFilters, dto.IntFilterValues );
-            
-            MapGlobalSpecCategories( metaModel.DyanmicGlobalTableIds, dto.DynamicGlobalTableIds );
-            MapDynamicSpecCategories( metaModel.DynamicTableCategories, dto.DynamicTableCategories );
-            MapDynamicSpecNames( metaModel.DynamicTables, dto.DynamicTableNames, dto.DynamicDisplayNames, dto.DynamicProductTableNames );
+            MapSingleSpecNames( metaModel.IntNames, dto.IntNames );
+            MapSingleSpecNames( metaModel.StringNames, dto.StringNames );
+            MapSingleSpecNames( metaModel.BoolNames, dto.BoolNames );
+
+            MapSingleSpecFilters( metaModel.IntFilters, dto.IntFilterNames );
+            MapSingleSpecFilters( metaModel.StringFilters, dto.StringFilterNames );
+
+            MapGlobalSpecCategories( metaModel.MultiTablesGlobal, dto.MultiGlobalTableIds );
+            MapMultiSpecCategories( metaModel.MultiTableCategories, dto.MultiTableCategories );
+            MapMultiSpecNames( metaModel.MultiTables, dto.MultiTableNames, dto.MultiDisplayNames, dto.MultiProductTableNames );
         } );
 
         return dto;
     }
-    static void MapGlobalSpecCategories( IEnumerable<short>? ids, HashSet<short> dto )
-    {
-        if ( ids is null )
-            return;
-
-        foreach ( short globalId in ids )
-        {
-            dto.Add( globalId );
-        }
-    }
-    static void MapRawSpecCategories( IEnumerable<RawSpecCategoryModel>? categoryModels, Dictionary<short, HashSet<short>> dto )
-    {
-        if ( categoryModels is null )
-            return;
-        
-        foreach ( RawSpecCategoryModel specCategory in categoryModels )
-        {
-            if ( !dto.TryGetValue( specCategory.PrimaryCategoryId, out HashSet<short>? tableIdSet ) )
-            {
-                tableIdSet = new HashSet<short>();
-                dto.Add( specCategory.PrimaryCategoryId, tableIdSet );
-            }
-
-            tableIdSet.Add( specCategory.ExplicitSpecId );
-        }
-    }
-    static void MapRawSpecNames( IEnumerable<RawSpecNameModel>? nameModels, Dictionary<short, string> dto )
-    {
-        if ( nameModels is null )
-            return;
-
-        foreach ( RawSpecNameModel specName in nameModels )
-        {
-            dto.TryAdd( specName.ExplicitSpecId, specName.ExplicitSpecName );
-        }
-    }
-    static void MapStringSpecValues( IEnumerable<StringSpecValueModel>? stringModels, Dictionary<short, List<string>> dto )
-    {
-        if ( stringModels is null )
-            return;
-
-        foreach ( StringSpecValueModel stringValue in stringModels )
-        {
-            if ( stringValue.Value is null )
-                continue;
-
-            if ( !dto.TryGetValue( stringValue.SpecId, out List<string>? dtoValues ) )
-            {
-                dtoValues = new List<string>();
-                dto.Add( stringValue.SpecId, dtoValues );
-            }
-
-            dtoValues.Add( stringValue.Value );
-        }
-    }
-    static void MapIntSpecFilters( IEnumerable<IntFilterModel>? filterModels, Dictionary<short, List<string>> dto )
-    {
-        if ( filterModels is null )
-            return;
-
-        foreach ( IntFilterModel specFilter in filterModels )
-        {
-            if ( specFilter.FilterValue is null )
-                continue;
-            
-            if ( !dto.TryGetValue( specFilter.SpecId, out List<string>? dtoFilters ) )
-            {
-                dtoFilters = new List<string>();
-                dto.Add( specFilter.SpecId, dtoFilters );
-            }
-
-            dtoFilters.Add( specFilter.FilterValue );
-        }
-    }
-    static void MapDynamicSpecCategories( IEnumerable<DynamicSpecTableCategoryModel>? categoryModels, Dictionary<short, HashSet<short>> dto )
-    {
-        if ( categoryModels is null )
-            return;
-
-        foreach ( DynamicSpecTableCategoryModel specCategory in categoryModels )
-        {
-            if ( !dto.TryGetValue( specCategory.PrimaryCategoryId, out HashSet<short>? tableIdSet ) )
-            {
-                tableIdSet = new HashSet<short>();
-                dto.Add( specCategory.PrimaryCategoryId, tableIdSet );
-            }
-
-            tableIdSet.Add( specCategory.DynamicTableId );
-        }
-    }
-    static void MapDynamicSpecNames( IEnumerable<DynamicSpecTableMetaModel>? tableMetaModel, Dictionary<short, string> specTableNamesDto, Dictionary<short, string> productTableNamesDto, Dictionary<short, string> displayNamesDto )
-    {
-        if ( tableMetaModel is null )
-            return;
-
-        foreach ( DynamicSpecTableMetaModel tableMeta in tableMetaModel )
-        {
-            string productSpecTableName = $"Product_{tableMeta.LookupTableName}";
-
-            specTableNamesDto.TryAdd( tableMeta.LookupTableId, tableMeta.LookupTableName );
-            productTableNamesDto.TryAdd( tableMeta.LookupTableId, productSpecTableName );
-            displayNamesDto.TryAdd( tableMeta.LookupTableId, tableMeta.DisplayName );
-        }
-    }
-    static async Task MapDynamicSpecValues( Dictionary<int, IEnumerable<DynamicSpecValueModel>?> dynamicModels, Dictionary<short, List<string>> dto )
+    static async Task MapMultiSpecValues( Dictionary<int, IEnumerable<SpecLookupValueModel>?> dynamicModels, Dictionary<short, List<string>> dto )
     {
         await Task.Run( () =>
         {
@@ -273,16 +172,108 @@ public class SpecLookupService : ApiService, ISpecLookupService
                 var values = new List<string>();
                 dto.Add( tableId, values );
 
-                foreach ( DynamicSpecValueModel value in dynamicModels[ tableId ]! )
+                foreach ( SpecLookupValueModel value in dynamicModels[ tableId ]! )
                 {
-                    values.Add( value.SpecValue );
+                    values.Add( value.LookupValue );
                 }
             }
         } );
     }
-    
+    static void MapGlobalSpecCategories( IEnumerable<short>? ids, HashSet<short> dto )
+    {
+        if ( ids is null )
+            return;
+
+        foreach ( short globalId in ids )
+        {
+            dto.Add( globalId );
+        }
+    }
+    static void MapSingleSpecCategories( IEnumerable<SpecLookupSingleCategoryModel>? categoryModels, Dictionary<short, HashSet<short>> dto )
+    {
+        if ( categoryModels is null )
+            return;
+        
+        foreach ( SpecLookupSingleCategoryModel specCategory in categoryModels )
+        {
+            if ( !dto.TryGetValue( specCategory.PrimaryCategoryId, out HashSet<short>? tableIdSet ) )
+            {
+                tableIdSet = new HashSet<short>();
+                dto.Add( specCategory.PrimaryCategoryId, tableIdSet );
+            }
+
+            tableIdSet.Add( specCategory.SpecId );
+        }
+    }
+    static void MapSingleSpecNames( IEnumerable<SpecLookupNameModel>? nameModels, Dictionary<short, string> dto )
+    {
+        if ( nameModels is null )
+            return;
+
+        foreach ( SpecLookupNameModel specName in nameModels )
+        {
+            dto.TryAdd( specName.SpecId, specName.SpecName );
+        }
+    }
+    static void MapSingleSpecFilters( IEnumerable<SpecLookupFilterModel>? stringModels, Dictionary<short, List<string>> dto )
+    {
+        if ( stringModels is null )
+            return;
+        
+        List<SpecLookupFilterModel> sortedFilters = stringModels.OrderBy( filter => filter.FilterId ).ToList();
+
+        foreach ( SpecLookupFilterModel stringValue in sortedFilters )
+        {
+            if ( stringValue.SpecValue is null )
+                continue;
+
+            string? specValue = stringValue.SpecValue.ToString();
+
+            if ( string.IsNullOrWhiteSpace( specValue ) )
+                continue;
+
+            if ( !dto.TryGetValue( stringValue.SpecId, out List<string>? dtoValues ) )
+            {
+                dtoValues = new List<string>();
+                dto.Add( stringValue.SpecId, dtoValues );
+            }
+
+            dtoValues.Add( specValue );
+        }
+    }
+    static void MapMultiSpecCategories( IEnumerable<SpecLookupMultiTableCategoryModel>? categoryModels, Dictionary<short, HashSet<short>> dto )
+    {
+        if ( categoryModels is null )
+            return;
+
+        foreach ( SpecLookupMultiTableCategoryModel specCategory in categoryModels )
+        {
+            if ( !dto.TryGetValue( specCategory.PrimaryCategoryId, out HashSet<short>? tableIdSet ) )
+            {
+                tableIdSet = new HashSet<short>();
+                dto.Add( specCategory.PrimaryCategoryId, tableIdSet );
+            }
+
+            tableIdSet.Add( specCategory.TableId );
+        }
+    }
+    static void MapMultiSpecNames( IEnumerable<SpecLookupMultiTableModel>? tableMetaModel, Dictionary<short, string> specTableNamesDto, Dictionary<short, string> productTableNamesDto, Dictionary<short, string> displayNamesDto )
+    {
+        if ( tableMetaModel is null )
+            return;
+
+        foreach ( SpecLookupMultiTableModel tableMeta in tableMetaModel )
+        {
+            string productSpecTableName = $"Product_{tableMeta.TableName}";
+
+            specTableNamesDto.TryAdd( tableMeta.TableId, tableMeta.TableName );
+            productTableNamesDto.TryAdd( tableMeta.TableId, productSpecTableName );
+            displayNamesDto.TryAdd( tableMeta.TableId, tableMeta.DisplayName );
+        }
+    }
+
     // VALIDATE SEARCH REQUEST SPEC FILTERS
-    static void ValidateFilterLookups<T>( Dictionary<short, T>? requestFiltersById, IReadOnlySet<short> globalIds, IReadOnlySet<short>? idsByCategory )
+    static void ValidateSpecLookupFiltersRequest<T>( Dictionary<short, T>? requestFiltersById, IReadOnlySet<short> globalIds, IReadOnlySet<short>? idsByCategory )
     {
         if ( requestFiltersById is null )
             return;
@@ -303,36 +294,36 @@ public class SpecLookupService : ApiService, ISpecLookupService
     }
     
     // GET SPEC FILTERS FOR CLIENT
-    static async Task<SpecFiltersResponse> MapCachedSpecDataToFilters( CachedSpecData specData, short? primaryCategoryId )
+    static async Task<SpecFiltersResponse> MapCachedSpecDataToFilterResponse( CachedSpecData specData, short? primaryCategoryId )
     {
         return await Task.Run( () =>
         {
             var response = new SpecFiltersResponse();
 
-            MapRawFilterValues( response.IntFilters, specData.IntGlobalIds, specData.IntNames, specData.IntFilterValues );
-            MapRawFilterValues( response.StringFilters, specData.StringGlobalIds, specData.StringNames, specData.StringValues );
-            MapRawFilterValues( response.DynamicFilters, specData.DynamicGlobalTableIds, specData.DynamicDisplayNames, specData.DynamicValuesByTable );
-            MapBoolFilters( response.BoolFilters, specData.BoolGlobalIds, specData.BoolNames );
+            MapFiltersResponse( response.IntFilters, specData.IntGlobalIds, specData.IntNames, specData.IntFilterNames );
+            MapFiltersResponse( response.StringFilters, specData.StringGlobalIds, specData.StringNames, specData.StringFilterNames );
+            MapFiltersResponse( response.MultiFilters, specData.MultiGlobalTableIds, specData.MultiDisplayNames, specData.MultiValuesByTable );
+            MapBoolFiltersResponse( response.BoolFilters, specData.BoolGlobalIds, specData.BoolNames );
             
             if ( primaryCategoryId is null )
                 return response;
 
             if ( specData.IntIdsByCategory.TryGetValue( primaryCategoryId.Value, out IReadOnlySet<short>? intIds ) )
-                MapRawFilterValues( response.IntFilters, intIds, specData.IntNames, specData.IntFilterValues );
+                MapFiltersResponse( response.IntFilters, intIds, specData.IntNames, specData.IntFilterNames );
 
             if ( specData.StringIdsByCategory.TryGetValue( primaryCategoryId.Value, out IReadOnlySet<short>? stringIds ) )
-                MapRawFilterValues( response.StringFilters, stringIds, specData.StringNames, specData.StringValues );
+                MapFiltersResponse( response.StringFilters, stringIds, specData.StringNames, specData.StringFilterNames );
 
-            if ( specData.DynamicTablesByCategory.TryGetValue( primaryCategoryId.Value, out IReadOnlySet<short>? dynamicIds ) )
-                MapRawFilterValues( response.DynamicFilters, dynamicIds, specData.DynamicDisplayNames, specData.DynamicValuesByTable );
+            if ( specData.MultiTablesByCategory.TryGetValue( primaryCategoryId.Value, out IReadOnlySet<short>? dynamicIds ) )
+                MapFiltersResponse( response.MultiFilters, dynamicIds, specData.MultiDisplayNames, specData.MultiValuesByTable );
 
             if ( specData.IntIdsByCategory.TryGetValue( primaryCategoryId.Value, out IReadOnlySet<short>? boolIds ) )
-                MapBoolFilters( response.BoolFilters, boolIds, specData.BoolNames );
+                MapBoolFiltersResponse( response.BoolFilters, boolIds, specData.BoolNames );
 
             return response;
         } );
     }
-    static void MapRawFilterValues( List<FilterTableResponse> responses, IReadOnlySet<short> cachedIds, IReadOnlyDictionary<short, string> cachedNames, IReadOnlyDictionary<short, IReadOnlyList<string>> cachedValues )
+    static void MapFiltersResponse( List<SpecFilterTableResponse> responses, IReadOnlySet<short> cachedIds, IReadOnlyDictionary<short, string> cachedNames, IReadOnlyDictionary<short, IReadOnlyList<string>> cachedValues )
     {
         foreach ( short id in cachedIds )
         {
@@ -342,10 +333,10 @@ public class SpecLookupService : ApiService, ISpecLookupService
             if ( !cachedValues.TryGetValue( id, out IReadOnlyList<string>? values ) )
                 continue;
 
-            responses.Add( new FilterTableResponse( id, name, values ) );
+            responses.Add( new SpecFilterTableResponse( id, name, values ) );
         }
     }
-    static void MapBoolFilters( List<string> responses, IReadOnlySet<short> cachedIds, IReadOnlyDictionary<short, string> cachedNames )
+    static void MapBoolFiltersResponse( List<string> responses, IReadOnlySet<short> cachedIds, IReadOnlyDictionary<short, string> cachedNames )
     {
         foreach ( short id in cachedIds )
         {
