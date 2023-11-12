@@ -10,7 +10,51 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="" />
+    <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/AdminCategoryController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/AdminProductController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminSpecLookupRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/IAdminSpecLookupRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/AdminRequest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/Categories/AddCategoryDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/Categories/UpdateCategoryDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/Products/AddUpdateProductDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/Products/AddUpdateProductVariantDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsMulti/RemoveSpecMultiDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsMulti/UpdateSpecMultiDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsSingle/RemoveSpecSingleDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsSingle/UpdateSpecSingleDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminCategoryController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/_AdminController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminFeaturesController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminProductController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminSpecController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/AdminSpecController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/AdminRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/_AdminRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/AdminSpecLookupRepository.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/IAdminSpecLookupRepository.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/AdminControllerRoutes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/AdminControllerRoutes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/AdminRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Categories/AddCategoryRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Categories/UpdateCategoryRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Features/AddOrDeleteFeaturedDealRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Features/AddOrUpdateFeatureRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Features/DeleteFeatureRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Features/UpdateFeatureRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Products/AddProductRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/Products/DeleteProductDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Products/AddProductVariantRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Products/DeleteProductRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Products/DeleteProductVariantRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Products/UpdateProductRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/Products/UpdateProductVariantRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/AddSpecMultiTableRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsMulti/AddSpecMultiDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/AddSpecSingleRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsSingle/AddSpecSingleDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/DeleteSpecMultiTableRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/DeleteSpecSingleRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/SingleSpecType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsSingle/SingleSpecType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/UpdateSpecMultiTableRequest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/UpdateSpecSingleRequest.cs" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -263,7 +307,9 @@
       <workItem from="1699735085337" duration="3827000" />
       <workItem from="1699740188135" duration="8847000" />
       <workItem from="1699749728511" duration="50000" />
-      <workItem from="1699757354200" duration="4781000" />
+      <workItem from="1699757354200" duration="5058000" />
+      <workItem from="1699815058377" duration="1061000" />
+      <workItem from="1699819522864" duration="5682000" />
     </task>
     <servers />
   </component>
