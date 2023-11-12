@@ -106,6 +106,35 @@ public abstract class DapperRepository
     protected const string COL_USER_SALT = "PasswordSalt";
     protected const string COL_USER_DATE = "DateCreated";
     
+    // PARAM CATEGORY
+    protected const string PARAM_CATEGORY_ID = "@CategoryId";
+    protected const string PARAM_CATEGORY_TIER = "@CategoryTier";
+    
+    // PARAM USER
+    protected const string PARAM_USER_ID = "@UserId";
+    protected const string PARAM_USER_NAME = "@Username";
+    protected const string PARAM_USER_EMAIL = "@Email";
+    protected const string PARAM_USER_EMAIL_OR_NAME = "@EmailOrName";
+    protected const string PARAM_USER_PHONE = "@Phone";
+    protected const string PARAM_USER_PASSWORD_HASH = "@PasswordHash";
+    protected const string PARAM_USER_PASSWORD_SALT = "@PasswordSalt";
+    
+    // PARAM SESSION
+    protected const string PARAM_SESSION_ACTIVE = "@SessionActive";
+    protected const string PARAM_SESSION_IP_ADDRESS = "@SessionIpAddress";
+    protected const string PARAM_SESSION_HASH = "@SessionHash";
+    protected const string PARAM_SESSION_SALT = "@SessionSalt";
+    
+    // PARAM PRODUCT
+    protected const string PARAM_PRODUCT_ID = "@ProductId";
+    protected const string PARAM_VARIANT_ID = "@VariantId";
+    
+    // PARAM CART
+    protected const string PARAM_ITEM_QUANTITY = "@CartItemQuantity";
+    protected const string PARAM_CART_PRODUCT_IDS = "@CartProductIds";
+    protected const string PARAM_CART_VARIANT_IDS = "@CartVariantIds";
+    protected const string PARAM_CART_ITEMS = "@CartItems";
+    
     // EXCEPTION CONSTS
     const int MAX_RETRIES = 3;
     const int RETRY_DELAY_MILLISECONDS = 1000;
@@ -195,14 +224,14 @@ public abstract class DapperRepository
         return default;
     }
 
-    static async Task HandleConnectionTransactionDisposal( SqlConnection? connection, DbTransaction? transaction = null )
+    protected static async Task HandleConnectionTransactionDisposal( SqlConnection? connection, DbTransaction? transaction = null )
     {
         if ( transaction != null )
             await transaction.DisposeAsync();
         if ( connection != null )
             await connection.CloseAsync();
     }
-    static async Task HandleConnectionTransactionRollbackDisposal( SqlConnection? connection, DbTransaction? transaction = null )
+    protected static async Task HandleConnectionTransactionRollbackDisposal( SqlConnection? connection, DbTransaction? transaction = null )
     {
         if ( transaction != null )
         {

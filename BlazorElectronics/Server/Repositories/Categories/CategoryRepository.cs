@@ -8,15 +8,11 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 
 public class CategoryRepository : DapperRepository, ICategoryRepository
 {
-    const string STORED_PROCEDURE_GET_CATEGORIES = "Get_Categories";
-    const string STORED_PROCEDURE_GET_DESCRIPTIONS_PRIMARY = "Get_Categories";
-    const string STORED_PROCEDURE_GET_DESCRIPTION = "Get_CategoryDescriptionsPrimary";
+    const string PROCEDURE_GET_CATEGORIES = "Get_Categories";
+    const string PROCEDURE_GET_DESCRIPTIONS_PRIMARY = "Get_Categories";
+    const string PROCEDURE_GET_DESCRIPTION = "Get_CategoryDescriptionsPrimary";
 
-    const string QUERY_PARAM_CATEGORY_ID = "@CategoryId";
-    const string QUERY_PARAM_CATEGORY_TIER = "@CategoryTier";
-
-    public CategoryRepository( DapperContext dapperContext )
-        : base( dapperContext ) { }
+    public CategoryRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<CategoriesModel?> GetCategories()
     {
@@ -39,22 +35,22 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
     public async Task<string?> GetCategoryDescription( int categoryId, int categoryTier )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_CATEGORY_ID, categoryId );
-        dynamicParams.Add( QUERY_PARAM_CATEGORY_TIER, categoryTier );
+        dynamicParams.Add( PARAM_CATEGORY_ID, categoryId );
+        dynamicParams.Add( PARAM_CATEGORY_TIER, categoryTier );
 
         return await TryQueryAsync( GetDescriptionQuery, dynamicParams );
     }
 
     static async Task<SqlMapper.GridReader?> GetCategoriesQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryMultipleAsync( STORED_PROCEDURE_GET_CATEGORIES, commandType: CommandType.StoredProcedure );
+        return await connection.QueryMultipleAsync( PROCEDURE_GET_CATEGORIES, commandType: CommandType.StoredProcedure );
     }
     static async Task<IEnumerable<string>?> GetPrimaryCategoryDescriptionsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryAsync<string>( STORED_PROCEDURE_GET_DESCRIPTIONS_PRIMARY, commandType: CommandType.StoredProcedure );
+        return await connection.QueryAsync<string>( PROCEDURE_GET_DESCRIPTIONS_PRIMARY, commandType: CommandType.StoredProcedure );
     }
     static async Task<string?> GetDescriptionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<string>( STORED_PROCEDURE_GET_DESCRIPTION, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<string>( PROCEDURE_GET_DESCRIPTION, commandType: CommandType.StoredProcedure );
     }
 }

@@ -1,10 +1,10 @@
+using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Models.Users;
 
 namespace BlazorElectronics.Server.Repositories.Sessions;
 
 public interface ISessionRepository
 {
-    Task<UserSession?> CreateSession( UserSession session );
-    Task<UserSession?> GetSession( int userId, string ipAddress );
-    Task<bool> UpdateSession( UserSession update );
+    Task<UserSession?> AddSession( int userId, byte[] sessionHash, byte[] sessionSalt, UserDeviceInfoDto? deviceInfo );
+    Task<UserSession?> GetSession( int userId, UserDeviceInfoDto? deviceInfo );
 }

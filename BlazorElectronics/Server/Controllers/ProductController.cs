@@ -26,7 +26,7 @@ public class ProductController : ControllerBase
     
     // TESTING
     [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
-    public async Task<ActionResult<Reply<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest? searchRequest )
+    public async Task<ActionResult<ApiReply<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest? searchRequest )
     {
         /*searchRequest ??= new ProductSearchFilters();
 
@@ -36,7 +36,7 @@ public class ProductController : ControllerBase
         return BadRequest();
     }
     [HttpGet( "searchQuery/{categoryUrl}" )]
-    public async Task<ActionResult<Reply<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchRequest? searchRequest )
+    public async Task<ActionResult<ApiReply<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchRequest? searchRequest )
     {
         /*if ( searchRequest == null )
             return BadRequest( new Reply<Products_DTO>( "Search request is null!" ) );
@@ -53,85 +53,85 @@ public class ProductController : ControllerBase
     // END TESTING 
 
     [HttpGet( "all" )]
-    public async Task<ActionResult<Reply<Products_DTO>>> GetAllProducts()
+    public async Task<ActionResult<ApiReply<Products_DTO>>> GetAllProducts()
     {
-        Reply<Products_DTO?> reply = await _productService.GetAllProducts();
+        ApiReply<Products_DTO?> reply = await _productService.GetAllProducts();
         return Ok( reply );
     }
 
     [HttpPost( "search-suggestions" )]
-    public async Task<ActionResult<Reply<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )
+    public async Task<ActionResult<ApiReply<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )
     {
-        Reply<bool> validateReply = await ValidateSearchSuggestionRequest( request );
+        ApiReply<bool> validateReply = await ValidateSearchSuggestionRequest( request );
 
         if ( !validateReply.Data )
-            return BadRequest( new Reply<ProductSearchSuggestions_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<ProductSearchSuggestions_DTO>( validateReply.Message ) );
         
         return Ok( await _productService.GetProductSuggestions( request ) );
     }
     [HttpGet( "search/{primaryUrl}" )]
-    public async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, [FromQuery] ProductSearchRequest? filters )
+    public async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, [FromQuery] ProductSearchRequest? filters )
     {
         return await GetProductSearchResponse( filters, primaryUrl );
     }
     [HttpGet( "search/{primaryUrl}/{secondaryUrl}" )]
-    public async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, [FromQuery] ProductSearchRequest? filters )
+    public async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, [FromQuery] ProductSearchRequest? filters )
     {
         return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl );
     }
     [HttpGet( "search/{primaryUrl}/{secondaryUrl}/{tertiaryUrl}" )]
-    public async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, string tertiaryUrl, [FromQuery] ProductSearchRequest? filters )
+    public async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, string tertiaryUrl, [FromQuery] ProductSearchRequest? filters )
     {
         return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl, tertiaryUrl );
     }
     [HttpGet( "details/{productId:int}" )]
-    public async Task<ActionResult<Reply<ProductDetails_DTO?>>> GetProductDetails( int productId )
+    public async Task<ActionResult<ApiReply<ProductDetails_DTO?>>> GetProductDetails( int productId )
     {
         return Ok( await _productService.GetProductDetails( productId ) );
     }
 
-    async Task<ActionResult<Reply<ProductSearchResults_DTO?>>> GetProductSearchResponse( ProductSearchRequest request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> GetProductSearchResponse( ProductSearchRequest request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
-        Reply<CategoryIdMap?> categoryReply = await ValidateCategoryUrls( primaryUrl, secondaryUrl, tertiaryUrl );
+        ApiReply<CategoryIdMap?> categoryReply = await ValidateCategoryUrls( primaryUrl, secondaryUrl, tertiaryUrl );
 
         if ( !categoryReply.Success )
             return BadRequest( categoryReply.Message );
 
-        Reply<bool> validateSpecsReply = await _specLookupService.ValidateProductSearchRequestSpecFilters( request.SpecFilters );
+        ApiReply<bool> validateSpecsReply = await _specLookupService.ValidateProductSearchRequestSpecFilters( request.SpecFilters );
 
         if ( !validateSpecsReply.Success )
             return Ok( validateSpecsReply.Message );
 
-        Reply<CachedSpecData?> specDataReply = await _specLookupService.GetSpecDataDto();
+        ApiReply<CachedSpecData?> specDataReply = await _specLookupService.GetSpecDataDto();
 
         if ( !specDataReply.Success || specDataReply.Data is null )
             return Ok( specDataReply.Message );
 
         return Ok( await _productService.GetProductSearch( categoryReply.Data, request, specDataReply.Data ) );
     }
-    async Task<Reply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
+    async Task<ApiReply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
     {
         if ( string.IsNullOrEmpty( request.SearchText ) )
-            return new Reply<bool>( "SearchText is empty!" );
+            return new ApiReply<bool>( "SearchText is empty!" );
 
         if ( request.SearchText.Length > 64 )
             request.SearchText.Remove( 63 );
 
-        Reply<bool> categoryReply = await _categoryService.ValidateCategoryIdMap( request.CategoryIdMap );
+        ApiReply<bool> categoryReply = await _categoryService.ValidateCategoryIdMap( request.CategoryIdMap );
 
         return categoryReply.Success
-            ? new Reply<bool>( categoryReply.Message )
-            : new Reply<bool>( true, true, categoryReply.Message! );
+            ? new ApiReply<bool>( categoryReply.Message )
+            : new ApiReply<bool>( true, true, categoryReply.Message! );
     }
-    async Task<Reply<CategoryIdMap?>> ValidateCategoryUrls( string? primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    async Task<ApiReply<CategoryIdMap?>> ValidateCategoryUrls( string? primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
         if ( string.IsNullOrEmpty( primaryUrl ) )
-            return new Reply<CategoryIdMap?>( "Invalid CategoryUrl!" );
+            return new ApiReply<CategoryIdMap?>( "Invalid CategoryUrl!" );
 
-        Reply<CategoryIdMap?> categoryReply = await _categoryService.GetCategoryIdMapFromUrl( primaryUrl, secondaryUrl, tertiaryUrl );
+        ApiReply<CategoryIdMap?> categoryReply = await _categoryService.GetCategoryIdMapFromUrl( primaryUrl, secondaryUrl, tertiaryUrl );
 
         return categoryReply.Success
-            ? new Reply<CategoryIdMap?>( categoryReply.Data!, true, categoryReply.Message! )
-            : new Reply<CategoryIdMap?>( categoryReply.Message );
+            ? new ApiReply<CategoryIdMap?>( categoryReply.Data!, true, categoryReply.Message! )
+            : new ApiReply<CategoryIdMap?>( categoryReply.Message );
     }
 }

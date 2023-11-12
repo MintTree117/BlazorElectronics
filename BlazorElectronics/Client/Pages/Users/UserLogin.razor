@@ -20,8 +20,8 @@
     <DataAnnotationsValidator/>
     <div class="mb-3">
         <label for="email">Email</label>
-        <InputText class="form-control" id="email" @bind-Value="_loginRequest.Email"/>
-        <ValidationMessage For="@(()=> _loginRequest.Email)"/>
+        <InputText class="form-control" id="email" @bind-Value="_loginRequest.EmailOrUsername"/>
+        <ValidationMessage For="@(()=> _loginRequest.EmailOrUsername)"/>
     </div>
     <div class="mb-3">
         <label for="password">Password</label>
@@ -55,7 +55,7 @@
     {
         _errorMessage = string.Empty;
         
-        Reply<UserLoginResponse?> response = await UserService.Login( _loginRequest );
+        ApiReply<UserLoginResponse?> response = await UserService.Login( _loginRequest );
 
         if ( !response.Success )
         {

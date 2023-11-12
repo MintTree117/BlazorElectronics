@@ -105,7 +105,7 @@ else {
     {
         _serverMessage = "Loading Product Details...";
 
-        Reply<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
+        ApiReply<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
         _loaded = true;
 
         if ( response.Data == null || !response.Success )

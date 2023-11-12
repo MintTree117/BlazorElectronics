@@ -5,9 +5,9 @@ namespace BlazorElectronics.Server.Services.Categories;
 
 public interface ICategoryService
 {
-    Task<Reply<CategoriesResponse?>> GetCategories();
-    Task<Reply<IReadOnlyList<string>?>> GetMainDescriptions();
-    Task<Reply<string?>> GetDescription( CategoryIdMap? idMap );
-    Task<Reply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null );
-    Task<Reply<bool>> ValidateCategoryIdMap( CategoryIdMap? idMap );
+    Task<ApiReply<CategoriesResponse?>> GetCategories();
+    Task<ApiReply<IReadOnlyList<string>?>> GetMainDescriptions();
+    Task<ApiReply<string?>> GetDescription( CategoryIdMap? idMap );
+    Task<ApiReply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null );
+    Task<ApiReply<bool>> ValidateCategoryIdMap( CategoryIdMap? idMap );
 }

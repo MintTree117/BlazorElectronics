@@ -17,21 +17,21 @@ public class CategoryController : ControllerBase
     }
     
     [HttpGet("categories")]
-    public async Task<ActionResult<Reply<CategoriesResponse>>> GetCategories()
+    public async Task<ActionResult<ApiReply<CategoriesResponse>>> GetCategories()
     {
-        Reply<CategoriesResponse?> response = await _categoryService.GetCategories();
+        ApiReply<CategoriesResponse?> response = await _categoryService.GetCategories();
         return Ok( response );
     }
     [HttpGet( "main-descriptions" )]
-    public async Task<ActionResult<Reply<IReadOnlyList<string?>>>> GetMainDescriptions()
+    public async Task<ActionResult<ApiReply<IReadOnlyList<string?>>>> GetMainDescriptions()
     {
-        Reply<IReadOnlyList<string>?> response = await _categoryService.GetMainDescriptions();
+        ApiReply<IReadOnlyList<string>?> response = await _categoryService.GetMainDescriptions();
         return Ok( response );
     }
     [HttpPost( "get-description" )]
-    public async Task<ActionResult<Reply<string?>>> GetDescription( [FromBody] CategoryIdMap idMap )
+    public async Task<ActionResult<ApiReply<string?>>> GetDescription( [FromBody] CategoryIdMap idMap )
     {
-        Reply<string?> reply = await _categoryService.GetDescription( idMap );
+        ApiReply<string?> reply = await _categoryService.GetDescription( idMap );
         return Ok( reply );
     }
 }

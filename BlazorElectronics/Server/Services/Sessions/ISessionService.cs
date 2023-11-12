@@ -1,7 +1,9 @@
+using BlazorElectronics.Server.Dtos.Users;
+
 namespace BlazorElectronics.Server.Services.Sessions;
 
 public interface ISessionService
 {
-    Task<Reply<string?>> CreateNewSession( int userId, string ipAddress );
-    Task<Reply<string?>> GetExistingSession( int userId, string sessionToken, string ipAddress );
+    Task<ApiReply<string?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo );
+    Task<ApiReply<string?>> GetExistingSession( int userId, string sessionToken, UserDeviceInfoDto? deviceInfo );
 }

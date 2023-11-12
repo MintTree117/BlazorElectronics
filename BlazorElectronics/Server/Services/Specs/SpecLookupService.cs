@@ -20,27 +20,27 @@ public class SpecLookupService : ApiService, ISpecLookupService
     }
     
     // PUBLIC API
-    public async Task<Reply<CachedSpecData?>> GetSpecDataDto()
+    public async Task<ApiReply<CachedSpecData?>> GetSpecDataDto()
     {
         return await TryGetSpecData();
     }
-    public async Task<Reply<SpecFiltersResponse?>> GetSpecFiltersResponse( short? primaryCategoryId = null )
+    public async Task<ApiReply<SpecFiltersResponse?>> GetSpecFiltersResponse( short? primaryCategoryId = null )
     {
-        Reply<CachedSpecData?> dataReply = await TryGetSpecData();
+        ApiReply<CachedSpecData?> dataReply = await TryGetSpecData();
 
         if ( !dataReply.Success || dataReply.Data is null )
-            return new Reply<SpecFiltersResponse?>( dataReply.Message );
+            return new ApiReply<SpecFiltersResponse?>( dataReply.Message );
         
         SpecFiltersResponse filtersResponse = await MapCachedSpecDataToFilterResponse( dataReply.Data, primaryCategoryId );
 
-        return new Reply<SpecFiltersResponse?>( filtersResponse );
+        return new ApiReply<SpecFiltersResponse?>( filtersResponse );
     }
-    public async Task<Reply<bool>> ValidateProductSearchRequestSpecFilters( ProductSearchRequestSpecFilters specFilters, short? primaryCategoryId = null )
+    public async Task<ApiReply<bool>> ValidateProductSearchRequestSpecFilters( ProductSearchRequestSpecFilters specFilters, short? primaryCategoryId = null )
     {
-        Reply<CachedSpecData?> dataReply = await GetSpecDataDto();
+        ApiReply<CachedSpecData?> dataReply = await GetSpecDataDto();
 
         if ( !dataReply.Success || dataReply.Data is null )
-            return new Reply<bool>( NO_DATA_FOUND_MESSAGE );
+            return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
 
         await Task.Run( () =>
         {
@@ -66,69 +66,68 @@ public class SpecLookupService : ApiService, ISpecLookupService
             ValidateSpecLookupFiltersRequest( specFilters.MultiExcludes, specData.MultiGlobalTableIds, dynamicTableCategories );
         } );
 
-        return new Reply<bool>( true );
+        return new ApiReply<bool>( true );
     }
     
     // FETCH SPEC DATA
-    async Task<Reply<CachedSpecData?>> TryGetSpecData()
+    async Task<ApiReply<CachedSpecData?>> TryGetSpecData()
     {
         if ( _cachedSpecData is not null && _cachedSpecData.IsValid( MAX_HOURS_BEFORE_CACHE_INVALIDATION ) )
-            return new Reply<CachedSpecData?>( _cachedSpecData );
+            return new ApiReply<CachedSpecData?>( _cachedSpecData );
 
-        Reply<SpecLookupsModel?> metaReply = await GetSpecLookupMetaModel();
+        ApiReply<SpecLookupsModel?> metaReply = await GetSpecLookupMetaModel();
 
         if ( !metaReply.Success || metaReply.Data is null )
-            return new Reply<CachedSpecData?>( metaReply.Message );
+            return new ApiReply<CachedSpecData?>( metaReply.Message );
 
         SpecDataDto dto = await MapSpecDataModelToDto( metaReply.Data );
+        ApiReply<SpecLookupValuesModel?> valuesReply = await GetDynamicSpecLookupValuesModel( dto.MultiTableNames );
 
-        Reply<SpecLookupValuesModel?> valuesReply = await GetDynamicSpecLookupValuesModel( dto.MultiTableNames );
+        if ( !valuesReply.Success || valuesReply.Data?.ValuesByTable is null )
+            return new ApiReply<CachedSpecData?>( valuesReply.Message );
 
-        if ( !valuesReply.Success || valuesReply.Data?.DyanmicValuesByTableId is null )
-            return new Reply<CachedSpecData?>( valuesReply.Message );
-
-        await MapMultiSpecValues( valuesReply.Data.DyanmicValuesByTableId, dto.MultiValuesByTable );
+        await MapMultiSpecValues( valuesReply.Data, dto.MultiTableNames.Keys, dto.MultiValuesByTable );
 
         _cachedSpecData = new CachedSpecData( dto );
-        return new Reply<CachedSpecData?>( _cachedSpecData );
+        return new ApiReply<CachedSpecData?>( _cachedSpecData );
     }
-    async Task<Reply<SpecLookupsModel?>> GetSpecLookupMetaModel()
+    async Task<ApiReply<SpecLookupsModel?>> GetSpecLookupMetaModel()
     {
         SpecLookupsModel? metaModel;
 
         try
         {
-            metaModel = await _repository.GetSpecLookupMeta();
+            metaModel = await _repository.GetSpecLookupMetaData();
 
             if ( metaModel is null )
-                return new Reply<SpecLookupsModel?>( NO_DATA_FOUND_MESSAGE );
+                return new ApiReply<SpecLookupsModel?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             _logger.LogError( e, e.Message );
-            return new Reply<SpecLookupsModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<SpecLookupsModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        return new Reply<SpecLookupsModel?>( metaModel );
+        return new ApiReply<SpecLookupsModel?>( metaModel );
     }
-    async Task<Reply<SpecLookupValuesModel?>> GetDynamicSpecLookupValuesModel( Dictionary<short, string> dynamicTableNamesById )
+    async Task<ApiReply<SpecLookupValuesModel?>> GetDynamicSpecLookupValuesModel( Dictionary<short, string> multiTableNamesById )
     {
         SpecLookupValuesModel? valuesModel;
 
         try
         {
-            valuesModel = await _repository.GetSpecLookupData( dynamicTableNamesById );
-
-            if ( valuesModel?.DyanmicValuesByTableId is null )
-                return new Reply<SpecLookupValuesModel?>( NO_DATA_FOUND_MESSAGE );
+            valuesModel = await _repository.GetSpecLookupMultiData( multiTableNamesById.Values );
+            
+            if ( valuesModel?.ValuesByTable is null )
+                return new ApiReply<SpecLookupValuesModel?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             _logger.LogError( e, e.Message );
-            return new Reply<SpecLookupValuesModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<SpecLookupValuesModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        return new Reply<SpecLookupValuesModel?>( valuesModel );
+        return new ApiReply<SpecLookupValuesModel?>( valuesModel );
     }
     
     // MAP SPEC DATA
@@ -160,22 +159,34 @@ public class SpecLookupService : ApiService, ISpecLookupService
 
         return dto;
     }
-    static async Task MapMultiSpecValues( Dictionary<int, IEnumerable<SpecLookupValueModel>?> dynamicModels, Dictionary<short, List<string>> dto )
+    static async Task MapMultiSpecValues( SpecLookupValuesModel model, IEnumerable<short> tableIds, Dictionary<short, List<string>> dto )
     {
         await Task.Run( () =>
         {
-            foreach ( short tableId in dynamicModels.Keys )
+            if ( model.ValuesByTable is null )
+                return;
+            
+            int count = 0;
+            List<IEnumerable<string>?> modelList = model.ValuesByTable.ToList();
+            
+            foreach ( short tableId in tableIds )
             {
-                if ( dynamicModels[ tableId ] is null || dto.ContainsKey( tableId ) )
-                    continue;
-
-                var values = new List<string>();
-                dto.Add( tableId, values );
-
-                foreach ( SpecLookupValueModel value in dynamicModels[ tableId ]! )
+                IEnumerable<string>? valueList = modelList[ count ];
+                
+                if ( valueList is null )
                 {
-                    values.Add( value.LookupValue );
+                    count++;
+                    continue;
                 }
+                
+                var returnList = new List<string>();
+                
+                foreach ( string value in valueList )
+                {
+                    returnList.Add( value );
+                }
+                
+                dto.Add( tableId, returnList );
             }
         } );
     }

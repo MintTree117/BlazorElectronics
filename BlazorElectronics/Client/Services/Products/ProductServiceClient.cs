@@ -9,7 +9,7 @@ namespace BlazorElectronics.Client.Services.Products;
 public class ProductServiceClient : IProductServiceClient
 {
     public event Action<string>? ExceptionEvent;
-    public event Action<Reply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
+    public event Action<ApiReply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
     public event Action<string>? ProductSearchNullabillityTest;
 
     string? CategoryUrl;
@@ -116,24 +116,24 @@ public class ProductServiceClient : IProductServiceClient
         return urlBuilder.ToString();
     }
     
-    public async Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText )
+    public async Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText )
     {
         string url = $"{PRODUCT_SEARCH_SUGGESTIONS_URL}{searchText}";
 
         try
         {
-            var response = await _http.GetFromJsonAsync<Reply<ProductSearchSuggestions_DTO?>>( url );
+            var response = await _http.GetFromJsonAsync<ApiReply<ProductSearchSuggestions_DTO?>>( url );
 
             if ( response == null )
-                return new Reply<ProductSearchSuggestions_DTO?>( null, false, "Service response is null!" );
+                return new ApiReply<ProductSearchSuggestions_DTO?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new Reply<ProductSearchSuggestions_DTO?>( null, false, response.Message ??= "Failed to retrieve Search Suggestions; message is null!" )
+                ? new ApiReply<ProductSearchSuggestions_DTO?>( null, false, response.Message ??= "Failed to retrieve Search Suggestions; message is null!" )
                 : response;
         }
         catch ( Exception e )
         {
-            return new Reply<ProductSearchSuggestions_DTO?>( null, false, e.Message );
+            return new ApiReply<ProductSearchSuggestions_DTO?>( null, false, e.Message );
         }
     }
     public async Task SearchProductsByCategory( ProductSearchRequest filters, string primary, string? secondary = null, string? tertiary = null )
@@ -159,39 +159,39 @@ public class ProductServiceClient : IProductServiceClient
             ExceptionEvent?.Invoke( e.Message );
         }
     }
-    public async Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
         try
         {
             string url = $"{PRODUCT_DETAILS_URL}/{productId}";
-            var response = await _http.GetFromJsonAsync<Reply<ProductDetails_DTO?>>( url );
+            var response = await _http.GetFromJsonAsync<ApiReply<ProductDetails_DTO?>>( url );
 
             if ( response == null )
-                return new Reply<ProductDetails_DTO?>( null, false, "Service response is null!" );
+                return new ApiReply<ProductDetails_DTO?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new Reply<ProductDetails_DTO?>( null, false, response.Message ??= "Failed to retrieve Product Details; message is null!" )
+                ? new ApiReply<ProductDetails_DTO?>( null, false, response.Message ??= "Failed to retrieve Product Details; message is null!" )
                 : response;
         }
         catch ( Exception e )
         {
-            return new Reply<ProductDetails_DTO?>( null, false, e.Message );
+            return new ApiReply<ProductDetails_DTO?>( null, false, e.Message );
         }
     }
     
     async Task SearchProducts( string url )
     {
-        var result = await _http.GetFromJsonAsync<Reply<ProductSearchResults_DTO?>>( url );
+        var result = await _http.GetFromJsonAsync<ApiReply<ProductSearchResults_DTO?>>( url );
 
         if ( result == null )
         {
-            ProductSearchChanged?.Invoke( new Reply<ProductSearchResults_DTO?>( null, false, SERVER_RESPONSE_MESSAGE_NULL ) );
+            ProductSearchChanged?.Invoke( new ApiReply<ProductSearchResults_DTO?>( null, false, SERVER_RESPONSE_MESSAGE_NULL ) );
             return;
         }
 
         if ( result.Data == null || !result.Success )
         {
-            ProductSearchChanged?.Invoke( new Reply<ProductSearchResults_DTO?>( null, false, result.Message ?? SERVER_RESPONSE_MESSAGE_FAILURE_NO_MESSAGE ) );
+            ProductSearchChanged?.Invoke( new ApiReply<ProductSearchResults_DTO?>( null, false, result.Message ?? SERVER_RESPONSE_MESSAGE_FAILURE_NO_MESSAGE ) );
             return;
         }
 

@@ -1,3 +1,4 @@
+using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Shared.Outbound.Categories;
 
@@ -6,10 +7,10 @@ namespace BlazorElectronics.Server.Services.Categories;
 public interface ICategoryCache
 {
     Task<List<string>?> GetPrimaryDescriptions();
-    Task<CategoriesResponse?> GetCategoriesResponse();
+    Task<CategoriesDto?> GetCategoriesResponse();
     Task<CategoryUrlMap?> GetUrlMap();
 
     Task SetPrimaryDescriptions( List<string> descriptions );
-    Task SetCategoriesResponse( CategoriesResponse response );
+    Task SetCategoriesResponse( CategoriesDto dto );
     Task SetUrlMap( CategoryUrlMap map );
 }

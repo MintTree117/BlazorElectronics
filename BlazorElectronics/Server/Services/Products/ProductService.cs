@@ -34,11 +34,11 @@ public class ProductService : ApiService, IProductService
         _productDetailsRepository = productDetailsRepository;
     }
 
-    public Task<Reply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
+    public Task<ApiReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
     {
         throw new NotImplementedException();
     }
-    public async Task<Reply<Products_DTO?>> GetAllProducts()
+    public async Task<ApiReply<Products_DTO?>> GetAllProducts()
     {
         /*Task<IEnumerable<Product>?> repoFunction = _productSearchRepository.GetAllProducts();
         Reply<IEnumerable<Product>?> repositoryReply = await ExecuteIoCall( async () => await repoFunction );
@@ -54,40 +54,40 @@ public class ProductService : ApiService, IProductService
 
         return null;
     }
-    public async Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request )
+    public async Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
         Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryTier, request.CategoryIdMap.CategoryId );
-        Reply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
+        ApiReply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
         if ( !repoReply.Success )
-            return new Reply<ProductSearchSuggestions_DTO?>( repoReply.Message );
+            return new ApiReply<ProductSearchSuggestions_DTO?>( repoReply.Message );
 
-        return new Reply<ProductSearchSuggestions_DTO?> {
+        return new ApiReply<ProductSearchSuggestions_DTO?> {
             Data = await MapSearchSuggestionsToDto( repoReply.Data! ),
             Success = true,
             Message = "Found matching results."
         };
     }
-    public async Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, CachedSpecData specMeta )
+    public async Task<ApiReply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, CachedSpecData specMeta )
     {
-        Reply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
+        ApiReply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
 
         if ( !validateReply.Success )
-            return new Reply<ProductSearchResults_DTO?>( validateReply.Message );
+            return new ApiReply<ProductSearchResults_DTO?>( validateReply.Message );
 
         Task<ProductSearch?> repoFunction = _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data!, specMeta );
-        Reply<ProductSearch?> repoReply = await ExecuteIoCall( async () => await repoFunction );
+        ApiReply<ProductSearch?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
         if ( !repoReply.Success )
-            return new Reply<ProductSearchResults_DTO?>( repoReply.Message );
+            return new ApiReply<ProductSearchResults_DTO?>( repoReply.Message );
         
-        return new Reply<ProductSearchResults_DTO?> {
+        return new ApiReply<ProductSearchResults_DTO?> {
             Data = await MapProductSearchToDto( repoReply.Data! ),
             Success = true,
             Message = "Successfully retrieved ProductSearch from repository."
         };
     }
-    public async Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
         Task<ProductDetails_DTO?> cacheFetchFunction = _cache.GetProductDetails( productId );
         var cacheFetchResult = ExecuteIoCall( async () => await cacheFetchFunction );
@@ -99,11 +99,11 @@ public class ProductService : ApiService, IProductService
         {
             dto = await _cache.GetProductDetails( productId );
             if ( dto != null )
-                return new Reply<ProductDetails_DTO?>( dto, true, "Successfully got Product Details from cache." );
+                return new ApiReply<ProductDetails_DTO?>( dto, true, "Successfully got Product Details from cache." );
         }
         catch ( ServiceException e )
         {
-            return new Reply<ProductDetails_DTO?>( e.Message );
+            return new ApiReply<ProductDetails_DTO?>( e.Message );
         }
 
         ProductDetails? model;
@@ -114,7 +114,7 @@ public class ProductService : ApiService, IProductService
         }
         catch ( ServiceException e )
         {
-            return new Reply<ProductDetails_DTO?>( e.Message );
+            return new ApiReply<ProductDetails_DTO?>( e.Message );
         }
 
         dto = await MapProductDetailsToDto( model! );
@@ -125,16 +125,16 @@ public class ProductService : ApiService, IProductService
         }
         catch ( ServiceException e )
         {
-            return new Reply<ProductDetails_DTO?>( dto, true, $"Successfully retrieved ProductDetails from repository, but failed to cache with message: {e.Message}" );
+            return new ApiReply<ProductDetails_DTO?>( dto, true, $"Successfully retrieved ProductDetails from repository, but failed to cache with message: {e.Message}" );
         } 
 
-        return new Reply<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, and cached." );
+        return new ApiReply<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, and cached." );
     }
 
-    static async Task<Reply<ProductSearchRequest>> GetValidatedProductSearchRequest( ProductSearchRequest? request )
+    static async Task<ApiReply<ProductSearchRequest>> GetValidatedProductSearchRequest( ProductSearchRequest? request )
     {
         if ( request == null )
-            return new Reply<ProductSearchRequest>( new ProductSearchRequest(), true, "Validated Search Request." );
+            return new ApiReply<ProductSearchRequest>( new ProductSearchRequest(), true, "Validated Search Request." );
 
         request.Page = Math.Max( request.Page, 0 );
         request.Rows = Math.Clamp( request.Rows, 0, MAX_PRODUCT_LIST_ROWS );

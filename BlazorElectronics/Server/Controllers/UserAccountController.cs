@@ -1,4 +1,4 @@
-using BlazorElectronics.Server.Models.Users;
+using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Inbound.Users;
@@ -13,85 +13,80 @@ public class UserAccountController : UserController
 {
     public UserAccountController( IUserAccountService userAccountService, ISessionService sessionService ) : base( userAccountService, sessionService ) { }
 
-    [HttpGet( "test-login" )]
-    public async Task<ActionResult<Reply<UserLoginResponse>>> TestLogin()
-    {
-        if ( !GetRequestIpAddress( out string? address ) )
-            return BadRequest( new Reply<UserLoginResponse?>( null, false, "Failed to get ip address for client!" ) );
-
-        Reply<UserLogin?> userResponse = await UserAccountService.ValidateUserLogin( "martygrof3708@gmail.com", "Modernwarfare3?" );
-
-        if ( !userResponse.Success )
-            return BadRequest( userResponse );
-
-        Reply<string?> sessionResponse = await SessionService.CreateNewSession( userResponse.Data!.UserId, address! );
-
-        return sessionResponse.Success
-            ? Ok( new Reply<UserLoginResponse>( new UserLoginResponse( userResponse.Data.Username, sessionResponse.Data! ), true, "Successfully logged user in." ) )
-            : BadRequest( sessionResponse );
-    }
-    
     [HttpPost( "register" )]
-    public async Task<ActionResult<Reply<UserLoginResponse>>> Register( [FromBody] UserRegisterRequest request )
+    public async Task<ActionResult<ApiReply<UserLoginResponse>>> Register( [FromBody] UserRegisterRequest request )
     {
-        if ( !GetRequestIpAddress( out string? address ) )
-            return BadRequest( new Reply<UserLoginResponse?>( null, false, "Failed to get ip address for client!" ) );
-
-        Reply<UserLogin?> registerResponse = await UserAccountService.RegisterUser( request );
+        if ( !ValidateRegisterRequest( request ) )
+            return BadRequest( new ApiReply<UserLoginResponse>( BAD_REQUEST_MESSAGE ) );
         
-        if ( !registerResponse.Success )
-            return BadRequest( registerResponse );
-
-        Reply<string?> sessionResponse = await SessionService.CreateNewSession( registerResponse.Data!.UserId, address! );
-
-        return sessionResponse.Success
-            ? Ok( new Reply<UserLoginResponse>( new UserLoginResponse( registerResponse.Data.Username, sessionResponse.Data! ), true, "Successfully logged user in." ) )
-            : BadRequest( new Reply<UserLoginResponse?>( null, false, $"Registered user {request.Email}, but " + ( sessionResponse.Message ??= "failed to get session!" ) ) );
+        ApiReply<UserLoginResponse> loginReply = await GetLogin(
+            await UserAccountService.Register( request.Username, request.Email, request.Password, request.Phone ), GetRequestDeviceInfo() );
+        
+        return Ok( loginReply );
     }
     [HttpPost( "login" )]
-    public async Task<ActionResult<Reply<UserLoginResponse>>> Login( UserLoginRequest request )
+    public async Task<ActionResult<ApiReply<UserLoginResponse>>> Login( [FromBody] UserLoginRequest request )
     {
-        if ( !GetRequestIpAddress( out string? address ) )
-            return BadRequest( new Reply<UserLoginResponse?>( null, false, "Failed to get ip address for client!" ) );
-
-        Reply<UserLogin?> userResponse = await UserAccountService.ValidateUserLogin( request.Email, request.Password );
-
-        if ( !userResponse.Success )
-            return BadRequest( userResponse );
+        if ( !ValidateLoginRequest( request ) )
+            return BadRequest( new ApiReply<UserLoginResponse>( BAD_REQUEST_MESSAGE ) );
         
-        Reply<string?> sessionResponse = await SessionService.CreateNewSession( userResponse.Data!.UserId, address! );
-
-        return sessionResponse.Success
-            ? Ok( new Reply<UserLoginResponse>( new UserLoginResponse( userResponse.Data.Username, sessionResponse.Data! ), true, "Successfully logged user in." ) )
-            : BadRequest( sessionResponse );
+        ApiReply<UserLoginResponse> loginReply = await GetLogin( 
+            await UserAccountService.Login( request.EmailOrUsername, request.Password ), GetRequestDeviceInfo() );
+        
+        return Ok( loginReply );
     }
-    [HttpPost( "authorize" )]
-    public async Task<ActionResult<Reply<bool>>> ValidateUser( [FromBody] SessionApiRequest request )
+    [HttpPost( "validate" )]
+    public async Task<ActionResult<ApiReply<bool>>> ValidateSession( [FromBody] SessionApiRequest request )
     {
-        if ( !ValidateApiRequest( request, out string? ipAddress, out string message ) )
-            return BadRequest( new Reply<bool>( false, false, message ) );
-
-        Reply<ValidatedIdAndSession> validateSessionResponse = await ValidateUserSession( request, ipAddress! );
-
-        return validateSessionResponse.Success
-            ? Ok( new Reply<bool>( true, true, $"Validated user {request.Username}." ) )
-            : BadRequest( new Reply<bool>( true, true, $"Failed to validate user {request.Username}!" ) );
+        if ( !ValidateSessionRequest( request ) )
+            return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
+        
+        ApiReply<ValidatedIdAndSession> validateReply = await ValidateUserSession( request );
+        return Ok( validateReply );
     }
     [HttpPost( "change-password" )]
-    public async Task<ActionResult<Reply<bool>>> ChangePassword( UserChangePasswordRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserChangePasswordRequest request )
     {
-        if ( !ValidateApiRequest( request.ApiRequest, out string? ipAddress, out string message ) )
-            return BadRequest( new Reply<bool>( false, false, message ) );
+        ApiReply<ValidatedIdAndSession> validateReply = await ValidateUserSession( request.ApiRequest );
 
-        Reply<ValidatedIdAndSession> validateSessionResponse = await ValidateUserSession( request.ApiRequest!, ipAddress! );
+        if ( !validateReply.Success || validateReply.Data is null )
+            return BadRequest( new ApiReply<bool>( validateReply.Message ) );
 
-        if ( !validateSessionResponse.Success )
-            return BadRequest( new Reply<bool>( false, false, validateSessionResponse.Message! ) );
+        ApiReply<bool> passwordReply = await UserAccountService.ChangePassword( validateReply.Data.UserId, request.Password );
 
-        Reply<bool> passwordResponse = await UserAccountService.ChangePassword( validateSessionResponse.Data!.UserId, request.Password );
+        return passwordReply.Success
+            ? Ok( passwordReply )
+            : Ok( new ApiReply<bool>( passwordReply.Message ) );
+    }
+    
+    async Task<ApiReply<UserLoginResponse>> GetLogin( ApiReply<UserLoginDto?> loginReply, UserDeviceInfoDto? deviceInfo )
+    {
+        if ( !loginReply.Success || loginReply.Data is null )
+            return new ApiReply<UserLoginResponse>( loginReply.Message );
+        
+        UserLoginDto login = loginReply.Data;
+        ApiReply<string?> sessionReply = await SessionService.CreateSession( loginReply.Data.UserId, deviceInfo );
 
-        return passwordResponse.Success
-            ? Ok( passwordResponse )
-            : BadRequest( passwordResponse );
+        if ( !sessionReply.Success || sessionReply.Data is null )
+            return new ApiReply<UserLoginResponse>( sessionReply.Message );
+
+        var response = new UserLoginResponse( login.Username, login.Email, sessionReply.Data, login.IsAdmin );
+        return new ApiReply<UserLoginResponse>( response );
+    }
+
+    static bool ValidateRegisterRequest( UserRegisterRequest request )
+    {
+        bool validUsername = !string.IsNullOrWhiteSpace( request.Username );
+        bool validEmail = !string.IsNullOrWhiteSpace( request.Email );
+        bool validPassword = !string.IsNullOrWhiteSpace( request.Password );
+
+        return validUsername && validEmail && validPassword;
+    }
+    static bool ValidateLoginRequest( UserLoginRequest request )
+    {
+        bool validEmailOrUsername = !string.IsNullOrWhiteSpace( request.EmailOrUsername );
+        bool validPassword = !string.IsNullOrWhiteSpace( request.Password );
+
+        return validEmailOrUsername && validPassword;
     }
 }

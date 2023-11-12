@@ -7,9 +7,9 @@ namespace BlazorElectronics.Server.Services.Products;
 
 public interface IProductService
 {
-    Task<Reply<string?>> GetProductSearchQueryString( ProductSearchRequest request );
-    Task<Reply<Products_DTO?>> GetAllProducts();
-    Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request );
-    Task<Reply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? idMap, ProductSearchRequest? request, CachedSpecData specMeta );
-    Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId );
+    Task<ApiReply<string?>> GetProductSearchQueryString( ProductSearchRequest request );
+    Task<ApiReply<Products_DTO?>> GetAllProducts();
+    Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request );
+    Task<ApiReply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? idMap, ProductSearchRequest? request, CachedSpecData specMeta );
+    Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

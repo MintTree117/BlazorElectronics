@@ -27,58 +27,58 @@ public class UserServiceClient : IUserServiceClient
         _localStorage = localStorage;
     }
     
-    public async Task<Reply<UserLoginResponse?>> Register( UserRegisterRequest request )
+    public async Task<ApiReply<UserLoginResponse?>> Register( UserRegisterRequest request )
     {
         try
         {
-            Reply<UserSessionData?> localSession = await GetUserSession();
+            ApiReply<UserSessionData?> localSession = await GetUserSession();
 
             if ( !localSession.Success )
-                return new Reply<UserLoginResponse?>( null, false, localSession.Message! );
+                return new ApiReply<UserLoginResponse?>( null, false, localSession.Message! );
 
-            request.ApiRequest = new SessionApiRequest( localSession.Data!.Username, localSession.Data.Token );
+            //request.ApiRequest = new SessionApiRequest( localSession.Data!.Username, localSession.Data.Token );
             
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_REGISTER, request );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<UserLoginResponse>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<UserLoginResponse>>();
 
             if ( serviceResponse == null )
-                return new Reply<UserLoginResponse?>( null, false, "Service response is null!" );
+                return new ApiReply<UserLoginResponse?>( null, false, "Service response is null!" );
 
             await _localStorage.SetItemAsync( SESSION_DATA_KEY, new UserSessionData( serviceResponse.Data!.Username, serviceResponse.Data.SessionToken ) );
             AuthorizationChanged?.Invoke( true );
             
             return (!serviceResponse.Success
-                ? new Reply<UserLoginResponse?>( null, false, serviceResponse.Message ??= "Failed to retrieve Search Suggestions; message is null!" )!
+                ? new ApiReply<UserLoginResponse?>( null, false, serviceResponse.Message ??= "Failed to retrieve Search Suggestions; message is null!" )!
                 : serviceResponse)!;
         }
         catch ( Exception e )
         {
-            return new Reply<UserLoginResponse?>( null, false, e.Message );
+            return new ApiReply<UserLoginResponse?>( null, false, e.Message );
         }
     }
-    public async Task<Reply<UserLoginResponse?>> Login( UserLoginRequest request )
+    public async Task<ApiReply<UserLoginResponse?>> Login( UserLoginRequest request )
     {
         try
         {
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_LOGIN, request );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<UserLoginResponse?>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<UserLoginResponse?>>();
 
             if ( serviceResponse == null )
-                return new Reply<UserLoginResponse?>( null, false, "Service response is null!" );
+                return new ApiReply<UserLoginResponse?>( null, false, "Service response is null!" );
 
             await _localStorage.SetItemAsync( SESSION_DATA_KEY, new UserSessionData( serviceResponse.Data!.Username, serviceResponse.Data.SessionToken ) );
             AuthorizationChanged?.Invoke( true );
             
             return !serviceResponse.Success
-                ? new Reply<UserLoginResponse?>( null, false, serviceResponse.Message ??= "Failed to login user; message is null!" )
+                ? new ApiReply<UserLoginResponse?>( null, false, serviceResponse.Message ??= "Failed to login user; message is null!" )
                 : serviceResponse;
         }
         catch ( Exception e )
         {
-            return new Reply<UserLoginResponse?>( null, false, e.Message );
+            return new ApiReply<UserLoginResponse?>( null, false, e.Message );
         }
     }
-    public async Task<Reply<bool>> Logout()
+    public async Task<ApiReply<bool>> Logout()
     {
         var sessionData = await _localStorage.GetItemAsync<UserSessionData>( SESSION_DATA_KEY );
         await _localStorage.RemoveItemAsync( SESSION_DATA_KEY );
@@ -87,72 +87,72 @@ public class UserServiceClient : IUserServiceClient
         try
         {
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_LOGOUT, new SessionApiRequest( sessionData.Username, sessionData.Token ) );
-            var logoutResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<bool>>();
+            var logoutResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>>();
 
-            return logoutResponse ?? new Reply<bool>( false, false, "Logout response is null!" );
+            return logoutResponse ?? new ApiReply<bool>( false, false, "Logout response is null!" );
         }
         catch ( Exception e )
         {
-            return new Reply<bool>( false, false, e.Message );
+            return new ApiReply<bool>( false, false, e.Message );
         }
 
     }
-    public async Task<Reply<bool>> AuthorizeUser()
+    public async Task<ApiReply<bool>> AuthorizeUser()
     {
-        Reply<UserSessionData?> localSession = await GetUserSession();
+        ApiReply<UserSessionData?> localSession = await GetUserSession();
 
         if ( !localSession.Success )
-            return new Reply<bool>( false, false, localSession.Message! );
+            return new ApiReply<bool>( false, false, localSession.Message! );
 
         try
         {
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_AUTHORIZE, new SessionApiRequest( localSession.Data!.Username, localSession.Data.Token ) );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<bool>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>>();
 
-            return serviceResponse ?? new Reply<bool>( false, false, "Authorization response is null!" );
+            return serviceResponse ?? new ApiReply<bool>( false, false, "Authorization response is null!" );
         }
         catch ( Exception e )
         {
-            return new Reply<bool>( false, false, e.Message );
+            return new ApiReply<bool>( false, false, e.Message );
         }
     }
-    public async Task<Reply<bool>> ChangePassword( UserChangePasswordRequest request )
+    public async Task<ApiReply<bool>> ChangePassword( UserChangePasswordRequest request )
     {
         try
         {
-            Reply<UserSessionData?> localSession = await GetUserSession();
+            ApiReply<UserSessionData?> localSession = await GetUserSession();
 
             if ( !localSession.Success )
-                return new Reply<bool>( false, false, localSession.Message! );
+                return new ApiReply<bool>( false, false, localSession.Message! );
 
             request.ApiRequest = new SessionApiRequest( localSession.Data!.Username, localSession.Data.Token );
             
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_CHANGE_PASSWORD, request );
-            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<Reply<bool>>();
+            var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>>();
 
             if ( serviceResponse == null )
-                return new Reply<bool>( false, false, "Service response is null!" );
+                return new ApiReply<bool>( false, false, "Service response is null!" );
 
             return !serviceResponse.Success
-                ? new Reply<bool>( false, false, serviceResponse.Message ??= "Failed to change user password; message is null!" )
+                ? new ApiReply<bool>( false, false, serviceResponse.Message ??= "Failed to change user password; message is null!" )
                 : serviceResponse;
         }
         catch ( Exception e )
         {
-            return new Reply<bool>( false, false, e.Message );
+            return new ApiReply<bool>( false, false, e.Message );
         }
     }
 
-    async Task<Reply<UserSessionData?>> GetUserSession()
+    async Task<ApiReply<UserSessionData?>> GetUserSession()
     {
         var sessionData = await _localStorage.GetItemAsync<UserSessionData>( SESSION_DATA_KEY );
 
         if ( sessionData == null )
-            return new Reply<UserSessionData?>( null, false, "Session object is null!" );
+            return new ApiReply<UserSessionData?>( null, false, "Session object is null!" );
 
         if ( !sessionData.Validate( out string message ) )
-            return new Reply<UserSessionData?>( null, false, message );
+            return new ApiReply<UserSessionData?>( null, false, message );
 
-        return new Reply<UserSessionData?>( sessionData, true, "Successfully got session data." );
+        return new ApiReply<UserSessionData?>( sessionData, true, "Successfully got session data." );
     }
 }

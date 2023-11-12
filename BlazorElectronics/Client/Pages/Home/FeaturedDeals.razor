@@ -59,13 +59,13 @@ else
     
     string _serverMessage = string.Empty;
     bool _isLoaded = false;
-    FeaturedDeals_DTO? _featuredDeals;
+    FeaturedDealsResponse? _featuredDeals;
 
     protected override async Task OnInitializedAsync()
     {
         _serverMessage = "Loading top deals...";
 
-        Reply<FeaturedDeals_DTO?>? response = await FeaturesService.GetFeaturedDeals();
+        ApiReply<FeaturedDealsResponse?>? response = await FeaturesService.GetFeaturedDeals();
         _isLoaded = true;
         
         if ( response == null )

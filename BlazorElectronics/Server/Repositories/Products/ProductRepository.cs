@@ -8,8 +8,7 @@ namespace BlazorElectronics.Server.Repositories.Products;
 
 public class ProductRepository : DapperRepository, IProductRepository
 {
-    public ProductRepository( DapperContext dapperContext )
-        : base( dapperContext ) { }
+    public ProductRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
     public async Task<IEnumerable<Product>?> GetAllProducts()
     {

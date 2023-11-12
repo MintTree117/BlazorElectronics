@@ -7,12 +7,16 @@ public sealed class UserLoginResponse
         
     }
 
-    public UserLoginResponse( string username, string token )
+    public UserLoginResponse( string username, string email, string token, bool isAdmin = false )
     {
         Username = username;
+        Email = email;
         SessionToken = token;
+        IsAdmin = isAdmin;
     }
     
-    public string Username { get; set; } = string.Empty;
-    public string SessionToken { get; set; } = string.Empty;
+    public string Username { get; } = string.Empty;
+    public string Email { get; } = string.Empty;
+    public string SessionToken { get; } = string.Empty;
+    public bool IsAdmin { get; set; } = false;
 }

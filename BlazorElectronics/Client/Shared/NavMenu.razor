@@ -52,7 +52,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Reply<CategoriesResponse?> response = await CategoryService.GetCategories();
+        ApiReply<CategoriesResponse?> response = await CategoryService.GetCategories();
         _loadedCategories = true;
 
         if ( !response.Success )

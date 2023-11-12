@@ -1,71 +1,58 @@
 using System.Security.Cryptography;
+using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Models.Users;
 using BlazorElectronics.Server.Repositories.Sessions;
 
 namespace BlazorElectronics.Server.Services.Sessions;
 
-public class SessionService : ISessionService
+public class SessionService : ApiService, ISessionService
 {
     readonly ISessionRepository _sessionRepository;
     
-    public SessionService( ISessionRepository sessionRepository )
+    public SessionService( ILogger logger, ISessionRepository sessionRepository ) : base( logger )
     {
         _sessionRepository = sessionRepository;
     }
 
-    public async Task<Reply<string?>> CreateNewSession( int userId, string ipAddress )
+    public async Task<ApiReply<string?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo )
     {
-        var session = new UserSession {
-            UserId = userId,
-            DateCreated = DateTime.Now,
-            LastActivityDate = DateTime.Now,
-            IsActive = true,
-            IpAddress = ipAddress
-        };
-
         CreateSessionToken( out string token, out byte[] hash, out byte[] salt );
-        session.Hash = hash;
-        session.Salt = salt;
 
         try
         {
-            await _sessionRepository.CreateSession( session );
+            UserSession? insertedSession = await _sessionRepository.AddSession( userId, hash, salt, deviceInfo );
+
+            if ( insertedSession is null )
+                return new ApiReply<string?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
-            return new Reply<string?>( e.Message );
+            _logger.LogError( e.Message, e );
+            return new ApiReply<string?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
-        
-        return new Reply<string?>( token, true, $"Successfully created new session for user {userId}." );
+
+        return new ApiReply<string?>( token );
     }
-    public async Task<Reply<string?>> GetExistingSession( int userId, string sessionToken, string ipAddress )
+    public async Task<ApiReply<string?>> GetExistingSession( int userId, string sessionToken, UserDeviceInfoDto? deviceInfo )
     {
         UserSession? session;
 
         try
         {
-            session = await _sessionRepository.GetSession( userId, ipAddress );
+            session = await _sessionRepository.GetSession( userId, deviceInfo );
+
+            if ( session is null )
+                return new ApiReply<string?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
-            return new Reply<string?>( e.Message );
+            _logger.LogError( e.Message, e );
+            return new ApiReply<string?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        if ( !VerifySessionToken( sessionToken, session.Hash, session.Salt ) )
-            return new Reply<string?>( null, false, $"Failed to validate session for User {userId}!" );
-
-        session.LastActivityDate = DateTime.Now;
-
-        try
-        {
-            await _sessionRepository.UpdateSession( session );
-        }
-        catch ( ServiceException e )
-        {
-            return new Reply<string?>( e.Message );
-        }
-
-        return new Reply<string?>( sessionToken, true, $"Successfully retrieved session for user {userId}." );
+        return VerifySessionToken( sessionToken, session.Hash, session.Salt )
+            ? new ApiReply<string?>( sessionToken )
+            : new ApiReply<string?>( NO_DATA_FOUND_MESSAGE );
     }
 
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )

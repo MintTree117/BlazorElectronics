@@ -9,12 +9,11 @@ namespace BlazorElectronics.Server.Repositories.Specs;
 
 public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
 {
-    const string STORED_PROCEDURE_GET_SPEC_TABLE_META = "Get_SpecTableMeta";
+    const string PROCEDURE_GET_SPEC_TABLE_META = "Get_SpecTableMeta";
 
-    public SpecLookupRepository( DapperContext dapperContext )
-        : base( dapperContext ) { }
+    public SpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
-    public async Task<SpecLookupsModel?> GetSpecLookupMeta()
+    public async Task<SpecLookupsModel?> GetSpecLookupMetaData()
     {
         SqlMapper.GridReader? multi = await TryQueryAsync( GetSpecLookupTableMetaQuery );
 
@@ -43,51 +42,45 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
             MultiTables = await multi.ReadAsync() as IEnumerable<SpecLookupMultiTableModel>
         };
     }
-    public async Task<SpecLookupValuesModel?> GetSpecLookupData( Dictionary<short, string> dynamicTableNamesById )
+    public async Task<SpecLookupValuesModel?> GetSpecLookupMultiData( IEnumerable<string> multiTableNames )
     {
-        Dictionary<short, string>.KeyCollection tableIds = dynamicTableNamesById.Keys;
-
-        string dyanmicSql = await BuildSpecDataQuery( tableIds, dynamicTableNamesById );
+        string dyanmicSql = await BuildSpecDataQuery( multiTableNames );
         SqlMapper.GridReader? multi = await TryQueryAsync( GetDynamicSpecLookupsQuery, null, dyanmicSql );
-
+        
         if ( multi is null )
             return null;
 
-        var specData = new SpecLookupValuesModel
+        var models = new List<IEnumerable<string>>();
+
+        while ( !multi.IsConsumed )
         {
-            DyanmicValuesByTableId = new Dictionary<int, IEnumerable<SpecLookupValueModel>?>()
+            models.Add( await multi.ReadAsync<string>() );
+        }
+
+        return new SpecLookupValuesModel()
+        {
+            ValuesByTable = models
         };
-
-        await Task.Run( () =>
-        {
-            foreach ( short tableId in tableIds )
-            {
-                IEnumerable<SpecLookupValueModel>? data = multi.Read<SpecLookupValueModel>();
-                specData.DyanmicValuesByTableId.TryAdd( tableId, data );
-            }
-        } );
-
-        return specData;
     }
     
     static async Task<SqlMapper.GridReader?> GetSpecLookupTableMetaQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryMultipleAsync( STORED_PROCEDURE_GET_SPEC_TABLE_META, commandType: CommandType.StoredProcedure );
+        return await connection.QueryMultipleAsync( PROCEDURE_GET_SPEC_TABLE_META, commandType: CommandType.StoredProcedure );
     }
     static async Task<SqlMapper.GridReader?> GetDynamicSpecLookupsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QueryMultipleAsync( dynamicSql, commandType: CommandType.Text );
     }
     
-    static async Task<string> BuildSpecDataQuery( Dictionary<short, string>.KeyCollection tableIds, Dictionary<short, string> dynamicTableNamesById )
+    static async Task<string> BuildSpecDataQuery( IEnumerable<string> multiTableNames )
     {
         var builder = new StringBuilder();
 
         await Task.Run( () =>
         {
-            foreach ( short tableId in tableIds )
+            foreach ( string tableName in multiTableNames )
             {
-                builder.Append( $"SELECT * FROM {dynamicTableNamesById[ tableId ]};" );
+                builder.Append( $"SELECT * FROM {tableName};" );
             }
         } );
         

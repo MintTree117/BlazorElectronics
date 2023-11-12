@@ -7,7 +7,7 @@ namespace BlazorElectronics.Client.Services.Products;
 public interface IProductServiceClient
 {
     event Action<string>? ExceptionEvent;
-    event Action<Reply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
+    event Action<ApiReply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
     event Action<string>? ProductSearchNullabillityTest;
     
     ProductSearchRequest? SearchRequest { get; set; }
@@ -20,6 +20,6 @@ public interface IProductServiceClient
     string? GetProductSearchUrl();
     
     Task SearchProductsByCategory( ProductSearchRequest filters, string primary, string? secondary = null, string? tertiary = null );
-    Task<Reply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
-    Task<Reply<ProductDetails_DTO?>> GetProductDetails( int productId );
+    Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
+    Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId );
 }

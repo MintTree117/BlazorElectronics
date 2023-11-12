@@ -9,94 +9,100 @@ namespace BlazorElectronics.Server.Repositories.Users;
 
 public class UserRepository : DapperRepository, IUserRepository
 {
-    const string STORED_PROCEDURE_GET_USER_BY_ID = "Get_UserById";
-    const string STORED_PROCEDURE_GET_USER_BY_USERNAME = "Get_UserByUsername";
-    const string STORED_PROCEDURE_GET_USER_BY_EMAIL = "Get_UserByEmail";
-    const string STORED_PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserByNameOrEmail";
-    const string STORED_PROCEDURE_CREATE_USER = "Create_User";
-    const string STORED_PROCEDURE_UPDATE_PASSWORD = "Update_UserPassword";
-    
-    const string QUERY_PARAM_USER_ID = "@UserId";
-    const string QUERY_PARAM_USER_NAME = "@Username";
-    const string QUERY_PARAM_USER_EMAIL = "@Email";
-    const string QUERY_PARAM_USER_HASH = "@Hash";
-    const string QUERY_PARAM_USER_SALT = "@Salt";
-    
-    public UserRepository( DapperContext dapperContext )
-        : base( dapperContext ) { }
+    const string PROCEDURE_GET_USER_BY_ID = "Get_UserById";
+    const string PROCEDURE_GET_USER_BY_USERNAME = "Get_UserByUsername";
+    const string PROCEDURE_GET_USER_BY_EMAIL = "Get_UserByEmail";
+    const string PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserByNameOrEmail";
+    const string PROCEDURE_GET_USER_EXISTS = "Get_UserExists";
+    const string PROCEDURE_ADD_USER = "Create_User";
+    const string PROCEDURE_UPDATE_PASSWORD = "Update_UserPassword";
+
+    public UserRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<User?> GetById( int id )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, id );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_ID, id );
         
-        return await TryQueryAsync( GetByIdQuery, dynamicParams );
+        return await TryQueryAsync( GetByIdQuery, parameters );
     }
     public async Task<User?> GetByUsername( string username )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_NAME, username );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_NAME, username );
 
-        return await TryQueryAsync( GetByUsernameQuery, dynamicParams );
+        return await TryQueryAsync( GetByUsernameQuery, parameters );
     }
     public async Task<User?> GetByEmail( string email )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_EMAIL, email );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_EMAIL, email );
 
-        return await TryQueryAsync( GetByEmailQuery, dynamicParams );
+        return await TryQueryAsync( GetByEmailQuery, parameters );
     }
-    public async Task<UserExists?> CheckIfUserExists( string username, string email )
+    public async Task<User?> GetByEmailOrUsername( string emailOrUsername )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_NAME, username );
-        dynamicParams.Add( QUERY_PARAM_USER_EMAIL, email );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_EMAIL_OR_NAME, emailOrUsername );
 
-        return await TryQueryAsync( CheckIfUserExistsQuery, dynamicParams );
+        return await TryQueryAsync( GetByEmailOrUsernameQuery, parameters );
     }
-    public async Task<User?> AddUser( User user )
+    public async Task<UserExists?> GetUserExists( string username, string email )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_NAME, user.Username );
-        dynamicParams.Add( QUERY_PARAM_USER_EMAIL, user.Email );
-        dynamicParams.Add( QUERY_PARAM_USER_HASH, user.PasswordHash );
-        dynamicParams.Add( QUERY_PARAM_USER_SALT, user.PasswordSalt );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_NAME, username );
+        parameters.Add( PARAM_USER_EMAIL, email );
 
-        return await TryQueryTransactionAsync( AddUserQuery, dynamicParams );
+        return await TryQueryAsync( GetUserExistsQuery, parameters );
     }
-    public async Task<bool> UpdateUserPassword( int id, byte[] hash, byte[] salt )
+    public async Task<User?> AddUser( string username, string email, int? phone, byte[] hash, byte[] salt )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, id );
-        dynamicParams.Add( QUERY_PARAM_USER_HASH, hash );
-        dynamicParams.Add( QUERY_PARAM_USER_SALT, salt );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_NAME, username );
+        parameters.Add( PARAM_USER_EMAIL, email );
+        parameters.Add( PARAM_USER_PHONE, phone );
+        parameters.Add( PARAM_USER_PASSWORD_HASH, hash );
+        parameters.Add( PARAM_USER_PASSWORD_SALT, salt );
 
-        return await TryQueryTransactionAsync( UpdateUserPasswordQuery, dynamicParams );
+        return await TryQueryTransactionAsync( AddUserQuery, parameters );
+    }
+    public async Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt )
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_USER_ID, id );
+        parameters.Add( PARAM_USER_PASSWORD_HASH, hash );
+        parameters.Add( PARAM_USER_PASSWORD_SALT, salt );
+
+        return await TryQueryTransactionAsync( UpdateUserPasswordQuery, parameters );
     }
     
     static async Task<User?> GetByIdQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( STORED_PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> GetByUsernameQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( STORED_PROCEDURE_GET_USER_BY_USERNAME, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_USERNAME, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> GetByEmailQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( STORED_PROCEDURE_GET_USER_BY_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
     }
-    static async Task<UserExists?> CheckIfUserExistsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<User?> GetByEmailOrUsernameQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<UserExists?>( STORED_PROCEDURE_GET_USER_BY_NAME_OR_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_NAME_OR_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+    }
+    static async Task<UserExists?> GetUserExistsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    {
+        return await connection.QuerySingleAsync<UserExists?>( PROCEDURE_GET_USER_EXISTS, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> AddUserQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( STORED_PROCEDURE_CREATE_USER, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<User?>( PROCEDURE_ADD_USER, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> UpdateUserPasswordQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int? result = await connection.ExecuteAsync( STORED_PROCEDURE_UPDATE_PASSWORD, dynamicParams, commandType: CommandType.StoredProcedure );
+        int? result = await connection.ExecuteAsync( PROCEDURE_UPDATE_PASSWORD, dynamicParams, commandType: CommandType.StoredProcedure );
         return result is > 0;
     }
 }

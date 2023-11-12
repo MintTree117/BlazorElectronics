@@ -8,7 +8,7 @@ namespace BlazorElectronics.Server.Repositories.Features;
 
 public class FeatureRepository : DapperRepository, IFeatureRepository
 {
-    const string STORED_PROCEDURE_GET_FEATURES = "Get_Features";
+    const string PROCEDURE_GET_FEATURES = "Get_Features";
     
     public FeatureRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
@@ -20,6 +20,6 @@ public class FeatureRepository : DapperRepository, IFeatureRepository
 
     static async Task<IEnumerable<Feature>?> GetFeaturesQuery( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryAsync<Feature>( sql, STORED_PROCEDURE_GET_FEATURES, commandType: CommandType.StoredProcedure );
+        return await connection.QueryAsync<Feature>( sql, PROCEDURE_GET_FEATURES, commandType: CommandType.StoredProcedure );
     }
 }

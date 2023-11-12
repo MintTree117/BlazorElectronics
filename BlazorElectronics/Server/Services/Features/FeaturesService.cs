@@ -8,11 +8,11 @@ namespace BlazorElectronics.Server.Services.Features;
 public class FeaturesService : IFeaturesService
 {
     readonly IFeaturesCache _cache;
-    public Task<Reply<FeaturedProducts_DTO?>> GetFeaturedProducts()
+    public Task<ApiReply<FeaturedProductsResponse?>> GetFeaturedProducts()
     {
         throw new NotImplementedException();
     }
-    public Task<Reply<FeaturedDeals_DTO?>> GetFeaturedDeals()
+    public Task<ApiReply<FeaturedDealsResponse?>> GetFeaturedDeals()
     {
         throw new NotImplementedException();
     }

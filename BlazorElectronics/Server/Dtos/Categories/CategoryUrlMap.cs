@@ -1,18 +1,33 @@
 using BlazorElectronics.Shared.Mutual;
 
-namespace BlazorElectronics.Server.Models.Categories;
+namespace BlazorElectronics.Server.Dtos.Categories;
 
-public sealed class CategoryUrlMap
+public sealed class CategoryUrlMap : LocallyCachedObject
 {
-    IReadOnlyDictionary<string, short> PrimaryUrlMap { get; set; }
-    IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> SecondaryUrlMap { get; set; }
-    IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> TertiaryUrlMap { get; set; }
+    IReadOnlyDictionary<string, short> PrimaryUrlMap { get; }
+    IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> SecondaryUrlMap { get; }
+    IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> TertiaryUrlMap { get; }
 
-    public CategoryUrlMap( Dictionary<string, short> primary, Dictionary<string, IReadOnlyDictionary<short, short>> secondary, IReadOnlyDictionary<string, IReadOnlyDictionary<short, short>> tertiary )
+    public CategoryUrlMap( Dictionary<string, short> primary, Dictionary<string, Dictionary<short, short>> secondary, Dictionary<string, Dictionary<short, short>> tertiary )
     {
-        PrimaryUrlMap = primary;
-        SecondaryUrlMap = secondary;
-        TertiaryUrlMap = tertiary;
+        PrimaryUrlMap = new Dictionary<string, short>( primary );
+
+        var secondaryTempMaps = new Dictionary<string, IReadOnlyDictionary<short, short>>();
+        var tertiaryTempMaps = new Dictionary<string, IReadOnlyDictionary<short, short>>();
+
+        foreach ( string url in secondary.Keys )
+        {
+            Dictionary<short, short> secondaryDict = secondary[ url ];
+            secondaryTempMaps.Add( url, new Dictionary<short, short>( secondaryDict ) );
+        }
+        foreach ( string url in tertiary.Keys )
+        {
+            Dictionary<short, short> tertiaryDict = tertiary[ url ];
+            tertiaryTempMaps.Add( url, new Dictionary<short, short>( tertiaryDict ) );
+        }
+
+        SecondaryUrlMap = secondaryTempMaps;
+        TertiaryUrlMap = tertiaryTempMaps;
     }
     
     public CategoryIdMap? GetCategoryIdMapFromUrl( List<string> urlCategories )
@@ -38,7 +53,7 @@ public sealed class CategoryUrlMap
 
         if ( !SecondaryUrlMap.TryGetValue( secondaryUrl, out IReadOnlyDictionary<short, short>? secondaryMap ) )
             return null;
-
+        
         return secondaryMap.TryGetValue( primaryId, out short secondaryId )
             ? new CategoryIdMap( 2, secondaryId )
             : null;

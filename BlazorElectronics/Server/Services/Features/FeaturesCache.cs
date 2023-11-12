@@ -11,29 +11,29 @@ public class FeaturesCache : ServiceCache, IFeaturesCache
 
     public FeaturesCache( IDistributedCache memoryCache ) : base( memoryCache ) { }
     
-    public async Task<FeaturedProducts_DTO?> GetFeaturedProducts()
+    public async Task<FeaturedProductsResponse?> GetFeaturedProducts()
     {
         try
         {
-            return await GetFromCache<FeaturedProducts_DTO>( CACHE_KEY_FEATURED_PRODUCTS );
+            return await GetFromCache<FeaturedProductsResponse>( CACHE_KEY_FEATURED_PRODUCTS );
         }
         catch ( Exception e )
         {
             throw new ServiceException( e.Message, e );
         }
     }
-    public async Task<FeaturedDeals_DTO?> GetFeaturedDeals()
+    public async Task<FeaturedDealsResponse?> GetFeaturedDeals()
     {
         try
         {
-            return await GetFromCache<FeaturedDeals_DTO>( CACHE_KEY_FEATURED_DEALS );   
+            return await GetFromCache<FeaturedDealsResponse>( CACHE_KEY_FEATURED_DEALS );   
         }
         catch ( Exception e )
         {
             throw new ServiceException( e.Message, e );
         }
     }
-    public async Task CacheFeaturedProducts( FeaturedProducts_DTO dto )
+    public async Task CacheFeaturedProducts( FeaturedProductsResponse dto )
     {
         try
         {
@@ -46,7 +46,7 @@ public class FeaturesCache : ServiceCache, IFeaturesCache
             throw new ServiceException( e.Message, e );
         }
     }
-    public async Task CacheFeaturedDeals( FeaturedDeals_DTO dto )
+    public async Task CacheFeaturedDeals( FeaturedDealsResponse dto )
     {
         try
         {

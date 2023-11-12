@@ -7,23 +7,23 @@ public enum DtoDefaultMessage
     SUCCESS
 }
 
-public sealed class Reply<T>
+public sealed class ApiReply<T>
 {
     const string MESSAGE_RESPONSE_ERROR = "Failed to produce a proper response message!";
     const string MESSAGE_RESPONSE_NULL = "Service response is null!";
     const string MESSAGE_RESPONSE_FAILURE = "Service returned failure without a message!";
     const string MESSAGE_RESPONSE_SUCCESS = "Service returned success without a message!";
     
-    public Reply()
+    public ApiReply()
     {
         
     }
-    public Reply( string? message )
+    public ApiReply( string? message )
     {
         Success = false;
         Message = message ?? GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
-    public Reply( Reply<T> response )
+    public ApiReply( ApiReply<T> response )
     {
         Data = response.Data;
         
@@ -35,25 +35,25 @@ public sealed class Reply<T>
         if ( string.IsNullOrEmpty( Message ) )
             Message = Success ? GetDefaultMessage( DtoDefaultMessage.SUCCESS ) : GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
-    public Reply( T data )
+    public ApiReply( T data )
     {
         Data = data;
         Success = true;
         Message = string.Empty;
     }
-    public Reply( T? data, bool success, string message )
+    public ApiReply( T? data, bool success, string message )
     {
         Data = data;
         Success = success;
         Message = message;
     }
-    public Reply( T? data, bool success, DtoDefaultMessage defaultMessage )
+    public ApiReply( T? data, bool success, DtoDefaultMessage defaultMessage )
     {
         Data = data;
         Success = success;
         Message = GetDefaultMessage( defaultMessage );
     }
-    public Reply( T? data, bool success, string? recievedMessage, DtoDefaultMessage defaultMessage )
+    public ApiReply( T? data, bool success, string? recievedMessage, DtoDefaultMessage defaultMessage )
     {
         Data = data;
         Success = success;

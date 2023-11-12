@@ -20,8 +20,6 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     //const string PARAM_QUERY_OFFSET = "@Offset";
     //const string PARAM_QUERY_ROWS = "@Rows";
     const string PARAM_SEARCH_TEXT = "@SearchText";
-    const string PARAM_CATEGORY_TIER = $"@{COL_CATEGORY_TIER_ID}";
-    const string PARAM_CATEGORY_ID = $"@{COL_CATEGORY_ID}";
     const string PARAM_SPEC_VALUE_ID = "@filterSpec_";
     const string PARAM_SPEC_ID = "@dynamicSpec_";
     const string PARAM_BOOL = "@boolSpec_";

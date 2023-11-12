@@ -60,7 +60,7 @@ else {
 
         NavigationManager.NavigateTo( string.IsNullOrEmpty( url ) ? "/" : url );
     }
-    void OnProductsChange( Reply<ProductSearchResults_DTO?>? productSearch  )
+    void OnProductsChange( ApiReply<ProductSearchResults_DTO?>? productSearch  )
     {
         StateHasChanged();
         

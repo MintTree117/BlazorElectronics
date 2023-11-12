@@ -50,7 +50,7 @@ else
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
         string? returnUrl = queryString.Get( "returnUrl" );
         
-        Reply<bool> response = await UserService.AuthorizeUser();
+        ApiReply<bool> response = await UserService.AuthorizeUser();
         _loaded = true;
         _isAuthorized = response.Data;
         StateHasChanged();
@@ -64,7 +64,7 @@ else
 
     async Task ChangePassword()
     {
-        Reply<bool> result = await UserService.ChangePassword( _request );
+        ApiReply<bool> result = await UserService.ChangePassword( _request );
         _message = result.Message ??= "Failed to change password; no response message!";
     }
 }

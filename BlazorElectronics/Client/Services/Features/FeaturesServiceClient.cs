@@ -13,40 +13,40 @@ public class FeaturesServiceClient : IFeaturesServiceClient
         _http = http;
     }
     
-    public async Task<Reply<FeaturedProducts_DTO?>?> GetFeaturedProducts()
+    public async Task<ApiReply<FeaturedProductsResponse?>?> GetFeaturedProducts()
     {
         try
         {
-            var response = await _http.GetFromJsonAsync<Reply<FeaturedProducts_DTO?>>( "api/Features/products" );
+            var response = await _http.GetFromJsonAsync<ApiReply<FeaturedProductsResponse?>>( "api/Features/products" );
 
             if ( response == null )
-                return new Reply<FeaturedProducts_DTO?>( null, false, "Service response is null!" );
+                return new ApiReply<FeaturedProductsResponse?>( null, false, "Service response is null!" );
             
             return !response.Success 
-                ? new Reply<FeaturedProducts_DTO?>( null, false, response.Message ??= "Failed to retrieve Featured Products; message is null!" ) 
+                ? new ApiReply<FeaturedProductsResponse?>( null, false, response.Message ??= "Failed to retrieve Featured Products; message is null!" ) 
                 : response;
         }
         catch ( Exception e )
         {
-            return new Reply<FeaturedProducts_DTO?>( null, false, e.Message );
+            return new ApiReply<FeaturedProductsResponse?>( null, false, e.Message );
         }
     }
-    public async Task<Reply<FeaturedDeals_DTO?>?> GetFeaturedDeals()
+    public async Task<ApiReply<FeaturedDealsResponse?>?> GetFeaturedDeals()
     {
         try
         {
-            var response = await _http.GetFromJsonAsync<Reply<FeaturedDeals_DTO?>>( "api/Features/deals" );
+            var response = await _http.GetFromJsonAsync<ApiReply<FeaturedDealsResponse?>>( "api/Features/deals" );
 
             if ( response == null )
-                return new Reply<FeaturedDeals_DTO?>( null, false, "Service response is null!" );
+                return new ApiReply<FeaturedDealsResponse?>( null, false, "Service response is null!" );
             
             return !response.Success 
-                ? new Reply<FeaturedDeals_DTO?>( null, false, response.Message ??= "Failed to retrieve Featured Deals; message is null!" ) 
+                ? new ApiReply<FeaturedDealsResponse?>( null, false, response.Message ??= "Failed to retrieve Featured Deals; message is null!" ) 
                 : response;
         }
         catch ( Exception e )
         {
-            return new Reply<FeaturedDeals_DTO?>( null, false, e.Message );
+            return new ApiReply<FeaturedDealsResponse?>( null, false, e.Message );
         }
     }
 }

@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Caches;
+using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Shared.Outbound.Categories;
 using Microsoft.Extensions.Caching.Distributed;
@@ -31,11 +32,11 @@ public sealed class CategoryCache : ServiceCache, ICategoryCache
             throw new ServiceException( e.Message, e );
         }
     }
-    public async Task<CategoriesResponse?> GetCategoriesResponse()
+    public async Task<CategoriesDto?> GetCategoriesResponse()
     {
         try
         {
-            return await GetFromCache<CategoriesResponse?>( CACHE_KEY_CATEGORIES_RESPONSE );
+            return await GetFromCache<CategoriesDto?>( CACHE_KEY_CATEGORIES_RESPONSE );
         }
         catch ( Exception e )
         {
@@ -67,11 +68,11 @@ public sealed class CategoryCache : ServiceCache, ICategoryCache
             throw new ServiceException( e.Message, e );
         }
     }
-    public async Task SetCategoriesResponse( CategoriesResponse response )
+    public async Task SetCategoriesResponse( CategoriesDto dto )
     {
         try
         {
-            await Cache( CACHE_KEY_CATEGORIES_RESPONSE, response, new DistributedCacheEntryOptions()
+            await Cache( CACHE_KEY_CATEGORIES_RESPONSE, dto, new DistributedCacheEntryOptions()
                 .SetSlidingExpiration( TimeSpan.FromHours( SLIDING_EXPIRATION_CATEGORIES_RESPONSE ) )
                 .SetAbsoluteExpiration( TimeSpan.FromDays( ABSOLUTE_EXPIRATION_CATEGORIES_RESPONSE ) ) );
         }

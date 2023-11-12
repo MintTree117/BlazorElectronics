@@ -14,27 +14,27 @@ public class CategoryServiceClient : ICategoryServiceClient
         _http = http;
     }
 
-    public async Task<Reply<CategoriesResponse?>> GetCategories()
+    public async Task<ApiReply<CategoriesResponse?>> GetCategories()
     {
         if ( Categories != null )
-            return new Reply<CategoriesResponse?>( Categories, true, "Successfully retrieved categories from local stash." );
+            return new ApiReply<CategoriesResponse?>( Categories, true, "Successfully retrieved categories from local stash." );
 
         try
         {
-            var response = await _http.GetFromJsonAsync<Reply<CategoriesResponse?>>( "api/Category/categories" );
+            var response = await _http.GetFromJsonAsync<ApiReply<CategoriesResponse?>>( "api/Category/categories" );
 
             if ( response == null )
-                return new Reply<CategoriesResponse?>( "Category response is null!" );
+                return new ApiReply<CategoriesResponse?>( "Category response is null!" );
             
             if ( response.Data == null )
-                return new Reply<CategoriesResponse?>( response.Message ??= "Failed to retrieve Categories; no response message!" );
+                return new ApiReply<CategoriesResponse?>( response.Message ??= "Failed to retrieve Categories; no response message!" );
 
             Categories = response.Data;
             return response;
         }
         catch ( Exception e )
         {
-            return new Reply<CategoriesResponse?>( e.Message );
+            return new ApiReply<CategoriesResponse?>( e.Message );
         }
     }
 }

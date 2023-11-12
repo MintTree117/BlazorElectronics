@@ -1,4 +1,5 @@
 using System.Net;
+using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Inbound.Users;
@@ -8,6 +9,7 @@ namespace BlazorElectronics.Server.Controllers;
 
 public class UserController : ControllerBase
 {
+    protected const string BAD_REQUEST_MESSAGE = "Bad request!";
     protected readonly IUserAccountService UserAccountService;
     protected readonly ISessionService SessionService;
     
@@ -29,49 +31,37 @@ public class UserController : ControllerBase
         public string? SessionToken { get; set; }
     }
 
-    protected async Task<Reply<ValidatedIdAndSession>> ValidateUserSession( SessionApiRequest request, string ipAddress )
+    protected async Task<ApiReply<ValidatedIdAndSession>> ValidateUserSession( SessionApiRequest? request )
     {
-        Reply<int> idResponse = await UserAccountService.ValidateUserId( request.Username );
-
+        if ( request is null )
+            return new ApiReply<ValidatedIdAndSession>( BAD_REQUEST_MESSAGE );
+        
+        ApiReply<int> idResponse = await UserAccountService.ValidateUserId( request.Email );
+        
         if ( !idResponse.Success )
-            return new Reply<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate UserId for {request.Username}!" );
-
-        Reply<string?> sessionResponse = await SessionService.GetExistingSession( idResponse.Data, request.SessionToken, ipAddress! );
-
-        return !sessionResponse.Success 
-            ? new Reply<ValidatedIdAndSession>( null, false, idResponse.Message ??= $"Failed to validate Session for {request.Username}!" ) 
-            : new Reply<ValidatedIdAndSession>( new ValidatedIdAndSession( idResponse.Data, sessionResponse.Data! ), true, $"Successfully validated session for {request.Username}." );
+            return new ApiReply<ValidatedIdAndSession>( idResponse.Message );
+        
+        ApiReply<string?> sessionResponse = await SessionService.GetExistingSession( idResponse.Data, request.SessionToken, GetRequestDeviceInfo() );
+        
+        return sessionResponse.Success 
+            ? new ApiReply<ValidatedIdAndSession>( sessionResponse.Message ) 
+            : new ApiReply<ValidatedIdAndSession>( new ValidatedIdAndSession( idResponse.Data, sessionResponse.Data! ) );
     }
-
-    protected bool ValidateApiRequest( SessionApiRequest? apiRequest, out string? ipAddress, out string message )
+    
+    protected UserDeviceInfoDto? GetRequestDeviceInfo()
     {
-        ipAddress = null;
-        message = "Failed to validate request!";
-
-        if ( apiRequest == null )
-        {
-            message = "Api request is null!";
-            return false;
-        }
-
-        if ( GetRequestIpAddress( out ipAddress ) )
-            return true;
-
-        message = "Failed to validate ip address for request!";
-        return false;
-
-    }
-    protected bool GetRequestIpAddress( out string? ipAddress )
-    {
-        ipAddress = null;
-
         IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
-
-        if ( address == null )
+        var dto = new UserDeviceInfoDto( address?.ToString() );
+        return dto;
+    }
+    protected static bool ValidateSessionRequest( SessionApiRequest? request )
+    {
+        if ( request is null )
             return false;
+        
+        bool validEmail = !string.IsNullOrWhiteSpace( request.Email );
+        bool validToken = !string.IsNullOrWhiteSpace( request.SessionToken );
 
-        ipAddress = address.ToString();
-
-        return !string.IsNullOrEmpty( ipAddress );
+        return validEmail && validToken;
     }
 }

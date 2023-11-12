@@ -12,7 +12,7 @@
     else
     {
         <ul class="nav flex-column">
-            @foreach ( PrimaryCategoryResponse p in _categories.PrimaryCategories.Values )
+            @foreach ( PrimaryCategoryResponse p in _categories.Primary )
             {
                 <li class="nav-item">
                     <a class="nav-link category-nav-link" href="@p.Url">
@@ -33,7 +33,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Reply<CategoriesResponse?> response = await CategoryService.GetCategories();
+        ApiReply<CategoriesResponse?> response = await CategoryService.GetCategories();
         _loadedCategories = true;
 
         if ( !response.Success )

@@ -12,16 +12,16 @@ public abstract class ApiService
         _logger = logger;
     }
     
-    protected static async Task<Reply<T>> ExecuteIoCall<T>( Func<Task<T>> func )
+    protected static async Task<ApiReply<T>> ExecuteIoCall<T>( Func<Task<T>> func )
     {
         try
         {
             T result = await func();
-            return new Reply<T>( result, true, "Operation successful" );
+            return new ApiReply<T>( result, true, "Operation successful" );
         }
         catch ( ServiceException ex )
         {
-            return new Reply<T>( $"Operation failed: {ex.Message}" );
+            return new ApiReply<T>( $"Operation failed: {ex.Message}" );
         }
     }
 }

@@ -11,36 +11,27 @@ namespace BlazorElectronics.Server.Repositories.Cart;
 
 public class CartRepository : DapperRepository, ICartRepository
 {
-    const string QUERY_PARAM_USER_ID = "@UserId";
-    const string QUERY_PARAM_PRODUCT_ID = "@ProductId";
-    const string QUERY_PARAM_VARIANT_ID = "@VariantSubId";
-    const string QUERY_PARAM_ITEM_QUANTITY = "@Quantity";
-    const string QUERY_PARAM_PRODUCT_ID_LIST = "@ProductIdList";
-    const string QUERY_PARAM_VARIANT_ID_LIST = "@VariantIdList";
-    const string QUERY_PARAM_CART_ITEMS = "@CartItems";
-    
-    const string STORED_PROCEDURE_COUNT_CART_ITEMS = "Count_CartItems";
-    const string STORED_PROCEDURE_GET_CART_ITEMS = "Get_CartItems";
-    const string STORED_PROCEDURE_GET_CART_PRODUCTS = "Get_CartProducts";
-    const string STORED_PROCEDURE_ADD_CART_ITEMS = "Add_CartItems";
-    const string STORED_PROCEDURE_ADD_CART_ITEM = "Add_CartItem";
-    const string STORED_PROCEDURE_UPDATE_CART_ITEM_QUANTITY = "Update_CartItemQuantity";
-    const string STORED_PROCEDURE_REMOVE_CART_ITEM = "Remove_CartItem";
+    const string PROCEDURE_COUNT_CART_ITEMS = "Count_CartItems";
+    const string PROCEDURE_GET_CART_ITEMS = "Get_CartItems";
+    const string PROCEDURE_GET_CART_PRODUCTS = "Get_CartProducts";
+    const string PROCEDURE_ADD_CART_ITEMS = "Add_CartItems";
+    const string PROCEDURE_ADD_CART_ITEM = "Add_CartItem";
+    const string PROCEDURE_UPDATE_CART_ITEM_QUANTITY = "Update_CartItemQuantity";
+    const string PROCEDURE_REMOVE_CART_ITEM = "Remove_CartItem";
 
-    public CartRepository( DapperContext dapperContext )
-        : base( dapperContext ) { }
+    public CartRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<int?> CountCartItems( int userId )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, userId );
+        dynamicParams.Add( PARAM_USER_ID, userId );
 
         return await TryQueryAsync( CountCartItemsQuery, dynamicParams );
     }
     public async Task<IEnumerable<CartItem>?> GetCartItems( int userId )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, userId );
+        dynamicParams.Add( PARAM_USER_ID, userId );
 
         return await TryQueryAsync( GetCartItemsQuery, dynamicParams );
     }
@@ -52,63 +43,63 @@ public class CartRepository : DapperRepository, ICartRepository
         await BuildCartProductParams( productIdBuilder, variantIdBuilder, productIds, variantIds );
 
         var dynamicParameters = new DynamicParameters();
-        dynamicParameters.Add( QUERY_PARAM_PRODUCT_ID_LIST, productIdBuilder.ToString() );
-        dynamicParameters.Add( QUERY_PARAM_VARIANT_ID_LIST, variantIdBuilder.ToString() );
+        dynamicParameters.Add( PARAM_CART_PRODUCT_IDS, productIdBuilder.ToString() );
+        dynamicParameters.Add( PARAM_CART_VARIANT_IDS, variantIdBuilder.ToString() );
 
         return await TryQueryAsync( GetCartProductsQuery, dynamicParameters );
     }
     public async Task<bool> AddCartItems( List<CartItem> items )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_CART_ITEMS, items );
+        dynamicParams.Add( PARAM_CART_ITEMS, items );
 
         return await TryQueryTransactionAsync( AddCartItemsQuery, dynamicParams );
     }
     public async Task<bool> AddCartItem( CartItem item )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, item.UserId );
-        dynamicParams.Add( QUERY_PARAM_PRODUCT_ID, item.ProductId );
-        dynamicParams.Add( QUERY_PARAM_VARIANT_ID, item.VariantId );
-        dynamicParams.Add( QUERY_PARAM_ITEM_QUANTITY, item.Quantity );
+        dynamicParams.Add( PARAM_USER_ID, item.UserId );
+        dynamicParams.Add( PARAM_PRODUCT_ID, item.ProductId );
+        dynamicParams.Add( PARAM_VARIANT_ID, item.VariantId );
+        dynamicParams.Add( PARAM_ITEM_QUANTITY, item.Quantity );
 
         return await TryQueryTransactionAsync( AddCartItemQuery, dynamicParams );
     }
     public async Task<bool> UpdateCartItemQuantity( CartItem item )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, item.UserId );
-        dynamicParams.Add( QUERY_PARAM_PRODUCT_ID, item.ProductId );
-        dynamicParams.Add( QUERY_PARAM_VARIANT_ID, item.VariantId );
-        dynamicParams.Add( QUERY_PARAM_ITEM_QUANTITY, item.Quantity );
+        dynamicParams.Add( PARAM_USER_ID, item.UserId );
+        dynamicParams.Add( PARAM_PRODUCT_ID, item.ProductId );
+        dynamicParams.Add( PARAM_VARIANT_ID, item.VariantId );
+        dynamicParams.Add( PARAM_ITEM_QUANTITY, item.Quantity );
 
         return await TryQueryTransactionAsync( UpdateCartItemQuantityQuery, dynamicParams );
     }
     public async Task<bool> RemoveCartItem( CartItem item )
     {
         var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( QUERY_PARAM_USER_ID, item.UserId );
-        dynamicParams.Add( QUERY_PARAM_PRODUCT_ID, item.ProductId );
-        dynamicParams.Add( QUERY_PARAM_VARIANT_ID, item.VariantId );
-        dynamicParams.Add( QUERY_PARAM_ITEM_QUANTITY, item.Quantity );
+        dynamicParams.Add( PARAM_USER_ID, item.UserId );
+        dynamicParams.Add( PARAM_PRODUCT_ID, item.ProductId );
+        dynamicParams.Add( PARAM_VARIANT_ID, item.VariantId );
+        dynamicParams.Add( PARAM_ITEM_QUANTITY, item.Quantity );
         
         return await TryQueryTransactionAsync( RemoveCartItemQuery, dynamicParams );
     }
 
     static async Task<int?> CountCartItemsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<int>( STORED_PROCEDURE_COUNT_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+        return await connection.QuerySingleAsync<int>( PROCEDURE_COUNT_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
     }
     static async Task<IEnumerable<CartItem>?> GetCartItemsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryAsync<CartItem>( STORED_PROCEDURE_GET_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+        return await connection.QueryAsync<CartItem>( PROCEDURE_GET_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
     }
     static async Task<IEnumerable<Product>?> GetCartProductsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         var productDictionary = new Dictionary<int, Product>();
         
         await connection.QueryAsync<Product, ProductVariant, Product>
-        ( STORED_PROCEDURE_GET_CART_PRODUCTS, ( product, variant ) =>
+        ( PROCEDURE_GET_CART_PRODUCTS, ( product, variant ) =>
             {
                 if ( !productDictionary.TryGetValue( product.ProductId, out Product? productEntry ) )
                 {
@@ -127,22 +118,22 @@ public class CartRepository : DapperRepository, ICartRepository
     }
     static async Task<bool> AddCartItemsQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int result = await connection.ExecuteAsync( STORED_PROCEDURE_ADD_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
+        int result = await connection.ExecuteAsync( PROCEDURE_ADD_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
     static async Task<bool> AddCartItemQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int result = await connection.ExecuteAsync( STORED_PROCEDURE_ADD_CART_ITEM, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
+        int result = await connection.ExecuteAsync( PROCEDURE_ADD_CART_ITEM, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
     static async Task<bool> UpdateCartItemQuantityQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int result = await connection.ExecuteAsync( STORED_PROCEDURE_UPDATE_CART_ITEM_QUANTITY, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
+        int result = await connection.ExecuteAsync( PROCEDURE_UPDATE_CART_ITEM_QUANTITY, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
     static async Task<bool> RemoveCartItemQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int result = await connection.ExecuteAsync( STORED_PROCEDURE_REMOVE_CART_ITEM, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
+        int result = await connection.ExecuteAsync( PROCEDURE_REMOVE_CART_ITEM, dynamicParams, commandType: CommandType.StoredProcedure, transaction: transaction ).ConfigureAwait( false );
         return result == 1;
     }
     

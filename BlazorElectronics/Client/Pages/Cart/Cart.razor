@@ -76,7 +76,7 @@ else
     
     async Task LoadCart()
     {
-        Reply<Cart_DTO?> response = await CartService.GetCart();
+        ApiReply<Cart_DTO?> response = await CartService.GetCart();
 
         if ( !response.Success )
             _serverMessage = response.Message ??= "Failed to get cart! No response message!";

@@ -1,124 +1,135 @@
 using System.Security.Cryptography;
 using System.Text;
+using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Models.Users;
 using BlazorElectronics.Server.Repositories.Users;
-using BlazorElectronics.Shared.Inbound.Users;
 
 namespace BlazorElectronics.Server.Services.Users;
 
-public class UserAccountService : IUserAccountService
+public class UserAccountService : ApiService, IUserAccountService
 {
+    const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
+    
     readonly IUserRepository _userRepository;
 
-    public UserAccountService( IUserRepository userRepository )
+    public UserAccountService( ILogger logger, IUserRepository userRepository ) : base( logger )
     {
         _userRepository = userRepository;
     }
 
-    public async Task<Reply<UserLogin?>> ValidateUserLogin( string email, string password )
+    public async Task<ApiReply<UserLoginDto?>> Login( string emailOrUsername, string password )
+    {
+        User? user;
+
+        try
+        {
+            user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
+            
+            if ( user is null )
+                return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            _logger.LogError( e.Message, e );
+            return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+
+        return VerifyPasswordHash( password, user.PasswordHash, user.PasswordSalt )
+            ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.Id, user.Email, user.Username, user.IsAdmin ) )
+            : new ApiReply<UserLoginDto?>( BAD_PASSWORD_MESSAGE );
+    }
+    public async Task<ApiReply<UserLoginDto?>> Register( string username, string email, string password, int? phone )
+    {
+        try
+        {
+            UserExists? userExists = await _userRepository.GetUserExists( username, email );
+
+            if ( userExists is not null )
+                return new ApiReply<UserLoginDto?>( GetUserExistsMessage( userExists, username, email ) );
+        }
+        catch ( ServiceException e )
+        {
+            _logger.LogError( e.Message, e );
+            return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+
+        CreatePasswordHash( password, out byte[] hash, out byte[] salt );
+        User? insertedUser;
+
+        try
+        {
+            insertedUser = await _userRepository.AddUser( username, email, phone, hash, salt );
+
+            if ( insertedUser is null )
+                return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            _logger.LogError( e.Message, e );
+            return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+
+        return new ApiReply<UserLoginDto?>( 
+            new UserLoginDto( insertedUser.Id, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
+    }
+    public async Task<ApiReply<int>> ValidateUserId( string email )
     {
         User? user;
 
         try
         {
             user = await _userRepository.GetByEmail( email );
+
+            if ( user is null )
+                return new ApiReply<int>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
-            return new Reply<UserLogin?>( e.Message );
+            _logger.LogError( e.Message, e );
+            return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
-        
-        return !VerifyPasswordHash( password, user!.PasswordHash, user.PasswordSalt ) 
-            ? new Reply<UserLogin?>( null, false, "Incorrect password!" ) 
-            : new Reply<UserLogin?>( new UserLogin( user.Id, user.Username ), true, $"Successfully validated user {email}." );
+
+        return new ApiReply<int>( user.Id );
     }
-    public async Task<Reply<UserLogin?>> RegisterUser( UserRegisterRequest request )
+    public async Task<ApiReply<bool>> ChangePassword( int userId, string newPassword )
     {
-        UserExists? userExists;
-
-        try
-        {
-            userExists = await _userRepository.CheckIfUserExists( request.Username, request.Email );
-            if ( userExists != null )
-                return new Reply<UserLogin?>( GetUserExistsMessage( userExists, request ) );
-        }
-        catch ( ServiceException e )
-        {
-            return new Reply<UserLogin?>( e.Message );
-        }
-
-        CreatePasswordHash( request.Password, out byte[] hash, out byte[] salt );
-
-        var newUserModel = new User {
-            Username = request.Username,
-            Email = request.Email,
-            PasswordHash = hash,
-            PasswordSalt = salt,
-            DateCreated = DateTime.Now
-        };
-
-        User? insertedUser = null;
-
-        try
-        {
-            await _userRepository.AddUser( newUserModel );
-        }
-        catch ( ServiceException e )
-        {
-            return new Reply<UserLogin?>( e.Message );
-        }
-
-        return new Reply<UserLogin?>( new UserLogin( insertedUser!.Id, insertedUser.Username ), true, $"Successfully registered user {insertedUser.Username}" );
-    }
-    public async Task<Reply<int>> ValidateUserId( string username )
-    {
-        User? user = null;
-
-        try
-        {
-            user = await _userRepository.GetByUsername( username );
-        }
-        catch ( ServiceException e )
-        {
-            return new Reply<int>( e.Message );
-        }
-
-        return new Reply<int>( user!.Id, false, $"Validated user {username}" );
-    }
-    public async Task<Reply<bool>> ChangePassword( int userId, string newPassword )
-    {
-        User? user = null;
+        User? user;
 
         try
         {
             user = await _userRepository.GetById( userId );
+
+            if ( user is null )
+                return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
-            return new Reply<bool>( e.Message );
+            _logger.LogError( e.Message, e );
+            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
         CreatePasswordHash( newPassword, out byte[] hash, out byte[] salt );
 
-        user!.PasswordHash = hash;
+        user.PasswordHash = hash;
         user.PasswordSalt = salt;
 
         try
         {
-            await _userRepository.UpdateUserPassword( userId, hash, salt );
+            bool success = await _userRepository.UpdatePassword( userId, hash, salt );
+
+            return new ApiReply<bool>( success );
         }
         catch ( ServiceException e )
         {
-            return new Reply<bool>( e.Message );
+            _logger.LogError( e.Message, e );
+            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
-
-        return new Reply<bool>( true, true, $"Successfully updated password for user {user.Username}." );
     }
 
     static void CreatePasswordHash( string password, out byte[] hash, out byte[] salt )
     {
         var hmac = new HMACSHA512();
-        var passwordBytes = System.Text.Encoding.UTF8.GetBytes( password );
+        byte[] passwordBytes = Encoding.UTF8.GetBytes( password );
 
         salt = hmac.Key;
         hash = hmac.ComputeHash( passwordBytes );
@@ -128,21 +139,21 @@ public class UserAccountService : IUserAccountService
     static bool VerifyPasswordHash( string password, byte[] hash, byte[] salt )
     {
         var hmac = new HMACSHA512( salt );
-        byte[] computedHash = hmac.ComputeHash( System.Text.Encoding.UTF8.GetBytes( password ) );
+        byte[] computedHash = hmac.ComputeHash( Encoding.UTF8.GetBytes( password ) );
         return computedHash.SequenceEqual( hash );
     }
-    static string GetUserExistsMessage( UserExists existsObj, UserRegisterRequest request )
+    static string GetUserExistsMessage( UserExists existsObj, string username, string email )
     {
         var messageBuilder = new StringBuilder();
         messageBuilder.Append( "User already exists with " );
         
         if ( existsObj.EmailExists )
         {
-            messageBuilder.Append( $"email ({request.Email})" );
+            messageBuilder.Append( $"email ({email})" );
 
             if ( existsObj.UsernameExists )
             {
-                messageBuilder.Append( $" and username ({request.Username})!" );
+                messageBuilder.Append( $" and username ({username})!" );
                 return messageBuilder.ToString();
             }
 
@@ -150,7 +161,7 @@ public class UserAccountService : IUserAccountService
             return messageBuilder.ToString();
         }
 
-        messageBuilder.Append( $"username ({request.Username})!" );
+        messageBuilder.Append( $"username ({username})!" );
         return messageBuilder.ToString();
     }
 }
