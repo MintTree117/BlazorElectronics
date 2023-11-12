@@ -2,6 +2,12 @@ namespace BlazorElectronics.Shared.Inbound.Admin.SpecLookups;
 
 public sealed class DeleteSpecSingleRequest : AdminRequest
 {
-    public SingleSpecLookupType SpecType { get; set; }
-    public int SpecId { get; set; }
+    public DeleteSpecSingleRequest( SingleSpecLookupType specType, int specId )
+    {
+        SpecType = specType;
+        SpecId = specId;
+    }
+    
+    public SingleSpecLookupType SpecType { get; }
+    public int SpecId { get; }
 }

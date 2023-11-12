@@ -7,6 +7,10 @@ namespace BlazorElectronics.Server.Services.Sessions;
 
 public class SessionService : ApiService, ISessionService
 {
+    const int MAX_SESSION_HOURS = 48;
+    const string SESSION_EXPIRED_MESSAGE = "Session has expired. Please login again.";
+    const string INVALID_SESSION_TOKEN_MESSAGE = "Invalid session token. Try loging in again.";
+    
     readonly ISessionRepository _sessionRepository;
     
     public SessionService( ILogger logger, ISessionRepository sessionRepository ) : base( logger )
@@ -33,7 +37,7 @@ public class SessionService : ApiService, ISessionService
 
         return new ApiReply<string?>( token );
     }
-    public async Task<ApiReply<string?>> GetExistingSession( int userId, string sessionToken, UserDeviceInfoDto? deviceInfo )
+    public async Task<ApiReply<bool>> ValidateSession( int userId, string sessionToken, UserDeviceInfoDto? deviceInfo )
     {
         UserSession? session;
 
@@ -42,17 +46,20 @@ public class SessionService : ApiService, ISessionService
             session = await _sessionRepository.GetSession( userId, deviceInfo );
 
             if ( session is null )
-                return new ApiReply<string?>( NO_DATA_FOUND_MESSAGE );
+                return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
+
+            if ( !session.IsValid( MAX_SESSION_HOURS ) )
+                return new ApiReply<bool>( SESSION_EXPIRED_MESSAGE );
         }
         catch ( ServiceException e )
         {
             _logger.LogError( e.Message, e );
-            return new ApiReply<string?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
         return VerifySessionToken( sessionToken, session.Hash, session.Salt )
-            ? new ApiReply<string?>( sessionToken )
-            : new ApiReply<string?>( NO_DATA_FOUND_MESSAGE );
+            ? new ApiReply<bool>( true )
+            : new ApiReply<bool>( INVALID_SESSION_TOKEN_MESSAGE );
     }
 
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )

@@ -26,7 +26,7 @@ public class AdminSpecLookupRepository : AdminRepository, IAdminSpecLookupReposi
     public AdminSpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
 
-    public async Task<bool> AddSpecSingle( SingleSpecLookupType specType, string specName, Dictionary<int, object>? filterValuesById, List<int>? primaryCategories, bool isGlobal )
+    public async Task<bool> AddSpecSingle( SingleSpecLookupType specType, string specName, Dictionary<int, object>? filterValuesById, List<int>? primaryCategories, bool? isGlobal )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_NAME, specName );
@@ -36,7 +36,7 @@ public class AdminSpecLookupRepository : AdminRepository, IAdminSpecLookupReposi
 
         return await ExecuteAdminTransaction( GetSingleProcedure( specType, PROCEDURE_ADD_SINGLE ), parameters );
     }
-    public async Task<bool> UpdateSpecSingle( SingleSpecLookupType specType, int specId, string specName, Dictionary<int, object>? filterValuesById, List<int> primaryCategories, bool isGlobal )
+    public async Task<bool> UpdateSpecSingle( SingleSpecLookupType specType, int specId, string specName, Dictionary<int, object>? filterValuesById, List<int>? primaryCategories, bool? isGlobal )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_ID, specId );
@@ -54,7 +54,7 @@ public class AdminSpecLookupRepository : AdminRepository, IAdminSpecLookupReposi
 
         return await ExecuteAdminTransaction( GetSingleProcedure( specType, PROCEDURE_DELETE_SINGLE ), parameters );
     }
-    public async Task<bool> AddSpecMultiTable( string tableName, List<string> multiValues, List<int> primaryCategories, bool isGlobal )
+    public async Task<bool> AddSpecMultiTable( string tableName, List<string>? multiValues, List<int>? primaryCategories, bool? isGlobal )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_TABLE_NAME, tableName );
@@ -64,7 +64,7 @@ public class AdminSpecLookupRepository : AdminRepository, IAdminSpecLookupReposi
 
         return await ExecuteAdminTransaction( PROCEDURE_ADD_MULTI_TABLE, parameters );
     }
-    public async Task<bool> UpdateSpecMultiTable( int tableId, string tableName, List<string> multiValues, List<int> primaryCategories, bool isGlobal )
+    public async Task<bool> UpdateSpecMultiTable( int tableId, string tableName, List<string>? multiValues, List<int>? primaryCategories, bool? isGlobal )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_TABLE_ID, tableId );

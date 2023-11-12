@@ -9,6 +9,7 @@ namespace BlazorElectronics.Server.Services.Users;
 public class UserAccountService : ApiService, IUserAccountService
 {
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
+    const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
     
     readonly IUserRepository _userRepository;
 
@@ -71,6 +72,29 @@ public class UserAccountService : ApiService, IUserAccountService
 
         return new ApiReply<UserLoginDto?>( 
             new UserLoginDto( insertedUser.Id, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
+    }
+    public async Task<ApiReply<int>> VerifyAdminId( string email )
+    {
+        User? admin;
+
+        try
+        {
+            admin = await _userRepository.GetByEmail( email );
+
+            if ( admin is null )
+                return new ApiReply<int>( NO_DATA_FOUND_MESSAGE );
+
+            if ( !admin.IsAdmin )
+                return new ApiReply<int>( NOT_ADMIN_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            _logger.LogError( e.Message, e );
+            return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+
+        return new ApiReply<int>( admin.Id );
+        
     }
     public async Task<ApiReply<int>> ValidateUserId( string email )
     {

@@ -41,18 +41,18 @@ public class UserAccountController : UserController
         if ( !ValidateSessionRequest( request ) )
             return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
         
-        ApiReply<ValidatedIdAndSession> validateReply = await ValidateUserSession( request );
-        return Ok( validateReply );
+        ApiReply<int> sessionReply = await ValidateUserSession( request );
+        return Ok( sessionReply );
     }
     [HttpPost( "change-password" )]
     public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserChangePasswordRequest request )
     {
-        ApiReply<ValidatedIdAndSession> validateReply = await ValidateUserSession( request.ApiRequest );
+        ApiReply<int> validateReply = await ValidateUserSession( request.ApiRequest );
 
-        if ( !validateReply.Success || validateReply.Data is null )
+        if ( !validateReply.Success )
             return BadRequest( new ApiReply<bool>( validateReply.Message ) );
 
-        ApiReply<bool> passwordReply = await UserAccountService.ChangePassword( validateReply.Data.UserId, request.Password );
+        ApiReply<bool> passwordReply = await UserAccountService.ChangePassword( validateReply.Data, request.Password );
 
         return passwordReply.Success
             ? Ok( passwordReply )

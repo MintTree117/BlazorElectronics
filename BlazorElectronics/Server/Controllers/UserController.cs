@@ -9,7 +9,7 @@ namespace BlazorElectronics.Server.Controllers;
 
 public class UserController : ControllerBase
 {
-    protected const string BAD_REQUEST_MESSAGE = "Bad request!";
+    protected const string BAD_REQUEST_MESSAGE = "Bad Request!";
     protected readonly IUserAccountService UserAccountService;
     protected readonly ISessionService SessionService;
     
@@ -19,36 +19,24 @@ public class UserController : ControllerBase
         SessionService = sessionService;
     }
 
-    protected sealed class ValidatedIdAndSession
-    {
-        public ValidatedIdAndSession( int userId, string token )
-        {
-            UserId = userId;
-            SessionToken = token;
-        }
-        
-        public int UserId { get; set; }
-        public string? SessionToken { get; set; }
-    }
-
-    protected async Task<ApiReply<ValidatedIdAndSession>> ValidateUserSession( SessionApiRequest? request )
+    protected async Task<ApiReply<int>> ValidateUserSession( SessionApiRequest? request )
     {
         if ( request is null )
-            return new ApiReply<ValidatedIdAndSession>( BAD_REQUEST_MESSAGE );
+            return new ApiReply<int>( BAD_REQUEST_MESSAGE );
         
-        ApiReply<int> idResponse = await UserAccountService.ValidateUserId( request.Email );
+        ApiReply<int> idReply = await UserAccountService.ValidateUserId( request.Email );
         
-        if ( !idResponse.Success )
-            return new ApiReply<ValidatedIdAndSession>( idResponse.Message );
+        if ( !idReply.Success )
+            return new ApiReply<int>( idReply.Message );
         
-        ApiReply<string?> sessionResponse = await SessionService.GetExistingSession( idResponse.Data, request.SessionToken, GetRequestDeviceInfo() );
-        
-        return sessionResponse.Success 
-            ? new ApiReply<ValidatedIdAndSession>( sessionResponse.Message ) 
-            : new ApiReply<ValidatedIdAndSession>( new ValidatedIdAndSession( idResponse.Data, sessionResponse.Data! ) );
+        ApiReply<bool> sessionReply = await SessionService.ValidateSession( idReply.Data, request.SessionToken, GetRequestDeviceInfo() );
+
+        return sessionReply.Success
+            ? new ApiReply<int>( idReply.Data )
+            : new ApiReply<int>( sessionReply.Message );
     }
     
-    protected UserDeviceInfoDto? GetRequestDeviceInfo()
+    protected UserDeviceInfoDto GetRequestDeviceInfo()
     {
         IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
         var dto = new UserDeviceInfoDto( address?.ToString() );
