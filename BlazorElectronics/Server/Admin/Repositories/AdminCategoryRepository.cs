@@ -9,11 +9,11 @@ public class AdminCategoryRepository : DapperRepository, IAdminCategoryRepositor
     public AdminCategoryRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public Task<bool> AddCategory( AddCategoryDto dto )
+    public Task<bool> AddCategory( AddUpdateCategoryDto dto )
     {
         throw new NotImplementedException();
     }
-    public Task<bool> UpdateCategory( UpdateCategoryDto dto )
+    public Task<bool> UpdateCategory( AddUpdateCategoryDto dto )
     {
         throw new NotImplementedException();
     }

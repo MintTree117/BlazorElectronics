@@ -20,14 +20,14 @@ public sealed class AdminCategoryController : _AdminController
     }
 
     [HttpPost( $"{AdminControllerRoutes.AddCategory}" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddCategory( [FromBody] AdminRequest<AddCategoryDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> AddCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
         
-        Func<AddCategoryDto, Task<bool>> action = _repository.AddCategory;
+        Func<AddUpdateCategoryDto, Task<bool>> action = _repository.AddCategory;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success
@@ -35,14 +35,14 @@ public sealed class AdminCategoryController : _AdminController
             : Ok( new ApiReply<bool>( result.Message ) );
     }
     [HttpPost( $"{AdminControllerRoutes.AddCategory}" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] AdminRequest<UpdateCategoryDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
         
-        Func<UpdateCategoryDto, Task<bool>> action = _repository.UpdateCategory;
+        Func<AddUpdateCategoryDto, Task<bool>> action = _repository.UpdateCategory;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success

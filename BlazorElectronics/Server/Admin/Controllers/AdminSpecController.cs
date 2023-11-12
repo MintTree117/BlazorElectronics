@@ -4,7 +4,6 @@ using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Admin;
 using BlazorElectronics.Shared.Admin.SpecsMulti;
 using BlazorElectronics.Shared.Admin.SpecsSingle;
-using BlazorElectronics.Shared.Inbound.Admin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Admin.Controllers;
@@ -22,14 +21,14 @@ public class AdminSpecController : _AdminController
     }
 
     [HttpPost($"{AdminControllerRoutes.AddSpecSingle}")]
-    public async Task<ActionResult<ApiReply<bool>>> AddSpecLookupSingle( [FromBody] AdminRequest<AddSpecSingleDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> AddSpecLookupSingle( [FromBody] AdminRequest<AddUpdateSpecSingleDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
 
-        Func<AddSpecSingleDto, Task<bool>> action = _repository.AddSpecSingle;
+        Func<AddUpdateSpecSingleDto, Task<bool>> action = _repository.AddSpecSingle;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success
@@ -37,14 +36,14 @@ public class AdminSpecController : _AdminController
             : Ok( new ApiReply<bool>( result.Message ) );
     }
     [HttpPost( $"{AdminControllerRoutes.UpdateSpecSingle}" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookupSingle( [FromBody] AdminRequest<UpdateSpecSingleDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookupSingle( [FromBody] AdminRequest<AddUpdateSpecSingleDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
 
-        Func<UpdateSpecSingleDto, Task<bool>> action = _repository.UpdateSpecSingle;
+        Func<AddUpdateSpecSingleDto, Task<bool>> action = _repository.UpdateSpecSingle;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success
@@ -68,14 +67,14 @@ public class AdminSpecController : _AdminController
     }
 
     [HttpPost( $"{AdminControllerRoutes.AddSpecMulti}" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddSpecLookupMulti( [FromBody] AdminRequest<AddSpecMultiDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> AddSpecLookupMulti( [FromBody] AdminRequest<AddUpdateSpecMultiDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
 
-        Func<AddSpecMultiDto, Task<bool>> action = _repository.AddSpecMultiTable;
+        Func<AddUpdateSpecMultiDto, Task<bool>> action = _repository.AddSpecMultiTable;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success
@@ -83,14 +82,14 @@ public class AdminSpecController : _AdminController
             : Ok( new ApiReply<bool>( result.Message ) );
     }
     [HttpPost( $"{AdminControllerRoutes.UpdateSpecMuti}" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookupMulti( [FromBody] AdminRequest<UpdateSpecMultiDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookupMulti( [FromBody] AdminRequest<AddUpdateSpecMultiDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
 
-        Func<UpdateSpecMultiDto, Task<bool>> action = _repository.UpdateSpecMultiTable;
+        Func<AddUpdateSpecMultiDto, Task<bool>> action = _repository.UpdateSpecMultiTable;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success

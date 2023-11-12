@@ -1,14 +1,17 @@
 namespace BlazorElectronics.Shared.Admin.SpecsMulti;
 
-public sealed class AddSpecMultiDto
+public sealed class AddUpdateSpecMultiDto
 {
-    public AddSpecMultiDto( string? tableName, List<string>? multiValues, List<int>? primaryCategories, bool? isGlobal )
+    public AddUpdateSpecMultiDto( int? tableId, string? tableName, List<string>? multiValues, List<int>? primaryCategories, bool? isGlobal )
     {
+        TableId = tableId;
         TableName = tableName;
         MultiValues = multiValues;
         PrimaryCategories = primaryCategories;
         IsGlobal = isGlobal;
     }
+
+    public int? TableId { get; }
     public string? TableName { get; }
     public List<string>? MultiValues { get; }
     public List<int>? PrimaryCategories { get; }

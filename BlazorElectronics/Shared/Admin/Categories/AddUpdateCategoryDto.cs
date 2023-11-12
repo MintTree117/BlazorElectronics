@@ -1,9 +1,9 @@
 namespace BlazorElectronics.Shared.Admin.Categories;
 
-public sealed class UpdateCategoryDto
+public sealed class AddUpdateCategoryDto
 {
-    public UpdateCategoryDto( 
-        int updateCategoryId, int updateCategoryTier, string? categoryName, int categoryTier, int? primaryCategoryId,
+    public AddUpdateCategoryDto( 
+        int? updateCategoryId, int? updateCategoryTier, string? categoryName, int categoryTier, int? primaryCategoryId,
         int? secondaryCategoryId, int? tertiaryCategoryId, string? categoryDescription, string? categoryApiUrl, string? categoryImageUrl )
     {
         UpdateCategoryId = updateCategoryId;
@@ -18,8 +18,8 @@ public sealed class UpdateCategoryDto
         CategoryImageUrl = categoryImageUrl;
     }
     
-    public int UpdateCategoryId { get; }
-    public int UpdateCategoryTier { get; }
+    public int? UpdateCategoryId { get; }
+    public int? UpdateCategoryTier { get; }
 
     public string? CategoryName { get; }
     public int CategoryTier { get; }

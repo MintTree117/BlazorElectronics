@@ -1,8 +1,8 @@
 namespace BlazorElectronics.Shared.Admin.Products;
 
-public sealed class DeleteProductDto
+public sealed class RemoveProductDto
 {
-    public DeleteProductDto( int productId )
+    public RemoveProductDto( int productId )
     {
         ProductId = productId;
     }

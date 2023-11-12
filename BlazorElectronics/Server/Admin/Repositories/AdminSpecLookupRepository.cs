@@ -26,7 +26,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
 
     public AdminSpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public async Task<bool> AddSpecSingle( AddSpecSingleDto dto )
+    public async Task<bool> AddSpecSingle( AddUpdateSpecSingleDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
@@ -36,7 +36,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
 
         return await ExecuteAdminTransaction( GetSingleProcedure( dto.SpecType, PROCEDURE_ADD_SINGLE ), parameters );
     }
-    public async Task<bool> UpdateSpecSingle( UpdateSpecSingleDto dto )
+    public async Task<bool> UpdateSpecSingle( AddUpdateSpecSingleDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );
@@ -55,7 +55,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         return await ExecuteAdminTransaction( GetSingleProcedure( dto.SpecType, PROCEDURE_DELETE_SINGLE ), parameters );
     }
     
-    public async Task<bool> AddSpecMultiTable( AddSpecMultiDto dto )
+    public async Task<bool> AddSpecMultiTable( AddUpdateSpecMultiDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_TABLE_NAME, dto.TableName );
@@ -65,7 +65,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
 
         return await ExecuteAdminTransaction( PROCEDURE_ADD_MULTI_TABLE, parameters );
     }
-    public async Task<bool> UpdateSpecMultiTable( UpdateSpecMultiDto dto )
+    public async Task<bool> UpdateSpecMultiTable( AddUpdateSpecMultiDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_TABLE_ID, dto.TableId );
