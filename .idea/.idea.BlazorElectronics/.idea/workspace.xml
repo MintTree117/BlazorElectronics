@@ -10,26 +10,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminSpecController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/AdminSpecController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/CartController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/CartController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/UserAccountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/UserAccountController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/UserController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Users/UserSession.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Users/UserSession.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/AdminSpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/AdminSpecLookupRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/IAdminSpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/IAdminSpecLookupRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/ISessionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/ISessionService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/SessionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/SessionService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/IUserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/IUserAccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/UserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/UserAccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/AddSpecMultiTableRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/AddSpecMultiTableRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/AddSpecSingleRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/AddSpecSingleRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/DeleteSpecMultiTableRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/DeleteSpecMultiTableRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/DeleteSpecSingleRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/DeleteSpecSingleRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/UpdateSpecMultiTableRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/UpdateSpecMultiTableRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/UpdateSpecSingleRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Admin/SpecLookups/UpdateSpecSingleRequest.cs" afterDir="false" />
-    </list>
+    <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -282,7 +263,7 @@
       <workItem from="1699735085337" duration="3827000" />
       <workItem from="1699740188135" duration="8847000" />
       <workItem from="1699749728511" duration="50000" />
-      <workItem from="1699757354200" duration="4351000" />
+      <workItem from="1699757354200" duration="4781000" />
     </task>
     <servers />
   </component>
