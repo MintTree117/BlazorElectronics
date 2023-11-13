@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Admin.SpecsSingle;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 
-public interface IAdminSpecLookupRepository
+public interface IAdminSpecRepository
 {
     Task<bool> AddSpecSingle( AddUpdateSpecSingleDto dto );
     Task<bool> UpdateSpecSingle( AddUpdateSpecSingleDto dto );

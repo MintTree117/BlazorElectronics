@@ -2,12 +2,12 @@ namespace BlazorElectronics.Shared.Admin.SpecsSingle;
 
 public sealed class AddUpdateSpecSingleDto
 {
-    public AddUpdateSpecSingleDto( SingleSpecLookupType specType, int? specId, string? specName, Dictionary<int, object>? filterValuesById, List<int>? primaryCategories, bool? isGlobal )
+    public AddUpdateSpecSingleDto( SingleSpecLookupType specType, int? specId, string? specName, Dictionary<int, object>? valuesById, List<int>? primaryCategories, bool? isGlobal )
     {
         SpecType = specType;
         SpecId = specId;
         SpecName = specName;
-        FilterValuesById = filterValuesById;
+        ValuesById = valuesById;
         PrimaryCategories = primaryCategories;
         IsGlobal = isGlobal;
     }
@@ -15,7 +15,7 @@ public sealed class AddUpdateSpecSingleDto
     public SingleSpecLookupType SpecType { get; }
     public int? SpecId { get; }
     public string? SpecName { get; }
-    public Dictionary<int, object>? FilterValuesById { get; }
+    public Dictionary<int, object>? ValuesById { get; }
     public List<int>? PrimaryCategories { get; }
     public bool? IsGlobal { get; }
 }

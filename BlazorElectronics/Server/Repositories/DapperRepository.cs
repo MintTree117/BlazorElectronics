@@ -109,6 +109,13 @@ public abstract class DapperRepository
     // PARAM CATEGORY
     protected const string PARAM_CATEGORY_ID = "@CategoryId";
     protected const string PARAM_CATEGORY_TIER = "@CategoryTier";
+    protected const string PARAM_CATEGORY_PRIMARY_ID = "@PrimaryCategoryId";
+    protected const string PARAM_CATEGORY_SECONDARY_ID = "@SecondaryCategoryId";
+    protected const string PARAM_CATEGORY_TERTIARY_ID = "@TertiaryCategoryId";
+    protected const string PARAM_CATEGORY_NAME = "@Name";
+    protected const string PARAM_CATEGORY_API_URL = "@ApiUrl";
+    protected const string PARAM_CATEGORY_IMAGE_URL = "@ImageUrl";
+    protected const string PARAM_CATEGORY_DESCRIPTION = "@Description";
     
     // PARAM USER
     protected const string PARAM_USER_ID = "@UserId";

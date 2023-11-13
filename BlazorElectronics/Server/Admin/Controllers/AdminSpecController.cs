@@ -12,9 +12,9 @@ namespace BlazorElectronics.Server.Admin.Controllers;
 [ApiController]
 public class AdminSpecController : _AdminController
 {
-    readonly IAdminSpecLookupRepository _repository;
+    readonly IAdminSpecRepository _repository;
 
-    public AdminSpecController( ILogger logger, IUserAccountService userAccountService, ISessionService sessionService, IAdminSpecLookupRepository repository )
+    public AdminSpecController( ILogger logger, IUserAccountService userAccountService, ISessionService sessionService, IAdminSpecRepository repository )
         : base( logger, userAccountService, sessionService )
     {
         _repository = repository;

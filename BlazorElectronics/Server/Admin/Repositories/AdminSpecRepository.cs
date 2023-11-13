@@ -5,11 +5,11 @@ using Dapper;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 
-public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepository
+public class AdminSpecRepository : _AdminRepository, IAdminSpecRepository
 {
-    static readonly string[] PROCEDURE_ADD_SINGLE = new [] { "", "", "" };
-    static readonly string[] PROCEDURE_UPDATE_SINGLE = new[] { "", "", "" };
-    static readonly string[] PROCEDURE_DELETE_SINGLE = new[] { "", "", "" };
+    static readonly string[] PROCEDURE_ADD_SINGLE = { "", "", "" };
+    static readonly string[] PROCEDURE_UPDATE_SINGLE = { "", "", "" };
+    static readonly string[] PROCEDURE_DELETE_SINGLE = { "", "", "" };
     
     const string PROCEDURE_ADD_MULTI_TABLE = "";
     const string PROCEDURE_UPDATE_MULTI_TABLE = "";
@@ -24,13 +24,13 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
     const string PARAM_SPEC_NAME = "@SpecName";
     const string PARAM_FILTER_VALUES = "@FilterValue";
 
-    public AdminSpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
+    public AdminSpecRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<bool> AddSpecSingle( AddUpdateSpecSingleDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
-        parameters.Add( PARAM_FILTER_VALUES, dto.FilterValuesById );
+        parameters.Add( PARAM_FILTER_VALUES, dto.ValuesById );
         parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
@@ -41,7 +41,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );
         parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
-        parameters.Add( PARAM_FILTER_VALUES, dto.FilterValuesById );
+        parameters.Add( PARAM_FILTER_VALUES, dto.ValuesById );
         parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
