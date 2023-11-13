@@ -6,10 +6,12 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 
 public class AdminCategoryRepository : DapperRepository, IAdminCategoryRepository
 {
-    static readonly string[] PROCEDURE_ADD_CATEGORY = { "", "", "" };
-    static readonly string[] PROCEDURE_UPDATE_CATEGORY = { "", "", "" };
-    static readonly string[] PROCEDURE_DELETE_CATEGORY = { "", "", "" };
-
+    static readonly string[] PROCEDURES_ADD_CATEGORY = { "Add_CategoryPrimary", "Add_CategorySecondary", "Add_CategoryTertiary" };
+    static readonly string[] PROCEDURES_UPDATE_CATEGORY = { "Update_CategoryPrimary", "Update_CategorySecondary", "Update_CategoryTertiary" };
+    static readonly string[] PROCEDURES_DELETE_CATEGORY = { "Remove_CategoryPrimary", "Remove_CategorySecondary", "Remove_CategoryTertiary" };
+    
+    
+    
     public AdminCategoryRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 

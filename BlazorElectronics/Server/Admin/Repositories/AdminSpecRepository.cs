@@ -7,84 +7,80 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 
 public class AdminSpecRepository : _AdminRepository, IAdminSpecRepository
 {
-    static readonly string[] PROCEDURE_ADD_SINGLE = { "", "", "" };
-    static readonly string[] PROCEDURE_UPDATE_SINGLE = { "", "", "" };
-    static readonly string[] PROCEDURE_DELETE_SINGLE = { "", "", "" };
+    static readonly string[] PROCEDURES_ADD_SINGLE = { "Add_SpecLookupSingleInt", "Add_SpecLookupSingleInt", "Add_SpecLookupSingleInt" };
+    static readonly string[] PROCEDURES_UPDATE_SINGLE = { "Update_SpecLookupSingleInt", "Update_SpecLookupSingleInt", "Update_SpecLookupSingleInt" };
+    static readonly string[] PROCEDURES_REMOVE_SINGLE = { "Remove_SpecLookupSingleInt", "Remove_SpecLookupSingleInt", "Remove_SpecLookupSingleInt" };
     
-    const string PROCEDURE_ADD_MULTI_TABLE = "";
-    const string PROCEDURE_UPDATE_MULTI_TABLE = "";
-    const string PROCEDURE_DELETE_MULTI_TABLE = "";
-    
-    const string PARAM_PRIMARY_CATEGORIES = "";
-    const string PARAM_IS_GLOBAL = "";
+    const string PROCEDURE_UPDATE_MULTI_TABLE = "Update_SpecLookupMulti";
+
+    const string PARAM_PRIMARY_CATEGORIES = "@PrimaryCategories";
+    const string PARAM_IS_GLOBAL = "@IsGlobal";
     const string PARAM_TABLE_ID = "@TableId";
-    const string PARAM_TABLE_NAME = "@TableName";
-    const string PARAM_MULTI_VALUES = "";
     const string PARAM_SPEC_ID = "@SpecId";
     const string PARAM_SPEC_NAME = "@SpecName";
     const string PARAM_FILTER_VALUES = "@FilterValue";
+    const string PARAM_SPEC_VALUES = "@SpecValues";
 
     public AdminSpecRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     public async Task<bool> AddSpecSingle( AddUpdateSpecSingleDto dto )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
-        parameters.Add( PARAM_FILTER_VALUES, dto.ValuesById );
-        parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
-        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
+        string procedure = GetSingleProcedure( dto.SpecType, PROCEDURES_ADD_SINGLE );
+        DynamicParameters parameters = GetAddUpdateSingleParams( dto, false );
 
-        return await ExecuteAdminTransaction( GetSingleProcedure( dto.SpecType, PROCEDURE_ADD_SINGLE ), parameters );
+        return await ExecuteAdminTransaction( procedure, parameters );
     }
     public async Task<bool> UpdateSpecSingle( AddUpdateSpecSingleDto dto )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_SPEC_ID, dto.SpecId );
-        parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
-        parameters.Add( PARAM_FILTER_VALUES, dto.ValuesById );
-        parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
-        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
+        string procedure = GetSingleProcedure( dto.SpecType, PROCEDURES_UPDATE_SINGLE );
+        DynamicParameters parameters = GetAddUpdateSingleParams( dto, false );
 
-        return await ExecuteAdminTransaction( GetSingleProcedure( dto.SpecType, PROCEDURE_UPDATE_SINGLE ), parameters );
+        return await ExecuteAdminTransaction( procedure, parameters );
     }
     public async Task<bool> RemoveSpecSingle( RemoveSpecSingleDto dto )
     {
+        string procedure = GetSingleProcedure( dto.SpecType, PROCEDURES_REMOVE_SINGLE );
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );
 
-        return await ExecuteAdminTransaction( GetSingleProcedure( dto.SpecType, PROCEDURE_DELETE_SINGLE ), parameters );
+        return await ExecuteAdminTransaction( procedure, parameters );
     }
     
-    public async Task<bool> AddSpecMultiTable( AddUpdateSpecMultiDto dto )
-    {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_TABLE_NAME, dto.TableName );
-        parameters.Add( PARAM_MULTI_VALUES, dto.MultiValues );
-        parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
-        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
-
-        return await ExecuteAdminTransaction( PROCEDURE_ADD_MULTI_TABLE, parameters );
-    }
-    public async Task<bool> UpdateSpecMultiTable( AddUpdateSpecMultiDto dto )
+    public async Task<bool> UpdateSpecMultiTable( UpdateSpecMultiDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_TABLE_ID, dto.TableId );
-        parameters.Add( PARAM_TABLE_NAME, dto.TableName );
-        parameters.Add( PARAM_MULTI_VALUES, dto.MultiValues );
+        parameters.Add( PARAM_SPEC_VALUES, dto.MultiValues );
         parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
         return await ExecuteAdminTransaction( PROCEDURE_UPDATE_MULTI_TABLE, parameters );
     }
-    public async Task<bool> RemoveSpecMultiTable( RemoveSpecMultiDto dto )
+
+    static DynamicParameters GetAddUpdateSingleParams( AddUpdateSpecSingleDto dto, bool isUpdate )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_TABLE_ID, dto.TableId );
-        parameters.Add( PARAM_TABLE_NAME, dto.TableName );
+        parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
+        parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
+        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
-        return await ExecuteAdminTransaction( PROCEDURE_DELETE_MULTI_TABLE, parameters );
+        if ( isUpdate )
+            parameters.Add( PARAM_SPEC_ID, dto.SpecId );
+
+        switch ( dto.SpecType )
+        {
+            case SingleSpecLookupType.INT:
+                parameters.Add( PARAM_FILTER_VALUES, dto.ValuesById );
+                break;
+            case SingleSpecLookupType.STRING:
+                parameters.Add( PARAM_SPEC_VALUES, dto.ValuesById );
+                break;
+            case SingleSpecLookupType.BOOL:
+            default: return parameters;
+        }
+
+        return parameters;
     }
-
     static string GetSingleProcedure( SingleSpecLookupType type, IReadOnlyList<string> procedures )
     {
         return procedures[ ( int ) type ];

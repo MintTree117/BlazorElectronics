@@ -9,7 +9,5 @@ public interface IAdminSpecRepository
     Task<bool> UpdateSpecSingle( AddUpdateSpecSingleDto dto );
     Task<bool> RemoveSpecSingle( RemoveSpecSingleDto dto );
     
-    Task<bool> AddSpecMultiTable( AddUpdateSpecMultiDto dto );
-    Task<bool> UpdateSpecMultiTable( AddUpdateSpecMultiDto dto );
-    Task<bool> RemoveSpecMultiTable( RemoveSpecMultiDto dto );
+    Task<bool> UpdateSpecMultiTable( UpdateSpecMultiDto dto );
 }

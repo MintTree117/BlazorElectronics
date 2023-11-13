@@ -13,10 +13,10 @@
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/AdminSpecController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/AdminSpecController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminCategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminCategoryRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminSpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminSpecRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/IAdminSpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/IAdminSpecRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/DapperRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/DapperRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminSpecRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminSpecRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/IAdminSpecRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/IAdminSpecRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsMulti/AddUpdateSpecMultiDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsMulti/UpdateSpecMultiDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsMulti/RemoveSpecMultiDto.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsSingle/AddUpdateSpecSingleDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Admin/SpecsSingle/AddUpdateSpecSingleDto.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -275,6 +275,7 @@
       <workItem from="1699815058377" duration="1061000" />
       <workItem from="1699819522864" duration="5752000" />
       <workItem from="1699826497789" duration="4663000" />
+      <workItem from="1699844774142" duration="696000" />
     </task>
     <servers />
   </component>

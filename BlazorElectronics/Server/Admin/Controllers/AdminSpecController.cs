@@ -65,46 +65,16 @@ public class AdminSpecController : _AdminController
             ? Ok( new ApiReply<bool>( true ) )
             : Ok( new ApiReply<bool>( result.Message ) );
     }
-
-    [HttpPost( $"{AdminControllerRoutes.AddSpecMulti}" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddSpecLookupMulti( [FromBody] AdminRequest<AddUpdateSpecMultiDto> request )
-    {
-        ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
-
-        if ( !sessionReply.Success )
-            return BadRequest( sessionReply );
-
-        Func<AddUpdateSpecMultiDto, Task<bool>> action = _repository.AddSpecMultiTable;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
-
-        return result.Success
-            ? Ok( new ApiReply<bool>( true ) )
-            : Ok( new ApiReply<bool>( result.Message ) );
-    }
+    
     [HttpPost( $"{AdminControllerRoutes.UpdateSpecMuti}" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookupMulti( [FromBody] AdminRequest<AddUpdateSpecMultiDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookupMulti( [FromBody] AdminRequest<UpdateSpecMultiDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
 
-        Func<AddUpdateSpecMultiDto, Task<bool>> action = _repository.UpdateSpecMultiTable;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
-
-        return result.Success
-            ? Ok( new ApiReply<bool>( true ) )
-            : Ok( new ApiReply<bool>( result.Message ) );
-    }
-    [HttpPost( $"{AdminControllerRoutes.DeleteSpecMulti}" )]
-    public async Task<ActionResult<ApiReply<bool>>> DeleteSpecLookupMulti( [FromBody] AdminRequest<RemoveSpecMultiDto> request )
-    {
-        ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
-
-        if ( !sessionReply.Success )
-            return BadRequest( sessionReply );
-
-        Func<RemoveSpecMultiDto, Task<bool>> action = _repository.RemoveSpecMultiTable;
+        Func<UpdateSpecMultiDto, Task<bool>> action = _repository.UpdateSpecMultiTable;
         ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
 
         return result.Success
