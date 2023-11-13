@@ -3,6 +3,7 @@ using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Inbound;
 using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Mutual;
 using Microsoft.AspNetCore.Mvc;
@@ -50,16 +51,9 @@ public class ProductController : ControllerBase
         return Ok( response );*/
         return BadRequest();
     }
-    // END TESTING 
+    // END TESTING
 
-    [HttpGet( "all" )]
-    public async Task<ActionResult<ApiReply<Products_DTO>>> GetAllProducts()
-    {
-        ApiReply<Products_DTO?> reply = await _productService.GetAllProducts();
-        return Ok( reply );
-    }
-
-    [HttpPost( "search-suggestions" )]
+    [HttpPost( "suggestions" )]
     public async Task<ActionResult<ApiReply<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )
     {
         ApiReply<bool> validateReply = await ValidateSearchSuggestionRequest( request );
@@ -69,18 +63,18 @@ public class ProductController : ControllerBase
         
         return Ok( await _productService.GetProductSuggestions( request ) );
     }
-    [HttpGet( "search/{primaryUrl}" )]
-    public async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, [FromQuery] ProductSearchRequest? filters )
+    [HttpPost( "search/{primaryUrl}" )]
+    public async Task<ActionResult<ApiReply<ProductSearchResponse?>>> SearchByCategory( string primaryUrl, [FromBody] ProductSearchRequest? filters )
     {
         return await GetProductSearchResponse( filters, primaryUrl );
     }
-    [HttpGet( "search/{primaryUrl}/{secondaryUrl}" )]
-    public async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, [FromQuery] ProductSearchRequest? filters )
+    [HttpPost( "search/{primaryUrl}/{secondaryUrl}" )]
+    public async Task<ActionResult<ApiReply<ProductSearchResponse?>>> SearchByCategory( string primaryUrl, string secondaryUrl, [FromBody] ProductSearchRequest? filters )
     {
         return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl );
     }
-    [HttpGet( "search/{primaryUrl}/{secondaryUrl}/{tertiaryUrl}" )]
-    public async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> SearchByPrimaryCategory( string primaryUrl, string secondaryUrl, string tertiaryUrl, [FromQuery] ProductSearchRequest? filters )
+    [HttpPost( "search/{primaryUrl}/{secondaryUrl}/{tertiaryUrl}" )]
+    public async Task<ActionResult<ApiReply<ProductSearchResponse?>>> SearchByCategory( string primaryUrl, string secondaryUrl, string tertiaryUrl, [FromBody] ProductSearchRequest? filters )
     {
         return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl, tertiaryUrl );
     }
@@ -90,17 +84,12 @@ public class ProductController : ControllerBase
         return Ok( await _productService.GetProductDetails( productId ) );
     }
 
-    async Task<ActionResult<ApiReply<ProductSearchResults_DTO?>>> GetProductSearchResponse( ProductSearchRequest request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    async Task<ActionResult<ApiReply<ProductSearchResponse?>>> GetProductSearchResponse( ProductSearchRequest? request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
         ApiReply<CategoryIdMap?> categoryReply = await ValidateCategoryUrls( primaryUrl, secondaryUrl, tertiaryUrl );
 
-        if ( !categoryReply.Success )
+        if ( !categoryReply.Success || categoryReply.Data is null )
             return BadRequest( categoryReply.Message );
-
-        ApiReply<bool> validateSpecsReply = await _specLookupService.ValidateProductSearchRequestSpecFilters( request.SpecFilters );
-
-        if ( !validateSpecsReply.Success )
-            return Ok( validateSpecsReply.Message );
 
         ApiReply<CachedSpecData?> specDataReply = await _specLookupService.GetSpecDataDto();
 
@@ -120,8 +109,8 @@ public class ProductController : ControllerBase
         ApiReply<bool> categoryReply = await _categoryService.ValidateCategoryIdMap( request.CategoryIdMap );
 
         return categoryReply.Success
-            ? new ApiReply<bool>( categoryReply.Message )
-            : new ApiReply<bool>( true, true, categoryReply.Message! );
+            ? new ApiReply<bool>( true )
+            : new ApiReply<bool>( categoryReply.Message );
     }
     async Task<ApiReply<CategoryIdMap?>> ValidateCategoryUrls( string? primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
@@ -131,7 +120,7 @@ public class ProductController : ControllerBase
         ApiReply<CategoryIdMap?> categoryReply = await _categoryService.GetCategoryIdMapFromUrl( primaryUrl, secondaryUrl, tertiaryUrl );
 
         return categoryReply.Success
-            ? new ApiReply<CategoryIdMap?>( categoryReply.Data!, true, categoryReply.Message! )
+            ? new ApiReply<CategoryIdMap?>( categoryReply.Data )
             : new ApiReply<CategoryIdMap?>( categoryReply.Message );
     }
 }

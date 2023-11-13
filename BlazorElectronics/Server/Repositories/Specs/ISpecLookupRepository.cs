@@ -4,6 +4,6 @@ namespace BlazorElectronics.Server.Repositories.Specs;
 
 public interface ISpecLookupRepository
 {
-    Task<SpecLookupsModel?> GetSpecLookupMetaData();
-    Task<SpecLookupValuesModel?> GetSpecLookupMultiData( IEnumerable<string> tableNames );
+    Task<SpecLookupsModel?> GetSpecLookupDataRound1();
+    Task<SpecLookupValuesModel?> GetSpecLookupDataRound2( IEnumerable<string> tableNames );
 }

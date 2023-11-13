@@ -86,7 +86,7 @@ public class UserServiceClient : IUserServiceClient
 
         try
         {
-            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_LOGOUT, new SessionApiRequest( sessionData.Username, sessionData.Token ) );
+            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_LOGOUT, new SessionApiRequest( -1, sessionData.Token ) );
             var logoutResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>>();
 
             return logoutResponse ?? new ApiReply<bool>( false, false, "Logout response is null!" );
@@ -106,7 +106,7 @@ public class UserServiceClient : IUserServiceClient
 
         try
         {
-            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_AUTHORIZE, new SessionApiRequest( localSession.Data!.Username, localSession.Data.Token ) );
+            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_AUTHORIZE, new SessionApiRequest( -1, localSession.Data.Token ) );
             var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>>();
 
             return serviceResponse ?? new ApiReply<bool>( false, false, "Authorization response is null!" );
@@ -125,7 +125,7 @@ public class UserServiceClient : IUserServiceClient
             if ( !localSession.Success )
                 return new ApiReply<bool>( false, false, localSession.Message! );
 
-            request.ApiRequest = new SessionApiRequest( localSession.Data!.Username, localSession.Data.Token );
+            request.ApiRequest = new SessionApiRequest( -1, localSession.Data.Token );
             
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_PATH_CHANGE_PASSWORD, request );
             var serviceResponse = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>>();

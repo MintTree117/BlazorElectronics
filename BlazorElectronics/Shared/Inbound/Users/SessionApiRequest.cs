@@ -7,12 +7,12 @@ public sealed class SessionApiRequest
         
     }
 
-    public SessionApiRequest( string email, string token )
+    public SessionApiRequest( int sessionId, string token )
     {
-        Email = email;
+        SessionId = sessionId;
         SessionToken = token;
     }
     
-    public string Email { get; } = string.Empty;
+    public int SessionId { get; }
     public string SessionToken { get; } = string.Empty;
 }

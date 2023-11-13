@@ -37,29 +37,29 @@ public class SessionService : ApiService, ISessionService
 
         return new ApiReply<string?>( token );
     }
-    public async Task<ApiReply<bool>> ValidateSession( int userId, string sessionToken, UserDeviceInfoDto? deviceInfo )
+    public async Task<ApiReply<int>> ValidateSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
     {
         UserSession? session;
 
         try
         {
-            session = await _sessionRepository.GetSession( userId, deviceInfo );
-
-            if ( session is null )
-                return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
-
-            if ( !session.IsValid( MAX_SESSION_HOURS ) )
-                return new ApiReply<bool>( SESSION_EXPIRED_MESSAGE );
+            session = await _sessionRepository.GetSession( sessionId );
         }
         catch ( ServiceException e )
         {
             _logger.LogError( e.Message, e );
-            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
+        if ( session is null )
+            return new ApiReply<int>( NO_DATA_FOUND_MESSAGE );
+
+        if ( !session.IsValid( MAX_SESSION_HOURS ) )
+            return new ApiReply<int>( SESSION_EXPIRED_MESSAGE );
+
         return VerifySessionToken( sessionToken, session.Hash, session.Salt )
-            ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( INVALID_SESSION_TOKEN_MESSAGE );
+            ? new ApiReply<int>( session.UserId )
+            : new ApiReply<int>( INVALID_SESSION_TOKEN_MESSAGE );
     }
 
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )

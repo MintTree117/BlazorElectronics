@@ -38,22 +38,6 @@ public class ProductService : ApiService, IProductService
     {
         throw new NotImplementedException();
     }
-    public async Task<ApiReply<Products_DTO?>> GetAllProducts()
-    {
-        /*Task<IEnumerable<Product>?> repoFunction = _productSearchRepository.GetAllProducts();
-        Reply<IEnumerable<Product>?> repositoryReply = await ExecuteIoCall( async () => await repoFunction );
-
-        if ( !repositoryReply.Success )
-            return new Reply<Products_DTO?>( repositoryReply.Message );
-        
-        return new Reply<Products_DTO?> {
-            Data = await MapProductsToDto( repositoryReply.Data! ),
-            Success = true,
-            Message = "Successfully retrieved product Dto's from repository."
-        };*/
-
-        return null;
-    }
     public async Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
         Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryTier, request.CategoryIdMap.CategoryId );
@@ -63,29 +47,34 @@ public class ProductService : ApiService, IProductService
             return new ApiReply<ProductSearchSuggestions_DTO?>( repoReply.Message );
 
         return new ApiReply<ProductSearchSuggestions_DTO?> {
-            Data = await MapSearchSuggestionsToDto( repoReply.Data! ),
+            Data = await MapSearchSuggestionsToResponse( repoReply.Data! ),
             Success = true,
             Message = "Found matching results."
         };
     }
-    public async Task<ApiReply<ProductSearchResults_DTO?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, CachedSpecData specMeta )
+    public async Task<ApiReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, CachedSpecData specData )
     {
         ApiReply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
 
-        if ( !validateReply.Success )
-            return new ApiReply<ProductSearchResults_DTO?>( validateReply.Message );
+        if ( !validateReply.Success || validateReply.Data is null )
+            return new ApiReply<ProductSearchResponse?>( validateReply.Message );
 
-        Task<ProductSearch?> repoFunction = _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data!, specMeta );
-        ApiReply<ProductSearch?> repoReply = await ExecuteIoCall( async () => await repoFunction );
+        IEnumerable<ProductSearchModel>? models;
 
-        if ( !repoReply.Success )
-            return new ApiReply<ProductSearchResults_DTO?>( repoReply.Message );
-        
-        return new ApiReply<ProductSearchResults_DTO?> {
-            Data = await MapProductSearchToDto( repoReply.Data! ),
-            Success = true,
-            Message = "Successfully retrieved ProductSearch from repository."
-        };
+        try
+        {
+            models = await _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data, specData );
+
+            if ( models is null )
+                return new ApiReply<ProductSearchResponse?>( NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            _logger.LogError( e.Message, e );
+            return new ApiReply<ProductSearchResponse?>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+
+        return new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) );
     }
     public async Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId )
     {
@@ -117,7 +106,7 @@ public class ProductService : ApiService, IProductService
             return new ApiReply<ProductDetails_DTO?>( e.Message );
         }
 
-        dto = await MapProductDetailsToDto( model! );
+        dto = await MapProductDetailsToResponse( model! );
 
         try
         {
@@ -149,19 +138,7 @@ public class ProductService : ApiService, IProductService
         
         return null;
     }
-    static async Task<Products_DTO> MapProductsToDto( IEnumerable<Product> models )
-    {
-        var dto = new Products_DTO();
-
-        await Task.Run( () =>
-        {
-            foreach ( Product p in models )
-                dto.Products.Add( MapProductToDto( p ) );
-        } );
-        
-        return dto;
-    }
-    static async Task<ProductSearchSuggestions_DTO> MapSearchSuggestionsToDto( IEnumerable<string> suggestions )
+    static async Task<ProductSearchSuggestions_DTO> MapSearchSuggestionsToResponse( IEnumerable<string> suggestions )
     {
         var suggestionList = new List<string>();
 
@@ -174,24 +151,27 @@ public class ProductService : ApiService, IProductService
             Suggestions = suggestionList
         };
     }
-    static async Task<ProductSearchResults_DTO> MapProductSearchToDto( ProductSearch model )
+    static async Task<ProductSearchResponse> MapProductSearchToResponse( IEnumerable<ProductSearchModel> models )
     {
-        var dto = new ProductSearchResults_DTO();
+        var dto = new ProductSearchResponse();
 
         await Task.Run( () =>
         {
-            foreach ( Product p in model.Products! )
-                dto.Products.Add( MapProductToDto( p ) );
-            
-            dto.TotalMatches = model.TotalSearchCount;
-            dto.TotalPages = model.TotalSearchCount / model.QueryRows;
-            dto.ItemsPerPage = model.QueryRows;
-            dto.CurrentPage = model.QueryOffset + 1;
+            foreach ( ProductSearchModel p in models )
+            {
+                dto.Products.Add( new ProductResponse
+                {
+                    Id = p.ProductId,
+                    Title = p.ProductTitle,
+                    Thumbnail = p.ProductThumbnail,
+                    Rating = p.ProductRating
+                } );
+            }
         } );
 
         return dto;
     }
-    static async Task<ProductDetails_DTO> MapProductDetailsToDto( ProductDetails productDetails )
+    static async Task<ProductDetails_DTO> MapProductDetailsToResponse( ProductDetails productDetails )
     {
         var dto = new ProductDetails_DTO();
 
@@ -238,33 +218,4 @@ public class ProductService : ApiService, IProductService
 
         return dto;
     }
-    static Product_DTO MapProductToDto( Product p )
-    {
-        var productDto = new Product_DTO {
-            Id = p.ProductId,
-            Title = p.ProductTitle,
-            Thumbnail = p.ProductThumbnail,
-            Rating = p.ProductRating
-        };
-        foreach ( ProductVariant v in p.ProductVariants )
-        {
-            productDto.Variants.Add( new ProductVariant_DTO {
-                Id = v.VariantId,
-                Name = v.VariantName ?? "No name!",
-                Price = v.VariantPriceMain,
-                SalePrice = v.VariantPriceSale
-            } );
-        }
-
-        return productDto;
-    }
-
-    static void ValidateProductSearchRequestBooks()
-    {
-        
-    }
-    static void ValidateProductSearchRequestSoftware() { }
-    static void ValidateProductSearchRequestGames() { }
-    static void ValidateProductSearchRequestMoviesTv() { }
-    static void ValidateProductSearchRequestCourses() { }
 }

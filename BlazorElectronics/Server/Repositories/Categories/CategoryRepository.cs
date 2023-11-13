@@ -9,8 +9,8 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 public class CategoryRepository : DapperRepository, ICategoryRepository
 {
     const string PROCEDURE_GET_CATEGORIES = "Get_Categories";
-    const string PROCEDURE_GET_DESCRIPTIONS_PRIMARY = "Get_Categories";
-    const string PROCEDURE_GET_DESCRIPTION = "Get_CategoryDescriptionsPrimary";
+    const string PROCEDURE_GET_DESCRIPTIONS_PRIMARY = "Get_CategoryDescriptionsPrimary";
+    const string PROCEDURE_GET_DESCRIPTION = "Get_CategoryDescription";
 
     public CategoryRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
@@ -40,7 +40,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
 
         return await TryQueryAsync( GetDescriptionQuery, dynamicParams );
     }
-
+    
     static async Task<SqlMapper.GridReader?> GetCategoriesQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QueryMultipleAsync( PROCEDURE_GET_CATEGORIES, commandType: CommandType.StoredProcedure );

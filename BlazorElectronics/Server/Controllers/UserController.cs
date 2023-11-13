@@ -23,16 +23,11 @@ public class UserController : ControllerBase
     {
         if ( request is null )
             return new ApiReply<int>( BAD_REQUEST_MESSAGE );
-        
-        ApiReply<int> idReply = await UserAccountService.ValidateUserId( request.Email );
-        
-        if ( !idReply.Success )
-            return new ApiReply<int>( idReply.Message );
-        
-        ApiReply<bool> sessionReply = await SessionService.ValidateSession( idReply.Data, request.SessionToken, GetRequestDeviceInfo() );
+
+        ApiReply<int> sessionReply = await SessionService.ValidateSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
 
         return sessionReply.Success
-            ? new ApiReply<int>( idReply.Data )
+            ? new ApiReply<int>( sessionReply.Data )
             : new ApiReply<int>( sessionReply.Message );
     }
     
@@ -46,10 +41,10 @@ public class UserController : ControllerBase
     {
         if ( request is null )
             return false;
-        
-        bool validEmail = !string.IsNullOrWhiteSpace( request.Email );
+
+        bool validId = request.SessionId >= 0;
         bool validToken = !string.IsNullOrWhiteSpace( request.SessionToken );
 
-        return validEmail && validToken;
+        return validId && validToken;
     }
 }

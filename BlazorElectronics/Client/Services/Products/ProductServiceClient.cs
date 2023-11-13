@@ -9,7 +9,7 @@ namespace BlazorElectronics.Client.Services.Products;
 public class ProductServiceClient : IProductServiceClient
 {
     public event Action<string>? ExceptionEvent;
-    public event Action<ApiReply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
+    public event Action<ApiReply<ProductSearchResponse?>?>? ProductSearchChanged;
     public event Action<string>? ProductSearchNullabillityTest;
 
     string? CategoryUrl;
@@ -181,17 +181,17 @@ public class ProductServiceClient : IProductServiceClient
     
     async Task SearchProducts( string url )
     {
-        var result = await _http.GetFromJsonAsync<ApiReply<ProductSearchResults_DTO?>>( url );
+        var result = await _http.GetFromJsonAsync<ApiReply<ProductSearchResponse?>>( url );
 
         if ( result == null )
         {
-            ProductSearchChanged?.Invoke( new ApiReply<ProductSearchResults_DTO?>( null, false, SERVER_RESPONSE_MESSAGE_NULL ) );
+            ProductSearchChanged?.Invoke( new ApiReply<ProductSearchResponse?>( null, false, SERVER_RESPONSE_MESSAGE_NULL ) );
             return;
         }
 
         if ( result.Data == null || !result.Success )
         {
-            ProductSearchChanged?.Invoke( new ApiReply<ProductSearchResults_DTO?>( null, false, result.Message ?? SERVER_RESPONSE_MESSAGE_FAILURE_NO_MESSAGE ) );
+            ProductSearchChanged?.Invoke( new ApiReply<ProductSearchResponse?>( null, false, result.Message ?? SERVER_RESPONSE_MESSAGE_FAILURE_NO_MESSAGE ) );
             return;
         }
 

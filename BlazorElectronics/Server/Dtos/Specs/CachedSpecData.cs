@@ -37,19 +37,19 @@ public sealed class CachedSpecData : LocallyCachedObject
         
         // SINGLE SPEC FILTERS
         var tempIntFilters = new Dictionary<short, IReadOnlyList<string>>();
-        var tempStringFilters = new Dictionary<short, IReadOnlyList<string>>();
-        foreach ( short id in dto.IntFilterNames.Keys )
+        var tempStringValues = new Dictionary<short, IReadOnlyList<string>>();
+        foreach ( short id in dto.IntFilters.Keys )
         {
-            List<string> tempList = dto.IntFilterNames[ id ];
+            List<string> tempList = dto.IntFilters[ id ];
             tempIntFilters.Add( id, new List<string>( tempList ) );
         }
-        foreach ( short id in dto.StringFilterNames.Keys )
+        foreach ( short id in dto.StringValues.Keys )
         {
-            List<string> tempList = dto.StringFilterNames[ id ];
-            tempStringFilters.Add( id, new List<string>( tempList ) );
+            List<string> tempList = dto.StringValues[ id ];
+            tempStringValues.Add( id, new List<string>( tempList ) );
         }
-        IntFilterNames = tempIntFilters;
-        StringFilterNames = tempStringFilters;
+        IntFilters = tempIntFilters;
+        StringValues = tempStringValues;
 
         // MULTI BASIC
         MultiGlobalTableIds = new HashSet<short>( dto.MultiGlobalTableIds );
@@ -88,8 +88,8 @@ public sealed class CachedSpecData : LocallyCachedObject
     public IReadOnlyDictionary<short, IReadOnlySet<short>> StringIdsByCategory { get; }
     public IReadOnlyDictionary<short, IReadOnlySet<short>> BoolIdsByCategory { get; }
     
-    public IReadOnlyDictionary<short, IReadOnlyList<string>> IntFilterNames { get; }
-    public IReadOnlyDictionary<short, IReadOnlyList<string>> StringFilterNames { get; }
+    public IReadOnlyDictionary<short, IReadOnlyList<string>> IntFilters { get; }
+    public IReadOnlyDictionary<short, IReadOnlyList<string>> StringValues { get; }
 
     public IReadOnlySet<short> MultiGlobalTableIds { get; }
     public IReadOnlyDictionary<short, string> MultiTableNames { get; }

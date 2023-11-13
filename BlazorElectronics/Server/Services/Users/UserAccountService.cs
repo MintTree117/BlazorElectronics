@@ -73,13 +73,13 @@ public class UserAccountService : ApiService, IUserAccountService
         return new ApiReply<UserLoginDto?>( 
             new UserLoginDto( insertedUser.Id, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
     }
-    public async Task<ApiReply<int>> VerifyAdminId( string email )
+    public async Task<ApiReply<int>> VerifyAdminId( int adminId )
     {
         User? admin;
 
         try
         {
-            admin = await _userRepository.GetByEmail( email );
+            admin = await _userRepository.GetById( adminId );
 
             if ( admin is null )
                 return new ApiReply<int>( NO_DATA_FOUND_MESSAGE );

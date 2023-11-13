@@ -2,6 +2,12 @@ namespace BlazorElectronics.Server.Models.Specs;
 
 public sealed class SpecLookupMultiTableCategoryModel
 {
-    public short TableId { get; set; }
-    public short PrimaryCategoryId { get; set; }
+    public SpecLookupMultiTableCategoryModel( short tableId, short primaryCategoryId )
+    {
+        TableId = tableId;
+        PrimaryCategoryId = primaryCategoryId;
+    }
+    
+    public short TableId { get; }
+    public short PrimaryCategoryId { get; }
 }

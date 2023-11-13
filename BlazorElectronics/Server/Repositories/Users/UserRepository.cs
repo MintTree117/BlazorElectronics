@@ -9,13 +9,13 @@ namespace BlazorElectronics.Server.Repositories.Users;
 
 public class UserRepository : DapperRepository, IUserRepository
 {
-    const string PROCEDURE_GET_USER_BY_ID = "Get_UserById";
-    const string PROCEDURE_GET_USER_BY_USERNAME = "Get_UserByUsername";
-    const string PROCEDURE_GET_USER_BY_EMAIL = "Get_UserByEmail";
-    const string PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserByNameOrEmail";
-    const string PROCEDURE_GET_USER_EXISTS = "Get_UserExists";
-    const string PROCEDURE_ADD_USER = "Create_User";
-    const string PROCEDURE_UPDATE_PASSWORD = "Update_UserPassword";
+    const string PROCEDURE_GET_USER_BY_ID = "Get_UserAccountById";
+    const string PROCEDURE_GET_USER_BY_USERNAME = "Get_UserAccountByUsername";
+    const string PROCEDURE_GET_USER_BY_EMAIL = "Get_UserAccountByEmail";
+    const string PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserAccountByNameOrEmail";
+    const string PROCEDURE_GET_USER_EXISTS = "Get_UserAccountExists";
+    const string PROCEDURE_ADD_USER = "Add_UserAccount";
+    const string PROCEDURE_UPDATE_PASSWORD = "Update_UserAccountPassword";
 
     public UserRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     

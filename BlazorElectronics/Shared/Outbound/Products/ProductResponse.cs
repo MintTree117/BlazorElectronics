@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Shared.DtosOutbound.Products;
 
-public sealed class Product_DTO
+public sealed class ProductResponse
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;

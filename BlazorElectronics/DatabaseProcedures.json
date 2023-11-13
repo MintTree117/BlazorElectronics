@@ -1,194 +1,222 @@
 [
   {
-    "ProcedureName": "Add_CartItem",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_CartItem]\r\n    @ProductId INT,\r\n    @UserId INT,\r\n    @VariantSubId INT,\r\n    @Quantity INT\r\nAS\r\nBEGIN\r\n    IF NOT EXISTS (\r\n        SELECT 1\r\n        FROM CartItems\r\n        WHERE ProductId = @ProductId\r\n        AND UserId = @UserId\r\n        AND VariantSubId = @VariantSubId\r\n    )\r\n    BEGIN\r\n        INSERT INTO CartItems (ProductId, UserId, VariantSubId, Quantity)\r\n        VALUES (@ProductId, @UserId, @VariantSubId, @Quantity);\r\n    END\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Add_CartItems",
-    "ProcedureDefinition": "CREATE PROCEDURE Add_CartItems\r\n    @CartItems CartItemTableType READONLY\r\nAS\r\nBEGIN\r\n    INSERT INTO CartItems (ProductId, UserId, VariantSubId, Quantity)\r\n    SELECT Source.ProductId, Source.UserId, Source.VariantSubId, Source.Quantity\r\n    FROM @CartItems AS Source\r\n    WHERE NOT EXISTS (\r\n        SELECT 1\r\n        FROM CartItems AS Target\r\n        WHERE Target.ProductId = Source.ProductId\r\n        AND Target.UserId = Source.UserId\r\n        AND Target.VariantSubId = Source.VariantSubId\r\n    );\r\nEND;"
-  },
-  {
-    "ProcedureName": "Add_CategoryPrimary",
-    "ProcedureDefinition": "CREATE PROCEDURE Add_CategoryPrimary\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    INSERT INTO Categories_Primary ([Name], ApiUrl, ImageUrl)\r\n    VALUES (@Name, @ApiUrl, @ImageUrl);\r\n\r\n    DECLARE @PrimaryCategoryId INT;\r\n    SET @PrimaryCategoryId = SCOPE_IDENTITY();\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        INSERT INTO Category_Descriptions (CategoryId, CategoryTier, [Description])\r\n        VALUES (@PrimaryCategoryId, 1, @Description);\r\n    END;\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Add_CategorySecondary",
-    "ProcedureDefinition": "CREATE PROCEDURE Add_CategorySecondary\r\n    @PrimaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    INSERT INTO Categories_Secondary (PrimaryCategoryId, [Name], ApiUrl, ImageUrl)\r\n    VALUES (@PrimaryCategoryId, @Name, @ApiUrl, @ImageUrl);\r\n\r\n    DECLARE @SecondaryCategoryId INT;\r\n    SET @SecondaryCategoryId = SCOPE_IDENTITY();\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        INSERT INTO Category_Descriptions (CategoryId, CategoryTier, [Description])\r\n        VALUES (@SecondaryCategoryId, 2, @Description);\r\n    END;\r\nEND;"
-  },
-  {
-    "ProcedureName": "Add_CategoryTertiary",
-    "ProcedureDefinition": "CREATE PROCEDURE Add_CategoryTertiary\r\n    @PrimaryCategoryId INT,\r\n    @SecondaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    INSERT INTO Categories_Tertiary (PrimaryCategoryId, SecondaryCategoryId, [Name], ApiUrl, ImageUrl)\r\n    VALUES (@PrimaryCategoryId, @SecondaryCategoryId, @Name, @ApiUrl, @ImageUrl);\r\n\r\n    DECLARE @TertiaryCategoryId INT;\r\n    SET @TertiaryCategoryId = SCOPE_IDENTITY();\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        INSERT INTO Category_Descriptions (CategoryId, CategoryTier, [Description])\r\n        VALUES (@TertiaryCategoryId, 3, @Description);\r\n    END;\r\nEND;"
-  },
-  {
-    "ProcedureName": "Add_SpecLookupSingleBool",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_SpecLookupSingleBool]\r\n    @SpecName NVARCHAR(64),\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    INSERT INTO Specs_Lookup_Single_Bool (SpecName)\r\n    VALUES (@SpecName);\r\n\r\n    DECLARE @SpecId INT;\r\n    SET @SpecId = SCOPE_IDENTITY();\r\n    \r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Bool_Categories\r\n        SELECT PrimaryCategoryId, @SpecId\r\n        FROM @PrimaryCategories;\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL AND @IsGlobal = 1\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Bool_Global (SpecId)\r\n        VALUES (@SpecId);\r\n    END;\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Add_SpecLookupSingleInt",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_SpecLookupSingleInt]\r\n    @SpecName NVARCHAR(64),\r\n    @SpecValues TableType_SpecLookupIntFilters READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    INSERT INTO Specs_Lookup_Single_Int (SpecName)\r\n    VALUES (@SpecName);\r\n\r\n    DECLARE @SpecId INT;\r\n    SET @SpecId = SCOPE_IDENTITY();\r\n\r\n    IF EXISTS (SELECT 1 FROM @SpecValues)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Int_Filters\r\n        SELECT FilterId, FilterValue, @SpecId\r\n        FROM @SpecValues;\r\n    END;\r\n    \r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Int_Categories\r\n        SELECT PrimaryCategoryId, @SpecId\r\n        FROM @PrimaryCategories;\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL AND @IsGlobal = 1\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Int_Global (SpecId)\r\n        VALUES (@SpecId);\r\n    END;\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Add_SpecLookupSingleString",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_SpecLookupSingleString]\r\n    @SpecName NVARCHAR(64),\r\n    @SpecValues TableType_SpecLookupStringValues READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    INSERT INTO Specs_Lookup_Single_String (SpecName)\r\n    VALUES (@SpecName);\r\n\r\n    DECLARE @SpecId INT;\r\n    SET @SpecId = SCOPE_IDENTITY();\r\n\r\n    IF EXISTS (SELECT 1 FROM @SpecValues)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_String_Values\r\n        SELECT ValueId, SpecValue, @SpecId\r\n        FROM @SpecValues;\r\n    END;\r\n    \r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_String_Categories\r\n        SELECT PrimaryCategoryId, @SpecId\r\n        FROM @PrimaryCategories;\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL AND @IsGlobal = 1\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_String_Global (SpecId)\r\n        VALUES (@SpecId);\r\n    END;\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Count_CartItems",
-    "ProcedureDefinition": "CREATE PROCEDURE Count_CartItems\r\n    @UserId INT\r\nAS\r\nBEGIN\r\n    SELECT COUNT(*)\r\n    FROM CartItems\r\n    WHERE UserId = @UserId\r\nEND;"
-  },
-  {
-    "ProcedureName": "Create_UserAccount",
-    "ProcedureDefinition": "CREATE PROCEDURE Create_UserAccount\r\n    @Username NVARCHAR(48),\r\n    @Email NVARCHAR(254),\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    INSERT INTO UserAccounts (Username, Email, PasswordHash, PasswordSalt)\r\n    VALUES (@Username, @Email, @Hash, @Salt);\r\n    SELECT * FROM UserAccounts WHERE UserId = SCOPE_IDENTITY();\r\nEND;"
-  },
-  {
-    "ProcedureName": "Create_UserSession",
-    "ProcedureDefinition": "CREATE PROCEDURE Create_UserSession\r\n    @UserId INT,\r\n    @IpAddress NVARCHAR(64),\r\n    @Fingerprint NVARCHAR(32),\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    INSERT INTO UserSessions (UserId, IpAddress, DeviceFingerprint, TokenHash, TokenSalt)\r\n    VALUES (@UserId, @IpAddress, @Fingerprint, @Hash, @Salt);\r\n    SELECT * FROM UserSessions WHERE SessionId = SCOPE_IDENTITY();\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_CartItems",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_CartItems\r\n    @UserId INT\r\nAS\r\nBEGIN\r\n    SELECT * FROM CartItems\r\n    WHERE UserId = @UserId\r\nEND;"
-  },
-  {
-    "ProcedureName": "Get_CartProducts",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_CartProducts]\r\n    @ProductIdList NVARCHAR(MAX),  -- Assuming a comma-separated list like '1,2,3,4'\r\n    @VariantSubIdList NVARCHAR(MAX)\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON;\r\n\r\n    -- Convert the comma-separated string into a table variable for comparison\r\n    DECLARE @ProductIdTable TABLE (ProductIdParam INT);\r\n    INSERT INTO @ProductIdTable\r\n    SELECT value\r\n    FROM STRING_SPLIT(@ProductIdList, ',');\r\n\r\n    DECLARE @VariantSubIdTable TABLE (VariantSubIdParam INT);\r\n    INSERT INTO @VariantSubIdTable\r\n    SELECT value\r\n    FROM STRING_SPLIT(@VariantSubIdList, ',');\r\n\r\n    -- Query to select items matching the IDs in the list\r\n    SELECT p.*, v.*\r\n    FROM Products p\r\n    LEFT JOIN ProductVariants v\r\n    ON p.ProductId = v.ProductId\r\n    WHERE p.ProductId IN (SELECT ProductIdParam FROM @ProductIdTable)\r\n    AND v.VariantSubId IN (SELECT VariantSubIdParam FROM @VariantSubIdTable)\r\nEND\r\n"
-  },
-  {
-    "ProcedureName": "Get_Categories",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_Categories]\r\nAS\r\nBEGIN\r\n    SELECT * FROM CategoriesPrimary cp\r\n    JOIN CategoriesSecondary cs ON cp.PrimaryCategoryId = cs.PrimaryCategoryId\r\n    JOIN CategoriesTertiary ct ON ct.SecondaryCategoryId = cs.SecondaryCategoryId\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_CategoriesPrimary",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoriesPrimary\nAS\nBEGIN\n    SELECT * FROM CategoriesPrimary\nEND;"
-  },
-  {
-    "ProcedureName": "Get_CategoriesSecondary",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoriesSecondary\r\nAS\r\nBEGIN\r\n    SELECT * FROM CategoriesSecondary\r\nEND;"
-  },
-  {
-    "ProcedureName": "Get_CategoriesTertiary",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoriesTertiary\r\nAS\r\nBEGIN\r\n    SELECT * FROM CategoriesTertiary\r\nEND;"
-  },
-  {
-    "ProcedureName": "Get_CategoryDescription",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoryDescription\r\n    @CategoryId INT,\r\n    @CategoryTier INT\r\nAS\r\nBEGIN\r\n    SELECT * FROM CategoryDescriptions\r\n    WHERE CategoryLevel = @CategoryTier\r\n    AND CategoryId = @CategoryId\r\nEND;"
-  },
-  {
-    "ProcedureName": "Get_CategoryDescriptionsPrimary",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoryDescriptionsPrimary\r\nAS\r\nBEGIN\r\n    SELECT * FROM CategoryDescriptions\r\n    WHERE CategoryLevel = 1\r\nEND;"
-  },
-  {
-    "ProcedureName": "Get_FeaturedDeals",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_FeaturedDeals]\r\nAS\r\nBEGIN\r\n    SELECT p.*, v.*\r\n    FROM Products p\r\n    LEFT JOIN FeaturesTopDeals d\r\n    ON p.ProductId = d.ProductId\r\n    LEFT JOIN ProductVariants v\r\n    ON p.ProductId = v.ProductId\r\n    WHERE p.ProductId = d.ProductId\r\n    AND v.VariantSubId = d.VariantSubId\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_FeaturedProducts",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_FeaturedProducts]\r\nAS\r\nBEGIN\r\n    SELECT * FROM FeaturesProducts\r\nEND;\r\n"
-  },
-  {
+    "SchemaName": "dbo",
     "ProcedureName": "Get_ProductDetails",
     "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_ProductDetails]\r\n    @ProductId INT\r\nAS\r\nBEGIN\r\n    SELECT p.*, pd.*, pv.*, pi.*, pr.*\r\n    FROM Products p\r\n    LEFT JOIN ProductDescriptions pd ON p.ProductId = pd.ProductId\r\n    LEFT JOIN ProductVariants pv ON p.ProductId = pv.ProductId\r\n    LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId\r\n    LEFT JOIN ProductReviews pr ON p.ProductId = pr.ProductId\r\n    WHERE p.ProductId = @ProductId;\r\nEND\r\n"
   },
   {
-    "ProcedureName": "Get_Products",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_Products\r\nAS\r\nBEGIN\r\n    SELECT p.*, pv.* \r\n    FROM Products p\r\n    LEFT JOIN ProductVariants pv ON p.ProductId = pv.ProductId\r\nEND;"
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_UserAccountByUsername",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_UserAccountByUsername\r\n    @Username NVARCHAR(48)\r\nAS\r\nBEGIN\r\n    SELECT * FROM User_Accounts\r\n    WHERE Username = @Username\r\nEND;\r\n"
   },
   {
-    "ProcedureName": "Get_ProductSearchSuggestions",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_ProductSearchSuggestions]\r\n    @SearchText NVARCHAR(64),\r\n    @TertiaryCategoryIdTable TertiaryCategoryIdTableType READONLY\r\nAS\r\nBEGIN\r\n    SELECT p.Title\r\n    FROM Products p\r\n    INNER JOIN ProductCategories pc ON p.ProductId = pc.ProductId\r\n    INNER JOIN ProductDescriptions pd ON p.ProductId = pd.ProductId\r\n    WHERE pc.TertiaryCategoryId IN (SELECT TertiaryCategoryId FROM @TertiaryCategoryIdTable)\r\n    AND (p.Title LIKE '%' + @SearchText + '%'\r\n    OR pd.DescriptionBody LIKE '%' + @SearchText + '%');\r\nEND;\r\n"
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_UserAccountExists",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_UserAccountExists\n    @Email NVARCHAR(254),\n    @Username NVARCHAR(48)\nAS\nBEGIN\n    SELECT \n        COALESCE(Email, NULL) AS Email,\n        COALESCE(Username, NULL) AS Username\n    FROM \n        User_Accounts\n    WHERE \n        Email = @Email OR Username = @Username;\nEND;"
   },
   {
-    "ProcedureName": "Get_SpecDescrs",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_SpecDescrs\r\nAS\r\nBEGIN\r\n    SELECT s.*, c.* \r\n    FROM SpecDescrs s\r\n    LEFT JOIN SpecCategories c\r\n    ON s.SpecId = c.SpecId\r\nEND"
+    "SchemaName": "dbo",
+    "ProcedureName": "Update_UserAccountPassword",
+    "ProcedureDefinition": "CREATE PROCEDURE Update_UserAccountPassword\r\n    @UserId INT,\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    UPDATE User_Accounts\r\n    SET PasswordHash = @Hash, PasswordSalt = @Salt\r\n    WHERE UserId = @UserId\r\nEND;\r\n"
   },
   {
-    "ProcedureName": "Get_SpecDescrsByCategory",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_SpecDescrsByCategory\r\n    @CategoryId INT\r\nAS\r\nBEGIN\r\n    SELECT s.*\r\n    FROM SpecDescrs s\r\n    LEFT JOIN SpecCategories c\r\n    ON s.SpecId = c.SpecId\r\n    WHERE c.CategoryId = @CategoryId;\r\nEND"
-  },
-  {
-    "ProcedureName": "Get_SpecLookupsByCategory",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_SpecLookupsByCategory\r\n    @CategoryId INT\r\nAS\r\nBEGIN\r\n    SELECT s.*\r\n    FROM SpecLookups s\r\n    LEFT JOIN SpecCategories c\r\n    ON s.SpecId = c.SpecId\r\n    WHERE c.CategoryId = @CategoryId;\r\nEND"
-  },
-  {
-    "ProcedureName": "Get_UserByEmail",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_UserByEmail]\r\n    @Email NVARCHAR(254)\r\nAS\r\nBEGIN\r\n    SELECT * FROM UserAccounts\r\n    WHERE Email = @Email\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_UserById",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_UserById]\r\n    @UserId INT\r\nAS\r\nBEGIN\r\n    SELECT * FROM UserAccounts\r\n    WHERE UserId = @UserId\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_UserByNameOrEmail",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_UserByNameOrEmail]\r\n    @Username NVARCHAR(48),\r\n    @Email NVARCHAR(254)\r\nAS\r\nBEGIN\r\n    SELECT * FROM UserAccounts\r\n    WHERE (Username = @Username\r\n    OR Email = @Email)\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_UserByUsername",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_UserByUsername] \r\n    @Username NVARCHAR(48)\r\nAS\r\nBEGIN\r\n    SELECT * FROM UserAccounts\r\n    WHERE Username = @Username\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Get_UserSession",
-    "ProcedureDefinition": "CREATE PROCEDURE Get_UserSession\r\n    @UserId INT,\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    SELECT * FROM UserSessions\r\n    WHERE UserId = @UserId\r\n    AND TokenHash = @Hash\r\n    AND TokenSalt = @Salt\r\nEND;\r\n"
-  },
-  {
+    "SchemaName": "dbo",
     "ProcedureName": "Remove_CartItem",
     "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Remove_CartItem]\r\n    @ProductId INT,\r\n    @UserId INT,\r\n    @VariantSubId INT\r\nAS\r\nBEGIN\r\n    IF EXISTS (\r\n        SELECT 1\r\n        FROM CartItems\r\n        WHERE ProductId = @ProductId\r\n        AND UserId = @UserId\r\n        AND VariantSubId = @VariantSubId\r\n    )\r\n    BEGIN\r\n        DELETE FROM CartItems\r\n        WHERE ProductId = @ProductId\r\n        AND UserId = @UserId\r\n        AND VariantSubId = @VariantSubId;\r\n    END\r\nEND;\r\n"
   },
   {
-    "ProcedureName": "Remove_CategoryPrimary",
-    "ProcedureDefinition": "CREATE PROCEDURE Remove_CategoryPrimary\r\n    @PrimaryCategoryId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Categories_Primary\r\n    WHERE PrimaryCategoryId = @PrimaryCategoryId;\r\nEND;"
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_SpecLookupDataRound1",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_SpecLookupDataRound1\r\nAS\r\nBEGIN\r\n    SELECT * FROM Specs_Lookup_Single_Int_Global;\r\n    SELECT * FROM Specs_Lookup_Single_String_Global;\r\n    SELECT * FROM Specs_Lookup_Single_Bool_Global;\r\n\r\n    SELECT * FROM Specs_Lookup_Single_Int_Categories;\r\n    SELECT * FROM Specs_Lookup_Single_String_Categories;\r\n    SELECT * FROM Specs_Lookup_Single_Bool_Categories;\r\n\r\n    SELECT * FROM Specs_Lookup_Single_Int;\r\n    SELECT * FROM Specs_Lookup_Single_String;\r\n    SELECT * FROM Specs_Lookup_Single_Bool;\r\n\r\n    SELECT * FROM Specs_Lookup_Single_Int_Filters;\r\n    SELECT * FROM Specs_Lookup_Single_String_Values;\r\n\r\n    SELECT * FROM Spec_Lookup_Multi_Tables_Global;\r\n    SELECT * FROM Spec_Lookup_Multi_Tables_Categories;\r\n    SELECT * FROM Spec_Lookup_Multi_Tables;\r\nEND;"
   },
   {
-    "ProcedureName": "Remove_CategorySecondary",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Remove_CategorySecondary]\r\n    @SecondaryCategoryId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Categories_Secondary\r\n    WHERE @SecondaryCategoryId = @SecondaryCategoryId;\r\nEND;\r\n"
-  },
-  {
-    "ProcedureName": "Remove_CategoryTertiary",
-    "ProcedureDefinition": "CREATE PROCEDURE Remove_CategoryTertiary\r\n    @TertiaryCategoryId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Categories_Tertiary\r\n    WHERE TertiaryCategoryId = @TertiaryCategoryId;\r\nEND;"
-  },
-  {
-    "ProcedureName": "Remove_SpecLookupBool",
-    "ProcedureDefinition": "CREATE PROCEDURE Remove_SpecLookupBool\r\n    @SpecId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Specs_Lookup_Single_Bool\r\n    WHERE SpecId = @SpecId;\r\nEND;"
-  },
-  {
-    "ProcedureName": "Remove_SpecLookupInt",
-    "ProcedureDefinition": "CREATE PROCEDURE Remove_SpecLookupInt\r\n    @SpecId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Specs_Lookup_Single_Int\r\n    WHERE SpecId = @SpecId;\r\nEND;"
-  },
-  {
-    "ProcedureName": "Remove_SpecLookupString",
-    "ProcedureDefinition": "CREATE PROCEDURE Remove_SpecLookupString\r\n    @SpecId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Specs_Lookup_Single_String\r\n    WHERE SpecId = @SpecId;\r\nEND;"
-  },
-  {
+    "SchemaName": "dbo",
     "ProcedureName": "Update_CartItemQuantity",
     "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Update_CartItemQuantity]\r\n    @ProductId INT,\r\n    @UserId INT,\r\n    @VariantSubId INT,\r\n    @NewQuantity INT\r\nAS\r\nBEGIN\r\n    IF EXISTS (\r\n        SELECT 1\r\n        FROM CartItems\r\n        WHERE ProductId = @ProductId\r\n        AND UserId = @UserId\r\n        AND VariantSubId = @VariantSubId\r\n    )\r\n    BEGIN\r\n        -- Update the cart item's quantity\r\n        UPDATE CartItems\r\n        SET Quantity = @NewQuantity\r\n        WHERE ProductId = @ProductId\r\n        AND UserId = @UserId\r\n        AND VariantSubId = @VariantSubId;\r\n    END\r\nEND;\r\n"
   },
   {
-    "ProcedureName": "Update_CategoryPrimary",
-    "ProcedureDefinition": "CREATE PROCEDURE Update_CategoryPrimary\r\n    @PrimaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    IF @Name IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Primary\r\n        SET [Name] = @Name\r\n        WHERE PrimaryCategoryId = @PrimaryCategoryId\r\n    END;\r\n\r\n    IF @ApiUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Primary\r\n        SET ApiUrl = @Name\r\n        WHERE PrimaryCategoryId = @PrimaryCategoryId\r\n    END;\r\n\r\n    IF @ImageUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Primary\r\n        SET ImageUrl = @ImageUrl\r\n        WHERE PrimaryCategoryId = @PrimaryCategoryId\r\n    END;\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        UPDATE Category_Descriptions\r\n        SET [Description] = @Description\r\n        WHERE CategoryTier = 1\r\n        AND CategoryId = @PrimaryCategoryId\r\n    END;\r\nEND;"
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_CategoryPrimary",
+    "ProcedureDefinition": "CREATE PROCEDURE Add_CategoryPrimary\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    INSERT INTO Categories_Primary ([Name], ApiUrl, ImageUrl)\r\n    VALUES (@Name, @ApiUrl, @ImageUrl);\r\n\r\n    DECLARE @PrimaryCategoryId INT;\r\n    SET @PrimaryCategoryId = SCOPE_IDENTITY();\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        INSERT INTO Category_Descriptions (CategoryId, CategoryTier, [Description])\r\n        VALUES (@PrimaryCategoryId, 1, @Description);\r\n    END;\r\nEND;\r\n"
   },
   {
-    "ProcedureName": "Update_CategorySecondary",
-    "ProcedureDefinition": "CREATE PROCEDURE Update_CategorySecondary\r\n    @PrimaryCategoryId INT,\r\n    @SecondaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    IF @PrimaryCategoryId IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET PrimaryCategoryId = @PrimaryCategoryId\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @Name IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET [Name] = @Name\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @ApiUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET ApiUrl = @Name\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @ImageUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET ImageUrl = @ImageUrl\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        UPDATE Category_Descriptions\r\n        SET [Description] = @Description\r\n        WHERE CategoryTier = 2\r\n        AND CategoryId = @SecondaryCategoryId\r\n    END;\r\nEND;"
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_CategorySecondary",
+    "ProcedureDefinition": "CREATE PROCEDURE Add_CategorySecondary\r\n    @PrimaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    INSERT INTO Categories_Secondary (PrimaryCategoryId, [Name], ApiUrl, ImageUrl)\r\n    VALUES (@PrimaryCategoryId, @Name, @ApiUrl, @ImageUrl);\r\n\r\n    DECLARE @SecondaryCategoryId INT;\r\n    SET @SecondaryCategoryId = SCOPE_IDENTITY();\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        INSERT INTO Category_Descriptions (CategoryId, CategoryTier, [Description])\r\n        VALUES (@SecondaryCategoryId, 2, @Description);\r\n    END;\r\nEND;"
   },
   {
-    "ProcedureName": "Update_CategoryTertiary",
-    "ProcedureDefinition": "CREATE PROCEDURE Update_CategoryTertiary\r\n    @PrimaryCategoryId INT,\r\n    @SecondaryCategoryId INT,\r\n    @TertiaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    IF @PrimaryCategoryId IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET PrimaryCategoryId = @PrimaryCategoryId\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @SecondaryCategoryId IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET SecondaryCategoryId = @SecondaryCategoryId\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @Name IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET [Name] = @Name\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @ApiUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET ApiUrl = @Name\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @ImageUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET ImageUrl = @ImageUrl\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        UPDATE Category_Descriptions\r\n        SET [Description] = @Description\r\n        WHERE CategoryTier = 3\r\n        AND CategoryId = @TertiaryCategoryId\r\n    END;\r\nEND;"
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_CategoryTertiary",
+    "ProcedureDefinition": "CREATE PROCEDURE Add_CategoryTertiary\r\n    @PrimaryCategoryId INT,\r\n    @SecondaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    INSERT INTO Categories_Tertiary (PrimaryCategoryId, SecondaryCategoryId, [Name], ApiUrl, ImageUrl)\r\n    VALUES (@PrimaryCategoryId, @SecondaryCategoryId, @Name, @ApiUrl, @ImageUrl);\r\n\r\n    DECLARE @TertiaryCategoryId INT;\r\n    SET @TertiaryCategoryId = SCOPE_IDENTITY();\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        INSERT INTO Category_Descriptions (CategoryId, CategoryTier, [Description])\r\n        VALUES (@TertiaryCategoryId, 3, @Description);\r\n    END;\r\nEND;"
   },
   {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_ProductSearchSuggestions",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_ProductSearchSuggestions]\r\n    @SearchText NVARCHAR(64),\r\n    @TertiaryCategoryIdTable TertiaryCategoryIdTableType READONLY\r\nAS\r\nBEGIN\r\n    SELECT p.Title\r\n    FROM Products p\r\n    INNER JOIN ProductCategories pc ON p.ProductId = pc.ProductId\r\n    INNER JOIN ProductDescriptions pd ON p.ProductId = pd.ProductId\r\n    WHERE pc.TertiaryCategoryId IN (SELECT TertiaryCategoryId FROM @TertiaryCategoryIdTable)\r\n    AND (p.Title LIKE '%' + @SearchText + '%'\r\n    OR pd.DescriptionBody LIKE '%' + @SearchText + '%');\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_SpecLookupSingleInt",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_SpecLookupSingleInt]\r\n    @SpecName NVARCHAR(64),\r\n    @SpecValues TableType_SpecLookupIntFilters READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    INSERT INTO Specs_Lookup_Single_Int (SpecName)\r\n    VALUES (@SpecName);\r\n\r\n    DECLARE @SpecId INT;\r\n    SET @SpecId = SCOPE_IDENTITY();\r\n\r\n    IF EXISTS (SELECT 1 FROM @SpecValues)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Int_Filters\r\n        SELECT FilterId, FilterValue, @SpecId\r\n        FROM @SpecValues;\r\n    END;\r\n    \r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Int_Categories\r\n        SELECT PrimaryCategoryId, @SpecId\r\n        FROM @PrimaryCategories;\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL AND @IsGlobal = 1\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Int_Global (SpecId)\r\n        VALUES (@SpecId);\r\n    END;\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_SpecLookupSingleString",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_SpecLookupSingleString]\r\n    @SpecName NVARCHAR(64),\r\n    @SpecValues TableType_SpecLookupStringValues READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    INSERT INTO Specs_Lookup_Single_String (SpecName)\r\n    VALUES (@SpecName);\r\n\r\n    DECLARE @SpecId INT;\r\n    SET @SpecId = SCOPE_IDENTITY();\r\n\r\n    IF EXISTS (SELECT 1 FROM @SpecValues)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_String_Values\r\n        SELECT ValueId, SpecValue, @SpecId\r\n        FROM @SpecValues;\r\n    END;\r\n    \r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_String_Categories\r\n        SELECT PrimaryCategoryId, @SpecId\r\n        FROM @PrimaryCategories;\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL AND @IsGlobal = 1\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_String_Global (SpecId)\r\n        VALUES (@SpecId);\r\n    END;\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_SpecLookupSingleBool",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_SpecLookupSingleBool]\r\n    @SpecName NVARCHAR(64),\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    INSERT INTO Specs_Lookup_Single_Bool (SpecName)\r\n    VALUES (@SpecName);\r\n\r\n    DECLARE @SpecId INT;\r\n    SET @SpecId = SCOPE_IDENTITY();\r\n    \r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Bool_Categories\r\n        SELECT PrimaryCategoryId, @SpecId\r\n        FROM @PrimaryCategories;\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL AND @IsGlobal = 1\r\n    BEGIN\r\n        INSERT INTO Specs_Lookup_Single_Bool_Global (SpecId)\r\n        VALUES (@SpecId);\r\n    END;\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_Products",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_Products\r\nAS\r\nBEGIN\r\n    SELECT p.*, pv.* \r\n    FROM Products p\r\n    LEFT JOIN ProductVariants pv ON p.ProductId = pv.ProductId\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_CartItems",
+    "ProcedureDefinition": "CREATE PROCEDURE Add_CartItems\r\n    @CartItems CartItemTableType READONLY\r\nAS\r\nBEGIN\r\n    INSERT INTO CartItems (ProductId, UserId, VariantSubId, Quantity)\r\n    SELECT Source.ProductId, Source.UserId, Source.VariantSubId, Source.Quantity\r\n    FROM @CartItems AS Source\r\n    WHERE NOT EXISTS (\r\n        SELECT 1\r\n        FROM CartItems AS Target\r\n        WHERE Target.ProductId = Source.ProductId\r\n        AND Target.UserId = Source.UserId\r\n        AND Target.VariantSubId = Source.VariantSubId\r\n    );\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Count_CartItems",
+    "ProcedureDefinition": "CREATE PROCEDURE Count_CartItems\r\n    @UserId INT\r\nAS\r\nBEGIN\r\n    SELECT COUNT(*)\r\n    FROM CartItems\r\n    WHERE UserId = @UserId\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_UserSession",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_UserSession]\r\n    @SessionId INT\r\nAS\r\nBEGIN\r\n    SELECT * FROM User_Sessions\r\n    WHERE SessionId = @SessionId\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_CartItems",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_CartItems\r\n    @UserId INT\r\nAS\r\nBEGIN\r\n    SELECT * FROM CartItems\r\n    WHERE UserId = @UserId\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_CartProducts",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_CartProducts]\r\n    @ProductIdList NVARCHAR(MAX),  -- Assuming a comma-separated list like '1,2,3,4'\r\n    @VariantSubIdList NVARCHAR(MAX)\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON;\r\n\r\n    -- Convert the comma-separated string into a table variable for comparison\r\n    DECLARE @ProductIdTable TABLE (ProductIdParam INT);\r\n    INSERT INTO @ProductIdTable\r\n    SELECT value\r\n    FROM STRING_SPLIT(@ProductIdList, ',');\r\n\r\n    DECLARE @VariantSubIdTable TABLE (VariantSubIdParam INT);\r\n    INSERT INTO @VariantSubIdTable\r\n    SELECT value\r\n    FROM STRING_SPLIT(@VariantSubIdList, ',');\r\n\r\n    -- Query to select items matching the IDs in the list\r\n    SELECT p.*, v.*\r\n    FROM Products p\r\n    LEFT JOIN ProductVariants v\r\n    ON p.ProductId = v.ProductId\r\n    WHERE p.ProductId IN (SELECT ProductIdParam FROM @ProductIdTable)\r\n    AND v.VariantSubId IN (SELECT VariantSubIdParam FROM @VariantSubIdTable)\r\nEND\r\n"
+  },
+  {
+    "SchemaName": "dbo",
     "ProcedureName": "Update_SpecLookupMulti",
     "ProcedureDefinition": "CREATE PROCEDURE Update_SpecLookupMulti\r\n    @TableId INT,\r\n    @SpecValues TableType_SpecLookupMultiValues READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    DECLARE @TableName NVARCHAR(64);\r\n    DECLARE @SQL NVARCHAR(MAX);\r\n\r\n    SELECT @TableName = TableName\r\n    FROM Spec_Lookup_Multi_Tables\r\n    WHERE TableId = @TableId;\r\n\r\n    -- If we have new categories\r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        -- Delete old entries in LookupCategories\r\n        DELETE FROM Spec_Lookup_Multi_Tables_Categories\r\n        WHERE TableId = @TableId\r\n        AND PrimaryCategoryId NOT IN (SELECT PrimaryCategoryId FROM @PrimaryCategories);\r\n\r\n        -- Insert new categories\r\n        INSERT INTO Spec_Lookup_Multi_Tables_Categories (TableId, PrimaryCategoryId)\r\n        SELECT @TableId, pc.PrimaryCategoryId\r\n        FROM @PrimaryCategories AS pc\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Spec_Lookup_Multi_Tables_Categories AS existing\r\n            WHERE existing.TableId = @TableId\r\n            AND existing.PrimaryCategoryId = pc.PrimaryCategoryId\r\n        );\r\n    END;\r\n\r\n    -- If we have new spec values\r\n    IF EXISTS (SELECT 1 FROM @SpecValues)\r\n    BEGIN\r\n        -- Delete entries in lookup table @TableName, that don't match the new spec values\r\n        SET @SQL = N'DELETE FROM ' + QUOTENAME(@TableName) + \r\n                N' WHERE SpecValue NOT IN (SELECT SpecValue FROM @SpecValues);';\r\n        EXEC sp_executesql @SQL, N'@SpecValues TableType_SpecLookupMultiValues READONLY', @SpecValues;\r\n\r\n        -- Insert new SpecValues into the table named @TableName that don't exist in that table\r\n        SET @SQL = N'INSERT INTO ' + QUOTENAME(@TableName) + ' (SpecValue) ' +\r\n                N'SELECT SpecValue FROM @SpecValues sv ' +\r\n                N'WHERE NOT EXISTS (' +\r\n                N'SELECT 1 FROM ' + QUOTENAME(@TableName) + ' t ' +\r\n                N'WHERE t.SpecValue = sv.SpecValue);';\r\n        EXEC sp_executesql @SQL, N'@SpecValues TableType_SpecLookupMultiValues READONLY', @SpecValues;\r\n    END;\r\n\r\n    -- If we have IsGlobal parameter\r\n    IF @IsGlobal IS NOT NULL\r\n    BEGIN\r\n        IF @IsGlobal = 1\r\n        BEGIN\r\n            -- Insert @TableId if it doesn't already exist\r\n            IF NOT EXISTS (SELECT 1 FROM Spec_Lookup_Multi_Tables_Global WHERE TableId = @TableId)\r\n            BEGIN\r\n                INSERT INTO Spec_Lookup_Multi_Tables_Global (TableId)\r\n                VALUES (@TableId);\r\n            END\r\n        END;\r\n        ELSE\r\n        BEGIN\r\n            -- Delete rows from global table that have @TableId\r\n            DELETE FROM Spec_Lookup_Multi_Tables_Global WHERE TableId = @TableId;\r\n        END;\r\n    END;\r\nEND;"
   },
   {
-    "ProcedureName": "Update_SpecLookupSingleBool",
-    "ProcedureDefinition": "CREATE PROCEDURE Update_SpecLookupSingleBool\r\n    @SpecId INT,\r\n    @SpecName NVARCHAR(64),\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    IF @SpecName IS NOT NULL\r\n    BEGIN\r\n        UPDATE Specs_Lookup_Single_Bool\r\n        SET SpecName = @SpecName\r\n        WHERE SpecId = @SpecId;\r\n    END;\r\n\r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        -- Remove entries that don't exist in the @PrimaryCategories parameter\r\n        DELETE FROM Specs_Lookup_Single_Bool_Categories\r\n        WHERE SpecId = @SpecId\r\n        AND PrimaryCategoryId NOT IN (SELECT PrimaryCategoryId FROM @PrimaryCategories);\r\n\r\n        -- Insert new entries from @PrimaryCategories that don't exist in the table\r\n        INSERT INTO Specs_Lookup_Single_Bool_Categories (SpecId, PrimaryCategoryId)\r\n        SELECT @SpecId, pc.PrimaryCategoryId\r\n        FROM @PrimaryCategories AS pc\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Specs_Lookup_Single_Bool_Categories AS existing\r\n            WHERE existing.SpecId = @SpecId\r\n            AND existing.PrimaryCategoryId = pc.PrimaryCategoryId\r\n        );\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL\r\n    BEGIN\r\n        IF @IsGlobal = 1\r\n        BEGIN\r\n            -- Insert @SpecIdif it doesn't already exist\r\n            IF NOT EXISTS (SELECT 1 FROM Specs_Lookup_Single_Bool_Global WHERE SpecId = @SpecId)\r\n            BEGIN\r\n                INSERT INTO Specs_Lookup_Single_Bool_Global (SpecId)\r\n                VALUES (@SpecId);\r\n            END\r\n        END;\r\n        ELSE\r\n        BEGIN\r\n            -- Delete rows from global table that have @SpecId\r\n            DELETE FROM Specs_Lookup_Single_Bool_Global WHERE SpecId = @SpecId;\r\n        END;\r\n    END;\r\nEND;"
+    "SchemaName": "dbo",
+    "ProcedureName": "Remove_SpecLookupInt",
+    "ProcedureDefinition": "CREATE PROCEDURE Remove_SpecLookupInt\r\n    @SpecId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Specs_Lookup_Single_Int\r\n    WHERE SpecId = @SpecId;\r\nEND;"
   },
   {
+    "SchemaName": "dbo",
+    "ProcedureName": "Remove_SpecLookupString",
+    "ProcedureDefinition": "CREATE PROCEDURE Remove_SpecLookupString\r\n    @SpecId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Specs_Lookup_Single_String\r\n    WHERE SpecId = @SpecId;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Remove_SpecLookupBool",
+    "ProcedureDefinition": "CREATE PROCEDURE Remove_SpecLookupBool\r\n    @SpecId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Specs_Lookup_Single_Bool\r\n    WHERE SpecId = @SpecId;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
     "ProcedureName": "Update_SpecLookupSingleInt",
     "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Update_SpecLookupSingleInt]\r\n    @SpecId INT,\r\n    @SpecName NVARCHAR(64),\r\n    @FilterValues TableType_SpecLookupIntFilters READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    IF @SpecName IS NOT NULL\r\n    BEGIN\r\n        UPDATE Specs_Lookup_Single_Int\r\n        SET SpecName = @SpecName\r\n        WHERE SpecId = @SpecId;\r\n    END;\r\n\r\n    IF EXISTS (SELECT 1 FROM @FilterValues)\r\n    BEGIN\r\n        -- Remove entries that don't exist in the @FilterValues parameter\r\n        DELETE FROM Specs_Lookup_Single_Int_Filters\r\n        WHERE SpecId = @SpecId\r\n        AND FilterValue NOT IN (SELECT FilterValue FROM @FilterValues);\r\n\r\n        -- Insert new entries from @FilterValues that don't exist in the table\r\n        INSERT INTO Specs_Lookup_Single_Int_Filters (SpecId, FilterValue)\r\n        SELECT @SpecId, fv.FilterValue\r\n        FROM @FilterValues AS fv\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Specs_Lookup_Single_Int_Filters AS existing\r\n            WHERE existing.SpecId = @SpecId\r\n            AND existing.FilterValue = fv.FilterValue\r\n        );\r\n    END;\r\n\r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        -- Remove entries that don't exist in the @PrimaryCategories parameter\r\n        DELETE FROM Specs_Lookup_Single_Int_Categories\r\n        WHERE SpecId = @SpecId\r\n        AND PrimaryCategoryId NOT IN (SELECT PrimaryCategoryId FROM @PrimaryCategories);\r\n\r\n        -- Insert new entries from @PrimaryCategories that don't exist in the table\r\n        INSERT INTO Specs_Lookup_Single_Int_Categories (SpecId, PrimaryCategoryId)\r\n        SELECT @SpecId, pc.PrimaryCategoryId\r\n        FROM @PrimaryCategories AS pc\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Specs_Lookup_Single_Int_Categories AS existing\r\n            WHERE existing.SpecId = @SpecId\r\n            AND existing.PrimaryCategoryId = pc.PrimaryCategoryId\r\n        );\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL\r\n    BEGIN\r\n        IF @IsGlobal = 1\r\n        BEGIN\r\n            -- Insert @SpecIdif it doesn't already exist\r\n            IF NOT EXISTS (SELECT 1 FROM Specs_Lookup_Single_Int_Global WHERE SpecId = @SpecId)\r\n            BEGIN\r\n                INSERT INTO Specs_Lookup_Single_Int_Global (SpecId)\r\n                VALUES (@SpecId);\r\n            END\r\n        END;\r\n        ELSE\r\n        BEGIN\r\n            -- Delete rows from global table that have @SpecId\r\n            DELETE FROM Specs_Lookup_Single_Int_Global WHERE SpecId = @SpecId;\r\n        END;\r\n    END;\r\nEND;\r\n"
   },
   {
+    "SchemaName": "dbo",
     "ProcedureName": "Update_SpecLookupSingleString",
     "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Update_SpecLookupSingleString]\r\n    @SpecId INT,\r\n    @SpecName NVARCHAR(64),\r\n    @SpecValues TableType_SpecLookupStringValues READONLY,\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    IF @SpecName IS NOT NULL\r\n    BEGIN\r\n        UPDATE Specs_Lookup_Single_String\r\n        SET SpecName = @SpecName\r\n        WHERE SpecId = @SpecId;\r\n    END;\r\n\r\n    IF EXISTS (SELECT 1 FROM @SpecValues)\r\n    BEGIN\r\n        -- Remove entries that don't exist in the @SpecValues parameter\r\n        DELETE FROM Specs_Lookup_Single_String_Values\r\n        WHERE SpecId = @SpecId\r\n        AND SpecValue NOT IN (SELECT SpecValue FROM @SpecValues);\r\n\r\n        -- Insert new entries from @SpecValues that don't exist in the table\r\n        INSERT INTO Specs_Lookup_Single_String_Values (SpecId, SpecValue)\r\n        SELECT @SpecId, sv.SpecValue\r\n        FROM @SpecValues AS sv\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Specs_Lookup_Single_String_Values AS existing\r\n            WHERE existing.SpecId = @SpecId\r\n            AND existing.SpecValue = sv.SpecValue\r\n        );\r\n    END;\r\n\r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        -- Remove entries that don't exist in the @PrimaryCategories parameter\r\n        DELETE FROM Specs_Lookup_Single_String_Categories\r\n        WHERE SpecId = @SpecId\r\n        AND PrimaryCategoryId NOT IN (SELECT PrimaryCategoryId FROM @PrimaryCategories);\r\n\r\n        -- Insert new entries from @PrimaryCategories that don't exist in the table\r\n        INSERT INTO Specs_Lookup_Single_String_Categories (SpecId, PrimaryCategoryId)\r\n        SELECT @SpecId, pc.PrimaryCategoryId\r\n        FROM @PrimaryCategories AS pc\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Specs_Lookup_Single_String_Categories AS existing\r\n            WHERE existing.SpecId = @SpecId\r\n            AND existing.PrimaryCategoryId = pc.PrimaryCategoryId\r\n        );\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL\r\n    BEGIN\r\n        IF @IsGlobal = 1\r\n        BEGIN\r\n            -- Insert @SpecIdif it doesn't already exist\r\n            IF NOT EXISTS (SELECT 1 FROM Specs_Lookup_Single_String_Global WHERE SpecId = @SpecId)\r\n            BEGIN\r\n                INSERT INTO Specs_Lookup_Single_String_Global (SpecId)\r\n                VALUES (@SpecId);\r\n            END\r\n        END;\r\n        ELSE\r\n        BEGIN\r\n            -- Delete rows from global table that have @SpecId\r\n            DELETE FROM Specs_Lookup_Single_String_Global WHERE SpecId = @SpecId;\r\n        END;\r\n    END;\r\nEND;\r\n"
   },
   {
-    "ProcedureName": "Update_UserPassword",
-    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Update_UserPassword]\r\n    @UserId INT,\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    UPDATE UserAccounts\r\n    SET PasswordHash = @Hash, PasswordSalt = @Salt\r\n    WHERE UserId = @UserId\r\nEND;\r\n"
+    "SchemaName": "dbo",
+    "ProcedureName": "Update_SpecLookupSingleBool",
+    "ProcedureDefinition": "CREATE PROCEDURE Update_SpecLookupSingleBool\r\n    @SpecId INT,\r\n    @SpecName NVARCHAR(64),\r\n    @PrimaryCategories TableType_PrimaryCategoryIds READONLY,\r\n    @IsGlobal BIT\r\nAS\r\nBEGIN\r\n    IF @SpecName IS NOT NULL\r\n    BEGIN\r\n        UPDATE Specs_Lookup_Single_Bool\r\n        SET SpecName = @SpecName\r\n        WHERE SpecId = @SpecId;\r\n    END;\r\n\r\n    IF EXISTS (SELECT 1 FROM @PrimaryCategories)\r\n    BEGIN\r\n        -- Remove entries that don't exist in the @PrimaryCategories parameter\r\n        DELETE FROM Specs_Lookup_Single_Bool_Categories\r\n        WHERE SpecId = @SpecId\r\n        AND PrimaryCategoryId NOT IN (SELECT PrimaryCategoryId FROM @PrimaryCategories);\r\n\r\n        -- Insert new entries from @PrimaryCategories that don't exist in the table\r\n        INSERT INTO Specs_Lookup_Single_Bool_Categories (SpecId, PrimaryCategoryId)\r\n        SELECT @SpecId, pc.PrimaryCategoryId\r\n        FROM @PrimaryCategories AS pc\r\n        WHERE NOT EXISTS (\r\n            SELECT 1\r\n            FROM Specs_Lookup_Single_Bool_Categories AS existing\r\n            WHERE existing.SpecId = @SpecId\r\n            AND existing.PrimaryCategoryId = pc.PrimaryCategoryId\r\n        );\r\n    END;\r\n\r\n    IF @IsGlobal IS NOT NULL\r\n    BEGIN\r\n        IF @IsGlobal = 1\r\n        BEGIN\r\n            -- Insert @SpecIdif it doesn't already exist\r\n            IF NOT EXISTS (SELECT 1 FROM Specs_Lookup_Single_Bool_Global WHERE SpecId = @SpecId)\r\n            BEGIN\r\n                INSERT INTO Specs_Lookup_Single_Bool_Global (SpecId)\r\n                VALUES (@SpecId);\r\n            END\r\n        END;\r\n        ELSE\r\n        BEGIN\r\n            -- Delete rows from global table that have @SpecId\r\n            DELETE FROM Specs_Lookup_Single_Bool_Global WHERE SpecId = @SpecId;\r\n        END;\r\n    END;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Update_CategoryPrimary",
+    "ProcedureDefinition": "CREATE PROCEDURE Update_CategoryPrimary\r\n    @PrimaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    IF @Name IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Primary\r\n        SET [Name] = @Name\r\n        WHERE PrimaryCategoryId = @PrimaryCategoryId\r\n    END;\r\n\r\n    IF @ApiUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Primary\r\n        SET ApiUrl = @Name\r\n        WHERE PrimaryCategoryId = @PrimaryCategoryId\r\n    END;\r\n\r\n    IF @ImageUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Primary\r\n        SET ImageUrl = @ImageUrl\r\n        WHERE PrimaryCategoryId = @PrimaryCategoryId\r\n    END;\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        UPDATE Category_Descriptions\r\n        SET [Description] = @Description\r\n        WHERE CategoryTier = 1\r\n        AND CategoryId = @PrimaryCategoryId\r\n    END;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Remove_CategoryPrimary",
+    "ProcedureDefinition": "CREATE PROCEDURE Remove_CategoryPrimary\r\n    @PrimaryCategoryId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Categories_Primary\r\n    WHERE PrimaryCategoryId = @PrimaryCategoryId;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Update_CategorySecondary",
+    "ProcedureDefinition": "CREATE PROCEDURE Update_CategorySecondary\r\n    @PrimaryCategoryId INT,\r\n    @SecondaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    IF @PrimaryCategoryId IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET PrimaryCategoryId = @PrimaryCategoryId\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @Name IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET [Name] = @Name\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @ApiUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET ApiUrl = @Name\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @ImageUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Secondary\r\n        SET ImageUrl = @ImageUrl\r\n        WHERE SecondaryCategoryId = @SecondaryCategoryId\r\n    END;\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        UPDATE Category_Descriptions\r\n        SET [Description] = @Description\r\n        WHERE CategoryTier = 2\r\n        AND CategoryId = @SecondaryCategoryId\r\n    END;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Remove_CategorySecondary",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Remove_CategorySecondary]\r\n    @SecondaryCategoryId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Categories_Secondary\r\n    WHERE @SecondaryCategoryId = @SecondaryCategoryId;\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Update_CategoryTertiary",
+    "ProcedureDefinition": "CREATE PROCEDURE Update_CategoryTertiary\r\n    @PrimaryCategoryId INT,\r\n    @SecondaryCategoryId INT,\r\n    @TertiaryCategoryId INT,\r\n    @Name NVARCHAR(64),\r\n    @ApiUrl NVARCHAR(64),\r\n    @ImageUrl NVARCHAR(64),\r\n    @Description NVARCHAR(1000)\r\nAS\r\nBEGIN\r\n    IF @PrimaryCategoryId IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET PrimaryCategoryId = @PrimaryCategoryId\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @SecondaryCategoryId IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET SecondaryCategoryId = @SecondaryCategoryId\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @Name IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET [Name] = @Name\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @ApiUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET ApiUrl = @Name\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @ImageUrl IS NOT NULL\r\n    BEGIN\r\n        UPDATE Categories_Tertiary\r\n        SET ImageUrl = @ImageUrl\r\n        WHERE TertiaryCategoryId = @TertiaryCategoryId\r\n    END;\r\n\r\n    IF @Description IS NOT NULL\r\n    BEGIN\r\n        UPDATE Category_Descriptions\r\n        SET [Description] = @Description\r\n        WHERE CategoryTier = 3\r\n        AND CategoryId = @TertiaryCategoryId\r\n    END;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Remove_CategoryTertiary",
+    "ProcedureDefinition": "CREATE PROCEDURE Remove_CategoryTertiary\r\n    @TertiaryCategoryId INT\r\nAS\r\nBEGIN\r\n    DELETE FROM Categories_Tertiary\r\n    WHERE TertiaryCategoryId = @TertiaryCategoryId;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_Categories",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_Categories\r\nAS\r\nBEGIN\r\n    SELECT * FROM Categories_Primary;\r\n    SELECT * FROM Categories_Secondary;\r\n    SELECT * FROM Categories_Tertiary;\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_CategoryDescription",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoryDescription\r\n    @CategoryId INT,\r\n    @CategoryTier INT\r\nAS\r\nBEGIN\r\n    SELECT [Description] FROM Category_Descriptions\r\n    WHERE CategoryTier = @CategoryTier\r\n    AND CategoryId = @CategoryId\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_CategoryDescriptionsPrimary",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_CategoryDescriptionsPrimary\r\nAS\r\nBEGIN\r\n    SELECT [Description] FROM Category_Descriptions\r\n    WHERE CategoryTier = 1\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_UserSession",
+    "ProcedureDefinition": "CREATE PROCEDURE Add_UserSession\r\n    @UserId INT,\r\n    @IpAddress NVARCHAR(64),\r\n    @Fingerprint NVARCHAR(64),\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    INSERT INTO User_Sessions (UserId, IpAddress, DeviceFingerprint, TokenHash, TokenSalt)\r\n    VALUES (@UserId, @IpAddress, @Fingerprint, @Hash, @Salt);\r\n    SELECT * FROM User_Sessions WHERE SessionId = SCOPE_IDENTITY();\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_FeaturedProducts",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_FeaturedProducts]\r\nAS\r\nBEGIN\r\n    SELECT * FROM FeaturesProducts\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_FeaturedDeals",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Get_FeaturedDeals]\r\nAS\r\nBEGIN\r\n    SELECT p.*, v.*\r\n    FROM Products p\r\n    LEFT JOIN FeaturesTopDeals d\r\n    ON p.ProductId = d.ProductId\r\n    LEFT JOIN ProductVariants v\r\n    ON p.ProductId = v.ProductId\r\n    WHERE p.ProductId = d.ProductId\r\n    AND v.VariantSubId = d.VariantSubId\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_UserAccount",
+    "ProcedureDefinition": "CREATE PROCEDURE Add_UserAccount\r\n    @Username NVARCHAR(48),\r\n    @Email NVARCHAR(254),\r\n    @Phone NVARCHAR(20),\r\n    @Hash VARBINARY(64),\r\n    @Salt VARBINARY(16)\r\nAS\r\nBEGIN\r\n    INSERT INTO User_Accounts (Username, Email, Phone, PasswordHash, PasswordSalt)\r\n    VALUES (@Username, @Email, @Phone, @Hash, @Salt);\r\n    SELECT * FROM User_Accounts WHERE UserId = SCOPE_IDENTITY();\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_UserAccountById",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_UserAccountById\r\n    @UserId INT\r\nAS\r\nBEGIN\r\n    SELECT * FROM User_Accounts\r\n    WHERE UserId = @UserId\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_UserAccountByEmail",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_UserAccountByEmail\r\n    @Email NVARCHAR(254)\r\nAS\r\nBEGIN\r\n    SELECT * FROM User_Accounts\r\n    WHERE Email = @Email\r\nEND;"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Add_CartItem",
+    "ProcedureDefinition": "CREATE PROCEDURE [dbo].[Add_CartItem]\r\n    @ProductId INT,\r\n    @UserId INT,\r\n    @VariantSubId INT,\r\n    @Quantity INT\r\nAS\r\nBEGIN\r\n    IF NOT EXISTS (\r\n        SELECT 1\r\n        FROM CartItems\r\n        WHERE ProductId = @ProductId\r\n        AND UserId = @UserId\r\n        AND VariantSubId = @VariantSubId\r\n    )\r\n    BEGIN\r\n        INSERT INTO CartItems (ProductId, UserId, VariantSubId, Quantity)\r\n        VALUES (@ProductId, @UserId, @VariantSubId, @Quantity);\r\n    END\r\nEND;\r\n"
+  },
+  {
+    "SchemaName": "dbo",
+    "ProcedureName": "Get_UserAccountByNameOrEmail",
+    "ProcedureDefinition": "CREATE PROCEDURE Get_UserAccountByNameOrEmail\r\n    @Username NVARCHAR(48),\r\n    @Email NVARCHAR(254)\r\nAS\r\nBEGIN\r\n    SELECT * FROM User_Accounts\r\n    WHERE (Username = @Username\r\n    OR Email = @Email)\r\nEND;"
   }
 ]

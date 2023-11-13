@@ -15,9 +15,9 @@ public abstract class DapperRepository
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
     protected const string TABLE_PRODUCT_VARIANTS = "Product_Variants";
     protected const string TABLE_PRODUCT_SPECS_INT_FILTERS = "Product_Specs_Explicit_Int_Filters";
-    protected const string TABLE_PRODUCT_SPECS_INT = "Product_Specs_Explicit_Int_Values";
-    protected const string TABLE_PRODUCT_SPECS_STRING = "Product_Specs_Explicit_String_Values";
-    protected const string TABLE_PRODUCT_SPECS_BOOL = "Specs_Explicit_Bool";
+    protected const string TABLE_PRODUCT_SPECS_INT = "Product_Specs_Lookup_Single_Int_Values";
+    protected const string TABLE_PRODUCT_SPECS_STRING = "Product_Specs_Lookup_Single_String_Values";
+    protected const string TABLE_PRODUCT_SPECS_BOOL = "Product_Specs_Lookup_Single_Bool_Values";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
@@ -60,6 +60,7 @@ public abstract class DapperRepository
     protected const string COL_SPEC_ID = "SpecId";
     protected const string COL_FILTER_INT_ID = "FilterId";
     protected const string COL_SPEC_VALUE_ID = "SpecValueId";
+    protected const string COL_SPEC_VALUE = "SpecValue";
 
     // COLUMNS PRODUCT VARIANTS
     protected const string COL_VARIANT_ID = "VariantId";
@@ -127,6 +128,7 @@ public abstract class DapperRepository
     protected const string PARAM_USER_PASSWORD_SALT = "@PasswordSalt";
     
     // PARAM SESSION
+    protected const string PARAM_SESSION_ID = "@SessionId";
     protected const string PARAM_SESSION_ACTIVE = "@SessionActive";
     protected const string PARAM_SESSION_IP_ADDRESS = "@SessionIpAddress";
     protected const string PARAM_SESSION_HASH = "@SessionHash";

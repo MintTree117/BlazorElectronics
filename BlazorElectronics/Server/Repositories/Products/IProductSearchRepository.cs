@@ -9,5 +9,5 @@ public interface IProductSearchRepository
 {
     Task<IEnumerable<string>?> GetSearchSuggestions( string searchText, int categoryTier, short categoryId );
     Task<string?> GetProductSearchQueryString( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest, CachedSpecData specData );
-    Task<ProductSearch?> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest, CachedSpecData specData );
+    Task<IEnumerable<ProductSearchModel>?> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest, CachedSpecData specData );
 }

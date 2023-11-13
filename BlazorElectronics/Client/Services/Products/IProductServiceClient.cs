@@ -7,7 +7,7 @@ namespace BlazorElectronics.Client.Services.Products;
 public interface IProductServiceClient
 {
     event Action<string>? ExceptionEvent;
-    event Action<ApiReply<ProductSearchResults_DTO?>?>? ProductSearchChanged;
+    event Action<ApiReply<ProductSearchResponse?>?>? ProductSearchChanged;
     event Action<string>? ProductSearchNullabillityTest;
     
     ProductSearchRequest? SearchRequest { get; set; }

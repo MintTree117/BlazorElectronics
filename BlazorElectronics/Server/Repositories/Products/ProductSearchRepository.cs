@@ -7,6 +7,7 @@ using BlazorElectronics.Server.Dtos.Specs;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Mutual;
+using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
@@ -17,15 +18,16 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     const string PARAM_MAX_RATING = $"@Max{COL_PRODUCT_RATING}";
     const string PARAM_MIN_PRICE = "@MinPrice";
     const string PARAM_MAX_PRICE = "@MaxPrice";
-    //const string PARAM_QUERY_OFFSET = "@Offset";
-    //const string PARAM_QUERY_ROWS = "@Rows";
+    const string PARAM_QUERY_OFFSET = "@Offset";
+    const string PARAM_QUERY_ROWS = "@Rows";
     const string PARAM_SEARCH_TEXT = "@SearchText";
     const string PARAM_SPEC_VALUE_ID = "@filterSpec_";
     const string PARAM_SPEC_ID = "@dynamicSpec_";
+    const string PARAM_SPEC_VALUE = "@specValue_";
     const string PARAM_BOOL = "@boolSpec_";
 
     // STORED PROCEDURES
-    const string STORED_PROCEDURE_GET_NAMES_BY_SEARCH_TEXT = "Get_ProductSearchSuggestions";
+    const string STORED_PROCEDURE_GET_SEARCH_SUGGESTIONS = "Get_ProductSearchSuggestions";
 
     enum DynamicSpecCondition
     {
@@ -48,7 +50,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         {
             await using SqlConnection connection = await _dbContext.GetOpenConnection();
             return await connection.QueryAsync<string>(
-                STORED_PROCEDURE_GET_NAMES_BY_SEARCH_TEXT, dynamicParams, commandType: CommandType.StoredProcedure );
+                STORED_PROCEDURE_GET_SEARCH_SUGGESTIONS, dynamicParams, commandType: CommandType.StoredProcedure );
         }
         catch ( SqlException e )
         {
@@ -64,40 +66,29 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         var productQuery = new StringBuilder();
         var countQuery = new StringBuilder();
 
-        await BuildSearchQueryString( categoryIdMap, searchRequest, specData );
+        await BuildProductSearchQuery( categoryIdMap, searchRequest, specData );
         return productQuery + "-----------------------------------------" + countQuery;
     }
-    public async Task<ProductSearch?> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest, CachedSpecData specData )
+    public async Task<IEnumerable<ProductSearchModel>?> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest, CachedSpecData specData )
     {
-        SearchQueryObject searchQueryObject = await BuildSearchQueryString( categoryIdMap, searchRequest, specData );
-        string multiSql = $"{searchQueryObject.SearchQuery}; {searchQueryObject.CountQuery}";
-        
-        return await TryQueryAsync( GetProductSearchQuery, searchQueryObject.DynamicParams, multiSql );
+        SearchQueryObject searchQueryObject = await BuildProductSearchQuery( categoryIdMap, searchRequest, specData );
+        return await TryQueryAsync( GetProductSearchQuery, searchQueryObject.DynamicParams, searchQueryObject.SearchQuery );
     }
     
     // BUILD & EXECUTE QUERY
-    static async Task<ProductSearch?> GetProductSearchQuery( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<ProductSearchModel>?> GetProductSearchQuery( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
     {
-        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( sql, dynamicParams );
-
-        IEnumerable<Product>? products = await multi.ReadAsync<Product>();
-        int count = await multi.ReadFirstAsync<int>();
-
-        await multi.DisposeAsync();
-
-        return new ProductSearch {
-            Products = products,
-            TotalSearchCount = count
-        };
+        return await connection.QueryAsync<ProductSearchModel>( sql, dynamicParams );
     }
-    static async Task<SearchQueryObject> BuildSearchQueryString( CategoryIdMap? categoryMap, ProductSearchRequest request, CachedSpecData specData )
+    static async Task<SearchQueryObject> BuildProductSearchQuery( CategoryIdMap? categoryMap, ProductSearchRequest request, CachedSpecData specData )
     {
         var builder = new StringBuilder();
         var dynamicParams = new DynamicParameters();
 
         await Task.Run( () =>
         {
-            builder.Append( $"SELECT * FROM {TABLE_PRODUCTS}" );
+            builder.Append( $"WITH Results AS (" );
+            builder.Append( $"SELECT *, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
             AppendCategoryJoin( builder, categoryMap );
 
@@ -120,12 +111,22 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
 
             if ( request.SpecFilters is not null )
             {
-                AppendStaticSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_INT_FILTERS, COL_FILTER_INT_ID, request.SpecFilters.IntFilters );
-                AppendStaticSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_STRING, COL_SPEC_VALUE_ID, request.SpecFilters.StringFilters );
+                AppendSingleSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_INT_FILTERS, COL_FILTER_INT_ID, request.SpecFilters.IntFilters );
+                AppendSingleSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_STRING, COL_SPEC_VALUE_ID, request.SpecFilters.StringFilters );
                 AppendBoolSpecConditions( builder, dynamicParams, request.SpecFilters.BoolFilters );
                 AppendDynamicConditions( builder, dynamicParams, DynamicSpecCondition.INCLUDE, specData.MultiProductTableNames, request.SpecFilters.MultiIncludes );
                 AppendDynamicConditions( builder, dynamicParams, DynamicSpecCondition.EXCLUDE, specData.MultiProductTableNames, request.SpecFilters.MultiExcludes );
             }
+
+            builder.Append( " )" );
+            builder.Append( $" SELECT *, TotalCount" );
+            builder.Append( $" FROM Results" );
+            builder.Append( $" ORDER BY {COL_PRODUCT_ID}" );
+            builder.Append( $" OFFSET {PARAM_QUERY_OFFSET} ROWS" );
+            builder.Append( $" FETCH NEXT {PARAM_QUERY_ROWS} ROWS ONLY;" );
+
+            dynamicParams.Add( PARAM_QUERY_OFFSET, Math.Max( 0, request.Page - 1 ) );
+            dynamicParams.Add( PARAM_QUERY_ROWS, request.Rows );
         } );
         
         return new SearchQueryObject() 
@@ -144,13 +145,13 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         builder.Append( $" INNER JOIN {TABLE_PRODUCT_CATEGORIES}" );
         builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_CATEGORIES}.{COL_PRODUCT_ID}" );   
     }
-    static void AppendStaticSpecJoin( StringBuilder builder, string staticTable, bool filtersExist )
+    static void AppendStaticSpecJoin( StringBuilder builder, string tableName, bool filtersExist )
     {
         if ( !filtersExist )
             return;
         
-        builder.Append( $" INNER JOIN {staticTable}" );
-        builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {staticTable}.{COL_PRODUCT_ID}" );
+        builder.Append( $" INNER JOIN {tableName}" );
+        builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {tableName}.{COL_PRODUCT_ID}" );
     }
     static void AppendDynamicSpecJoins( StringBuilder builder, IReadOnlyDictionary<short, string> productSpecTableNames, Dictionary<short, List<short>>? request )
     {
@@ -222,7 +223,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         }
     }
     
-    static void AppendStaticSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, string tableName, string subIdColName, Dictionary<short, List<short>>? request )
+    static void AppendSingleSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, string tableName, string valueIdName, Dictionary<short, List<short>>? request )
     {
         if ( request is null )
             return;
@@ -238,7 +239,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
                 string valueIdParamName = $"{PARAM_SPEC_VALUE_ID}{tableName}{i}";
 
                 string clause = $"( {tableName}.{COL_SPEC_ID} = {specIdParamName}";
-                clause += $" AND {tableName}.{subIdColName} = {valueIdParamName} )";
+                clause += $" AND {tableName}.{valueIdName} = {valueIdParamName} )";
 
                 clauses.Add( clause );
                 
@@ -259,9 +260,14 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
 
         foreach ( short specId in request.Keys )
         {
-            string paramName = $"{PARAM_BOOL}{TABLE_PRODUCT_SPECS_BOOL}{specId}";
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_BOOL}.{COL_SPEC_ID} = {paramName}" );
-            dynamicParams.Add( paramName, request[ specId ] );
+            string idParamName = $"{PARAM_BOOL}{TABLE_PRODUCT_SPECS_BOOL}{specId}";
+            string valueParamName = $"{PARAM_SPEC_VALUE}{TABLE_PRODUCT_SPECS_BOOL}{specId}";
+            
+            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_BOOL}.{COL_SPEC_ID} = {idParamName}" );
+            builder.Append( $" {TABLE_PRODUCT_SPECS_BOOL}.{COL_SPEC_VALUE} = {valueParamName} )" );
+                
+            dynamicParams.Add( idParamName, specId);
+            dynamicParams.Add( valueParamName, request[ specId ] );
         }
     }
     static void AppendDynamicConditions( StringBuilder builder, DynamicParameters dynamicParams, DynamicSpecCondition conditionType, IReadOnlyDictionary<short, string> productSpecTableNames, Dictionary<short, List<short>>? request )
@@ -299,8 +305,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
 
     sealed class SearchQueryObject
     {
-        public string SearchQuery { get; set; } = string.Empty;
-        public string CountQuery { get; set; } = string.Empty;
-        public DynamicParameters DynamicParams { get; set; } = new();
+        public string SearchQuery { get; init; } = string.Empty;
+        public DynamicParameters DynamicParams { get; init; } = new();
     }
 }

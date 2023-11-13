@@ -4,6 +4,12 @@ namespace BlazorElectronics.Shared.Inbound.Products;
 
 public sealed class ProductSuggestionRequest
 {
-    public string? SearchText { get; set; }
-    public CategoryIdMap? CategoryIdMap { get; set; }
+    public ProductSuggestionRequest( string searchText, CategoryIdMap? categoryIdMap )
+    {
+        SearchText = searchText;
+        CategoryIdMap = categoryIdMap;
+    }
+    
+    public string SearchText { get; }
+    public CategoryIdMap? CategoryIdMap { get; }
 }

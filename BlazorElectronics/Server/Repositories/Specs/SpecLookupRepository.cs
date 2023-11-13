@@ -9,11 +9,11 @@ namespace BlazorElectronics.Server.Repositories.Specs;
 
 public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
 {
-    const string PROCEDURE_GET_SPEC_TABLE_META = "Get_SpecTableMeta";
+    const string PROCEDURE_GET_SPEC_TABLE_META = "Get_SpecLookupDataRound1";
 
     public SpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
-    public async Task<SpecLookupsModel?> GetSpecLookupMetaData()
+    public async Task<SpecLookupsModel?> GetSpecLookupDataRound1()
     {
         SqlMapper.GridReader? multi = await TryQueryAsync( GetSpecLookupTableMetaQuery );
 
@@ -34,17 +34,17 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
             StringNames = await multi.ReadAsync() as IEnumerable<SpecLookupNameModel>,
             BoolNames = await multi.ReadAsync() as IEnumerable<SpecLookupNameModel>,
             
-            IntFilters = await multi.ReadAsync() as IEnumerable<SpecLookupFilterModel>,
-            StringFilters = await multi.ReadAsync() as IEnumerable<SpecLookupFilterModel>,
+            IntFilters = await multi.ReadAsync() as IEnumerable<SpecLookupIntFilterModel>,
+            StringValues = await multi.ReadAsync() as IEnumerable<SpecLookupStringValueModel>,
             
             MultiTablesGlobal = await multi.ReadAsync() as IEnumerable<short>,
             MultiTableCategories = await multi.ReadAsync() as IEnumerable<SpecLookupMultiTableCategoryModel>,
             MultiTables = await multi.ReadAsync() as IEnumerable<SpecLookupMultiTableModel>
         };
     }
-    public async Task<SpecLookupValuesModel?> GetSpecLookupMultiData( IEnumerable<string> multiTableNames )
+    public async Task<SpecLookupValuesModel?> GetSpecLookupDataRound2( IEnumerable<string> multiTableNames )
     {
-        string dyanmicSql = await BuildSpecDataQuery( multiTableNames );
+        string dyanmicSql = await BuildSpecLookupDataRound2Query( multiTableNames );
         SqlMapper.GridReader? multi = await TryQueryAsync( GetDynamicSpecLookupsQuery, null, dyanmicSql );
         
         if ( multi is null )
@@ -72,7 +72,7 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         return await connection.QueryMultipleAsync( dynamicSql, commandType: CommandType.Text );
     }
     
-    static async Task<string> BuildSpecDataQuery( IEnumerable<string> multiTableNames )
+    static async Task<string> BuildSpecLookupDataRound2Query( IEnumerable<string> multiTableNames )
     {
         var builder = new StringBuilder();
 

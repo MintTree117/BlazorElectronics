@@ -10,8 +10,8 @@ namespace BlazorElectronics.Server.Repositories.Sessions;
 
 public class SessionRepository : DapperRepository, ISessionRepository
 {
+    const string PROCEDURE_ADD_SESSION = "Add_Session";
     const string PROCEDURE_GET_SESSION = "Get_Session";
-    const string PROCEDURE_CREATE_SESSION = "Create_Session";
 
     public SessionRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
@@ -26,18 +26,17 @@ public class SessionRepository : DapperRepository, ISessionRepository
 
         return await TryQueryTransactionAsync( AddSessionQuery, parameters );
     }
-    public async Task<UserSession?> GetSession( int userId, UserDeviceInfoDto? deviceInfo )
+    public async Task<UserSession?> GetSession( int sessionId )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_USER_ID, userId );
-        parameters.Add( PARAM_SESSION_IP_ADDRESS, deviceInfo?.IpAddress );
+        parameters.Add( PARAM_SESSION_ID, sessionId );
 
         return await TryQueryAsync( GetSessionQuery, parameters );
     }
     
     static async Task<UserSession?> AddSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<UserSession?>( PROCEDURE_CREATE_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleAsync<UserSession?>( PROCEDURE_ADD_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<UserSession?> GetSessionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {

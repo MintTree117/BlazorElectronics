@@ -26,12 +26,16 @@ public class _AdminController : UserController
         if ( !ValidateSessionRequest( request ) )
             return new ApiReply<bool>( BAD_REQUEST_MESSAGE );
         
-        ApiReply<int> adminIdReply = await UserAccountService.VerifyAdminId( request!.Email );
+        ApiReply<int> sessionReply = await SessionService.ValidateSession( request!.SessionId, request.SessionToken, deviceInfo );
 
-        if ( !adminIdReply.Success )
-            return new ApiReply<bool>( adminIdReply.Message );
+        if ( !sessionReply.Success )
+            return new ApiReply<bool>( sessionReply.Message );
+        
+        ApiReply<int> adminIdReply = await UserAccountService.VerifyAdminId( sessionReply.Data );
 
-        return await SessionService.ValidateSession( adminIdReply.Data, request.SessionToken, deviceInfo );
+        return adminIdReply.Success
+            ? new ApiReply<bool>( true )
+            : new ApiReply<bool>( adminIdReply.Message );
     }
     protected async Task<ApiReply<bool>> TryExecuteAdminAction( Delegate action, params object?[] args )
     {
