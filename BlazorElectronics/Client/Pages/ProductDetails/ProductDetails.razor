@@ -86,7 +86,7 @@ else {
     string _cartMessage = string.Empty;
     bool _loaded = false;
 
-    ProductDetails_DTO? _productDetails = null;
+    ProductDetailsResponse? _productDetails = null;
     int _currentImageIndex = 0;
     int _currentVariantId = 1;
 
@@ -105,7 +105,7 @@ else {
     {
         _serverMessage = "Loading Product Details...";
 
-        ApiReply<ProductDetails_DTO?> response = await ProductServiceClient.GetProductDetails( Id );
+        ApiReply<ProductDetailsResponse?> response = await ProductServiceClient.GetProductDetails( Id );
         _loaded = true;
 
         if ( response.Data == null || !response.Success )

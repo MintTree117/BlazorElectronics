@@ -1,7 +1,7 @@
 namespace BlazorElectronics.Shared.DtosOutbound.Products;
 
 [Serializable]
-public class ProductDetails_DTO
+public class ProductDetailsResponse
 {   
     public int Id { get; set; }
     public int Rating { get; set; }

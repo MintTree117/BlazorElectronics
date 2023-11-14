@@ -20,6 +20,6 @@ public interface IProductServiceClient
     string? GetProductSearchUrl();
     
     Task SearchProductsByCategory( ProductSearchRequest filters, string primary, string? secondary = null, string? tertiary = null );
-    Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText );
-    Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId );
+    Task<ApiReply<ProductSuggestionsResponse?>> GetProductSearchSuggestions( string searchText );
+    Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId );
 }

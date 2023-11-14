@@ -1,8 +1,6 @@
 using BlazorElectronics.Server.Caches.Products;
-using BlazorElectronics.Server.Dtos.Specs;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Products;
-using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Mutual;
@@ -14,23 +12,17 @@ public class ProductService : ApiService, IProductService
     readonly IProductCache _cache;
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductDetailsRepository _productDetailsRepository;
-    readonly ISpecLookupService _specLookupService;
 
     const int MAX_PRODUCT_LIST_ROWS = 100;
     const int MAX_SEARCH_TEXT_LENGTH = 64;
     const int MAX_FILTER_ID_LENGTH = 8;
 
     public ProductService(
-        ILogger logger,
-        IProductCache cache, 
-        IProductSearchRepository productSearchRepository, 
-        IProductDetailsRepository productDetailsRepository,
-        ISpecLookupService specLookupService )
+        ILogger logger, IProductCache cache, IProductSearchRepository productSearchRepository, IProductDetailsRepository productDetailsRepository )
         : base( logger )
     {
         _cache = cache;
         _productSearchRepository = productSearchRepository;
-        _specLookupService = specLookupService;
         _productDetailsRepository = productDetailsRepository;
     }
 
@@ -38,32 +30,29 @@ public class ProductService : ApiService, IProductService
     {
         throw new NotImplementedException();
     }
-    public async Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSuggestions( ProductSuggestionRequest request )
+    public async Task<ApiReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
         Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryTier, request.CategoryIdMap.CategoryId );
         ApiReply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
         if ( !repoReply.Success )
-            return new ApiReply<ProductSearchSuggestions_DTO?>( repoReply.Message );
+            return new ApiReply<ProductSuggestionsResponse?>( repoReply.Message );
 
-        return new ApiReply<ProductSearchSuggestions_DTO?> {
+        return new ApiReply<ProductSuggestionsResponse?> {
             Data = await MapSearchSuggestionsToResponse( repoReply.Data! ),
             Success = true,
             Message = "Found matching results."
         };
     }
-    public async Task<ApiReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request, CachedSpecData specData )
+    public async Task<ApiReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request )
     {
-        ApiReply<ProductSearchRequest> validateReply = await GetValidatedProductSearchRequest( request );
-
-        if ( !validateReply.Success || validateReply.Data is null )
-            return new ApiReply<ProductSearchResponse?>( validateReply.Message );
-
+        request = await ValidateProductSearchRequest( request );
+        
         IEnumerable<ProductSearchModel>? models;
 
         try
         {
-            models = await _productSearchRepository.GetProductSearch( categoryIdMap, validateReply.Data, specData );
+            models = await _productSearchRepository.GetProductSearch( categoryIdMap, request );
 
             if ( models is null )
                 return new ApiReply<ProductSearchResponse?>( NO_DATA_FOUND_MESSAGE );
@@ -76,34 +65,33 @@ public class ProductService : ApiService, IProductService
 
         return new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) );
     }
-    public async Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId )
     {
-        Task<ProductDetails_DTO?> cacheFetchFunction = _cache.GetProductDetails( productId );
+        Task<ProductDetailsResponse?> cacheFetchFunction = _cache.GetProductDetails( productId );
         var cacheFetchResult = ExecuteIoCall( async () => await cacheFetchFunction );
         
-        
-        ProductDetails_DTO? dto;
+        ProductDetailsResponse? dto;
 
         try
         {
             dto = await _cache.GetProductDetails( productId );
             if ( dto != null )
-                return new ApiReply<ProductDetails_DTO?>( dto, true, "Successfully got Product Details from cache." );
+                return new ApiReply<ProductDetailsResponse?>( dto, true, "Successfully got Product Details from cache." );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<ProductDetails_DTO?>( e.Message );
+            return new ApiReply<ProductDetailsResponse?>( e.Message );
         }
 
-        ProductDetails? model;
+        ProductOverviewModel? model;
 
         try
         {
-            model = await _productDetailsRepository.GetProductDetailsById( productId );
+            model = await _productDetailsRepository.GetProductOverview( productId );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<ProductDetails_DTO?>( e.Message );
+            return new ApiReply<ProductDetailsResponse?>( e.Message );
         }
 
         dto = await MapProductDetailsToResponse( model! );
@@ -114,31 +102,46 @@ public class ProductService : ApiService, IProductService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<ProductDetails_DTO?>( dto, true, $"Successfully retrieved ProductDetails from repository, but failed to cache with message: {e.Message}" );
+            return new ApiReply<ProductDetailsResponse?>( dto, true, $"Successfully retrieved ProductDetails from repository, but failed to cache with message: {e.Message}" );
         } 
 
-        return new ApiReply<ProductDetails_DTO?>( dto, true, "Successfully retrieved ProductDetails from repository, and cached." );
+        return new ApiReply<ProductDetailsResponse?>( dto, true, "Successfully retrieved ProductDetails from repository, and cached." );
     }
 
-    static async Task<ApiReply<ProductSearchRequest>> GetValidatedProductSearchRequest( ProductSearchRequest? request )
+    static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest? request )
     {
-        if ( request == null )
-            return new ApiReply<ProductSearchRequest>( new ProductSearchRequest(), true, "Validated Search Request." );
+        if ( request is null )
+            return new ProductSearchRequest();
 
-        request.Page = Math.Max( request.Page, 0 );
-        request.Rows = Math.Clamp( request.Rows, 0, MAX_PRODUCT_LIST_ROWS );
-        request.MinPrice = request.MinPrice == null ? null : Math.Max( request.MinPrice.Value, 0 );
-        request.MaxPrice = request.MaxPrice == null ? null : Math.Max( request.MaxPrice.Value, 0 );
-        request.MinRating = request.MinRating == null ? null : Math.Max( request.MinRating.Value, 0 );
-        request.MaxRating = request.MaxRating == null ? null : Math.Max( request.MaxRating.Value, 0 );
-        request.SearchText = request.SearchText;
+        return await Task.Run( () =>
+        {
+            request.Page = Math.Max( request.Page, 0 );
+            request.Rows = Math.Clamp( request.Rows, 0, MAX_PRODUCT_LIST_ROWS );
 
-        if ( request.SearchText?.Length > MAX_SEARCH_TEXT_LENGTH )
-            request.SearchText.Remove( MAX_SEARCH_TEXT_LENGTH - 1 );
-        
-        return null;
+            request.MinPrice = request.MinPrice is null ? null : Math.Max( request.MinPrice.Value, 0 );
+            request.MaxPrice = request.MaxPrice is null ? null : Math.Max( request.MaxPrice.Value, 0 );
+            request.MinRating = request.MinRating is null ? null : Math.Max( request.MinRating.Value, 0 );
+            request.MaxRating = request.MaxRating is null ? null : Math.Max( request.MaxRating.Value, 0 );
+
+            if ( request.SearchText?.Length > MAX_SEARCH_TEXT_LENGTH )
+                request.SearchText.Remove( MAX_SEARCH_TEXT_LENGTH - 1 );
+
+            ProductSearchRequestSpecFilters? specFilters = request.SpecFilters;
+
+            if ( specFilters is null )
+                return request;
+
+            TrimExcessFilterLists( specFilters.IntFilters );
+            TrimExcessFilterLists( specFilters.StringFilters );
+            TrimExcessFilterLists( specFilters.MultiIncludes );
+            TrimExcessFilterLists( specFilters.MultiExcludes );
+            TrimExcessBoolFilters( specFilters.BoolFilters );
+
+            return request;
+
+        } );
     }
-    static async Task<ProductSearchSuggestions_DTO> MapSearchSuggestionsToResponse( IEnumerable<string> suggestions )
+    static async Task<ProductSuggestionsResponse> MapSearchSuggestionsToResponse( IEnumerable<string> suggestions )
     {
         var suggestionList = new List<string>();
 
@@ -147,7 +150,7 @@ public class ProductService : ApiService, IProductService
             suggestionList = suggestions.ToList();
         } );
 
-        return new ProductSearchSuggestions_DTO {
+        return new ProductSuggestionsResponse {
             Suggestions = suggestionList
         };
     }
@@ -171,24 +174,24 @@ public class ProductService : ApiService, IProductService
 
         return dto;
     }
-    static async Task<ProductDetails_DTO> MapProductDetailsToResponse( ProductDetails productDetails )
+    static async Task<ProductDetailsResponse> MapProductDetailsToResponse( ProductOverviewModel productOverviewModel )
     {
-        var dto = new ProductDetails_DTO();
+        var dto = new ProductDetailsResponse();
 
         await Task.Run( () =>
         {
-            if ( productDetails.Product == null )
+            if ( productOverviewModel.Product == null )
                 return;
             
-            dto.Id = productDetails.Product.ProductId;
-            dto.Title = productDetails.Product.ProductTitle;
+            dto.Id = productOverviewModel.Product.ProductId;
+            dto.Title = productOverviewModel.Product.ProductTitle;
 
-            if ( productDetails.ProductDescription != null )
+            if ( productOverviewModel.ProductDescription != null )
             {
-                dto.Description = productDetails.ProductDescription.DescriptionBody ?? "No description!";
+                dto.Description = productOverviewModel.ProductDescription.DescriptionBody ?? "No description!";
             }
 
-            foreach ( ProductVariant variant in productDetails.Product.ProductVariants )
+            foreach ( ProductVariant variant in productOverviewModel.Product.ProductVariants )
             {
                 dto.Variants.Add( new ProductVariant_DTO {
                     Id = variant.VariantId,
@@ -198,24 +201,46 @@ public class ProductService : ApiService, IProductService
                 } );
             }
 
-            foreach ( ProductImage image in productDetails.ProductImages )
+            foreach ( ProductImage image in productOverviewModel.ProductImages )
             {
                 dto.Images.Add( new ProductImage_DTO {
                     Url = image.ImageUrl,
                     VariantId = image.ProductVariantId
                 } );
             }
-
-            foreach ( ProductReview review in productDetails.ProductReviews )
-            {
-                dto.Reviews.Add( new ProductReview_DTO {
-                    Rating = review.ReviewScore,
-                    Review = review.ReviewBody,
-                    UserId = review.UserId
-                } );
-            }
         } );
 
         return dto;
+    }
+
+    static void TrimExcessFilterLists( Dictionary<short, List<short>>? filters )
+    {
+        if ( filters is null )
+            return;
+        
+        List<short> keysToTrim = filters.Keys.Where( k => filters[ k ].Count > MAX_FILTER_ID_LENGTH ).ToList();
+        foreach ( short key in keysToTrim )
+        {
+            filters[ key ] = filters[ key ].Take( MAX_FILTER_ID_LENGTH ).ToList();
+        }
+        
+        List<short> keysToRemove = filters.Keys.Skip( MAX_FILTER_ID_LENGTH ).ToList();
+        foreach ( short key in keysToRemove )
+        {
+            filters.Remove( key );
+        }
+    }
+    static void TrimExcessBoolFilters( Dictionary<short, bool>? filters )
+    {
+        if ( filters is null || filters.Count <= MAX_FILTER_ID_LENGTH )
+            return;
+        
+        List<KeyValuePair<short, bool>> trimmedFilters = filters.Take( MAX_FILTER_ID_LENGTH ).ToList();
+        filters.Clear();
+        
+        foreach ( KeyValuePair<short, bool> pair in trimmedFilters )
+        {
+            filters.Add( pair.Key, pair.Value );
+        }
     }
 }

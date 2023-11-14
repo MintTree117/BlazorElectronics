@@ -11,49 +11,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ProductSearchModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupIntFilterModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupStringValueModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/ControllerRoutes.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Client/Pages/ProductSearch/ProductList.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Client/Pages/ProductSearch/ProductList.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Client/Pages/ProductDetails/ProductDetails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Client/Pages/ProductDetails/ProductDetails.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Client/Services/Products/IProductServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Client/Services/Products/IProductServiceClient.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Client/Services/Products/ProductServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Client/Services/Products/ProductServiceClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Client/Services/Users/UserServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Client/Services/Users/UserServiceClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/_AdminController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Controllers/_AdminController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminCategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Admin/Repositories/AdminCategoryRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Client/Shared/ProductSearchBar.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Client/Shared/ProductSearchBar.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Caches/Products/IProductCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Caches/Products/IProductCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Caches/Products/ProductCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Caches/Products/ProductCache.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/ProductController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/ProductController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Controllers/UserController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/CachedSpecData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/CachedSpecData.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/SpecDataDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Dtos/Specs/SpecDataDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ProductSearch.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupFilterModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableCategoryModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableCategoryModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupNameModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupNameModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupSingleCategoryModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupSingleCategoryModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ProductDetails.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ProductOverviewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Products/ProductSpecFilter.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupMultiTableCategoryModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupSingleCategoryModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupCategoryModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupsModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Models/Specs/SpecLookupsModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Categories/CategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Categories/CategoryRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/DapperRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/DapperRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductDetailsRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductDetailsRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductSearchRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/IProductSearchRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductDetailsRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductDetailsRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductSearchRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Products/ProductSearchRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Sessions/ISessionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Sessions/ISessionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Sessions/SessionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Sessions/SessionRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/ISpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/ISpecLookupRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/SpecLookupRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Specs/SpecLookupRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Users/UserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Repositories/Users/UserRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/IProductService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Products/ProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/ISessionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/ISessionService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/SessionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Sessions/SessionService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecLookupService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Specs/SpecLookupService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/IUserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/IUserAccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/UserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Server/Services/Users/UserAccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Products/ProductSuggestionRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Products/ProductSuggestionRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Users/SessionApiRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Inbound/Users/SessionApiRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductSearchResults_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductSearchResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/Product_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/Products_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/Products_DTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductDetails_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductDetailsResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductSearchSuggestions_DTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Products/ProductSuggestionsResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFiltersResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlazorElectronics/Shared/Outbound/Specs/SpecFiltersResponse.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -313,6 +298,10 @@
       <workItem from="1699826497789" duration="4663000" />
       <workItem from="1699844774142" duration="993000" />
       <workItem from="1699884345706" duration="9825000" />
+      <workItem from="1699897260584" duration="3135000" />
+      <workItem from="1699908985530" duration="1852000" />
+      <workItem from="1699921466793" duration="2494000" />
+      <workItem from="1700003830366" duration="2177000" />
     </task>
     <servers />
   </component>

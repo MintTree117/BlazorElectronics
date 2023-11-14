@@ -10,15 +10,15 @@ public sealed class ProductCache : ServiceCache, IProductCache
     
     public ProductCache( IDistributedCache memoryCache ) : base( memoryCache ) { }
     
-    public async Task<ProductDetails_DTO?> GetProductDetails( int id )
+    public async Task<ProductDetailsResponse?> GetProductDetails( int id )
     {
         string key = $"{CACHE_KEY_PRODUCT_DETAILS}{id}";
-        return await GetFromCache<ProductDetails_DTO>( key );
+        return await GetFromCache<ProductDetailsResponse>( key );
     }
-    public async Task CacheProductDetails( ProductDetails_DTO dto )
+    public async Task CacheProductDetails( ProductDetailsResponse response )
     {
-        string key = $"{CACHE_KEY_PRODUCT_DETAILS}{dto.Id}";
-        await Cache( key, dto, new DistributedCacheEntryOptions()
+        string key = $"{CACHE_KEY_PRODUCT_DETAILS}{response.Id}";
+        await Cache( key, response, new DistributedCacheEntryOptions()
             .SetSlidingExpiration( TimeSpan.FromHours( 1.0 ) )
             .SetAbsoluteExpiration( TimeSpan.FromDays( 1 ) ) );
     }

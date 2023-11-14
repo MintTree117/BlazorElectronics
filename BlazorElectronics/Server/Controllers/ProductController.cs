@@ -54,12 +54,12 @@ public class ProductController : ControllerBase
     // END TESTING
 
     [HttpPost( "suggestions" )]
-    public async Task<ActionResult<ApiReply<ProductSearchSuggestions_DTO>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )
+    public async Task<ActionResult<ApiReply<ProductSuggestionsResponse>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )
     {
         ApiReply<bool> validateReply = await ValidateSearchSuggestionRequest( request );
 
         if ( !validateReply.Data )
-            return BadRequest( new ApiReply<ProductSearchSuggestions_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<ProductSuggestionsResponse>( validateReply.Message ) );
         
         return Ok( await _productService.GetProductSuggestions( request ) );
     }
@@ -79,7 +79,7 @@ public class ProductController : ControllerBase
         return await GetProductSearchResponse( filters, primaryUrl, secondaryUrl, tertiaryUrl );
     }
     [HttpGet( "details/{productId:int}" )]
-    public async Task<ActionResult<ApiReply<ProductDetails_DTO?>>> GetProductDetails( int productId )
+    public async Task<ActionResult<ApiReply<ProductDetailsResponse?>>> GetProductDetails( int productId )
     {
         return Ok( await _productService.GetProductDetails( productId ) );
     }
@@ -96,7 +96,7 @@ public class ProductController : ControllerBase
         if ( !specDataReply.Success || specDataReply.Data is null )
             return Ok( specDataReply.Message );
 
-        return Ok( await _productService.GetProductSearch( categoryReply.Data, request, specDataReply.Data ) );
+        return Ok( await _productService.GetProductSearch( categoryReply.Data, request ) );
     }
     async Task<ApiReply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
     {

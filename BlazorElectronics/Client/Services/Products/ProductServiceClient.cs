@@ -116,24 +116,24 @@ public class ProductServiceClient : IProductServiceClient
         return urlBuilder.ToString();
     }
     
-    public async Task<ApiReply<ProductSearchSuggestions_DTO?>> GetProductSearchSuggestions( string searchText )
+    public async Task<ApiReply<ProductSuggestionsResponse?>> GetProductSearchSuggestions( string searchText )
     {
         string url = $"{PRODUCT_SEARCH_SUGGESTIONS_URL}{searchText}";
 
         try
         {
-            var response = await _http.GetFromJsonAsync<ApiReply<ProductSearchSuggestions_DTO?>>( url );
+            var response = await _http.GetFromJsonAsync<ApiReply<ProductSuggestionsResponse?>>( url );
 
             if ( response == null )
-                return new ApiReply<ProductSearchSuggestions_DTO?>( null, false, "Service response is null!" );
+                return new ApiReply<ProductSuggestionsResponse?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new ApiReply<ProductSearchSuggestions_DTO?>( null, false, response.Message ??= "Failed to retrieve Search Suggestions; message is null!" )
+                ? new ApiReply<ProductSuggestionsResponse?>( null, false, response.Message ??= "Failed to retrieve Search Suggestions; message is null!" )
                 : response;
         }
         catch ( Exception e )
         {
-            return new ApiReply<ProductSearchSuggestions_DTO?>( null, false, e.Message );
+            return new ApiReply<ProductSuggestionsResponse?>( null, false, e.Message );
         }
     }
     public async Task SearchProductsByCategory( ProductSearchRequest filters, string primary, string? secondary = null, string? tertiary = null )
@@ -159,23 +159,23 @@ public class ProductServiceClient : IProductServiceClient
             ExceptionEvent?.Invoke( e.Message );
         }
     }
-    public async Task<ApiReply<ProductDetails_DTO?>> GetProductDetails( int productId )
+    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId )
     {
         try
         {
             string url = $"{PRODUCT_DETAILS_URL}/{productId}";
-            var response = await _http.GetFromJsonAsync<ApiReply<ProductDetails_DTO?>>( url );
+            var response = await _http.GetFromJsonAsync<ApiReply<ProductDetailsResponse?>>( url );
 
             if ( response == null )
-                return new ApiReply<ProductDetails_DTO?>( null, false, "Service response is null!" );
+                return new ApiReply<ProductDetailsResponse?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new ApiReply<ProductDetails_DTO?>( null, false, response.Message ??= "Failed to retrieve Product Details; message is null!" )
+                ? new ApiReply<ProductDetailsResponse?>( null, false, response.Message ??= "Failed to retrieve Product Details; message is null!" )
                 : response;
         }
         catch ( Exception e )
         {
-            return new ApiReply<ProductDetails_DTO?>( null, false, e.Message );
+            return new ApiReply<ProductDetailsResponse?>( null, false, e.Message );
         }
     }
     

@@ -1,8 +1,8 @@
 namespace BlazorElectronics.Server.Models.Specs;
 
-public sealed class SpecLookupSingleCategoryModel
+public sealed class SpecLookupCategoryModel
 {
-    public SpecLookupSingleCategoryModel( short specId, short primaryCategoryId )
+    public SpecLookupCategoryModel( short specId, short primaryCategoryId )
     {
         SpecId = specId;
         PrimaryCategoryId = primaryCategoryId;

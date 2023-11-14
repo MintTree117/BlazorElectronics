@@ -14,10 +14,11 @@ public abstract class DapperRepository
     protected const string TABLE_PRODUCT_IMAGES = "Product_Images";
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
     protected const string TABLE_PRODUCT_VARIANTS = "Product_Variants";
-    protected const string TABLE_PRODUCT_SPECS_INT_FILTERS = "Product_Specs_Explicit_Int_Filters";
+    protected const string TABLE_PRODUCT_SPECS_INT_FILTERS = "Product_Specs_Lookup_Single_Int_Filters";
     protected const string TABLE_PRODUCT_SPECS_INT = "Product_Specs_Lookup_Single_Int_Values";
     protected const string TABLE_PRODUCT_SPECS_STRING = "Product_Specs_Lookup_Single_String_Values";
     protected const string TABLE_PRODUCT_SPECS_BOOL = "Product_Specs_Lookup_Single_Bool_Values";
+    protected const string TABLE_PRODUCT_SPECS_MULTI = "Product_Specs_Lookup_Multi_String_Values";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
