@@ -3,13 +3,15 @@
 @inject IProductServiceClient ProductService
 
 <PageTitle>BlazorElectronics</PageTitle>
-<FeaturedProducts></FeaturedProducts>
-<FeaturedDeals></FeaturedDeals>
 
 <span>@_debugMessage</span>
 
 @code
 {
+    /*
+     <FeaturedProducts></FeaturedProducts>
+    <FeaturedDeals></FeaturedDeals>*/
+    
     string _debugMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()

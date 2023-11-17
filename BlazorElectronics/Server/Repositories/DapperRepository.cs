@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using Dapper;
@@ -123,7 +124,7 @@ public abstract class DapperRepository
     protected const string PARAM_USER_ID = "@UserId";
     protected const string PARAM_USER_NAME = "@Username";
     protected const string PARAM_USER_EMAIL = "@Email";
-    protected const string PARAM_USER_EMAIL_OR_NAME = "@EmailOrName";
+    protected const string PARAM_USER_NAME_OR_EMAIL = "@NameOrEmail";
     protected const string PARAM_USER_PHONE = "@Phone";
     protected const string PARAM_USER_PASSWORD_HASH = "@PasswordHash";
     protected const string PARAM_USER_PASSWORD_SALT = "@PasswordSalt";
@@ -131,7 +132,8 @@ public abstract class DapperRepository
     // PARAM SESSION
     protected const string PARAM_SESSION_ID = "@SessionId";
     protected const string PARAM_SESSION_ACTIVE = "@SessionActive";
-    protected const string PARAM_SESSION_IP_ADDRESS = "@SessionIpAddress";
+    protected const string PARAM_SESSION_IP_ADDRESS = "@IpAddress";
+    protected const string PARAM_SESSION_DEVICE_FINGERPRINT = "@Fingerprint";
     protected const string PARAM_SESSION_HASH = "@SessionHash";
     protected const string PARAM_SESSION_SALT = "@SessionSalt";
     
@@ -163,77 +165,83 @@ public abstract class DapperRepository
     protected async Task<T?> TryQueryAsync<T>( DapperQueryDelegate<T> dapperQueryDelegate, DynamicParameters? dynamicParams = null, string? dynamicSql = null )
     {
         int currentRetry = 0;
-        
-        while ( currentRetry < MAX_RETRIES )
+        while ( true )
         {
             try
             {
                 await using SqlConnection? connection = await _dbContext.GetOpenConnection();
                 return await dapperQueryDelegate.Invoke( connection, dynamicSql, dynamicParams );
             }
-            catch ( Exception ex ) when ( ex is TimeoutException )
+            catch ( TimeoutException timeout )
             {
                 currentRetry++;
+
+                if ( currentRetry >= MAX_RETRIES )
+                    throw new RepositoryException( timeout.Message, timeout );
+
                 await Task.Delay( RETRY_DELAY_MILLISECONDS );
             }
+            catch ( SqlException sqlException )
+            {
+                throw new RepositoryException( sqlException.Message, sqlException );
+            }
+            catch ( Exception e )
+            {
+                throw new RepositoryException( e.Message, e );
+            }
         }
-
-        return default;
     }
     protected async Task<T?> TryQueryTransactionAsync<T>( DapperQueryTransactionDelegate<T> dapperQueryDelegate, DynamicParameters? dynamicParams = null, string? dynamicSql = null )
     {
-        SqlConnection connection = null;
-        DbTransaction transaction = null;
-        
-        int currentConnectionRetry = 0;
-        int currentQueryRetry = 0;
+        SqlConnection? connection = null;
+        DbTransaction? transaction = null;
 
-        while ( currentConnectionRetry < MAX_RETRIES )
+        int currentRetry = 0;
+        while ( true )
         {
             try
             {
                 connection = await _dbContext.GetOpenConnection();
-                transaction = await connection.BeginTransactionAsync();
-            }
-            catch ( Exception ex ) when ( ex is TimeoutException )
-            {
-                currentConnectionRetry++;
-                await Task.Delay( RETRY_DELAY_MILLISECONDS );
+                transaction = await connection.BeginTransactionAsync( IsolationLevel.ReadCommitted );
 
-                if ( currentConnectionRetry <= MAX_RETRIES ) 
-                    continue;
-                
-                await HandleConnectionTransactionDisposal( connection, transaction );
-                return default;
-            }
-        }
-
-        while ( currentQueryRetry < MAX_RETRIES )
-        {
-            try
-            {
-                T? transactionResult = await dapperQueryDelegate.Invoke( connection!, transaction!, dynamicSql, dynamicParams );
-                await transaction!.CommitAsync();
-                await transaction.DisposeAsync();
-                await connection!.CloseAsync();
+                T? transactionResult = await dapperQueryDelegate.Invoke( connection, transaction, dynamicSql, dynamicParams );
+                await transaction.CommitAsync();
                 return transactionResult;
             }
-            catch ( Exception ex ) when ( ex is TimeoutException )
+            catch ( TimeoutException timeout )
             {
-                currentQueryRetry++;
+                currentRetry++;
+
+                if ( currentRetry >= MAX_RETRIES )
+                    throw new RepositoryException( timeout.Message, timeout );
+
                 await Task.Delay( RETRY_DELAY_MILLISECONDS );
-
-                if ( currentQueryRetry <= MAX_RETRIES )
-                    continue;
-
-                await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-                return default;
             }
+            catch ( SqlException sqlException )
+            {
+                throw new RepositoryException( sqlException.Message, sqlException );
+            }
+            catch ( Exception e )
+            {
+                throw new RepositoryException( e.Message, e );
+            }
+            finally
+            {
+                if ( transaction?.Connection is not null )
+                    await transaction.RollbackAsync();
+                
+                if ( transaction is not null )
+                    await transaction.DisposeAsync();
+                
+                if ( connection is not null )
+                {
+                    await connection.CloseAsync();
+                    await connection.DisposeAsync();
+                }
+            }    
         }
-        
-        return default;
     }
-
+    
     protected static async Task HandleConnectionTransactionDisposal( SqlConnection? connection, DbTransaction? transaction = null )
     {
         if ( transaction != null )

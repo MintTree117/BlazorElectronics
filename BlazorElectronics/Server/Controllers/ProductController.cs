@@ -1,3 +1,4 @@
+using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Dtos.Specs;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
@@ -6,6 +7,8 @@ using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound;
 using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Outbound.Categories;
+using BlazorElectronics.Shared.Outbound.Products;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
@@ -81,7 +84,12 @@ public class ProductController : ControllerBase
     [HttpGet( "details/{productId:int}" )]
     public async Task<ActionResult<ApiReply<ProductDetailsResponse?>>> GetProductDetails( int productId )
     {
-        return Ok( await _productService.GetProductDetails( productId ) );
+        ApiReply<CategoriesDto?> categoriesReply = await _categoryService.GetCategoriesDto();
+
+        if ( !categoriesReply.Success || categoriesReply.Data is null )
+            return Ok( new ApiReply<ProductDetailsResponse?>( categoriesReply.Message ) );
+        
+        return Ok( await _productService.GetProductDetails( productId, categoriesReply.Data ) );
     }
 
     async Task<ActionResult<ApiReply<ProductSearchResponse?>>> GetProductSearchResponse( ProductSearchRequest? request, string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )

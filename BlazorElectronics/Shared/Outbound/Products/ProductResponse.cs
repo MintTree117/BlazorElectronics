@@ -1,3 +1,5 @@
+using BlazorElectronics.Shared.Outbound.Products;
+
 namespace BlazorElectronics.Shared.DtosOutbound.Products;
 
 public sealed class ProductResponse
@@ -6,5 +8,5 @@ public sealed class ProductResponse
     public string Title { get; set; } = string.Empty;
     public string Thumbnail { get; set; } = string.Empty;
     public int Rating { get; set; }
-    public List<ProductVariant_DTO> Variants { get; set; } = new();
+    public List<ProductVariantResponse> Variants { get; set; } = new();
 }

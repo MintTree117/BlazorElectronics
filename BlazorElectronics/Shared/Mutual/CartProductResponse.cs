@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Shared.Mutual;
 
-public sealed class CartItem_DTO
+public sealed class CartProductResponse
 {
     public int UserId { get; set; }
     public int ProductId { get; set; }

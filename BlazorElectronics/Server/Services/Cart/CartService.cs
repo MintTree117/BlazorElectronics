@@ -15,7 +15,7 @@ public class CartService : ICartService
         _cartRepository = cartRepository;
     }
     
-    public async Task<ApiReply<Cart_DTO?>> PostCartItems( int userId, List<CartItemId_DTO> cartItemsDtos )
+    public async Task<ApiReply<CartResponse?>> PostCartItems( int userId, List<CartItemId_DTO> cartItemsDtos )
     {
         List<CartItem> models = MapItemIdsToModels( cartItemsDtos, userId );
         
@@ -25,7 +25,7 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<Cart_DTO?>( e.Message );
+            return new ApiReply<CartResponse?>( e.Message );
         }
         
         IEnumerable<CartItem>? allItems;
@@ -36,11 +36,11 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<Cart_DTO?>( e.Message );
+            return new ApiReply<CartResponse?>( e.Message );
         }
         
         GetProductIdsFromModels( allItems!, out List<int> productIds, out List<int> variantIds );
-        IEnumerable<Product>? cartProducts;
+        IEnumerable<CartProductModel>? cartProducts;
         
         try
         {
@@ -48,11 +48,11 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<Cart_DTO?>( e.Message );
+            return new ApiReply<CartResponse?>( e.Message );
         }
 
-        Cart_DTO cartDto = await MapProductsToCart( cartProducts!, cartItemsDtos );
-        return new ApiReply<Cart_DTO?>( cartDto, true, "Successfully inserted Cart Items to database, and retrieved Cart Products from database." );
+        CartResponse cartResponse = await MapProductsToCart( cartProducts!, cartItemsDtos );
+        return new ApiReply<CartResponse?>( cartResponse, true, "Successfully inserted Cart Items to database, and retrieved Cart Products from database." );
     }
     public async Task<ApiReply<bool>> AddToCart( int userId, CartItemId_DTO cartItem )
     {
@@ -116,7 +116,7 @@ public class CartService : ICartService
 
         return new ApiReply<int>( count.Value, true, $"Found cart items for user {userId}" );
     }
-    public async Task<ApiReply<Cart_DTO?>> GetCartProducts( int userId )
+    public async Task<ApiReply<CartResponse?>> GetCartProducts( int userId )
     {
         IEnumerable<CartItem>? cartItems = null;
 
@@ -126,13 +126,13 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<Cart_DTO?>( e.Message );
+            return new ApiReply<CartResponse?>( e.Message );
         }
         
         List<CartItem> itemsList = cartItems!.ToList();
         GetProductIdsFromModels( itemsList, out List<int> productIds, out List<int> variantIds );
 
-        IEnumerable<Product>? cartProducts = null;
+        IEnumerable<CartProductModel>? cartProducts = null;
 
         try
         {
@@ -140,11 +140,11 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<Cart_DTO?>( e.Message );
+            return new ApiReply<CartResponse?>( e.Message );
         }
 
-        Cart_DTO cartDto = await MapProductsToCart( cartProducts!, itemsList.ToList() );
-        return new ApiReply<Cart_DTO?>( cartDto, true, "Successfully retrieved Cart Products from database." );
+        CartResponse cartResponse = await MapProductsToCart( cartProducts!, itemsList.ToList() );
+        return new ApiReply<CartResponse?>( cartResponse, true, "Successfully retrieved Cart Products from database." );
     }
     
     static void GetProductIdsFromModels( IEnumerable<CartItem> models, out List<int> productIds, out List<int> variantIds )
@@ -176,57 +176,57 @@ public class CartService : ICartService
             Quantity = dto.Quantity
         };
     }
-    static async Task<Cart_DTO> MapProductsToCart( IEnumerable<Product> products, List<CartItemId_DTO> dtos )
+    static async Task<CartResponse> MapProductsToCart( IEnumerable<CartProductModel> products, List<CartItemId_DTO> dtos )
     {
-        var cartDto = new Cart_DTO();
+        var cartDto = new CartResponse();
 
         await Task.Run( () =>
         {
-            foreach ( Product p in products )
+            foreach ( CartProductModel p in products )
             {
-                if ( p.ProductVariants.Count <= 0 )
+                /*if ( p.ProductVariants.Count <= 0 )
                     continue;
 
-                ProductVariant variantData = p.ProductVariants[ 0 ];
+                ProductVariantModel variantModelData = p.ProductVariants[ 0 ];
 
-                cartDto.Items.Add( new CartItem_DTO {
+                cartDto.Items.Add( new CartProductResponse {
                     ProductId = p.ProductId,
                     ProductTitle = p.ProductTitle,
                     ProductThumbnail = p.ProductThumbnail,
-                    VariantId = variantData.VariantId,
-                    VariantName = variantData.VariantName,
-                    MainPrice = variantData.VariantPriceMain,
-                    SalePrice = variantData.VariantPriceSale,
-                    Quantity = dtos.Find( x => x.ProductId == p.ProductId && x.VariantId == variantData.VariantId )!.Quantity
-                } );
+                    VariantId = variantModelData.VariantId,
+                    VariantName = variantModelData.VariantName,
+                    MainPrice = variantModelData.VariantPriceMain,
+                    SalePrice = variantModelData.VariantPriceSale,
+                    Quantity = dtos.Find( x => x.ProductId == p.ProductId && x.VariantId == variantModelData.VariantId )!.Quantity
+                } );*/
             }
         } );
 
         return cartDto;
     }
-    static async Task<Cart_DTO> MapProductsToCart( IEnumerable<Product> products, List<CartItem> items )
+    static async Task<CartResponse> MapProductsToCart( IEnumerable<CartProductModel> products, List<CartItem> items )
     {
-        var cartDto = new Cart_DTO();
+        var cartDto = new CartResponse();
 
         await Task.Run( () =>
         {
-            foreach ( Product p in products )
+            foreach ( CartProductModel p in products )
             {
-                if ( p.ProductVariants.Count <= 0 )
+                /*if ( p.ProductVariants.Count <= 0 )
                     continue;
 
-                ProductVariant variantData = p.ProductVariants[ 0 ];
+                ProductVariantModel variantModelData = p.ProductVariants[ 0 ];
 
-                cartDto.Items.Add( new CartItem_DTO {
+                cartDto.Items.Add( new CartProductResponse {
                     ProductId = p.ProductId,
                     ProductTitle = p.ProductTitle,
                     ProductThumbnail = p.ProductThumbnail,
-                    VariantId = variantData.VariantId,
-                    VariantName = variantData.VariantName,
-                    MainPrice = variantData.VariantPriceMain,
-                    SalePrice = variantData.VariantPriceSale,
-                    Quantity = items.Find( x => x.ProductId == p.ProductId && x.VariantId == variantData.VariantId )!.Quantity
-                } );
+                    VariantId = variantModelData.VariantId,
+                    VariantName = variantModelData.VariantName,
+                    MainPrice = variantModelData.VariantPriceMain,
+                    SalePrice = variantModelData.VariantPriceSale,
+                    Quantity = items.Find( x => x.ProductId == p.ProductId && x.VariantId == variantModelData.VariantId )!.Quantity
+                } );*/
             }
         } );
 

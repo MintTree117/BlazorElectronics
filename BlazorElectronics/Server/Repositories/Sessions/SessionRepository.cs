@@ -10,8 +10,8 @@ namespace BlazorElectronics.Server.Repositories.Sessions;
 
 public class SessionRepository : DapperRepository, ISessionRepository
 {
-    const string PROCEDURE_ADD_SESSION = "Add_Session";
-    const string PROCEDURE_GET_SESSION = "Get_Session";
+    const string PROCEDURE_ADD_SESSION = "Add_UserSession";
+    const string PROCEDURE_GET_SESSION = "Get_UserSession";
 
     public SessionRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
@@ -36,10 +36,10 @@ public class SessionRepository : DapperRepository, ISessionRepository
     
     static async Task<UserSession?> AddSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<UserSession?>( PROCEDURE_ADD_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<UserSession>( PROCEDURE_ADD_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
     static async Task<UserSession?> GetSessionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<UserSession?>( PROCEDURE_GET_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<UserSession>( PROCEDURE_GET_SESSION, dynamicParams, commandType: CommandType.StoredProcedure );
     }
 }

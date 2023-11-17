@@ -35,7 +35,7 @@ public class CartRepository : DapperRepository, ICartRepository
 
         return await TryQueryAsync( GetCartItemsQuery, dynamicParams );
     }
-    public async Task<IEnumerable<Product>?> GetCartProducts( List<int> productIds, List<int> variantIds )
+    public async Task<IEnumerable<CartProductModel>?> GetCartProducts( List<int> productIds, List<int> variantIds )
     {
         var productIdBuilder = new StringBuilder();
         var variantIdBuilder = new StringBuilder();
@@ -94,25 +94,9 @@ public class CartRepository : DapperRepository, ICartRepository
     {
         return await connection.QueryAsync<CartItem>( PROCEDURE_GET_CART_ITEMS, dynamicParams, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
     }
-    static async Task<IEnumerable<Product>?> GetCartProductsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<IEnumerable<CartProductModel>?> GetCartProductsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        var productDictionary = new Dictionary<int, Product>();
-        
-        await connection.QueryAsync<Product, ProductVariant, Product>
-        ( PROCEDURE_GET_CART_PRODUCTS, ( product, variant ) =>
-            {
-                if ( !productDictionary.TryGetValue( product.ProductId, out Product? productEntry ) )
-                {
-                    productEntry = product;
-                    productDictionary.Add( productEntry.ProductId, productEntry );
-                }
-                if ( variant != null && productEntry.ProductVariants.Count <= 0 )
-                    productEntry.ProductVariants.Add( variant );
-                return productEntry;
-            },
-            dynamicParams,
-            splitOn: COL_PRODUCT_ID,
-            commandType: CommandType.StoredProcedure );
+        var productDictionary = new Dictionary<int, CartProductModel>();
 
         return productDictionary.Values;
     }

@@ -12,6 +12,8 @@
 @inject ICartServiceClient CartService
 @inject NavigationManager NavManager
 
+@implements IDisposable
+
 <PageTitle>Login</PageTitle>
 
 <h3>UserLogin</h3>
@@ -43,33 +45,40 @@
 
     protected override void OnInitialized()
     {
+        UserService.SessionStorageError += OnSessionStorageError;
+        
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
         string? returnUrl = queryString.Get( "returnUrl" );
 
-        if ( !string.IsNullOrEmpty( returnUrl ) )
-            _returnUrl = returnUrl;
+        _returnUrl = !string.IsNullOrWhiteSpace( returnUrl )
+            ? returnUrl
+            : "/profile";
     }
-
+    
     async Task HandleLogin()
     {
         _errorMessage = string.Empty;
         
-        ApiReply<UserLoginResponse?> response = await UserService.Login( _loginRequest );
+        ApiReply<UserLoginResponse?> loginReply = await UserService.Login( _loginRequest );
 
-        if ( !response.Success )
+        if ( !loginReply.Success || loginReply.Data is null )
         {
-            _errorMessage = response.Message!;
+            _errorMessage = loginReply.Message ?? "Null login response!";
             return;
         }
 
-        if ( response.Data == null )
-        {
-            _errorMessage = "Null session data!";
-            return;
-        }
-        
-        await CartService.PostCartToServer( true );
+        //await CartService.PostCartToServer( true );
         NavManager.NavigateTo( _returnUrl );
+    }
+
+    void OnSessionStorageError( string error )
+    {
+        _errorMessage = error;
+        StateHasChanged();
+    }
+    public void Dispose()
+    {
+        UserService.SessionStorageError -= OnSessionStorageError;
     }
 }

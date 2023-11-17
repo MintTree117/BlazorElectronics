@@ -7,7 +7,7 @@ namespace BlazorElectronics.Client.Services.Categories;
 public class CategoryServiceClient : ICategoryServiceClient
 {
     readonly HttpClient _http;
-    CategoriesResponse? Categories { get; set; }
+    CategoriesResponse? Categories;
 
     public CategoryServiceClient( HttpClient http )
     {
@@ -16,25 +16,25 @@ public class CategoryServiceClient : ICategoryServiceClient
 
     public async Task<ApiReply<CategoriesResponse?>> GetCategories()
     {
-        if ( Categories != null )
-            return new ApiReply<CategoriesResponse?>( Categories, true, "Successfully retrieved categories from local stash." );
+        if ( Categories is not null )
+            return new ApiReply<CategoriesResponse?>( Categories );
 
+        ApiReply<CategoriesResponse?>? reply;
+        
         try
         {
-            var response = await _http.GetFromJsonAsync<ApiReply<CategoriesResponse?>>( "api/Category/categories" );
-
-            if ( response == null )
-                return new ApiReply<CategoriesResponse?>( "Category response is null!" );
-            
-            if ( response.Data == null )
-                return new ApiReply<CategoriesResponse?>( response.Message ??= "Failed to retrieve Categories; no response message!" );
-
-            Categories = response.Data;
-            return response;
+            reply = await _http.GetFromJsonAsync<ApiReply<CategoriesResponse?>?>( "api/Category/categories" );
         }
         catch ( Exception e )
         {
             return new ApiReply<CategoriesResponse?>( e.Message );
         }
+
+        if ( reply is null || !reply.Success || reply.Data is null )
+            return new ApiReply<CategoriesResponse?>( reply?.Message );
+
+        Categories = reply.Data;
+
+        return new ApiReply<CategoriesResponse?>( Categories );
     }
 }

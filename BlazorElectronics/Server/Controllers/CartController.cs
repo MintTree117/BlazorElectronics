@@ -20,26 +20,26 @@ public class CartController : UserController
     }
 
     [HttpPost( "post" )]
-    public async Task<ActionResult<ApiReply<Cart_DTO>>> UpdateCartItems( [FromBody] CartItemsInsertRequest request )
+    public async Task<ActionResult<ApiReply<CartResponse>>> UpdateCartItems( [FromBody] CartItemsInsertRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request.ApiRequest );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request.ApiRequest );
 
         if ( !validateReply.Success )
-            return BadRequest( new ApiReply<Cart_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<CartResponse>( validateReply.Message ) );
         
-        ApiReply<Cart_DTO?> cartReply = await _cartService.PostCartItems( validateReply.Data, request.Items );
+        ApiReply<CartResponse?> cartReply = await _cartService.PostCartItems( validateReply.Data, request.Items );
 
         return cartReply.Success
             ? Ok( cartReply )
-            : BadRequest( new ApiReply<Cart_DTO?>( cartReply.Message ) );
+            : BadRequest( new ApiReply<CartResponse?>( cartReply.Message ) );
     }
     [HttpPost( "insert" )]
     public async Task<ActionResult<ApiReply<bool>>> AddToCart( [FromBody] CartItemRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request.ApiRequest );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request.ApiRequest );
 
         if ( !validateReply.Success )
-            return BadRequest( new ApiReply<Cart_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<CartResponse>( validateReply.Message ) );
         
         ApiReply<bool> cartReply = await _cartService.AddToCart( validateReply.Data, request.CartItemIds! );
 
@@ -50,10 +50,10 @@ public class CartController : UserController
     [HttpPost( "update-quantity" )]
     public async Task<ActionResult<ApiReply<bool>>> UpdateQuantity( [FromBody] CartItemRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request.ApiRequest );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request.ApiRequest );
 
         if ( !validateReply.Success )
-            return BadRequest( new ApiReply<Cart_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<CartResponse>( validateReply.Message ) );
 
         ApiReply<bool> cartResponse = await _cartService.UpdateQuantity( validateReply.Data, request.CartItemIds! );
 
@@ -64,10 +64,10 @@ public class CartController : UserController
     [HttpPost( "remove" )]
     public async Task<ActionResult<ApiReply<bool>>> RemoveItemFromCart( [FromBody] CartItemRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request.ApiRequest );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request.ApiRequest );
 
         if ( !validateReply.Success )
-            return BadRequest( new ApiReply<Cart_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<CartResponse>( validateReply.Message ) );
 
         ApiReply<bool> cartResponse = await _cartService.RemoveFromCart( validateReply.Data, request.CartItemIds! );
 
@@ -78,10 +78,10 @@ public class CartController : UserController
     [HttpGet( "count" )]
     public async Task<ActionResult<ApiReply<int>>> GetCartItemsCount( [FromBody] SessionApiRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request );
 
         if ( !validateReply.Success )
-            return BadRequest( new ApiReply<Cart_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<CartResponse>( validateReply.Message ) );
 
         ApiReply<int> cartResponse = await _cartService.CountCartItems( validateReply.Data  );
 
@@ -90,14 +90,14 @@ public class CartController : UserController
             : BadRequest( cartResponse );
     }
     [HttpGet( "products")]
-    public async Task<ActionResult<ApiReply<Cart_DTO>>> GetCartProducts( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<CartResponse>>> GetCartProducts( [FromBody] SessionApiRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request );
 
         if ( !validateReply.Success )
-            return BadRequest( new ApiReply<Cart_DTO>( validateReply.Message ) );
+            return BadRequest( new ApiReply<CartResponse>( validateReply.Message ) );
 
-        ApiReply<Cart_DTO?> cartResponse = await _cartService.GetCartProducts( validateReply.Data );
+        ApiReply<CartResponse?> cartResponse = await _cartService.GetCartProducts( validateReply.Data );
 
         return cartResponse.Success
             ? Ok( cartResponse )

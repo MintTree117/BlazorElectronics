@@ -1,3 +1,4 @@
+using BlazorElectronics.Server.Dtos.Sessions;
 using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
@@ -35,19 +36,19 @@ public class UserAccountController : UserController
         
         return Ok( loginReply );
     }
-    [HttpPost( "validate" )]
-    public async Task<ActionResult<ApiReply<bool>>> ValidateSession( [FromBody] SessionApiRequest request )
+    [HttpPost( "authorize" )]
+    public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] SessionApiRequest request )
     {
         if ( !ValidateSessionRequest( request ) )
             return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
         
-        ApiReply<int> sessionReply = await ValidateUserSession( request );
+        ApiReply<int> sessionReply = await AuthorizeUserSession( request );
         return Ok( sessionReply );
     }
     [HttpPost( "change-password" )]
     public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserChangePasswordRequest request )
     {
-        ApiReply<int> validateReply = await ValidateUserSession( request.ApiRequest );
+        ApiReply<int> validateReply = await AuthorizeUserSession( request.ApiRequest );
 
         if ( !validateReply.Success )
             return BadRequest( new ApiReply<bool>( validateReply.Message ) );
@@ -65,12 +66,20 @@ public class UserAccountController : UserController
             return new ApiReply<UserLoginResponse>( loginReply.Message );
         
         UserLoginDto login = loginReply.Data;
-        ApiReply<string?> sessionReply = await SessionService.CreateSession( loginReply.Data.UserId, deviceInfo );
+        ApiReply<SessionDto?> sessionReply = await SessionService.CreateSession( loginReply.Data.UserId, deviceInfo );
 
         if ( !sessionReply.Success || sessionReply.Data is null )
             return new ApiReply<UserLoginResponse>( sessionReply.Message );
 
-        var response = new UserLoginResponse( login.Username, login.Email, sessionReply.Data, login.IsAdmin );
+        var response = new UserLoginResponse
+        {
+            Email = login.Email,
+            Username = login.Username,
+            SessionSessionId = sessionReply.Data.Id,
+            SessionToken = sessionReply.Data.Token,
+            IsAdmin = login.IsAdmin
+        };
+        
         return new ApiReply<UserLoginResponse>( response );
     }
 

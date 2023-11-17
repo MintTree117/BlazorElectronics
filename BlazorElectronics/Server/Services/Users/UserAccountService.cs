@@ -6,14 +6,14 @@ using BlazorElectronics.Server.Repositories.Users;
 
 namespace BlazorElectronics.Server.Services.Users;
 
-public class UserAccountService : ApiService, IUserAccountService
+public class UserAccountService : ApiService<UserAccountService>, IUserAccountService
 {
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
     const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
     
     readonly IUserRepository _userRepository;
 
-    public UserAccountService( ILogger logger, IUserRepository userRepository ) : base( logger )
+    public UserAccountService( ILogger<UserAccountService> logger, IUserRepository userRepository ) : base( logger )
     {
         _userRepository = userRepository;
     }
@@ -25,9 +25,6 @@ public class UserAccountService : ApiService, IUserAccountService
         try
         {
             user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
-            
-            if ( user is null )
-                return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
@@ -35,8 +32,14 @@ public class UserAccountService : ApiService, IUserAccountService
             return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
+        if ( user is null )
+            return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
+        
+        _logger.LogError( "Password" + password );
+        _logger.LogError( "Hash length" + user.PasswordHash.Length.ToString() );
+
         return VerifyPasswordHash( password, user.PasswordHash, user.PasswordSalt )
-            ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.Id, user.Email, user.Username, user.IsAdmin ) )
+            ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Email, user.Username, user.IsAdmin ) )
             : new ApiReply<UserLoginDto?>( BAD_PASSWORD_MESSAGE );
     }
     public async Task<ApiReply<UserLoginDto?>> Register( string username, string email, string password, int? phone )
@@ -61,6 +64,8 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             insertedUser = await _userRepository.AddUser( username, email, phone, hash, salt );
 
+            _logger.LogError( insertedUser.UserId.ToString() );
+            
             if ( insertedUser is null )
                 return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
         }
@@ -71,7 +76,7 @@ public class UserAccountService : ApiService, IUserAccountService
         }
 
         return new ApiReply<UserLoginDto?>( 
-            new UserLoginDto( insertedUser.Id, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
+            new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
     }
     public async Task<ApiReply<int>> VerifyAdminId( int adminId )
     {
@@ -93,7 +98,7 @@ public class UserAccountService : ApiService, IUserAccountService
             return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        return new ApiReply<int>( admin.Id );
+        return new ApiReply<int>( admin.UserId );
         
     }
     public async Task<ApiReply<int>> ValidateUserId( string email )
@@ -113,7 +118,7 @@ public class UserAccountService : ApiService, IUserAccountService
             return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        return new ApiReply<int>( user.Id );
+        return new ApiReply<int>( user.UserId );
     }
     public async Task<ApiReply<bool>> ChangePassword( int userId, string newPassword )
     {

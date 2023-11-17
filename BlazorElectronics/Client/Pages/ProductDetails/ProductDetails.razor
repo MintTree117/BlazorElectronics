@@ -4,6 +4,7 @@
 @using BlazorElectronics.Shared.DtosOutbound.Products
 @using BlazorElectronics.Client.Services.Cart
 @using BlazorElectronics.Shared.Mutual
+@using BlazorElectronics.Shared.Outbound.Products
 @inject IProductServiceClient ProductServiceClient
 @inject ICartServiceClient CartService
 @implements IDisposable
@@ -20,7 +21,7 @@ else {
                     <img class="pd-img-selected" src="@_productDetails.Images[ 0 ].Url" alt="@_productDetails.Title"/>
                 </div>
                 <div class="pd-img-selection">
-                    @foreach ( ProductImage_DTO img in _productDetails.Images )
+                    @foreach ( ProductImageResponse img in _productDetails.Images )
                     {
                         <img class="pd-img-mini" src="@img.Url" alt="@_productDetails.Description"/>
                     }
@@ -31,7 +32,7 @@ else {
                 <h2 class="mb-0">@_productDetails.Title</h2>
 
                 <!-- Get Selected Variant -->
-                @if ( !GetSelectedVariant( out ProductVariant_DTO variant ) )
+                @if ( !GetSelectedVariant( out ProductVariantResponse variant ) )
                 {
                     <span>No Product Variants Found!</span>
                 }
@@ -41,7 +42,7 @@ else {
                 {
                     <div>
                         <select class="form-control" @bind="_currentVariantId">
-                            @foreach ( ProductVariant_DTO v in _productDetails.Variants )
+                            @foreach ( ProductVariantResponse v in _productDetails.Variants )
                             {
                                 <option value="@v.Id">@v.Name</option>
                             }
@@ -123,13 +124,13 @@ else {
     }
     async Task AddToCart()
     {
-        if ( !GetSelectedVariant( out ProductVariant_DTO variant ) )
+        if ( !GetSelectedVariant( out ProductVariantResponse variant ) )
         {
             OnCartError( "Failed to get variant!" );
             return;   
         }
 
-        var cartItem = new CartItem_DTO {
+        var cartItem = new CartProductResponse {
             ProductId = _productDetails!.Id,
             ProductTitle = _productDetails.Title,
             VariantId = variant.Id,
@@ -138,7 +139,7 @@ else {
 
         await CartService.AddToCart( cartItem );
     }
-    bool GetSelectedVariant( out ProductVariant_DTO variant )
+    bool GetSelectedVariant( out ProductVariantResponse variant )
     {
         variant = _productDetails!.Variants.FirstOrDefault( v => v.Id == _currentVariantId )!;
         return variant != null;

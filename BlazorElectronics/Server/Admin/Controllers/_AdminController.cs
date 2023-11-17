@@ -26,7 +26,7 @@ public class _AdminController : UserController
         if ( !ValidateSessionRequest( request ) )
             return new ApiReply<bool>( BAD_REQUEST_MESSAGE );
         
-        ApiReply<int> sessionReply = await SessionService.ValidateSession( request!.SessionId, request.SessionToken, deviceInfo );
+        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, deviceInfo );
 
         if ( !sessionReply.Success )
             return new ApiReply<bool>( sessionReply.Message );

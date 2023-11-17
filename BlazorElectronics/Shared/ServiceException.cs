@@ -7,7 +7,7 @@ public class ServiceException : Exception
     public ServiceException( string message, Exception? exception )
         : base( CreateExceptionMessage( message, exception ), exception ) { }
     
-    static string CreateExceptionMessage( string message, Exception? exception )
+    protected static string CreateExceptionMessage( string message, Exception? exception )
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine( message );

@@ -6,7 +6,8 @@ namespace BlazorElectronics.Client.Services.Users;
 
 public interface IUserServiceClient
 {
-    event Action<bool> AuthorizationChanged;
+    event Action<bool> SessionChanged;
+    event Action<string>? SessionStorageError;
     
     Task<ApiReply<UserLoginResponse?>> Register( UserRegisterRequest request );
     Task<ApiReply<UserLoginResponse?>> Login( UserLoginRequest request );

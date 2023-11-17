@@ -19,7 +19,7 @@
 else
 {
     <div class="container">
-        @foreach ( CartItem_DTO item in _cart.Items )
+        @foreach ( CartProductResponse item in _cart.Items )
         {
             <div class="image-wrapper">
                 <img class="cart-item-image" src="@item.ProductThumbnail" alt="@item.ProductTitle">
@@ -59,7 +59,7 @@ else
 @code 
 {
     string _serverMessage = string.Empty;
-    Cart_DTO? _cart = null;
+    CartResponse? _cart = null;
 
     public void Dispose()
     {
@@ -76,7 +76,7 @@ else
     
     async Task LoadCart()
     {
-        ApiReply<Cart_DTO?> response = await CartService.GetCart();
+        ApiReply<CartResponse?> response = await CartService.GetCart();
 
         if ( !response.Success )
             _serverMessage = response.Message ??= "Failed to get cart! No response message!";
@@ -86,12 +86,12 @@ else
         if ( _cart == null || _cart.Items.Count <= 0 )
             _serverMessage = "Your cart is empty.";
     }
-    async Task RemoveFromCart( CartItem_DTO item )
+    async Task RemoveFromCart( CartProductResponse item )
     {
         await CartService.RemoveFromCart( item );
         await LoadCart();
     }
-    async Task UpdateQuantity( ChangeEventArgs e, CartItem_DTO item )
+    async Task UpdateQuantity( ChangeEventArgs e, CartProductResponse item )
     {
         item.Quantity = int.Parse( e.Value?.ToString() ?? "1" );
         if ( item.Quantity < 1 )

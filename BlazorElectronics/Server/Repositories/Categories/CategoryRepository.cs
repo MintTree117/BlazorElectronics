@@ -16,17 +16,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
     
     public async Task<CategoriesModel?> GetCategories()
     {
-        SqlMapper.GridReader? multi = await TryQueryAsync( GetCategoriesQuery );
-
-        if ( multi is null )
-            return null;
-        
-        return new CategoriesModel
-        {
-            Primary = await multi.ReadAsync<PrimaryCategory>(),
-            Secondary = await multi.ReadAsync<SecondaryCategory>(),
-            Tertiary = await multi.ReadAsync<TertiaryCategory>()
-        };
+        return await TryQueryAsync( GetCategoriesQuery );
     }
     public async Task<IEnumerable<string>?> GetPrimaryCategoryDescriptions()
     {
@@ -41,9 +31,23 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         return await TryQueryAsync( GetDescriptionQuery, dynamicParams );
     }
     
-    static async Task<SqlMapper.GridReader?> GetCategoriesQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<CategoriesModel?> GetCategoriesQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QueryMultipleAsync( PROCEDURE_GET_CATEGORIES, commandType: CommandType.StoredProcedure );
+        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_CATEGORIES, commandType: CommandType.StoredProcedure );
+
+        if ( multi is null )
+            return null;
+
+        IEnumerable<PrimaryCategoryModel>? primary = await multi.ReadAsync<PrimaryCategoryModel>();
+        IEnumerable<SecondaryCategoryModel>? secondary = await multi.ReadAsync<SecondaryCategoryModel>();
+        IEnumerable<TertiaryCategoryModel>? tertiary = await multi.ReadAsync<TertiaryCategoryModel>();
+
+        return new CategoriesModel
+        {
+            Primary = primary,
+            Secondary = secondary,
+            Tertiary = tertiary
+        };
     }
     static async Task<IEnumerable<string>?> GetPrimaryCategoryDescriptionsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {

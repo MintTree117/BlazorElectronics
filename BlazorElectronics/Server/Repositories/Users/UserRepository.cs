@@ -43,7 +43,7 @@ public class UserRepository : DapperRepository, IUserRepository
     public async Task<User?> GetByEmailOrUsername( string emailOrUsername )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_USER_EMAIL_OR_NAME, emailOrUsername );
+        parameters.Add( PARAM_USER_NAME_OR_EMAIL, emailOrUsername );
 
         return await TryQueryAsync( GetByEmailOrUsernameQuery, parameters );
     }
@@ -78,31 +78,31 @@ public class UserRepository : DapperRepository, IUserRepository
     
     static async Task<User?> GetByIdQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> GetByUsernameQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_USERNAME, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_GET_USER_BY_USERNAME, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> GetByEmailQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_GET_USER_BY_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> GetByEmailOrUsernameQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( PROCEDURE_GET_USER_BY_NAME_OR_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_GET_USER_BY_NAME_OR_EMAIL, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<UserExists?> GetUserExistsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<UserExists?>( PROCEDURE_GET_USER_EXISTS, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<UserExists>( PROCEDURE_GET_USER_EXISTS, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<User?> AddUserQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleAsync<User?>( PROCEDURE_ADD_USER, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_ADD_USER, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> UpdateUserPasswordQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int? result = await connection.ExecuteAsync( PROCEDURE_UPDATE_PASSWORD, dynamicParams, commandType: CommandType.StoredProcedure );
+        int? result = await connection.ExecuteAsync( PROCEDURE_UPDATE_PASSWORD, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
         return result is > 0;
     }
 }

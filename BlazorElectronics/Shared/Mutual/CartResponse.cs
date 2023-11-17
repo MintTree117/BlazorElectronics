@@ -1,23 +1,23 @@
 namespace BlazorElectronics.Shared.Mutual;
 
-public sealed class Cart_DTO
+public sealed class CartResponse
 {
-    public List<CartItem_DTO> Items { get; set; } = new();
+    public List<CartProductResponse> Items { get; set; } = new();
 
     public decimal GetTotalPrice()
     {
         return Items.Sum( item => item.GetRealPrice() * item.Quantity );
     }
 
-    public bool GetSameItem( CartItem_DTO itemToCompare, out CartItem_DTO? item )
+    public bool GetSameItem( CartProductResponse itemToCompare, out CartProductResponse? item )
     {
         item = Items.Find( x => x.ProductId == itemToCompare.ProductId && x.VariantId == itemToCompare.VariantId );
         return item != null;
     }
 
-    public void AddOrUpdateQuantity( CartItem_DTO item )
+    public void AddOrUpdateQuantity( CartProductResponse item )
     {
-        if ( GetSameItem( item, out CartItem_DTO? sameItem ) )
+        if ( GetSameItem( item, out CartProductResponse? sameItem ) )
             sameItem!.Quantity += item.Quantity;
         else
             Items.Add( item );

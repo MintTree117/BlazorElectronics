@@ -7,6 +7,9 @@ public sealed class RepositoryException : ServiceException
 {
     public RepositoryException( string message, SqlException sqlException )
         : base( CreateSqlExceptionMessage( message, sqlException ), sqlException ) { }
+    
+    public RepositoryException( string message, Exception exception )
+        : base( CreateExceptionMessage( message, exception ), exception ) { }
 
     static string CreateSqlExceptionMessage( string message, SqlException sqlException )
     {

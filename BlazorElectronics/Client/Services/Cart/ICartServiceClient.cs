@@ -9,9 +9,9 @@ public interface ICartServiceClient
     event Action<string?> PostErrorEvent;
 
     Task PostCartToServer( bool emptyLocalCart );
-    Task<ApiReply<Cart_DTO?>> GetCart();
-    Task AddToCart( CartItem_DTO item );
-    Task UpdateItemQuantity( CartItem_DTO item );
-    Task RemoveFromCart( CartItem_DTO item );
+    Task<ApiReply<CartResponse?>> GetCart();
+    Task AddToCart( CartProductResponse item );
+    Task UpdateItemQuantity( CartProductResponse item );
+    Task RemoveFromCart( CartProductResponse item );
     Task<int> GetCartItemsCount();
 }

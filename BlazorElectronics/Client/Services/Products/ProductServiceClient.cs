@@ -3,6 +3,7 @@ using System.Text;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound.Products;
+using BlazorElectronics.Shared.Outbound.Products;
 
 namespace BlazorElectronics.Client.Services.Products;
 

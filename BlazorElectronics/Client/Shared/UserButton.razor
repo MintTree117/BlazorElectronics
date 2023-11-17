@@ -37,11 +37,11 @@
 
     protected override void OnInitialized()
     {
-        UserService.AuthorizationChanged += HandleAuthorizationChange;
+        UserService.SessionChanged += HandleAuthorizationChange;
     }
     public void Dispose()
     {
-        UserService.AuthorizationChanged -= HandleAuthorizationChange;
+        UserService.SessionChanged -= HandleAuthorizationChange;
     }
     
     async Task HideUserMenu()

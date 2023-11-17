@@ -20,6 +20,7 @@ public sealed class ApiReply<T>
     }
     public ApiReply( string? message )
     {
+        Data = default;
         Success = false;
         Message = message ?? GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
@@ -28,7 +29,7 @@ public sealed class ApiReply<T>
         Data = response.Data;
         
         Success = response.Success;
-        if ( Data == null )
+        if ( Data is null )
             Success = false;
         
         Message = response.Message;
@@ -60,11 +61,6 @@ public sealed class ApiReply<T>
         Message = recievedMessage ?? GetDefaultMessage( defaultMessage );
     }
 
-    public bool IsSuccessful()
-    {
-        return Data != null && Success;
-    }
-    
     public bool Success { get; set; }
     public string? Message { get; set; }
     public T? Data { get; set; }

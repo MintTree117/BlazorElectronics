@@ -2,14 +2,14 @@ namespace BlazorElectronics.Shared.Outbound.Categories;
 
 public sealed class CategoriesResponse
 {
-    public CategoriesResponse( IReadOnlyList<PrimaryCategoryResponse> primary, IReadOnlyList<SecondaryCategoryResponse> secondary, IReadOnlyList<TertiaryCategoryResponse> tertiary )
+    public CategoriesResponse( List<PrimaryCategoryResponse> primary, List<SecondaryCategoryResponse> secondary, List<TertiaryCategoryResponse> tertiary )
     {
         Primary = primary;
         Secondary = secondary;
         Tertiary = tertiary;
     }
     
-    public IReadOnlyList<PrimaryCategoryResponse> Primary { get; }
-    public IReadOnlyList<SecondaryCategoryResponse> Secondary { get; }
-    public IReadOnlyList<TertiaryCategoryResponse> Tertiary { get; }
+    public List<PrimaryCategoryResponse> Primary { get; }
+    public List<SecondaryCategoryResponse> Secondary { get; }
+    public List<TertiaryCategoryResponse> Tertiary { get; }
 }

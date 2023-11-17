@@ -6,23 +6,29 @@ using BlazorElectronics.Shared.Outbound.Categories;
 
 namespace BlazorElectronics.Server.Services.Categories;
 
-public class CategoryService : ApiService, ICategoryService
+public class CategoryService : ApiService<CategoryService>, ICategoryService
 {
-    readonly ICategoryCache _cache;
     readonly ICategoryRepository _repository;
 
     const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
 
     CategoryUrlMap? _cachedUrlMap;
-    CategoriesDto? _cachedCategoriesResponse;
+    CategoriesDto? _cachedCategoriesDto;
     IReadOnlyList<string>? _cachedMainDescriptions;
 
-    public CategoryService( ILogger logger, ICategoryCache cache, ICategoryRepository repository ) : base( logger )
+    public CategoryService( ILogger<CategoryService> logger, ICategoryRepository repository ) : base( logger )
     {
-        _cache = cache;
         _repository = repository;
     }
-    
+
+    public async Task<ApiReply<CategoriesDto?>> GetCategoriesDto()
+    {
+        ApiReply<CategoriesDto?> categoriesReply = await TryGetCategoriesDto();
+
+        return categoriesReply.Success
+            ? new ApiReply<CategoriesDto?>( _cachedCategoriesDto )
+            : new ApiReply<CategoriesDto?>( categoriesReply.Message );
+    }
     public async Task<ApiReply<CategoriesResponse?>> GetCategories()
     {
         ApiReply<CategoriesDto?> categoriesReply = await TryGetCategoriesDto();
@@ -116,8 +122,8 @@ public class CategoryService : ApiService, ICategoryService
     }
     async Task<ApiReply<CategoriesDto?>> TryGetCategoriesDto()
     {
-        if ( _cachedCategoriesResponse is not null )
-            return new ApiReply<CategoriesDto?>( _cachedCategoriesResponse );
+        if ( _cachedCategoriesDto is not null )
+            return new ApiReply<CategoriesDto?>( _cachedCategoriesDto );
         
         CategoriesModel? repositoryResponse;
 
@@ -134,9 +140,9 @@ public class CategoryService : ApiService, ICategoryService
             return new ApiReply<CategoriesDto?>( INTERNAL_SERVER_ERROR_MESSAGE);
         }
 
-        _cachedCategoriesResponse = await MapCategoriesModelToDto( repositoryResponse );
+        _cachedCategoriesDto = await MapCategoriesModelToDto( repositoryResponse );
         
-        return new ApiReply<CategoriesDto?>( _cachedCategoriesResponse );
+        return new ApiReply<CategoriesDto?>( _cachedCategoriesDto );
     }
     
     static async Task<CategoriesDto?> MapCategoriesModelToDto( CategoriesModel model )
@@ -158,31 +164,46 @@ public class CategoryService : ApiService, ICategoryService
             var secondaryChildren = new Dictionary<short, HashSet<short>>();
 
             short count = 0;
-            foreach ( PrimaryCategory p in model.Primary )
+            foreach ( PrimaryCategoryModel p in model.Primary )
             {
                 if ( !primaryIds.TryAdd( p.PrimaryCategoryId, count ) )
                     continue;
                 
-                tempPrimaryResponses.Add( new PrimaryCategoryResponse( p.PrimaryCategoryId, p.Name, p.ApiUrl, p.ImageUrl, new HashSet<short>() ) );
+                tempPrimaryResponses.Add( new PrimaryCategoryResponse
+                {
+                    Id = p.PrimaryCategoryId,
+                    Name = p.Name,
+                    Url = p.ApiUrl,
+                    ImageUrl = p.ImageUrl,
+                    ChildCategories = new HashSet<short>()
+                });
                 primaryChildren.TryAdd( p.PrimaryCategoryId, new HashSet<short>() );
                 count++;
             }
             count = 0;
-            foreach ( SecondaryCategory s in model.Secondary )
+            foreach ( SecondaryCategoryModel s in model.Secondary )
             {
                 if ( !primaryIds.ContainsKey( s.PrimaryCategoryId ) )
                     continue;
                 if ( !secondaryIds.TryAdd( s.SecondaryCategoryId, count ) )
                     continue;
-                
-                tempSecondaryResponses.Add( new SecondaryCategoryResponse( s.PrimaryCategoryId, s.SecondaryCategoryId, s.Name, s.ApiUrl, s.ImageUrl, new HashSet<short>() ) );
+                 
+                tempSecondaryResponses.Add( new SecondaryCategoryResponse
+                {
+                    Id = s.PrimaryCategoryId,
+                    ParentId = s.SecondaryCategoryId,
+                    Name = s.Name,
+                    Url = s.ApiUrl,
+                    ImageUrl = s.ImageUrl,
+                    ChildCategories = new HashSet<short>()
+                } );
                 secondaryChildren.TryAdd( s.SecondaryCategoryId, new HashSet<short>() );
                 primaryChildren[ s.PrimaryCategoryId ].Add( s.SecondaryCategoryId );
                 
                 count++;
             }
             count = 0;
-            foreach ( TertiaryCategory t in model.Tertiary )
+            foreach ( TertiaryCategoryModel t in model.Tertiary )
             {
                 if ( !primaryIds.ContainsKey( t.PrimaryCategoryId ) )
                     continue;
@@ -191,7 +212,14 @@ public class CategoryService : ApiService, ICategoryService
                 if ( !tertiaryIds.TryAdd( t.TertiaryCategoryId, count ) )
                     continue;
 
-                tempTertiaryResponses.Add( new TertiaryCategoryResponse( t.SecondaryCategoryId, t.SecondaryCategoryId, t.Name, t.ApiUrl, t.ImageUrl ) );
+                tempTertiaryResponses.Add( new TertiaryCategoryResponse
+                {
+                    Id = t.TertiaryCategoryId,
+                    ParentId = t.SecondaryCategoryId,
+                    Name = t.Name,
+                    Url = t.ApiUrl,
+                    ImageUrl = t.ImageUrl
+                });
                 secondaryChildren[ t.SecondaryCategoryId ].Add( t.TertiaryCategoryId );
                 count++;
             }
@@ -202,26 +230,48 @@ public class CategoryService : ApiService, ICategoryService
 
             foreach ( short id in primaryIds.Keys )
             {
-                PrimaryCategoryResponse r = tempPrimaryResponses[ primaryIds[ id ] ];
+                PrimaryCategoryResponse p = tempPrimaryResponses[ primaryIds[ id ] ];
                 HashSet<short> c = primaryChildren[ id ];
 
-                primaryResponses.Add( 
-                    new PrimaryCategoryResponse( id, r.Name, r.Url, r.ImageUrl, c ) );
+                primaryResponses.Add(
+                    new PrimaryCategoryResponse
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Url = p.Url,
+                        ImageUrl = p.ImageUrl,
+                        ChildCategories = c
+                    } );
             }
             foreach ( short id in secondaryIds.Keys )
             {
-                SecondaryCategoryResponse r = tempSecondaryResponses[ secondaryIds[ id ] ];
+                SecondaryCategoryResponse s = tempSecondaryResponses[ secondaryIds[ id ] ];
                 HashSet<short> c = secondaryChildren[ id ];
 
                 secondaryResponses.Add( 
-                    new SecondaryCategoryResponse( r.ParentId, id, r.Name, r.Url, r.ImageUrl, c ) );
+                    new SecondaryCategoryResponse
+                    {
+                        Id = s.Id,
+                        ParentId = s.ParentId,
+                        Name = s.Name,
+                        Url = s.Url,
+                        ImageUrl = s.ImageUrl,
+                        ChildCategories = c
+                    } );
             }
             foreach ( short id in tertiaryIds.Keys )
             {
-                TertiaryCategoryResponse r = tempTertiaryResponses[ tertiaryIds[ id ] ];
+                TertiaryCategoryResponse t = tempTertiaryResponses[ tertiaryIds[ id ] ];
 
-                tertiaryResponses.Add( 
-                    new TertiaryCategoryResponse( r.ParentId, id, r.Name, r.Url, r.ImageUrl ) );
+                tertiaryResponses.Add(
+                    new TertiaryCategoryResponse
+                    {
+                        Id = t.Id,
+                        ParentId = t.ParentId,
+                        Name = t.Name,
+                        Url = t.Url,
+                        ImageUrl = t.ImageUrl
+                    } );
             }
 
             return new CategoriesDto( primaryIds, secondaryIds, tertiaryIds, primaryResponses, secondaryResponses, tertiaryResponses );
@@ -275,7 +325,7 @@ public class CategoryService : ApiService, ICategoryService
     }
     static CategoriesResponse? GetCategoriesResponse( CategoriesDto dto )
     {
-        return new CategoriesResponse( dto.PrimaryResponses, dto.SecondaryResponses, dto.TertiaryResponses );
+        return new CategoriesResponse( dto.PrimaryResponses.ToList(), dto.SecondaryResponses.ToList(), dto.TertiaryResponses.ToList() );
     }
     static bool ValidateCategoryIdMap( CategoryIdMap map, CategoriesDto categories )
     {

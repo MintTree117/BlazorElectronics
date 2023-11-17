@@ -48,24 +48,19 @@
 
     async Task HandleRegistration()
     {
-        ApiReply<UserLoginResponse?> response = await UserService.Register( _user );
+        ApiReply<UserLoginResponse?> reply = await UserService.Register( _user );
 
-        if ( response == null )
+        if ( !reply.Success || reply.Data is null )
         {
-            _serverMessage = $"Failed to register user {_user.Username}; service response is null!";
+            _serverMessage = reply.Message ?? "Null reply!";
             return;
         }
 
-        if ( !response.Success )
-        {
-            _serverMessage = response.Message ??= $"Failed to register user {_user.Username}; service response message is empty!";
-            return;
-        }
-        
         _messageCssClass = "text-success";
-        _serverMessage = response.Message ??= $"Successfully registered user {_user.Username}";
+        _serverMessage = $"Successfully registered user {_user.Username}";
+        StateHasChanged();
 
-        await Task.Delay( 3000 );
+        await Task.Delay( 4000 );
         NavManager.NavigateTo( "profile" );
     }
 }

@@ -7,7 +7,6 @@ using Blazored.LocalStorage;
 using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Client.Services.Features;
 using BlazorElectronics.Client.Services.Users;
-using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault( args );
 builder.RootComponents.Add<App>( "#app" );

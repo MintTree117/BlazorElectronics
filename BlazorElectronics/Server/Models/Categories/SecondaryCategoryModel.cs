@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Models.Categories;
 
-public sealed class SecondaryCategory
+public sealed class SecondaryCategoryModel
 {
     public short SecondaryCategoryId { get; set; }
     public short PrimaryCategoryId { get; set; }

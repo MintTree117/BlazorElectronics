@@ -1,15 +1,17 @@
-using BlazorElectronics.Server.Caches.Products;
+using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Products;
+using BlazorElectronics.Server.Models.Products.Details;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Outbound.Categories;
+using BlazorElectronics.Shared.Outbound.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
 
-public class ProductService : ApiService, IProductService
+public class ProductService : ApiService<ProductService>, IProductService
 {
-    readonly IProductCache _cache;
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductDetailsRepository _productDetailsRepository;
 
@@ -18,10 +20,9 @@ public class ProductService : ApiService, IProductService
     const int MAX_FILTER_ID_LENGTH = 8;
 
     public ProductService(
-        ILogger logger, IProductCache cache, IProductSearchRepository productSearchRepository, IProductDetailsRepository productDetailsRepository )
+        ILogger<ProductService> logger, IProductSearchRepository productSearchRepository, IProductDetailsRepository productDetailsRepository )
         : base( logger )
     {
-        _cache = cache;
         _productSearchRepository = productSearchRepository;
         _productDetailsRepository = productDetailsRepository;
     }
@@ -65,47 +66,28 @@ public class ProductService : ApiService, IProductService
 
         return new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) );
     }
-    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId )
+    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesDto categoriesDto )
     {
-        Task<ProductDetailsResponse?> cacheFetchFunction = _cache.GetProductDetails( productId );
-        var cacheFetchResult = ExecuteIoCall( async () => await cacheFetchFunction );
-        
-        ProductDetailsResponse? dto;
+        ProductDetailsModel? model;
 
         try
         {
-            dto = await _cache.GetProductDetails( productId );
-            if ( dto != null )
-                return new ApiReply<ProductDetailsResponse?>( dto, true, "Successfully got Product Details from cache." );
+            model = await _productDetailsRepository.GetProductDetails( productId );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<ProductDetailsResponse?>( e.Message );
+            _logger.LogError( e.Message, e );
+            return new ApiReply<ProductDetailsResponse?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
-        ProductOverviewModel? model;
+        if ( model is null )
+            return new ApiReply<ProductDetailsResponse?>( NO_DATA_FOUND_MESSAGE );
 
-        try
-        {
-            model = await _productDetailsRepository.GetProductOverview( productId );
-        }
-        catch ( ServiceException e )
-        {
-            return new ApiReply<ProductDetailsResponse?>( e.Message );
-        }
+        ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, categoriesDto );
 
-        dto = await MapProductDetailsToResponse( model! );
-
-        try
-        {
-            await _cache.CacheProductDetails( dto );
-        }
-        catch ( ServiceException e )
-        {
-            return new ApiReply<ProductDetailsResponse?>( dto, true, $"Successfully retrieved ProductDetails from repository, but failed to cache with message: {e.Message}" );
-        } 
-
-        return new ApiReply<ProductDetailsResponse?>( dto, true, "Successfully retrieved ProductDetails from repository, and cached." );
+        return dto is not null
+            ? new ApiReply<ProductDetailsResponse?>( dto )
+            : new ApiReply<ProductDetailsResponse?>( NO_DATA_FOUND_MESSAGE );
     }
 
     static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest? request )
@@ -174,45 +156,93 @@ public class ProductService : ApiService, IProductService
 
         return dto;
     }
-    static async Task<ProductDetailsResponse> MapProductDetailsToResponse( ProductOverviewModel productOverviewModel )
+    static async Task<ProductDetailsResponse?> MapProductDetailsToResponse( ProductDetailsModel detailsModel, CategoriesDto categoriesDto )
     {
-        var dto = new ProductDetailsResponse();
-
-        await Task.Run( () =>
+        return await Task.Run( () =>
         {
-            if ( productOverviewModel.Product == null )
-                return;
+            if ( detailsModel.Overview is null )
+                return null;
             
-            dto.Id = productOverviewModel.Product.ProductId;
-            dto.Title = productOverviewModel.Product.ProductTitle;
+            ProductOverviewModel overviewModel = detailsModel.Overview;
 
-            if ( productOverviewModel.ProductDescription != null )
-            {
-                dto.Description = productOverviewModel.ProductDescription.DescriptionBody ?? "No description!";
-            }
+            var variants = new List<ProductVariantResponse>();
+            var images = new List<ProductImageResponse>();
 
-            foreach ( ProductVariant variant in productOverviewModel.Product.ProductVariants )
+            foreach ( ProductVariantModel variant in detailsModel.Variants )
             {
-                dto.Variants.Add( new ProductVariant_DTO {
+                variants.Add( new ProductVariantResponse {
                     Id = variant.VariantId,
-                    Name = variant.VariantName ?? "No Variant Name!",
+                    Name = variant.VariantName,
                     Price = variant.VariantPriceMain,
                     SalePrice = variant.VariantPriceSale,
                 } );
             }
 
-            foreach ( ProductImage image in productOverviewModel.ProductImages )
+            foreach ( ProductImageModel image in detailsModel.Images )
             {
-                dto.Images.Add( new ProductImage_DTO {
+                images.Add( new ProductImageResponse {
                     Url = image.ImageUrl,
-                    VariantId = image.ProductVariantId
+                    VariantId = image.VariantId
                 } );
             }
-        } );
 
-        return dto;
+            var primaryCategory = new ProductCategoryResponse
+            {
+                Name = categoriesDto.PrimaryResponses[ detailsModel.PrimaryCategory ].Name,
+                Url = categoriesDto.PrimaryResponses[ detailsModel.PrimaryCategory ].Url
+            };
+
+            List<ProductCategoryResponse>? parsedSecondaryCategories = ParseProductDetailsCategories( detailsModel.SecondaryCategories, categoriesDto.SecondaryIds, categoriesDto.SecondaryResponses );
+            List<ProductCategoryResponse>? parsedTertiaryCategories = ParseProductDetailsCategories( detailsModel.TertiaryCategories, categoriesDto.TertiaryIds, categoriesDto.TertiaryResponses );
+
+            return new ProductDetailsResponse
+            {
+                PrimaryCategory = primaryCategory,
+                SecondaryCategories = parsedSecondaryCategories ?? new List<ProductCategoryResponse>(),
+                TertiaryCategories = parsedTertiaryCategories ?? new List<ProductCategoryResponse>(),
+                Title = overviewModel.Title,
+                Rating = overviewModel.Rating,
+                ReleaseDate = overviewModel.ReleaseDate,
+                HasDrm = overviewModel.HasDrm,
+                NumberSold = overviewModel.NumberSold,
+                VariantTypeName = "",
+                Description = detailsModel.ProductDescription ?? "No description!",
+                Images = images,
+                Variants = variants
+            };
+        } );
     }
 
+    static List<ProductCategoryResponse>? ParseProductDetailsCategories( string? modelCategories, IReadOnlyDictionary<short, short> dtoIds, IReadOnlyList<CategoryResponse> dtoResponses )
+    {
+        if ( string.IsNullOrEmpty( modelCategories ) )
+            return null;
+        
+        List<int>? ids = modelCategories?
+            .Split( ',' )
+            .ToList()
+            .Select( int.Parse )
+            .ToList();
+
+        if ( ids is null )
+            return new List<ProductCategoryResponse>();
+
+        var responses = new List<ProductCategoryResponse>();
+
+        foreach ( int id in ids )
+        {
+            if ( !dtoIds.TryGetValue( ( short ) id, out short responseId ) )
+                continue;
+
+            responses.Add( new ProductCategoryResponse
+            {
+                Name = dtoResponses[ responseId ].Name,
+                Url = dtoResponses[ responseId ].Url
+            } );
+        }
+
+        return responses;
+    }
     static void TrimExcessFilterLists( Dictionary<short, List<short>>? filters )
     {
         if ( filters is null )

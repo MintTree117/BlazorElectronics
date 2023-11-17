@@ -19,12 +19,12 @@ public class UserController : ControllerBase
         SessionService = sessionService;
     }
 
-    protected async Task<ApiReply<int>> ValidateUserSession( SessionApiRequest? request )
+    protected async Task<ApiReply<int>> AuthorizeUserSession( SessionApiRequest? request )
     {
         if ( request is null )
             return new ApiReply<int>( BAD_REQUEST_MESSAGE );
 
-        ApiReply<int> sessionReply = await SessionService.ValidateSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
 
         return sessionReply.Success
             ? new ApiReply<int>( sessionReply.Data )

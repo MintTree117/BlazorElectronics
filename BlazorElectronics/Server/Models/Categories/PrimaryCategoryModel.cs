@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Models.Categories;
 
-public sealed class PrimaryCategory
+public sealed class PrimaryCategoryModel
 {
     public short PrimaryCategoryId { get; set; }
     public string Name { get; set; } = string.Empty;

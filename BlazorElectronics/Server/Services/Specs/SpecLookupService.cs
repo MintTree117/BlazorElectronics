@@ -6,7 +6,7 @@ using BlazorElectronics.Shared.Outbound.Specs;
 
 namespace BlazorElectronics.Server.Services.Specs;
 
-public class SpecLookupService : ApiService, ISpecLookupService
+public class SpecLookupService : ApiService<SpecLookupService>, ISpecLookupService
 {
     readonly ISpecLookupRepository _repository;
 
@@ -14,7 +14,7 @@ public class SpecLookupService : ApiService, ISpecLookupService
     CachedSpecData? _cachedSpecData;
     
     // CONSTRUCTOR
-    public SpecLookupService( ILogger logger, ISpecLookupRepository repository ) : base( logger )
+    public SpecLookupService( ILogger<SpecLookupService> logger, ISpecLookupRepository repository ) : base( logger )
     {
         _repository = repository;
     }
