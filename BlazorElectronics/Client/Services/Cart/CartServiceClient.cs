@@ -4,6 +4,7 @@ using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Inbound.Cart;
 using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Outbound.Users;
 
 namespace BlazorElectronics.Client.Services.Cart;
 
@@ -33,9 +34,9 @@ public class CartServiceClient : ICartServiceClient
         if ( localCart == null )
             return;
 
-        ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
+        ApiReply<UserSessionResponse?> authorizeResponse = await _userService.AuthorizeUser();
 
-        if ( !authorizeResponse.Data )
+        if ( !authorizeResponse.Success || authorizeResponse.Data is null )
             return;
 
         CartItemsInsertRequest cartIds = GetCartIds( localCart );
@@ -65,9 +66,9 @@ public class CartServiceClient : ICartServiceClient
     }
     public async Task<ApiReply<CartResponse?>> GetCart()
     {
-        ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
+        ApiReply<UserSessionResponse?> authorizeResponse = await _userService.AuthorizeUser();
 
-        if ( !authorizeResponse.Data )
+        if ( !authorizeResponse.Success || authorizeResponse.Data is null )
         {
             CartResponse localCart = await GetCartFromStorage();
             return new ApiReply<CartResponse?>( localCart, true, "Got cart from local storage." );
@@ -87,9 +88,9 @@ public class CartServiceClient : ICartServiceClient
         cart.AddOrUpdateQuantity( item );
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
 
-        ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
+        ApiReply<UserSessionResponse?> authorizeResponse = await _userService.AuthorizeUser();
 
-        if ( !authorizeResponse.Data )
+        if ( !authorizeResponse.Success || authorizeResponse.Data is null )
         {
             OnChange?.Invoke( cart.Items.Count );
             return;
@@ -133,9 +134,9 @@ public class CartServiceClient : ICartServiceClient
         
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
 
-        ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
+        ApiReply<UserSessionResponse?> authorizeResponse = await _userService.AuthorizeUser();
 
-        if ( !authorizeResponse.Data )
+        if ( !authorizeResponse.Success || authorizeResponse.Data is null )
         {
             OnChange?.Invoke( cart.Items.Count );
             return;
@@ -179,9 +180,9 @@ public class CartServiceClient : ICartServiceClient
         sameItem!.Quantity = item.Quantity;
         await _localStorage.SetItemAsync( CART_STORAGE_KEY, cart );
 
-        ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
+        ApiReply<UserSessionResponse?> authorizeResponse = await _userService.AuthorizeUser();
 
-        if ( !authorizeResponse.Data )
+        if ( !authorizeResponse.Success || authorizeResponse.Data is null )
             return;
 
         try

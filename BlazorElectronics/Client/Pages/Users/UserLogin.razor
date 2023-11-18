@@ -60,7 +60,7 @@
     {
         _errorMessage = string.Empty;
         
-        ApiReply<UserLoginResponse?> loginReply = await UserService.Login( _loginRequest );
+        ApiReply<UserSessionResponse?> loginReply = await UserService.Login( _loginRequest );
 
         if ( !loginReply.Success || loginReply.Data is null )
         {

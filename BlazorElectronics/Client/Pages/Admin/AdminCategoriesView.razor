@@ -1,0 +1,156 @@
+@page "/admin/categories-view"
+@using BlazorElectronics.Shared.Outbound.Categories
+@using BlazorElectronics.Client.Services.Categories
+@using BlazorElectronics.Shared
+@inject ICategoryServiceClient CategoryService
+@inject NavigationManager NavManager
+
+<h3>AdminCategoriesView</h3>
+
+@if ( !_isLoaded )
+{
+    <span>Loading Categories...</span>
+}
+else if ( _categories is null )
+{
+    <span>@_errorMessage</span>
+}
+else
+{
+    <div class="row">
+        <div class="col-4 px-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>Primary</h4>
+                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
+                    <i class="oi oi-plus"></i> Add New Primary Category
+                </button>
+            </div>
+            @foreach ( PrimaryCategoryResponse p in _categories.Primary )
+            {
+                <div class="row admin-view-row align-items-center">
+                    <div class="col">
+                        @p.Id
+                    </div>
+                    <div class="col">
+                        @p.Name
+                    </div>
+                    <div class="col">
+                        @p.Url
+                    </div>
+                    <div class="col">
+                        @p.ImageUrl
+                    </div>
+                    <div class="col text-nowrap">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( p.Id, 1 ) )">
+                            <i class="oi oi-pencil"></i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="( () => DeleteCategory( p.Id, 1 ) )">
+                            <i class="oi oi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-4 px-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>Secondary</h4>
+                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
+                    <i class="oi oi-plus"></i> Add New Primary Category
+                </button>
+            </div>
+            @foreach ( SecondaryCategoryResponse s in _categories.Secondary )
+            {
+                <div class="row admin-view-row align-items-center">
+                    <div class="col">
+                        @s.Id
+                    </div>
+                    <div class="col">
+                        @s.Name
+                    </div>
+                    <div class="col">
+                        @s.Url
+                    </div>
+                    <div class="col">
+                        @s.ImageUrl
+                    </div>
+                    <div class="col text-nowrap">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( s.Id, 2 ) )">
+                            <i class="oi oi-pencil"></i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="( () => DeleteCategory( s.Id, 2 ) )">
+                            <i class="oi oi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-4 px-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>Primary</h4>
+                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
+                    <i class="oi oi-plus"></i> Add New Primary Category
+                </button>
+            </div>
+            @foreach ( TertiaryCategoryResponse t in _categories.Tertiary )
+            {
+                <div class="row admin-view-row align-items-center">
+                    <div class="col">
+                        @t.Id
+                    </div>
+                    <div class="col">
+                        @t.Name
+                    </div>
+                    <div class="col">
+                        @t.Url
+                    </div>
+                    <div class="col">
+                        @t.ImageUrl
+                    </div>
+                    <div class="col text-nowrap">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( t.Id, 3 ) )">
+                            <i class="oi oi-pencil"></i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="( () => DeleteCategory( t.Id, 3 ) )">
+                            <i class="oi oi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>   
+}
+
+@code 
+{
+    bool _isLoaded = false;
+    string _errorMessage = string.Empty;
+    CategoriesResponse? _categories;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ApiReply<CategoriesResponse?> reply = await CategoryService.GetCategories();
+
+        _isLoaded = true;
+        
+        if ( !reply.Success || reply.Data is null )
+        {
+            _errorMessage = reply.Message ??= "Failed to get Categories!";
+            return;
+        }
+        
+        _categories = reply.Data;
+    }
+
+    void CreateNewCategory( int categoryTier )
+    {
+        NavManager.NavigateTo( $"admin/category-edit?newCategory=true&categoryTier={categoryTier}" );
+    }
+    void EditCategory( short categoryId, int categoryTier )
+    {
+        NavManager.NavigateTo( $"admin/category-edit?categoryId={categoryId}&categoryTier={categoryTier}" );
+    }
+    void DeleteCategory( short categoryId, int categoryTier )
+    {
+        
+    }
+}

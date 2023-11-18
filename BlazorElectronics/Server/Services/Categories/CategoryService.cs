@@ -190,8 +190,8 @@ public class CategoryService : ApiService<CategoryService>, ICategoryService
                  
                 tempSecondaryResponses.Add( new SecondaryCategoryResponse
                 {
-                    Id = s.PrimaryCategoryId,
-                    ParentId = s.SecondaryCategoryId,
+                    Id = s.SecondaryCategoryId,
+                    ParentId = s.PrimaryCategoryId,
                     Name = s.Name,
                     Url = s.ApiUrl,
                     ImageUrl = s.ImageUrl,

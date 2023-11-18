@@ -18,8 +18,8 @@ public sealed class AdminCategoryController : _AdminController
     {
         _repository = repository;
     }
-
-    [HttpPost( $"{AdminControllerRoutes.AddCategory}" )]
+    
+    [HttpPost( "add" )]
     public async Task<ActionResult<ApiReply<bool>>> AddCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
@@ -34,7 +34,7 @@ public sealed class AdminCategoryController : _AdminController
             ? Ok( new ApiReply<bool>( true ) )
             : Ok( new ApiReply<bool>( result.Message ) );
     }
-    [HttpPost( $"{AdminControllerRoutes.AddCategory}" )]
+    [HttpPost( "update" )]
     public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
@@ -49,7 +49,7 @@ public sealed class AdminCategoryController : _AdminController
             ? Ok( new ApiReply<bool>( true ) )
             : Ok( new ApiReply<bool>( result.Message ) );
     }
-    [HttpPost( $"{AdminControllerRoutes.AddCategory}" )]
+    [HttpPost( "delete" )]
     public async Task<ActionResult<ApiReply<bool>>> DeleteCategory( [FromBody] AdminRequest<DeleteCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );

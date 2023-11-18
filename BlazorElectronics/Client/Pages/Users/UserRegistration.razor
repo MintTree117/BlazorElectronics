@@ -48,7 +48,7 @@
 
     async Task HandleRegistration()
     {
-        ApiReply<UserLoginResponse?> reply = await UserService.Register( _user );
+        ApiReply<UserSessionResponse?> reply = await UserService.Register( _user );
 
         if ( !reply.Success || reply.Data is null )
         {

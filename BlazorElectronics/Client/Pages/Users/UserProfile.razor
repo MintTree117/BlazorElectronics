@@ -5,6 +5,7 @@
 @using BlazorElectronics.Client.Services.Users
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.Inbound.Users
+@using BlazorElectronics.Shared.Outbound.Users
 
 @inject IUserServiceClient UserService
 @inject NavigationManager NavManager
@@ -50,9 +51,9 @@ else
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
         string? returnUrl = queryString.Get( "returnUrl" );
         
-        ApiReply<bool> response = await UserService.AuthorizeUser();
+        ApiReply<UserSessionResponse?> response = await UserService.AuthorizeUser();
         _loaded = true;
-        _isAuthorized = response.Data;
+        _isAuthorized = response.Data is not null;
         StateHasChanged();
 
         if ( !_isAuthorized )

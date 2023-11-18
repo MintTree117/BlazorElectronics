@@ -15,23 +15,23 @@ public class UserAccountController : UserController
     public UserAccountController( IUserAccountService userAccountService, ISessionService sessionService ) : base( userAccountService, sessionService ) { }
 
     [HttpPost( "register" )]
-    public async Task<ActionResult<ApiReply<UserLoginResponse>>> Register( [FromBody] UserRegisterRequest request )
+    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Register( [FromBody] UserRegisterRequest request )
     {
         if ( !ValidateRegisterRequest( request ) )
-            return BadRequest( new ApiReply<UserLoginResponse>( BAD_REQUEST_MESSAGE ) );
+            return BadRequest( new ApiReply<UserSessionResponse>( BAD_REQUEST_MESSAGE ) );
         
-        ApiReply<UserLoginResponse> loginReply = await GetLogin(
+        ApiReply<UserSessionResponse> loginReply = await GetLogin(
             await UserAccountService.Register( request.Username, request.Email, request.Password, request.Phone ), GetRequestDeviceInfo() );
         
         return Ok( loginReply );
     }
     [HttpPost( "login" )]
-    public async Task<ActionResult<ApiReply<UserLoginResponse>>> Login( [FromBody] UserLoginRequest request )
+    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Login( [FromBody] UserLoginRequest request )
     {
         if ( !ValidateLoginRequest( request ) )
-            return BadRequest( new ApiReply<UserLoginResponse>( BAD_REQUEST_MESSAGE ) );
+            return BadRequest( new ApiReply<UserSessionResponse>( BAD_REQUEST_MESSAGE ) );
         
-        ApiReply<UserLoginResponse> loginReply = await GetLogin( 
+        ApiReply<UserSessionResponse> loginReply = await GetLogin( 
             await UserAccountService.Login( request.EmailOrUsername, request.Password ), GetRequestDeviceInfo() );
         
         return Ok( loginReply );
@@ -75,18 +75,18 @@ public class UserAccountController : UserController
             : Ok( new ApiReply<bool>( deleteReply.Message ) );
     }
     
-    async Task<ApiReply<UserLoginResponse>> GetLogin( ApiReply<UserLoginDto?> loginReply, UserDeviceInfoDto? deviceInfo )
+    async Task<ApiReply<UserSessionResponse>> GetLogin( ApiReply<UserLoginDto?> loginReply, UserDeviceInfoDto? deviceInfo )
     {
         if ( !loginReply.Success || loginReply.Data is null )
-            return new ApiReply<UserLoginResponse>( loginReply.Message );
+            return new ApiReply<UserSessionResponse>( loginReply.Message );
         
         UserLoginDto login = loginReply.Data;
         ApiReply<SessionDto?> sessionReply = await SessionService.CreateSession( loginReply.Data.UserId, deviceInfo );
 
         if ( !sessionReply.Success || sessionReply.Data is null )
-            return new ApiReply<UserLoginResponse>( sessionReply.Message );
+            return new ApiReply<UserSessionResponse>( sessionReply.Message );
         
-        var response = new UserLoginResponse
+        var response = new UserSessionResponse
         {
             Email = login.Email,
             Username = login.Username,
@@ -95,7 +95,7 @@ public class UserAccountController : UserController
             IsAdmin = login.IsAdmin
         };
         
-        return new ApiReply<UserLoginResponse>( response );
+        return new ApiReply<UserSessionResponse>( response );
     }
 
     static bool ValidateRegisterRequest( UserRegisterRequest request )

@@ -6,12 +6,13 @@ namespace BlazorElectronics.Client.Services.Users;
 
 public interface IUserServiceClient
 {
-    event Action<bool> SessionChanged;
+    event Action<UserSessionResponse?> SessionChanged;
     event Action<string>? SessionStorageError;
     
-    Task<ApiReply<UserLoginResponse?>> Register( UserRegisterRequest request );
-    Task<ApiReply<UserLoginResponse?>> Login( UserLoginRequest request );
+    Task<ApiReply<UserSessionResponse?>> Register( UserRegisterRequest request );
+    Task<ApiReply<UserSessionResponse?>> Login( UserLoginRequest request );
+    Task<ApiReply<UserSessionResponse?>> AuthorizeUser();
+    Task<ApiReply<bool>> AuthorizeAdmin();
     Task<ApiReply<bool>> Logout();
-    Task<ApiReply<bool>> AuthorizeUser();
     Task<ApiReply<bool>> ChangePassword( UserChangePasswordRequest request );
 }

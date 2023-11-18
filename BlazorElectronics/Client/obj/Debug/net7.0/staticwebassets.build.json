@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Bvmx24Nb/FYLrXAO+N2IRqSz/FUc54nmsBZXgzcgYn0=",
+  "Hash": "1slQifTBtQ1zeK239InN0OLBc2BwTWYgXiBYMmJjj2w=",
   "Source": "BlazorElectronics.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -7818,6 +7818,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/scopedcss/projectbundle/BlazorElectronics.Client.bundle.scp.css"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/admin.css",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "css/admin.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/admin.css"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",

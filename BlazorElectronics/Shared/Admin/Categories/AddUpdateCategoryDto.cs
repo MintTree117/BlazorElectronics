@@ -2,31 +2,15 @@ namespace BlazorElectronics.Shared.Admin.Categories;
 
 public sealed class AddUpdateCategoryDto
 {
-    public AddUpdateCategoryDto( 
-        int? updateCategoryId, int? updateCategoryTier, string? categoryName, int categoryTier, int? primaryCategoryId,
-        int? secondaryCategoryId, int? tertiaryCategoryId, string? categoryDescription, string? categoryApiUrl, string? categoryImageUrl )
-    {
-        UpdateCategoryId = updateCategoryId;
-        UpdateCategoryTier = updateCategoryTier;
-        CategoryName = categoryName;
-        CategoryTier = categoryTier;
-        PrimaryCategoryId = primaryCategoryId;
-        SecondaryCategoryId = secondaryCategoryId;
-        TertiaryCategoryId = tertiaryCategoryId;
-        CategoryDescription = categoryDescription;
-        CategoryApiUrl = categoryApiUrl;
-        CategoryImageUrl = categoryImageUrl;
-    }
-    
-    public int? UpdateCategoryId { get; }
-    public int? UpdateCategoryTier { get; }
+    public int? UpdateCategoryId { get; init; }
+    public int? UpdateCategoryTier { get; init; }
 
-    public string? CategoryName { get; }
-    public int CategoryTier { get; }
-    public int? PrimaryCategoryId { get; }
-    public int? SecondaryCategoryId { get; }
-    public int? TertiaryCategoryId { get; }
-    public string? CategoryDescription { get; }
-    public string? CategoryApiUrl { get; }
-    public string? CategoryImageUrl { get; }
+    public string? CategoryName { get; init; }
+    public int CategoryTier { get; init; }
+    public int? PrimaryCategoryId { get; init; }
+    public int? SecondaryCategoryId { get; init; }
+    public int? TertiaryCategoryId { get; init; }
+    public string? CategoryDescription { get; init; }
+    public string? CategoryApiUrl { get; init; }
+    public string? CategoryImageUrl { get; init; }
 }
