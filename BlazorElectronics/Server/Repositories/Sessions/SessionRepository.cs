@@ -11,6 +11,7 @@ namespace BlazorElectronics.Server.Repositories.Sessions;
 public class SessionRepository : DapperRepository, ISessionRepository
 {
     const string PROCEDURE_ADD_SESSION = "Add_UserSession";
+    const string PROCEDURE_REMOVE_SESSION = "Remove_UserSession";
     const string PROCEDURE_GET_SESSION = "Get_UserSession";
 
     public SessionRepository( DapperContext dapperContext )
@@ -21,10 +22,17 @@ public class SessionRepository : DapperRepository, ISessionRepository
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_USER_ID, userId );
         parameters.Add( PARAM_SESSION_IP_ADDRESS, deviceInfo?.IpAddress );
-        parameters.Add( PARAM_SESSION_SALT, sessionHash );
-        parameters.Add( PARAM_SESSION_HASH, sessionSalt );
+        parameters.Add( PARAM_SESSION_HASH, sessionHash );
+        parameters.Add( PARAM_SESSION_SALT, sessionSalt );
 
         return await TryQueryTransactionAsync( AddSessionQuery, parameters );
+    }
+    public async Task<bool> RemoveSession( int sessionId )
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_SESSION_ID, sessionId );
+
+        return await TryQueryTransactionAsync( RemoveSessionQuery, parameters );
     }
     public async Task<UserSession?> GetSession( int sessionId )
     {
@@ -37,6 +45,11 @@ public class SessionRepository : DapperRepository, ISessionRepository
     static async Task<UserSession?> AddSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QuerySingleOrDefaultAsync<UserSession>( PROCEDURE_ADD_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+    }
+    static async Task<bool> RemoveSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
+    {
+        int result = await connection.ExecuteAsync( PROCEDURE_REMOVE_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+        return result > 0;
     }
     static async Task<UserSession?> GetSessionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {

@@ -23,12 +23,12 @@ public class UserController : ControllerBase
     {
         if ( request is null )
             return new ApiReply<int>( BAD_REQUEST_MESSAGE );
-
+        
         ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
-
+        
         return sessionReply.Success
-            ? new ApiReply<int>( sessionReply.Data )
-            : new ApiReply<int>( sessionReply.Message );
+            ? new ApiReply<int>( sessionReply.Data, true, "" )
+            : new ApiReply<int>( -1, false, sessionReply.Message );
     }
     
     protected UserDeviceInfoDto GetRequestDeviceInfo()

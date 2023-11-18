@@ -8,8 +8,8 @@ public sealed class UserSession
     public DateTime LastActivityDate { get; set; }
     public bool IsActive { get; set; }
     public string? IpAddress { get; set; } = string.Empty;
-    public byte[] Salt { get; set; } = Array.Empty<byte>();
-    public byte[] Hash { get; set; } = Array.Empty<byte>();
+    public byte[] TokenHash { get; set; } = Array.Empty<byte>();
+    public byte[] TokenSalt { get; set; } = Array.Empty<byte>();
 
     public bool IsValid( int maxHours )
     {

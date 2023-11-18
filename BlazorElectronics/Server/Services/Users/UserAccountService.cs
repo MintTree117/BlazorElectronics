@@ -34,12 +34,9 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
 
         if ( user is null )
             return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
-        
-        _logger.LogError( "Password" + password );
-        _logger.LogError( "Hash length" + user.PasswordHash.Length.ToString() );
 
         return VerifyPasswordHash( password, user.PasswordHash, user.PasswordSalt )
-            ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Email, user.Username, user.IsAdmin ) )
+            ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Username, user.Email, user.IsAdmin ) )
             : new ApiReply<UserLoginDto?>( BAD_PASSWORD_MESSAGE );
     }
     public async Task<ApiReply<UserLoginDto?>> Register( string username, string email, string password, int? phone )

@@ -23,7 +23,7 @@ public sealed class UserLoginResponse
     
     public string Username { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
-    public int SessionSessionId { get; init; }
+    public int SessionId { get; init; }
     public string SessionToken { get; init; } = string.Empty;
     public bool IsAdmin { get; init; } = false;
 }

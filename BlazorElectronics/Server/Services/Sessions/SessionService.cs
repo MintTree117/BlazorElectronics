@@ -35,10 +35,29 @@ public class SessionService : ApiService<SessionService>, ISessionService
             _logger.LogError( e.Message, e );
             return new ApiReply<SessionDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
-
-        return insertedSession is not null ? 
-            new ApiReply<SessionDto?>( new SessionDto( insertedSession.SessionId, token ) ) 
+        
+        return insertedSession is not null 
+            ? new ApiReply<SessionDto?>( new SessionDto( insertedSession.SessionId, token ) ) 
             : new ApiReply<SessionDto?>( NO_DATA_FOUND_MESSAGE );
+    }
+    public async Task<ApiReply<bool>> DeleteSession( int sessionId )
+    {
+        bool success = false;
+
+        try
+        {
+            success = await _sessionRepository.RemoveSession( sessionId );
+        }
+        catch ( ServiceException e )
+        {
+            _logger.LogError( e.Message, e );
+            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+
+        return success
+            ? new ApiReply<bool>( true )
+            : new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
+
     }
     public async Task<ApiReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
     {
@@ -58,9 +77,12 @@ public class SessionService : ApiService<SessionService>, ISessionService
             return new ApiReply<int>( NO_DATA_FOUND_MESSAGE );
 
         if ( !session.IsValid( MAX_SESSION_HOURS ) )
-            return new ApiReply<int>( SESSION_EXPIRED_MESSAGE );
+        {
+            await DeleteSession( session.SessionId );
+            return new ApiReply<int>( SESSION_EXPIRED_MESSAGE );   
+        }
 
-        return VerifySessionToken( sessionToken, session.Hash, session.Salt )
+        return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
             ? new ApiReply<int>( session.UserId )
             : new ApiReply<int>( INVALID_SESSION_TOKEN_MESSAGE );
     }
@@ -72,7 +94,7 @@ public class SessionService : ApiService<SessionService>, ISessionService
         byte[] tokenBytes = new byte[ 32 ];
         using ( var rng = RandomNumberGenerator.Create() )
             rng.GetBytes( tokenBytes );
-
+        
         token = Convert.ToBase64String( tokenBytes );
         salt = hmac.Key;
         hash = hmac.ComputeHash( Encoding.UTF8.GetBytes( token ) );
@@ -82,11 +104,9 @@ public class SessionService : ApiService<SessionService>, ISessionService
     static bool VerifySessionToken( string token, byte[] hash, byte[] salt )
     {
         var hmac = new HMACSHA512( salt );
-        
-        // Convert the Base64 string back to a byte array before hashing
-        byte[] tokenBytes = Convert.FromBase64String( token );
-        byte[] computedHash = hmac.ComputeHash( tokenBytes );
-        
+
+        byte[] computedHash = hmac.ComputeHash( Encoding.UTF8.GetBytes( token ) );
+
         hmac.Dispose();
         
         return computedHash.SequenceEqual( hash );

@@ -210,7 +210,7 @@ public class CartServiceClient : ICartServiceClient
     }
     public async Task<int> GetCartItemsCount()
     {
-        ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
+        /*ApiReply<bool> authorizeResponse = await _userService.AuthorizeUser();
         
         if ( !authorizeResponse.Data )
         {
@@ -229,7 +229,8 @@ public class CartServiceClient : ICartServiceClient
         {
             PostErrorEvent?.Invoke( e.Message );
             return 0;
-        }
+        }*/
+        return 0;
     }
     
     async Task<ApiReply<CartResponse?>> GetCartFromServer()

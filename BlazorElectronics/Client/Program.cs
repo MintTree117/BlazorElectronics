@@ -20,4 +20,6 @@ builder.Services.AddScoped<IProductServiceClient, ProductServiceClient>();
 builder.Services.AddScoped<ICartServiceClient, CartServiceClient>();
 builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
+builder.Logging.SetMinimumLevel( LogLevel.Error ); // Set the minimum level of logging
+
 await builder.Build().RunAsync();

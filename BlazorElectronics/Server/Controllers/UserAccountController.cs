@@ -43,7 +43,10 @@ public class UserAccountController : UserController
             return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
         
         ApiReply<int> sessionReply = await AuthorizeUserSession( request );
-        return Ok( sessionReply );
+
+        return sessionReply.Success
+            ? Ok( new ApiReply<bool>( true ) )
+            : Ok( new ApiReply<bool>( sessionReply.Message ) );
     }
     [HttpPost( "change-password" )]
     public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserChangePasswordRequest request )
@@ -59,6 +62,18 @@ public class UserAccountController : UserController
             ? Ok( passwordReply )
             : Ok( new ApiReply<bool>( passwordReply.Message ) );
     }
+    [HttpPost( "logout" )]
+    public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] SessionApiRequest request )
+    {
+        if ( !ValidateSessionRequest( request ) )
+            return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
+
+        ApiReply<bool> deleteReply = await SessionService.DeleteSession( request.SessionId );
+
+        return deleteReply.Success
+            ? Ok( new ApiReply<bool>( true ) )
+            : Ok( new ApiReply<bool>( deleteReply.Message ) );
+    }
     
     async Task<ApiReply<UserLoginResponse>> GetLogin( ApiReply<UserLoginDto?> loginReply, UserDeviceInfoDto? deviceInfo )
     {
@@ -70,12 +85,12 @@ public class UserAccountController : UserController
 
         if ( !sessionReply.Success || sessionReply.Data is null )
             return new ApiReply<UserLoginResponse>( sessionReply.Message );
-
+        
         var response = new UserLoginResponse
         {
             Email = login.Email,
             Username = login.Username,
-            SessionSessionId = sessionReply.Data.Id,
+            SessionId = sessionReply.Data.Id,
             SessionToken = sessionReply.Data.Token,
             IsAdmin = login.IsAdmin
         };

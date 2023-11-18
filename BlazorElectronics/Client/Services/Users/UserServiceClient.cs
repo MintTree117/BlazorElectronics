@@ -18,13 +18,15 @@ public class UserServiceClient : IUserServiceClient
     const string API_PATH_AUTHORIZE = API_PATH_CONTROLLER + "/authorize";
     const string API_PATH_CHANGE_PASSWORD = API_PATH_CONTROLLER + "/change-password";
     const string SESSION_DATA_KEY = "UserSession";
-    
+
+    readonly ILogger<UserServiceClient> _logger;
     readonly HttpClient _http;
     readonly ILocalStorageService _localStorage;
     UserLoginResponse? _userSession;
     
-    public UserServiceClient( HttpClient http, ILocalStorageService localStorage )
+    public UserServiceClient( ILogger<UserServiceClient> logger, HttpClient http, ILocalStorageService localStorage )
     {
+        _logger = logger;
         _http = http;
         _localStorage = localStorage;
     }
@@ -42,17 +44,17 @@ public class UserServiceClient : IUserServiceClient
     {
         ApiReply<UserLoginResponse?> loginReply = await TryGetLoginResponse( API_PATH_LOGIN, request );
 
-        if ( !loginReply.Success || loginReply.Data is null )
+        if ( loginReply is { Success: true, Data: not null } )
             SessionChanged?.Invoke( true );
 
         return loginReply;
     }
     public async Task<ApiReply<bool>> Logout()
     {
+        ApiReply<bool> serverReply = await TryExecuteApiRequest( API_PATH_LOGOUT );
         await _localStorage.RemoveItemAsync( SESSION_DATA_KEY );
         SessionChanged?.Invoke( false );
-        
-        return await TryExecuteApiRequest( API_PATH_LOGOUT );
+        return serverReply;
     }
     public async Task<ApiReply<bool>> AuthorizeUser()
     {
@@ -62,7 +64,7 @@ public class UserServiceClient : IUserServiceClient
     {
         return await TryExecuteApiRequest( API_PATH_CHANGE_PASSWORD );
     }
-
+    
     async Task<ApiReply<UserLoginResponse?>> TryGetLoginResponse( string apiPath, object requestObject )
     {
         ApiReply<UserLoginResponse?>? loginReply;
@@ -84,7 +86,7 @@ public class UserServiceClient : IUserServiceClient
         
         try
         {
-            await _localStorage.SetItemAsync( SESSION_DATA_KEY, loginReply.Data );
+            await _localStorage.SetItemAsync( SESSION_DATA_KEY, _userSession );
         }
         catch ( Exception e )
         {
@@ -98,11 +100,14 @@ public class UserServiceClient : IUserServiceClient
         ApiReply<UserLoginResponse?> sessionReply = await TryGetLocalUserSession();
 
         if ( !sessionReply.Success || sessionReply.Data is null )
-            return new ApiReply<bool>( sessionReply.Message );
+        {
+            _logger.LogError( "Failed to get local session!" );
+            return new ApiReply<bool>( sessionReply.Message );   
+        }
 
-        var apiRequest = new SessionApiRequest( sessionReply.Data.SessionSessionId, sessionReply.Data.SessionToken );
+        var apiRequest = new SessionApiRequest( sessionReply.Data.SessionId, sessionReply.Data.SessionToken );
         ApiReply<bool>? apiReply;
-
+        
         try
         {
             HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( apiPath, apiRequest );
@@ -110,8 +115,11 @@ public class UserServiceClient : IUserServiceClient
         }
         catch ( Exception e )
         {
+            _logger.LogError( "Failed to read POST response!" );
             return new ApiReply<bool>( e.Message );
         }
+        
+        _logger.LogError( apiReply.Data.ToString() + " " + apiReply.Success );
 
         return apiReply is not null && apiReply.Success
             ? apiReply

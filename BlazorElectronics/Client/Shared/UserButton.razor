@@ -1,5 +1,6 @@
 @using Blazored.LocalStorage
 @using BlazorElectronics.Client.Services.Users
+@using BlazorElectronics.Shared
 @using Microsoft.AspNetCore.Components.Authorization
 
 @implements IDisposable
@@ -35,9 +36,17 @@
     bool _showUserMenu = false;
     string? _userMenuCssClass => _showUserMenu ? "show-user-menu" : null;
 
+
     protected override void OnInitialized()
     {
-        UserService.SessionChanged += HandleAuthorizationChange;
+        UserService.SessionChanged += HandleAuthorizationChange;   
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        ApiReply<bool> authorizeReply = await UserService.AuthorizeUser();
+
+        if ( authorizeReply.Success )
+            HandleAuthorizationChange( true );
     }
     public void Dispose()
     {
