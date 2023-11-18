@@ -1,15 +1,17 @@
 using System.Net.Http.Json;
+using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Outbound.Categories;
 
 namespace BlazorElectronics.Client.Services.Categories;
 
-public class CategoryServiceClient : ICategoryServiceClient
+public class CategoryServiceClient : ClientService<CategoryServiceClient>, ICategoryServiceClient
 {
     readonly HttpClient _http;
     CategoriesResponse? Categories;
 
-    public CategoryServiceClient( HttpClient http )
+    public CategoryServiceClient( ILogger<CategoryServiceClient> logger, HttpClient http )
+        : base( logger )
     {
         _http = http;
     }

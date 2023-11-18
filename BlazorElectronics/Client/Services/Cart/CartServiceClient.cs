@@ -8,7 +8,7 @@ using BlazorElectronics.Shared.Outbound.Users;
 
 namespace BlazorElectronics.Client.Services.Cart;
 
-public class CartServiceClient : ICartServiceClient
+public class CartServiceClient : ClientService<CartServiceClient>, ICartServiceClient
 {
     public event Action<int>? OnChange;
     public event Action<string>? PostErrorEvent;
@@ -20,7 +20,8 @@ public class CartServiceClient : ICartServiceClient
     readonly ILocalStorageService _localStorage;
     readonly HttpClient _http;
 
-    public CartServiceClient( IUserServiceClient userService, ILocalStorageService localStorage, HttpClient http )
+    public CartServiceClient( ILogger<CartServiceClient> logger, IUserServiceClient userService, ILocalStorageService localStorage, HttpClient http )
+        : base( logger )
     {
         _userService = userService;
         _localStorage = localStorage;

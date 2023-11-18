@@ -4,11 +4,12 @@ using BlazorElectronics.Shared.Outbound.Features;
 
 namespace BlazorElectronics.Client.Services.Features;
 
-public class FeaturesServiceClient : IFeaturesServiceClient
+public class FeaturesServiceClient : ClientService<FeaturesServiceClient>, IFeaturesServiceClient
 {
     readonly HttpClient _http;
 
-    public FeaturesServiceClient( HttpClient http )
+    public FeaturesServiceClient( ILogger<FeaturesServiceClient> logger, HttpClient http )
+        : base( logger )
     {
         _http = http;
     }

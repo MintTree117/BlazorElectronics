@@ -2,7 +2,10 @@ using BlazorElectronics.Server.Controllers;
 using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
+using BlazorElectronics.Shared.Admin;
+using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Inbound.Users;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Admin.Controllers;
@@ -14,13 +17,31 @@ public class _AdminController : UserController
     const string ADMIN_TASK_INTERNAL_SERVER_ERROR = "An internal server error occured!";
 
     readonly ILogger _logger;
-    
+
     public _AdminController( ILogger logger, IUserAccountService userAccountService, ISessionService sessionService )
         : base( userAccountService, sessionService )
     {
         _logger = logger;
     }
 
+    [HttpPost( "authorize-admin-view" )]
+    public async Task<ActionResult<ApiReply<bool>>> AddCategory( [FromBody] SessionApiRequest request )
+    {
+        if ( !ValidateSessionRequest( request ) )
+            return new ApiReply<bool>( BAD_REQUEST_MESSAGE );
+
+        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+
+        if ( !sessionReply.Success )
+            return new ApiReply<bool>( sessionReply.Message );
+
+        ApiReply<int> adminIdReply = await UserAccountService.VerifyAdminId( sessionReply.Data );
+
+        return adminIdReply.Success
+            ? new ApiReply<bool>( true )
+            : new ApiReply<bool>( adminIdReply.Message );
+    }
+    
     protected async Task<ApiReply<bool>> ValidateAdminRequest( SessionApiRequest? request, UserDeviceInfoDto? deviceInfo )
     {
         if ( !ValidateSessionRequest( request ) )

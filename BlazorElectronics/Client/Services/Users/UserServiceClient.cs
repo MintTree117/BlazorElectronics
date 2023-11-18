@@ -6,8 +6,15 @@ using BlazorElectronics.Shared.Outbound.Users;
 
 namespace BlazorElectronics.Client.Services.Users;
 
-public class UserServiceClient : IUserServiceClient
+public class UserServiceClient : ClientService<UserServiceClient>, IUserServiceClient
 {
+    public UserServiceClient( ILogger<UserServiceClient> logger, HttpClient http, ILocalStorageService localStorage )
+        : base( logger )
+    {
+        _http = http;
+        _localStorage = localStorage;
+    }
+    
     public event Action<UserSessionResponse?>? SessionChanged;
     public event Action<string>? SessionStorageError;
     
@@ -19,18 +26,10 @@ public class UserServiceClient : IUserServiceClient
     const string API_PATH_CHANGE_PASSWORD = API_PATH_CONTROLLER + "/change-password";
     const string SESSION_DATA_KEY = "UserSession";
 
-    readonly ILogger<UserServiceClient> _logger;
     readonly HttpClient _http;
     readonly ILocalStorageService _localStorage;
     UserSessionResponse? _userSession;
-    
-    public UserServiceClient( ILogger<UserServiceClient> logger, HttpClient http, ILocalStorageService localStorage )
-    {
-        _logger = logger;
-        _http = http;
-        _localStorage = localStorage;
-    }
-    
+
     public async Task<ApiReply<UserSessionResponse?>> Register( UserRegisterRequest request )
     {
         ApiReply<UserSessionResponse?> registerReply = await TryGetLoginResponse( API_PATH_REGISTER, request );
@@ -65,7 +64,7 @@ public class UserServiceClient : IUserServiceClient
         }
         catch ( Exception e )
         {
-            _logger.LogError( e.Message + e.InnerException );
+            Logger.LogError( e.Message + e.InnerException );
             return new ApiReply<UserSessionResponse?>( e.Message + e.InnerException );
         }
 
@@ -98,6 +97,22 @@ public class UserServiceClient : IUserServiceClient
     {
         return await TryExecuteApiRequest( API_PATH_CHANGE_PASSWORD );
     }
+    public async Task<ApiReply<UserSessionResponse?>> TryGetLocalUserSession()
+    {
+        if ( _userSession is not null )
+            return new ApiReply<UserSessionResponse?>( _userSession );
+
+        var storedSession = await _localStorage.GetItemAsync<UserSessionResponse?>( SESSION_DATA_KEY );
+
+        if ( storedSession is null )
+            return new ApiReply<UserSessionResponse?>( "Stored session is null!" );
+
+        if ( !storedSession.ValidateIntegrity( out string message ) )
+            return new ApiReply<UserSessionResponse?>( message );
+
+        _userSession = storedSession;
+        return new ApiReply<UserSessionResponse?>( _userSession );
+    }
     
     async Task<ApiReply<UserSessionResponse?>> TryGetLoginResponse( string apiPath, object requestObject )
     {
@@ -110,7 +125,7 @@ public class UserServiceClient : IUserServiceClient
         }
         catch ( Exception e )
         {
-            _logger.LogError( e.Message + e.InnerException );
+            Logger.LogError( e.Message + e.InnerException );
             return new ApiReply<UserSessionResponse?>( e.Message + e.InnerException );
         }
 
@@ -136,7 +151,7 @@ public class UserServiceClient : IUserServiceClient
 
         if ( !sessionReply.Success || sessionReply.Data is null )
         {
-            _logger.LogError( "Failed to get local session!" );
+            Logger.LogError( "Failed to get local session!" );
             return new ApiReply<bool>( sessionReply.Message );   
         }
 
@@ -150,28 +165,12 @@ public class UserServiceClient : IUserServiceClient
         }
         catch ( Exception e )
         {
-            _logger.LogError( e.Message + e.InnerException );
+            Logger.LogError( e.Message + e.InnerException );
             return new ApiReply<bool>( e.Message );
         }
         
         return apiReply is not null && apiReply.Success
             ? apiReply
             : new ApiReply<bool>( apiReply?.Message );
-    }
-    async Task<ApiReply<UserSessionResponse?>> TryGetLocalUserSession()
-    {
-        if ( _userSession is not null )
-            return new ApiReply<UserSessionResponse?>( _userSession );
-        
-        var storedSession = await _localStorage.GetItemAsync<UserSessionResponse?>( SESSION_DATA_KEY );
-
-        if ( storedSession is null )
-            return new ApiReply<UserSessionResponse?>( "Stored session is null!" );
-
-        if ( !storedSession.ValidateIntegrity( out string message ) )
-            return new ApiReply<UserSessionResponse?>( message );
-        
-        _userSession = storedSession;
-        return new ApiReply<UserSessionResponse?>( _userSession );
     }
 }

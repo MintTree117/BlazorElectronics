@@ -21,6 +21,7 @@ builder.Services.AddScoped<IProductServiceClient, ProductServiceClient>();
 builder.Services.AddScoped<ICartServiceClient, CartServiceClient>();
 builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
+builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCategoryServiceClient, AdminCategoryServiceClient>();
 
 builder.Logging.SetMinimumLevel( LogLevel.Error ); // Set the minimum level of logging

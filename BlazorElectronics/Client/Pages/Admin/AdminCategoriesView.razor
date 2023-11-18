@@ -1,19 +1,20 @@
 @page "/admin/categories-view"
 @using BlazorElectronics.Shared.Outbound.Categories
 @using BlazorElectronics.Client.Services.Categories
-@using BlazorElectronics.Shared
+
+@inherits AdminView
+
 @inject ICategoryServiceClient CategoryService
-@inject NavigationManager NavManager
 
 <h3>AdminCategoriesView</h3>
 
-@if ( !_isLoaded )
+@if ( !IsLoaded )
 {
     <span>Loading Categories...</span>
 }
-else if ( _categories is null )
+else if ( !IsAuthorized || Categories is null )
 {
-    <span>@_errorMessage</span>
+    <span>@Message</span>
 }
 else
 {
@@ -25,7 +26,7 @@ else
                     <i class="oi oi-plus"></i> Add New Primary Category
                 </button>
             </div>
-            @foreach ( PrimaryCategoryResponse p in _categories.Primary )
+            @foreach ( PrimaryCategoryResponse p in Categories.Primary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
@@ -58,7 +59,7 @@ else
                     <i class="oi oi-plus"></i> Add New Primary Category
                 </button>
             </div>
-            @foreach ( SecondaryCategoryResponse s in _categories.Secondary )
+            @foreach ( SecondaryCategoryResponse s in Categories.Secondary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
@@ -91,7 +92,7 @@ else
                     <i class="oi oi-plus"></i> Add New Primary Category
                 </button>
             </div>
-            @foreach ( TertiaryCategoryResponse t in _categories.Tertiary )
+            @foreach ( TertiaryCategoryResponse t in Categories.Tertiary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
@@ -118,39 +119,4 @@ else
             }
         </div>
     </div>   
-}
-
-@code 
-{
-    bool _isLoaded = false;
-    string _errorMessage = string.Empty;
-    CategoriesResponse? _categories;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        ApiReply<CategoriesResponse?> reply = await CategoryService.GetCategories();
-
-        _isLoaded = true;
-        
-        if ( !reply.Success || reply.Data is null )
-        {
-            _errorMessage = reply.Message ??= "Failed to get Categories!";
-            return;
-        }
-        
-        _categories = reply.Data;
-    }
-
-    void CreateNewCategory( int categoryTier )
-    {
-        NavManager.NavigateTo( $"admin/category-edit?newCategory=true&categoryTier={categoryTier}" );
-    }
-    void EditCategory( short categoryId, int categoryTier )
-    {
-        NavManager.NavigateTo( $"admin/category-edit?categoryId={categoryId}&categoryTier={categoryTier}" );
-    }
-    void DeleteCategory( short categoryId, int categoryTier )
-    {
-        
-    }
 }

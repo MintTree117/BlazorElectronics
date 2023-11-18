@@ -2,8 +2,11 @@ using BlazorElectronics.Shared.Admin.Categories;
 
 namespace BlazorElectronics.Client.Services.Admin;
 
-public class AdminCategoryServiceClient : IAdminCategoryServiceClient
+public class AdminCategoryServiceClient : ClientService<AdminCategoryServiceClient>, IAdminCategoryServiceClient
 {
+    public AdminCategoryServiceClient( ILogger<AdminCategoryServiceClient> logger )
+        : base( logger ) { }
+    
     public Task<bool> AddCategory( AddUpdateCategoryDto dto )
     {
         throw new NotImplementedException();
