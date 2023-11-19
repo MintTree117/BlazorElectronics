@@ -1,0 +1,43 @@
+h3 {
+    margin-top: 1rem; /* Adds space above the h3 */
+    margin-bottom: 1rem; /* Adds space below the h3 */
+    padding: 0.5rem 0; /* Adds space inside the borders of the h3 */
+    font-size: 1.75rem; /* Adjusts the size of the font */
+    font-weight: bold; /* Makes the font bold */
+    line-height: 1.2; /* Adjusts the spacing between lines of text */
+    color: #333; /* Sets the text color */
+}
+
+h4 {
+    margin-top: 0.8rem; /* Adds space above the h4 */
+    margin-bottom: 0.8rem; /* Adds space below the h4 */
+    padding: 0.4rem 0; /* Adds space inside the borders of the h4 */
+    font-size: 1.5rem; /* Adjusts the size of the font, slightly smaller than h3 */
+    font-weight: bold; /* Makes the font bold */
+    line-height: 1.3; /* Adjusts the spacing between lines of text */
+    color: #444; /* Sets the text color, slightly lighter than h3 */
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loading-circle {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

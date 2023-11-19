@@ -19,7 +19,7 @@ public sealed class AdminCategoryController : _AdminController
         _repository = repository;
     }
 
-    [HttpPost("get-edit")]
+    [HttpPost("get-category-edit")]
     public async Task<ActionResult<ApiReply<AddUpdateCategoryDto?>>> GetCategoryForEdit( [FromBody] AdminRequest<GetCategoryEditRequest> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
@@ -29,12 +29,14 @@ public sealed class AdminCategoryController : _AdminController
 
         Func<GetCategoryEditRequest, Task<AddUpdateCategoryDto?>> action = _repository.GetEditCategory;
         ApiReply<AddUpdateCategoryDto?> result = await TryExecuteAdminQuery<AddUpdateCategoryDto>( action, request.Dto );
-
+        
+        Logger.LogError( result.Success.ToString() );
+        
         return result is { Success: true, Data: not null }
             ? Ok( new ApiReply<AddUpdateCategoryDto?>( result.Data ) )
             : Ok( new ApiReply<AddUpdateCategoryDto?>( NO_DATA_MESSAGE ) );
     }
-    [HttpPost( "add" )]
+    [HttpPost( "add-category" )]
     public async Task<ActionResult<ApiReply<AddUpdateCategoryDto?>>> AddCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
     {
         Logger.LogError( "Hit controller" );
@@ -55,7 +57,7 @@ public sealed class AdminCategoryController : _AdminController
             ? Ok( new ApiReply<AddUpdateCategoryDto?>( result.Data ) )
             : Ok( new ApiReply<AddUpdateCategoryDto?>( result.Message ) );
     }
-    [HttpPost( "update" )]
+    [HttpPost( "update-category" )]
     public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
@@ -70,10 +72,9 @@ public sealed class AdminCategoryController : _AdminController
             ? Ok( new ApiReply<bool>( true ) )
             : Ok( new ApiReply<bool>( result.Message ) );
     }
-    [HttpPost( "remove" )]
+    [HttpPost( "remove-category" )]
     public async Task<ActionResult<ApiReply<bool>>> RemoveCategory( [FromBody] AdminRequest<DeleteCategoryDto> request )
     {
-
         Logger.LogError( "Hit remove method" );
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 

@@ -293,6 +293,10 @@
       "PackagePath": "staticwebassets/css/products.css"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/razor-page.css",
+      "PackagePath": "staticwebassets/css/razor-page.css"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/favicon.png",
       "PackagePath": "staticwebassets/favicon.png"
     },

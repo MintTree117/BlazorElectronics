@@ -17,7 +17,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     
     public event Action<UserSessionResponse?>? SessionChanged;
     public event Action<string>? SessionStorageError;
-    
+
     const string API_PATH_CONTROLLER = "api/UserAccount";
     const string API_PATH_REGISTER = API_PATH_CONTROLLER + "/register";
     const string API_PATH_LOGIN = API_PATH_CONTROLLER + "/login";
@@ -67,6 +67,8 @@ public class UserServiceClient : ClientService, IUserServiceClient
             Logger.LogError( e.Message + e.InnerException );
             return new ApiReply<UserSessionResponse?>( e.Message + e.InnerException );
         }
+        
+        Logger.LogError( authorizeReply.Success.ToString() );
 
         if ( authorizeReply is null || !authorizeReply.Success )
             return new ApiReply<UserSessionResponse?>( authorizeReply?.Message );

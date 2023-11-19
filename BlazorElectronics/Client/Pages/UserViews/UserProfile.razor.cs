@@ -5,21 +5,25 @@ namespace BlazorElectronics.Client.Pages.UserViews;
 
 public partial class UserProfile : UserView
 {
-    protected readonly UserChangePasswordRequest Request = new();
+    const string DEFAULT_FAIL_PASSWORD_CHANGE = "Failed to change password; no response message!";
+    
+    readonly UserChangePasswordRequest _changePasswordRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
+        GetReturnUrl();
+        
         await AuthorizeUser();
 
-        IsLoaded = true;
+        PageIsLoaded = true;
 
-        if ( !IsAuthorized )
-            await HandleRedirection();
+        if ( !PageIsAuthorized )
+            StartPageRedirection();
     }
 
     async Task ChangePassword()
     {
-        ApiReply<bool> result = await UserService.ChangePassword( Request );
-        Message = result.Message ??= "Failed to change password; no response message!";
+        ApiReply<bool> result = await UserService.ChangePassword( _changePasswordRequest );
+        RazorViewMessage = result.Message ??= DEFAULT_FAIL_PASSWORD_CHANGE;
     }
 }

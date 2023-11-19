@@ -1,29 +1,10 @@
 ﻿@page "/"
-@using BlazorElectronics.Client.Services.Products
-@inject IProductServiceClient ProductService
 
-<PageTitle>BlazorElectronics</PageTitle>
+@inherits PageView
 
-<span>@_debugMessage</span>
+<PageTitle>BlazorMedia</PageTitle>
 
-@code
+@if ( !PageIsReady() )
 {
-    /*
-     <FeaturedProducts></FeaturedProducts>
-    <FeaturedDeals></FeaturedDeals>*/
-    
-    string _debugMessage = string.Empty;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            ProductService.ClearSearchRequest();
-        }
-        catch ( Exception e )
-        {
-            _debugMessage = e.Message;
-        }
-
-    }
+    <span>@RazorViewMessage</span>
 }

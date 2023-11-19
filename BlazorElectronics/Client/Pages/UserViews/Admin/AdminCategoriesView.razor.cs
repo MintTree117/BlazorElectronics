@@ -5,9 +5,9 @@ using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Outbound.Categories;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.Admin;
+namespace BlazorElectronics.Client.Pages.UserViews.Admin;
 
-public partial class AdminCategoriesView
+public sealed partial class AdminCategoriesView
 {
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
     [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
@@ -18,20 +18,20 @@ public partial class AdminCategoriesView
     {
         await base.OnInitializedAsync();
 
-        if ( !IsAuthorized )
+        if ( !PageIsAuthorized )
         {
             Logger.LogError( "Not authorized!" );
-            await HandleRedirection();
+            StartPageRedirection();
             return;
         }
 
         ApiReply<CategoriesResponse?> reply = await CategoryService.GetCategories();
 
-        IsLoaded = true;
+        PageIsLoaded = true;
         
         if ( !reply.Success || reply.Data is null )
         {
-            Message = reply.Message ??= "Failed to get Categories!";
+            RazorViewMessage = reply.Message ??= "Failed to get Categories!";
             return;
         }
 
@@ -53,7 +53,7 @@ public partial class AdminCategoriesView
 
         if ( !result.Success )
         {
-            Message = result.Message ??= "Failed to delete category!";
+            RazorViewMessage = result.Message ??= "Failed to delete category!";
             return false;
         }
         

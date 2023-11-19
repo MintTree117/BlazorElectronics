@@ -7,10 +7,10 @@ namespace BlazorElectronics.Client.Services.Admin;
 public class AdminCategoryServiceClient : AdminDbServiceClient, IAdminCategoryServiceClient
 {
     const string API_ROUTE = "api/admincategory";
-    const string API_ROUTE_GET = API_ROUTE + "/get-edit";
-    const string API_ROUTE_ADD = API_ROUTE + "/add";
-    const string API_ROUTE_UPDATE = API_ROUTE + "/update";
-    const string API_ROUTE_REMOVE = API_ROUTE + "/remove";
+    const string API_ROUTE_GET = API_ROUTE + "/get-category-edit";
+    const string API_ROUTE_ADD = API_ROUTE + "/add-category";
+    const string API_ROUTE_UPDATE = API_ROUTE + "/update-category";
+    const string API_ROUTE_REMOVE = API_ROUTE + "/remove-category";
     
     public AdminCategoryServiceClient( ILogger<ClientService> logger, IUserServiceClient userService, HttpClient http )
         : base( logger, userService, http ) { }

@@ -39,7 +39,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
     {
         string procedure = GetProcedure( PROCEDURES_REMOVE_CATEGORY, dto.CategoryTier );
         DynamicParameters parameters = GetDeleteParameters( dto );
-
+        
         return await TryAdminTransaction( procedure, parameters );
     }
 
@@ -98,7 +98,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
     static DynamicParameters GetDeleteParameters( DeleteCategoryDto dto )
     {
         var parameters = new DynamicParameters();
-
+        
         string paramName = dto.CategoryTier switch
         {
             1 => PARAM_CATEGORY_PRIMARY_ID,
@@ -107,7 +107,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
             _ => throw new ServiceException( "Invalid category tier!", null )
         };
         
-        parameters.Add( paramName );
+        parameters.Add( paramName, dto.CategoryId );
         return parameters;
     }
 }

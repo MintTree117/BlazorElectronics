@@ -5,9 +5,9 @@ using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.Admin;
+namespace BlazorElectronics.Client.Pages.UserViews.Admin;
 
-public partial class AdminCategoriesEdit
+public sealed partial class AdminCategoriesEdit
 {
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
     
@@ -21,23 +21,24 @@ public partial class AdminCategoriesEdit
     {
         await base.OnInitializedAsync();
 
-        if ( !IsAuthorized )
+        if ( !PageIsAuthorized )
         {
             Logger.LogError( "Not authorized!" );
-            await HandleRedirection();
+            StartPageRedirection();
             return;
         }
 
         if ( !TryParseUrlParameters() )
         {
-            Message = INVALID_QUERY_PARAMS_MESSAGE;
-            Logger.LogError( INVALID_QUERY_PARAMS_MESSAGE );
-            await HandleRedirection();
+            RazorViewMessage = ERROR_INVALID_URL_PARAMS;
+            Logger.LogError( ERROR_INVALID_URL_PARAMS );
+            StartPageRedirection();
             return;
         }
 
         if ( _newCategory )
         {
+            PageIsLoaded = true;
             _dto.Tier = _categoryTier;
             return;
         }
@@ -47,11 +48,13 @@ public partial class AdminCategoriesEdit
 
         if ( !reply.Success || reply.Data is null )
         {
-            Message = reply.Message ??= "Failed to get category!";
-            await HandleRedirection();
+            Logger.LogError( reply.Message ??= "Failed to get category!" );
+            RazorViewMessage = reply.Message ??= "Failed to get category!";
+            StartPageRedirection();
             return;
         }
-
+        
+        PageIsLoaded = true;
         _dto = reply.Data;
         StateHasChanged();
     }
@@ -85,15 +88,14 @@ public partial class AdminCategoriesEdit
 
         if ( !reply.Success || reply.Data is null )
         {
-            Message = reply.Message ??= "Failed to add category!";
+            RazorViewMessage = reply.Message ??= "Failed to add category!";
             return false;
         }
 
         _newCategory = false;
-
         _dto = reply.Data;
+        
         StateHasChanged();
-
         return true;
     }
     async Task<bool> SubmitEdit()
@@ -103,7 +105,7 @@ public partial class AdminCategoriesEdit
         if ( reply.Success ) 
             return true;
         
-        Message = reply.Message ??= "Failed to submit changes!";
+        RazorViewMessage = reply.Message ??= "Failed to submit changes!";
         return false;
 
     }

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "LG7XqJRQ6gq/456pp8lhp5ZbP0aO7dHBbiU3XbXbLQk=",
+  "Hash": "wnp7HFsI0kc4XJUtSj2AE6MpaIFJgFvUmEo6MBvoX/I=",
   "Source": "BlazorElectronics.Server",
   "BasePath": "_content/BlazorElectronics.Server",
   "Mode": "Default",
@@ -8119,6 +8119,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/products.css"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/razor-page.css",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Project",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "css/razor-page.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/razor-page.css"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/favicon.png",
