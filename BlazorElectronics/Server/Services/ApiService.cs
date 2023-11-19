@@ -1,15 +1,15 @@
 namespace BlazorElectronics.Server.Services;
 
-public abstract class ApiService<T>
+public abstract class ApiService
 {
     protected const string NO_DATA_FOUND_MESSAGE = "No data was found in cache or database!";
     protected const string INTERNAL_SERVER_ERROR_MESSAGE = "An internal server error occured!";
     
-    protected ILogger<T> _logger;
+    protected readonly ILogger<ApiService> Logger;
     
-    public ApiService( ILogger<T> logger )
+    public ApiService( ILogger<ApiService> logger )
     {
-        _logger = logger;
+        Logger = logger;
     }
     
     protected static async Task<ApiReply<T>> ExecuteIoCall<T>( Func<Task<T>> func )

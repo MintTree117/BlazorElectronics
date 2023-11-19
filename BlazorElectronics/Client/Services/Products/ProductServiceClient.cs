@@ -7,7 +7,7 @@ using BlazorElectronics.Shared.Outbound.Products;
 
 namespace BlazorElectronics.Client.Services.Products;
 
-public class ProductServiceClient : ClientService<ProductServiceClient>, IProductServiceClient
+public class ProductServiceClient : ClientService, IProductServiceClient
 {
     public event Action<string>? ExceptionEvent;
     public event Action<ApiReply<ProductSearchResponse?>?>? ProductSearchChanged;
@@ -28,7 +28,7 @@ public class ProductServiceClient : ClientService<ProductServiceClient>, IProduc
 
     readonly HttpClient _http;
 
-    public ProductServiceClient( ILogger<ProductServiceClient> logger, HttpClient http )
+    public ProductServiceClient( ILogger<ClientService> logger, HttpClient http )
         : base( logger )
     {
         _http = http;

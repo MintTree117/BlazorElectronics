@@ -7,7 +7,8 @@ namespace BlazorElectronics.Client.Pages.Admin;
 
 public class AdminView : UserView
 {
-    const string NOT_ADMIN_AUTHORIZED_MESSAGE = "You are not an admin!";
+    protected const string NOT_ADMIN_AUTHORIZED_MESSAGE = "You are not an admin!";
+    protected const string INVALID_QUERY_PARAMS_MESSAGE = "Invalid url paramters!";
     
     [Inject]
     IAdminServiceClient AdminService { get; init; } = default!;
@@ -20,7 +21,7 @@ public class AdminView : UserView
 
     protected async Task AuthorizeAdmin()
     {
-        ApiReply<bool> response = await AdminService.AuthorizeAdminView();
+        ApiReply<bool> response = await AdminService.AuthorizeAdmin();
         IsAuthorized = response.Data;
         if ( !IsAuthorized )
             Message = NOT_ADMIN_AUTHORIZED_MESSAGE;

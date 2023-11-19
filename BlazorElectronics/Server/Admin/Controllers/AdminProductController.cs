@@ -13,7 +13,7 @@ public class AdminProductController : _AdminController
 {
     readonly IAdminProductRepository _repository;
     
-    public AdminProductController( ILogger logger, IUserAccountService userAccountService, ISessionService sessionService, IAdminProductRepository repository )
+    public AdminProductController( ILogger<AdminProductController> logger, IUserAccountService userAccountService, ISessionService sessionService, IAdminProductRepository repository )
         : base( logger, userAccountService, sessionService )
     {
         _repository = repository;
@@ -28,7 +28,7 @@ public class AdminProductController : _AdminController
             return BadRequest( sessionReply );
 
         Func<AddUpdateProductDto, Task<bool>> action = _repository.AddProduct;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )
@@ -43,7 +43,7 @@ public class AdminProductController : _AdminController
             return BadRequest( sessionReply );
 
         Func<AddUpdateProductDto, Task<bool>> action = _repository.UpdateProduct;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )
@@ -58,7 +58,7 @@ public class AdminProductController : _AdminController
             return BadRequest( sessionReply );
 
         Func<RemoveProductDto, Task<bool>> action = _repository.RemoveProduct;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )

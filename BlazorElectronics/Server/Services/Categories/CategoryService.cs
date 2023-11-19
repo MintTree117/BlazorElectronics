@@ -6,7 +6,7 @@ using BlazorElectronics.Shared.Outbound.Categories;
 
 namespace BlazorElectronics.Server.Services.Categories;
 
-public class CategoryService : ApiService<CategoryService>, ICategoryService
+public class CategoryService : ApiService, ICategoryService
 {
     readonly ICategoryRepository _repository;
 
@@ -16,7 +16,7 @@ public class CategoryService : ApiService<CategoryService>, ICategoryService
     CategoriesDto? _cachedCategoriesDto;
     IReadOnlyList<string>? _cachedMainDescriptions;
 
-    public CategoryService( ILogger<CategoryService> logger, ICategoryRepository repository ) : base( logger )
+    public CategoryService( ILogger<ApiService> logger, ICategoryRepository repository ) : base( logger )
     {
         _repository = repository;
     }
@@ -73,7 +73,7 @@ public class CategoryService : ApiService<CategoryService>, ICategoryService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e, e.Message );
+            Logger.LogError( e, e.Message );
             return new ApiReply<string?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
     }
@@ -136,7 +136,7 @@ public class CategoryService : ApiService<CategoryService>, ICategoryService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<CategoriesDto?>( INTERNAL_SERVER_ERROR_MESSAGE);
         }
 

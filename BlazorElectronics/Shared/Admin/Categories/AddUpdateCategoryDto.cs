@@ -2,15 +2,16 @@ namespace BlazorElectronics.Shared.Admin.Categories;
 
 public sealed class AddUpdateCategoryDto
 {
-    public int? UpdateCategoryId { get; init; }
-    public int? UpdateCategoryTier { get; init; }
-
-    public string? CategoryName { get; init; }
-    public int CategoryTier { get; init; }
-    public int? PrimaryCategoryId { get; init; }
-    public int? SecondaryCategoryId { get; init; }
-    public int? TertiaryCategoryId { get; init; }
-    public string? CategoryDescription { get; init; }
-    public string? CategoryApiUrl { get; init; }
-    public string? CategoryImageUrl { get; init; }
+    public int? NewPrimaryCategory { get; set; }
+    public int? NewSecondaryCategory { get; set; }
+    public int? NewTertiaryCategory { get; set; }
+    
+    public string? Name { get; set; }
+    public int Tier { get; set; }
+    public int? PrimaryCategoryId { get; set; }
+    public int? SecondaryCategoryId { get; set; }
+    public int? TertiaryCategoryId { get; set; }
+    public string? Description { get; set; }
+    public string? ApiUrl { get; set; }
+    public string? ImageUrl { get; set; }
 }

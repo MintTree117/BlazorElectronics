@@ -7,7 +7,7 @@ using BlazorElectronics.Server.Repositories.Sessions;
 
 namespace BlazorElectronics.Server.Services.Sessions;
 
-public class SessionService : ApiService<SessionService>, ISessionService
+public class SessionService : ApiService, ISessionService
 {
     const int MAX_SESSION_HOURS = 48;
     const string SESSION_EXPIRED_MESSAGE = "Session has expired. Please login again.";
@@ -15,7 +15,7 @@ public class SessionService : ApiService<SessionService>, ISessionService
     
     readonly ISessionRepository _sessionRepository;
     
-    public SessionService( ILogger<SessionService> logger, ISessionRepository sessionRepository ) : base( logger )
+    public SessionService( ILogger<ApiService> logger, ISessionRepository sessionRepository ) : base( logger )
     {
         _sessionRepository = sessionRepository;
     }
@@ -32,7 +32,7 @@ public class SessionService : ApiService<SessionService>, ISessionService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<SessionDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
         
@@ -50,7 +50,7 @@ public class SessionService : ApiService<SessionService>, ISessionService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -69,7 +69,7 @@ public class SessionService : ApiService<SessionService>, ISessionService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 

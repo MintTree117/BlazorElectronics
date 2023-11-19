@@ -1,18 +1,11 @@
-@page "/admin/categories-view"
+@page "/admin/categories/view"
 @using BlazorElectronics.Shared.Outbound.Categories
-@using BlazorElectronics.Client.Services.Categories
 
 @inherits AdminView
 
-@inject ICategoryServiceClient CategoryService
-
 <h3>AdminCategoriesView</h3>
 
-@if ( !IsLoaded )
-{
-    <span>Loading Categories...</span>
-}
-else if ( !IsAuthorized || Categories is null )
+@if ( !IsAuthorized || !IsLoaded || Categories is null )
 {
     <span>@Message</span>
 }
@@ -45,7 +38,7 @@ else
                         <button class="btn btn-primary" @onclick="( () => EditCategory( p.Id, 1 ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( () => DeleteCategory( p.Id, 1 ) )">
+                        <button class="btn btn-primary" @onclick="(async () => await RemoveCategory( p.Id, 1 ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>
@@ -78,7 +71,7 @@ else
                         <button class="btn btn-primary" @onclick="( () => EditCategory( s.Id, 2 ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( () => DeleteCategory( s.Id, 2 ) )">
+                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.Id, 2 ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>
@@ -111,7 +104,7 @@ else
                         <button class="btn btn-primary" @onclick="( () => EditCategory( t.Id, 3 ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( () => DeleteCategory( t.Id, 3 ) )">
+                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.Id, 3 ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>

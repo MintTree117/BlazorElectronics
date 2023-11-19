@@ -1,4 +1,5 @@
 global using BlazorElectronics.Shared;
+using BlazorElectronics.Server.Admin.Repositories;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Server.Repositories.Categories;
@@ -45,6 +46,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+
+builder.Services.AddScoped<IAdminCategoryRepository, AdminCategoryRepository>();
 
 WebApplication app = builder.Build();
 

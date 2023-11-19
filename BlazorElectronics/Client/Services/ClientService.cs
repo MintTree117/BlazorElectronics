@@ -1,10 +1,10 @@
 namespace BlazorElectronics.Client.Services;
 
-public abstract class ClientService<T>
+public abstract class ClientService
 {
-    protected readonly ILogger<T> Logger;
+    protected readonly ILogger<ClientService> Logger;
     
-    protected ClientService( ILogger<T> logger )
+    protected ClientService( ILogger<ClientService> logger )
     {
         Logger = logger;
     }

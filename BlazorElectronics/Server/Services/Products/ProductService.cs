@@ -10,7 +10,7 @@ using BlazorElectronics.Shared.Outbound.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
 
-public class ProductService : ApiService<ProductService>, IProductService
+public class ProductService : ApiService, IProductService
 {
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductDetailsRepository _productDetailsRepository;
@@ -20,7 +20,7 @@ public class ProductService : ApiService<ProductService>, IProductService
     const int MAX_FILTER_ID_LENGTH = 8;
 
     public ProductService(
-        ILogger<ProductService> logger, IProductSearchRepository productSearchRepository, IProductDetailsRepository productDetailsRepository )
+        ILogger<ApiService> logger, IProductSearchRepository productSearchRepository, IProductDetailsRepository productDetailsRepository )
         : base( logger )
     {
         _productSearchRepository = productSearchRepository;
@@ -60,7 +60,7 @@ public class ProductService : ApiService<ProductService>, IProductService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<ProductSearchResponse?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -76,7 +76,7 @@ public class ProductService : ApiService<ProductService>, IProductService
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<ProductDetailsResponse?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 

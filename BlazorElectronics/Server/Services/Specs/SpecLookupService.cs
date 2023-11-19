@@ -6,7 +6,7 @@ using BlazorElectronics.Shared.Outbound.Specs;
 
 namespace BlazorElectronics.Server.Services.Specs;
 
-public class SpecLookupService : ApiService<SpecLookupService>, ISpecLookupService
+public class SpecLookupService : ApiService, ISpecLookupService
 {
     readonly ISpecLookupRepository _repository;
 
@@ -14,7 +14,7 @@ public class SpecLookupService : ApiService<SpecLookupService>, ISpecLookupServi
     CachedSpecData? _cachedSpecData;
     
     // CONSTRUCTOR
-    public SpecLookupService( ILogger<SpecLookupService> logger, ISpecLookupRepository repository ) : base( logger )
+    public SpecLookupService( ILogger<ApiService> logger, ISpecLookupRepository repository ) : base( logger )
     {
         _repository = repository;
     }
@@ -98,7 +98,7 @@ public class SpecLookupService : ApiService<SpecLookupService>, ISpecLookupServi
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e, e.Message );
+            Logger.LogError( e, e.Message );
             return new ApiReply<SpecLookupsModel?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 

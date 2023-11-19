@@ -10,7 +10,9 @@ namespace BlazorElectronics.Client.Pages.UserViews;
 public abstract class UserView : ComponentBase
 {
     const string NOT_AUTHORIZED_MESSAGE = "You are not authorized to be here!";
-    
+
+    [Inject] 
+    protected ILogger<UserView> Logger { get; init; } = default!;
     [Inject]
     protected NavigationManager NavManager { get; init; } = default!;
     [Inject]

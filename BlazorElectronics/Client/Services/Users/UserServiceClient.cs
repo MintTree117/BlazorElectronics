@@ -6,9 +6,9 @@ using BlazorElectronics.Shared.Outbound.Users;
 
 namespace BlazorElectronics.Client.Services.Users;
 
-public class UserServiceClient : ClientService<UserServiceClient>, IUserServiceClient
+public class UserServiceClient : ClientService, IUserServiceClient
 {
-    public UserServiceClient( ILogger<UserServiceClient> logger, HttpClient http, ILocalStorageService localStorage )
+    public UserServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService localStorage )
         : base( logger )
     {
         _http = http;

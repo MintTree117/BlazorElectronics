@@ -5,12 +5,12 @@ using BlazorElectronics.Shared.Outbound.Categories;
 
 namespace BlazorElectronics.Client.Services.Categories;
 
-public class CategoryServiceClient : ClientService<CategoryServiceClient>, ICategoryServiceClient
+public class CategoryServiceClient : ClientService, ICategoryServiceClient
 {
     readonly HttpClient _http;
     CategoriesResponse? Categories;
 
-    public CategoryServiceClient( ILogger<CategoryServiceClient> logger, HttpClient http )
+    public CategoryServiceClient( ILogger<ClientService> logger, HttpClient http )
         : base( logger )
     {
         _http = http;

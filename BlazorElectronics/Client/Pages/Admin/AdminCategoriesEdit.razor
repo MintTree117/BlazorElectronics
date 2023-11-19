@@ -1,0 +1,105 @@
+@page "/admin/categories/edit"
+@inherits AdminView
+
+<h3>AdminCategoriesEdit</h3>
+
+@if ( _newCategory )
+{
+    <EditForm Model="_dto" OnSubmit="( async () => await SubmitNew() )">
+        <div class="mb-3">
+            <label for="Tier" class="form-label">Category Tier</label>
+            <InputSelect @bind-Value="_dto.Tier" class="form-control" id="Tier">
+                <option value="0">Select a Category Tier</option>
+                <option value="1">Primary</option>
+                <option value="2">Secondary</option>
+                <option value="3">Tertiary</option>
+            </InputSelect>
+        </div>
+        @switch ( _dto.Tier )
+        {
+            case 2:
+                <div class="mb-3">
+                    <label for="PrimaryCategory" class="form-label">Primary Category ID</label>
+                    <InputNumber @bind-Value="@_dto.PrimaryCategoryId" class="form-control" id="PrimaryCategory"/>
+                </div>
+                break;
+            case 3:
+                <div class="mb-3">
+                    <label for="PrimaryCategory" class="form-label">Primary Category ID</label>
+                    <InputNumber @bind-Value="@_dto.PrimaryCategoryId" class="form-control" id="PrimaryCategory"/>
+                </div>
+                <div class="mb-3">
+                    <label for="SecondaryCategory" class="form-label">Secondary Category ID</label>
+                    <InputNumber @bind-Value="@_dto.SecondaryCategoryId" class="form-control" id="SecondaryCategory"/>
+                </div>
+                break;
+        }
+        <div class="mb-3">
+            <label for="Name" class="form-label">Name</label>
+            <InputText @bind-Value="_dto.Name" class="form-control" id="Name"></InputText>
+        </div>
+        <div class="mb-3">
+            <label for="ApiUrl" class="form-label">Api Url</label>
+            <InputText @bind-Value="_dto.ApiUrl" class="form-control" id="ApiUrl"></InputText>
+        </div>
+        <div class="mb-3">
+            <label for="ImageUrl" class="form-label">Image Url</label>
+           <InputText @bind-Value="_dto.ImageUrl" class="form-control" id="ImageUrl"></InputText>
+        </div>
+        <div class="mb-3">
+            <label for="Description" class="form-label">Description</label>
+            <InputTextArea @bind-Value="_dto.Description" class="form-control" id="Description"/>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="oi oi-cloud-upload"></i>
+        </button>
+    </EditForm>
+}
+else
+{
+    <EditForm Model="_dto" OnSubmit="( async () => await SubmitEdit() )">
+        @switch ( _dto.Tier )
+        {
+            case 2:
+                <div class="mb-3">
+                    <p>Current Primary Category ID</p>
+                    <label for="PrimaryCategory" class="form-label">New Primary Category ID</label>
+                    <InputNumber @bind-Value="@_dto.NewPrimaryCategory" class="form-control" id="PrimaryCategory"/>
+                </div>
+                break;
+            case 3:
+                <div class="mb-3">
+                    <p>Current Primary Category ID</p>
+                    <label for="PrimaryCategory" class="form-label">New Primary Category ID</label>
+                    <InputNumber @bind-Value="@_dto.PrimaryCategoryId" class="form-control" id="PrimaryCategory"/>
+                </div>
+                <div class="mb-3">
+                    <p>Current Secondary Category ID</p>
+                    <label for="SecondaryCategory" class="form-label">New Secondary Category ID</label>
+                    <InputNumber @bind-Value="@_dto.SecondaryCategoryId" class="form-control" id="SecondaryCategory"/>
+                </div>
+                break;
+        }
+        <div class="mb-3">
+            <label for="Name" class="form-label">Name</label>
+            <InputText @bind-Value="_dto.Name" class="form-control" id="Name"></InputText>
+        </div>
+        <div class="mb-3">
+            <label for="ApiUrl" class="form-label">Api Url</label>
+            <InputText @bind-Value="_dto.ApiUrl" class="form-control" id="ApiUrl"></InputText>
+        </div>
+        <div class="mb-3">
+            <label for="ImageUrl" class="form-label">Image Url</label>
+           <InputText @bind-Value="_dto.ImageUrl" class="form-control" id="ImageUrl"></InputText>
+        </div>
+        <div class="mb-3">
+            <label for="Description" class="form-label">Description</label>
+            <InputTextArea @bind-Value="_dto.Description" class="form-control" id="Description"/>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="oi oi-cloud-upload"></i>
+        </button>
+    </EditForm>
+}
+
+

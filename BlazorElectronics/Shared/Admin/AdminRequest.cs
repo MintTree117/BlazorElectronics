@@ -4,12 +4,17 @@ namespace BlazorElectronics.Shared.Admin;
 
 public class AdminRequest<T>
 {
+    public AdminRequest()
+    {
+        
+    }
+    
     public AdminRequest( SessionApiRequest request, T dto )
     {
         SessionApiRequest = request;
         Dto = dto;
     }
     
-    public SessionApiRequest? SessionApiRequest { get; }
-    public T? Dto { get; }
+    public SessionApiRequest? SessionApiRequest { get; init; }
+    public T? Dto { get; init; }
 }

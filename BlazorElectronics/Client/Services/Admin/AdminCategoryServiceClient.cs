@@ -1,22 +1,34 @@
+using BlazorElectronics.Client.Services.Users;
+using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
 
 namespace BlazorElectronics.Client.Services.Admin;
 
-public class AdminCategoryServiceClient : ClientService<AdminCategoryServiceClient>, IAdminCategoryServiceClient
+public class AdminCategoryServiceClient : AdminDbServiceClient, IAdminCategoryServiceClient
 {
-    public AdminCategoryServiceClient( ILogger<AdminCategoryServiceClient> logger )
-        : base( logger ) { }
+    const string API_ROUTE = "api/admincategory";
+    const string API_ROUTE_GET = API_ROUTE + "/get-edit";
+    const string API_ROUTE_ADD = API_ROUTE + "/add";
+    const string API_ROUTE_UPDATE = API_ROUTE + "/update";
+    const string API_ROUTE_REMOVE = API_ROUTE + "/remove";
     
-    public Task<bool> AddCategory( AddUpdateCategoryDto dto )
+    public AdminCategoryServiceClient( ILogger<ClientService> logger, IUserServiceClient userService, HttpClient http )
+        : base( logger, userService, http ) { }
+    
+    public async Task<ApiReply<AddUpdateCategoryDto?>> GetCategoryEdit( GetCategoryEditRequest dto )
     {
-        throw new NotImplementedException();
+        return await TryExecuteApiQuery<GetCategoryEditRequest, AddUpdateCategoryDto?>( API_ROUTE_GET, dto );
     }
-    public Task<bool> UpdateCategory( AddUpdateCategoryDto dto )
+    public async Task<ApiReply<AddUpdateCategoryDto?>> AddCategory( AddUpdateCategoryDto dto )
     {
-        throw new NotImplementedException();
+        return await TryExecuteApiQuery<AddUpdateCategoryDto, AddUpdateCategoryDto?>( API_ROUTE_ADD, dto );
     }
-    public Task<bool> DeleteCategory( DeleteCategoryDto dto )
+    public async Task<ApiReply<bool>> UpdateCategory( AddUpdateCategoryDto dto )
     {
-        throw new NotImplementedException();
+        return await TryExecuteApiTransaction( API_ROUTE_UPDATE, dto );
+    }
+    public async Task<ApiReply<bool>> RemoveCategory( DeleteCategoryDto dto )
+    {
+        return await TryExecuteApiTransaction( API_ROUTE_REMOVE, dto );
     }
 }

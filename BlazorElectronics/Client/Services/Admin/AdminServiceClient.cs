@@ -5,21 +5,24 @@ using BlazorElectronics.Shared.Outbound.Users;
 
 namespace BlazorElectronics.Client.Services.Admin;
 
-public class AdminServiceClient : ClientService<AdminServiceClient>, IAdminServiceClient
+public class AdminServiceClient : ClientService, IAdminServiceClient
 {
-    readonly HttpClient _http;
-    readonly IUserServiceClient _userService;
+    const string API_ROUTE = "api/_admin";
+    const string API_ROUTE_AUTHORIZE = API_ROUTE + "/authorize";
     
-    public AdminServiceClient( ILogger<AdminServiceClient> logger, IUserServiceClient userService, HttpClient http )
+    protected readonly HttpClient _http;
+    protected readonly IUserServiceClient UserService;
+    
+    public AdminServiceClient( ILogger<ClientService> logger, IUserServiceClient userService, HttpClient http )
         : base( logger )
     {
-        _userService = userService;
+        UserService = userService;
         _http = http;
     }
     
-    public async Task<ApiReply<bool>> AuthorizeAdminView()
+    public async Task<ApiReply<bool>> AuthorizeAdmin()
     {
-        ApiReply<UserSessionResponse?> localReply = await _userService.TryGetLocalUserSession();
+        ApiReply<UserSessionResponse?> localReply = await UserService.TryGetLocalUserSession();
 
         if ( !localReply.Success || localReply.Data is null )
             return new ApiReply<bool>( localReply.Message );
@@ -28,7 +31,7 @@ public class AdminServiceClient : ClientService<AdminServiceClient>, IAdminServi
         
         try
         {
-            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( "authorize-admin", localReply.Data );
+            HttpResponseMessage httpResponse = await _http.PostAsJsonAsync( API_ROUTE_AUTHORIZE, localReply.Data );
             authorizeReply = await httpResponse.Content.ReadFromJsonAsync<ApiReply<bool>?>();
         }
         catch ( Exception e )

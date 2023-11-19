@@ -14,7 +14,7 @@ public class AdminSpecController : _AdminController
 {
     readonly IAdminSpecRepository _repository;
 
-    public AdminSpecController( ILogger logger, IUserAccountService userAccountService, ISessionService sessionService, IAdminSpecRepository repository )
+    public AdminSpecController( ILogger<AdminSpecController> logger, IUserAccountService userAccountService, ISessionService sessionService, IAdminSpecRepository repository )
         : base( logger, userAccountService, sessionService )
     {
         _repository = repository;
@@ -29,7 +29,7 @@ public class AdminSpecController : _AdminController
             return BadRequest( sessionReply );
 
         Func<AddUpdateSpecSingleDto, Task<bool>> action = _repository.AddSpecSingle;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )
@@ -44,7 +44,7 @@ public class AdminSpecController : _AdminController
             return BadRequest( sessionReply );
 
         Func<AddUpdateSpecSingleDto, Task<bool>> action = _repository.UpdateSpecSingle;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )
@@ -59,7 +59,7 @@ public class AdminSpecController : _AdminController
             return BadRequest( sessionReply );
 
         Func<RemoveSpecSingleDto, Task<bool>> action = _repository.RemoveSpecSingle;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )
@@ -75,7 +75,7 @@ public class AdminSpecController : _AdminController
             return BadRequest( sessionReply );
 
         Func<UpdateSpecMultiDto, Task<bool>> action = _repository.UpdateSpecMultiTable;
-        ApiReply<bool> result = await TryExecuteAdminAction( action, request.Dto );
+        ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )

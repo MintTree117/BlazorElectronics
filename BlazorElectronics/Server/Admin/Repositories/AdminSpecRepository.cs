@@ -28,14 +28,14 @@ public class AdminSpecRepository : _AdminRepository, IAdminSpecRepository
         string procedure = GetSingleProcedure( dto.SpecType, PROCEDURES_ADD_SINGLE );
         DynamicParameters parameters = GetAddUpdateSingleParams( dto, false );
 
-        return await ExecuteAdminTransaction( procedure, parameters );
+        return await TryAdminTransaction( procedure, parameters );
     }
     public async Task<bool> UpdateSpecSingle( AddUpdateSpecSingleDto dto )
     {
         string procedure = GetSingleProcedure( dto.SpecType, PROCEDURES_UPDATE_SINGLE );
         DynamicParameters parameters = GetAddUpdateSingleParams( dto, false );
 
-        return await ExecuteAdminTransaction( procedure, parameters );
+        return await TryAdminTransaction( procedure, parameters );
     }
     public async Task<bool> RemoveSpecSingle( RemoveSpecSingleDto dto )
     {
@@ -43,7 +43,7 @@ public class AdminSpecRepository : _AdminRepository, IAdminSpecRepository
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );
 
-        return await ExecuteAdminTransaction( procedure, parameters );
+        return await TryAdminTransaction( procedure, parameters );
     }
     
     public async Task<bool> UpdateSpecMultiTable( UpdateSpecMultiDto dto )
@@ -54,7 +54,7 @@ public class AdminSpecRepository : _AdminRepository, IAdminSpecRepository
         parameters.Add( PARAM_PRIMARY_CATEGORIES, dto.PrimaryCategories );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
-        return await ExecuteAdminTransaction( PROCEDURE_UPDATE_MULTI_TABLE, parameters );
+        return await TryAdminTransaction( PROCEDURE_UPDATE_MULTI_TABLE, parameters );
     }
 
     static DynamicParameters GetAddUpdateSingleParams( AddUpdateSpecSingleDto dto, bool isUpdate )

@@ -6,14 +6,14 @@ using BlazorElectronics.Server.Repositories.Users;
 
 namespace BlazorElectronics.Server.Services.Users;
 
-public class UserAccountService : ApiService<UserAccountService>, IUserAccountService
+public class UserAccountService : ApiService, IUserAccountService
 {
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
     const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
     
     readonly IUserRepository _userRepository;
 
-    public UserAccountService( ILogger<UserAccountService> logger, IUserRepository userRepository ) : base( logger )
+    public UserAccountService( ILogger<ApiService> logger, IUserRepository userRepository ) : base( logger )
     {
         _userRepository = userRepository;
     }
@@ -28,7 +28,7 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -50,7 +50,7 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -61,14 +61,14 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         {
             insertedUser = await _userRepository.AddUser( username, email, phone, hash, salt );
 
-            _logger.LogError( insertedUser.UserId.ToString() );
+            Logger.LogError( insertedUser.UserId.ToString() );
             
             if ( insertedUser is null )
                 return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<UserLoginDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -91,7 +91,7 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -111,7 +111,7 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -130,7 +130,7 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
 
@@ -147,7 +147,7 @@ public class UserAccountService : ApiService<UserAccountService>, IUserAccountSe
         }
         catch ( ServiceException e )
         {
-            _logger.LogError( e.Message, e );
+            Logger.LogError( e.Message, e );
             return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
         }
     }
