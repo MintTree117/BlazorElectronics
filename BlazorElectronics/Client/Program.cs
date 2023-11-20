@@ -23,6 +23,7 @@ builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
 builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCategoryServiceClient, AdminCategoryServiceClient>();
+builder.Services.AddScoped<IAdminSpecsServiceClient, AdminSpecsServiceClient>();
 
 builder.Logging.SetMinimumLevel( LogLevel.Error ); // Set the minimum level of logging
 

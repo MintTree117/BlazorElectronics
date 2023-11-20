@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Shared.Admin.Categories;
 
-public sealed class AddUpdateCategoryDto
+public sealed class EditCategoryDto
 {
     public int? NewPrimaryCategory { get; set; }
     public int? NewSecondaryCategory { get; set; }

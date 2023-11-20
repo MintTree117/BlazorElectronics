@@ -68,8 +68,6 @@ public class UserServiceClient : ClientService, IUserServiceClient
             return new ApiReply<UserSessionResponse?>( e.Message + e.InnerException );
         }
         
-        Logger.LogError( authorizeReply.Success.ToString() );
-
         if ( authorizeReply is null || !authorizeReply.Success )
             return new ApiReply<UserSessionResponse?>( authorizeReply?.Message );
         

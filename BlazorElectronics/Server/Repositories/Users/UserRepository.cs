@@ -14,7 +14,7 @@ public class UserRepository : DapperRepository, IUserRepository
     const string PROCEDURE_GET_USER_BY_EMAIL = "Get_UserAccountByEmail";
     const string PROCEDURE_GET_USER_BY_NAME_OR_EMAIL = "Get_UserAccountByNameOrEmail";
     const string PROCEDURE_GET_USER_EXISTS = "Get_UserAccountExists";
-    const string PROCEDURE_ADD_USER = "Add_UserAccount";
+    const string PROCEDURE_INSERT_USER = "Insert_UserAccount";
     const string PROCEDURE_UPDATE_PASSWORD = "Update_UserAccountPassword";
 
     public UserRepository( DapperContext dapperContext ) : base( dapperContext ) { }
@@ -98,7 +98,7 @@ public class UserRepository : DapperRepository, IUserRepository
     }
     static async Task<User?> AddUserQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_ADD_USER, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_INSERT_USER, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> UpdateUserPasswordQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {

@@ -1,0 +1,47 @@
+@page "/admin/specs/edit"
+@inherits AdminView
+
+<div class="container-sm">
+    @if ( PageIsRedirecting )
+    {
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>@RazorViewMessage</p>
+            <p>Redirecting in @PageRedirectCountdown...</p>
+        </div>
+    }
+    else if ( !PageIsReady() )
+    {
+        <span>@RazorViewMessage</span>
+    }
+    else
+    {
+        if ( _newSpec )
+        {
+            <h3>Create New Spec</h3>
+        }
+        else
+        {
+            <h3>Edit Spec</h3>
+        }
+        
+        <EditForm Model="_dto" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="Name" class="form-label">Name</label>
+                <InputText @bind-Value="_dto.SpecName" class="form-control" id="Name"></InputText>
+            </div>
+            <div class="mb-3">
+                <label for="IsGlobal" class="form-label">Is Global</label>
+                <InputCheckbox @bind-Value="_dto.IsGlobal" class="form-control" id="IsGlobal" />
+            </div>
+            <div class="mb-3">
+                <label for="Categories" class="form-label">Primary Categories, separate by comma.</label>
+                <InputText @bind-Value="_dto.PrimaryCategoriesAsString" class="form-control" id="Categories"></InputText>
+            </div>
+            <div class="mb-3">
+                <label for="Values" class="form-label">Values, ordered by Id, separate by comma.</label>
+                <InputText @bind-Value="_dto.ValuesByIdAsString" class="form-control" id="Values"></InputText>
+            </div>
+        </EditForm>
+    }
+</div>

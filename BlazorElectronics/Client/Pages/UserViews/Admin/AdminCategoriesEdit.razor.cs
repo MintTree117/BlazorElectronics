@@ -15,7 +15,7 @@ public sealed partial class AdminCategoriesEdit
     int _categoryId = -1;
     int _categoryTier = -1;
 
-    AddUpdateCategoryDto _dto = new();
+    EditCategoryDto _dto = new();
     
     protected override async Task OnInitializedAsync()
     {
@@ -43,8 +43,8 @@ public sealed partial class AdminCategoriesEdit
             return;
         }
 
-        var request = new GetCategoryEditRequest( _categoryId, _categoryTier );
-        ApiReply<AddUpdateCategoryDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
+        var request = new GetCategoryEditDto( _categoryId, _categoryTier );
+        ApiReply<EditCategoryDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
 
         if ( !reply.Success || reply.Data is null )
         {
@@ -82,31 +82,30 @@ public sealed partial class AdminCategoriesEdit
         return parsed;
     }
     
-    async Task<bool> SubmitNew()
+    async Task SubmitNew()
     {
-        ApiReply<AddUpdateCategoryDto?> reply = await AdminCategoryService.AddCategory( _dto );
+        var request = new AddCategoryDto( _dto );
+        ApiReply<EditCategoryDto?> reply = await AdminCategoryService.AddCategory( request );
 
         if ( !reply.Success || reply.Data is null )
         {
             RazorViewMessage = reply.Message ??= "Failed to add category!";
-            return false;
+            return;
         }
 
         _newCategory = false;
         _dto = reply.Data;
         
         StateHasChanged();
-        return true;
     }
-    async Task<bool> SubmitEdit()
+    async Task SubmitEdit()
     {
         ApiReply<bool> reply = await AdminCategoryService.UpdateCategory( _dto );
 
-        if ( reply.Success ) 
-            return true;
+        if ( reply.Success )
+            return;
         
         RazorViewMessage = reply.Message ??= "Failed to submit changes!";
-        return false;
 
     }
 }

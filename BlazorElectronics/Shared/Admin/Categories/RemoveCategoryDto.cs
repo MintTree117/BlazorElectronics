@@ -1,12 +1,12 @@
 namespace BlazorElectronics.Shared.Admin.Categories;
 
-public sealed class DeleteCategoryDto
+public sealed class RemoveCategoryDto
 {
-    public DeleteCategoryDto()
+    public RemoveCategoryDto()
     {
         
     }
-    public DeleteCategoryDto( int categoryId, int categoryTier )
+    public RemoveCategoryDto( int categoryId, int categoryTier )
     {
         CategoryId = categoryId;
         CategoryTier = categoryTier;

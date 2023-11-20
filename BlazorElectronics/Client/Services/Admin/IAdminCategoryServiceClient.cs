@@ -5,8 +5,9 @@ namespace BlazorElectronics.Client.Services.Admin;
 
 public interface IAdminCategoryServiceClient
 {
-    Task<ApiReply<AddUpdateCategoryDto?>> GetCategoryEdit( GetCategoryEditRequest dto );
-    Task<ApiReply<AddUpdateCategoryDto?>> AddCategory( AddUpdateCategoryDto dto );
-    Task<ApiReply<bool>> UpdateCategory( AddUpdateCategoryDto dto );
-    Task<ApiReply<bool>> RemoveCategory( DeleteCategoryDto dto );
+    Task<ApiReply<CategoryViewDto?>> GetCategoriesView();
+    Task<ApiReply<EditCategoryDto?>> GetCategoryEdit( GetCategoryEditDto request );
+    Task<ApiReply<EditCategoryDto?>> AddCategory( AddCategoryDto dto );
+    Task<ApiReply<bool>> UpdateCategory( EditCategoryDto dto );
+    Task<ApiReply<bool>> RemoveCategory( RemoveCategoryDto dto );
 }

@@ -19,25 +19,38 @@ public sealed class AdminCategoryController : _AdminController
         _repository = repository;
     }
 
+    [HttpPost( "get-categories-view" )]
+    public async Task<ActionResult<ApiReply<CategoryViewDto?>>> GetCategoriesView( [FromBody] AdminRequest<object> request )
+    {
+        ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
+
+        if ( !sessionReply.Success )
+            return BadRequest( sessionReply );
+
+        Func<Task<CategoryViewDto?>> action = _repository.GetCategoriesView;
+        ApiReply<CategoryViewDto?> result = await TryExecuteAdminQuery<CategoryViewDto>( action );
+
+        return result is { Success: true, Data: not null }
+            ? Ok( new ApiReply<CategoryViewDto?>( result.Data ) )
+            : Ok( new ApiReply<CategoryViewDto?>( NO_DATA_MESSAGE ) );
+    }
     [HttpPost("get-category-edit")]
-    public async Task<ActionResult<ApiReply<AddUpdateCategoryDto?>>> GetCategoryForEdit( [FromBody] AdminRequest<GetCategoryEditRequest> request )
+    public async Task<ActionResult<ApiReply<EditCategoryDto?>>> GetCategoryForEdit( [FromBody] AdminRequest<GetCategoryEditDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success || request.Dto is null )
             return BadRequest( sessionReply );
 
-        Func<GetCategoryEditRequest, Task<AddUpdateCategoryDto?>> action = _repository.GetEditCategory;
-        ApiReply<AddUpdateCategoryDto?> result = await TryExecuteAdminQuery<AddUpdateCategoryDto>( action, request.Dto );
-        
-        Logger.LogError( result.Success.ToString() );
-        
+        Func<GetCategoryEditDto, Task<EditCategoryDto?>> action = _repository.GetEditCategory;
+        ApiReply<EditCategoryDto?> result = await TryExecuteAdminQuery<EditCategoryDto>( action, request.Dto );
+
         return result is { Success: true, Data: not null }
-            ? Ok( new ApiReply<AddUpdateCategoryDto?>( result.Data ) )
-            : Ok( new ApiReply<AddUpdateCategoryDto?>( NO_DATA_MESSAGE ) );
+            ? Ok( new ApiReply<EditCategoryDto?>( result.Data ) )
+            : Ok( new ApiReply<EditCategoryDto?>( NO_DATA_MESSAGE ) );
     }
     [HttpPost( "add-category" )]
-    public async Task<ActionResult<ApiReply<AddUpdateCategoryDto?>>> AddCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
+    public async Task<ActionResult<ApiReply<EditCategoryDto?>>> AddCategory( [FromBody] AdminRequest<AddCategoryDto> request )
     {
         Logger.LogError( "Hit controller" );
         
@@ -48,24 +61,24 @@ public sealed class AdminCategoryController : _AdminController
 
         Logger.LogError( "Validated admin" );
         
-        Func<AddUpdateCategoryDto, Task<AddUpdateCategoryDto?>> action = _repository.AddCategory;
-        ApiReply<AddUpdateCategoryDto?> result = await TryExecuteAdminQuery<AddUpdateCategoryDto>( action, request.Dto );
+        Func<AddCategoryDto, Task<EditCategoryDto?>> action = _repository.InsertCategory;
+        ApiReply<EditCategoryDto?> result = await TryExecuteAdminQuery<EditCategoryDto>( action, request.Dto );
         
         Logger.LogError( "Add result " + result.Success );
         
         return result is { Success: true, Data: not null }
-            ? Ok( new ApiReply<AddUpdateCategoryDto?>( result.Data ) )
-            : Ok( new ApiReply<AddUpdateCategoryDto?>( result.Message ) );
+            ? Ok( new ApiReply<EditCategoryDto?>( result.Data ) )
+            : Ok( new ApiReply<EditCategoryDto?>( result.Message ) );
     }
     [HttpPost( "update-category" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] AdminRequest<AddUpdateCategoryDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] AdminRequest<EditCategoryDto> request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
         
-        Func<AddUpdateCategoryDto, Task<bool>> action = _repository.UpdateCategory;
+        Func<EditCategoryDto, Task<bool>> action = _repository.UpdateCategory;
         ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         return result.Success
@@ -73,7 +86,7 @@ public sealed class AdminCategoryController : _AdminController
             : Ok( new ApiReply<bool>( result.Message ) );
     }
     [HttpPost( "remove-category" )]
-    public async Task<ActionResult<ApiReply<bool>>> RemoveCategory( [FromBody] AdminRequest<DeleteCategoryDto> request )
+    public async Task<ActionResult<ApiReply<bool>>> RemoveCategory( [FromBody] AdminRequest<RemoveCategoryDto> request )
     {
         Logger.LogError( "Hit remove method" );
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request.SessionApiRequest, GetRequestDeviceInfo() );
@@ -81,7 +94,7 @@ public sealed class AdminCategoryController : _AdminController
         if ( !sessionReply.Success )
             return BadRequest( sessionReply );
         
-        Func<DeleteCategoryDto, Task<bool>> action = _repository.DeleteCategory;
+        Func<RemoveCategoryDto, Task<bool>> action = _repository.DeleteCategory;
         ApiReply<bool> result = await TryExecuteAdminTransaction( action, request.Dto );
 
         Logger.LogError( "Remove result: " + result.Success + " " + request.Dto.CategoryTier + " " + request.Dto.CategoryId + " " + result.Message);

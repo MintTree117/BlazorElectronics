@@ -10,7 +10,33 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 public class _AdminRepository : DapperRepository
 {
     protected _AdminRepository( DapperContext dapperContext ) : base( dapperContext ) { }
-    
+
+    protected async Task<T?> TryAdminQueryMulti<T>( string procedure, DynamicParameters paramters )
+    {
+        SqlConnection connection = await _dbContext.GetOpenConnection();
+
+        try
+        {
+            var result = await connection.QuerySingleOrDefaultAsync<T>( procedure, paramters, commandType: CommandType.StoredProcedure );
+            await connection.CloseAsync();
+            return result;
+        }
+        catch ( SqlException sqlEx )
+        {
+            await connection.CloseAsync();
+            throw new ServiceException( sqlEx.Message, sqlEx );
+        }
+        catch ( TimeoutException timeoutEx )
+        {
+            await connection.CloseAsync();
+            throw new ServiceException( timeoutEx.Message, timeoutEx );
+        }
+        catch ( Exception ex )
+        {
+            await connection.CloseAsync();
+            throw new ServiceException( ex.Message, ex );
+        }
+    }    
     protected async Task<T?> TryAdminQuerySingle<T>( string procedure, DynamicParameters paramters )
     {
         SqlConnection connection = await _dbContext.GetOpenConnection();

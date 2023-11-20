@@ -10,9 +10,9 @@ namespace BlazorElectronics.Server.Repositories.Sessions;
 
 public class SessionRepository : DapperRepository, ISessionRepository
 {
-    const string PROCEDURE_ADD_SESSION = "Add_UserSession";
-    const string PROCEDURE_REMOVE_SESSION = "Remove_UserSession";
     const string PROCEDURE_GET_SESSION = "Get_UserSession";
+    const string PROCEDURE_INSERT_SESSION = "Insert_UserSession";
+    const string PROCEDURE_DELETE_SESSION = "Delete_UserSession";
 
     public SessionRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
@@ -44,11 +44,11 @@ public class SessionRepository : DapperRepository, ISessionRepository
     
     static async Task<UserSession?> AddSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleOrDefaultAsync<UserSession>( PROCEDURE_ADD_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<UserSession>( PROCEDURE_INSERT_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> RemoveSessionQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        int result = await connection.ExecuteAsync( PROCEDURE_REMOVE_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
+        int result = await connection.ExecuteAsync( PROCEDURE_DELETE_SESSION, dynamicParams, transaction, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
         return result > 0;
     }
     static async Task<UserSession?> GetSessionQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )

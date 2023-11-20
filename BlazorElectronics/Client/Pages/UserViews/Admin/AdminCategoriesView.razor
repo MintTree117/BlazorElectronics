@@ -1,5 +1,5 @@
 @page "/admin/categories/view"
-@using BlazorElectronics.Shared.Outbound.Categories
+@using BlazorElectronics.Shared.Admin.Categories
 @inherits AdminView
 
 @if ( PageIsRedirecting )
@@ -22,29 +22,23 @@ else
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>Primary</h4>
                 <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
-                    <i class="oi oi-plus"></i> Add New Primary Category
+                    <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-            @foreach ( PrimaryCategoryResponse p in Categories.Primary )
+            @foreach ( CategoryPrimaryViewDto p in _category.Primary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
-                        @p.Id
+                        @p.PrimaryCategoryId
                     </div>
                     <div class="col">
                         @p.Name
                     </div>
-                    <div class="col">
-                        @p.Url
-                    </div>
-                    <div class="col">
-                        @p.ImageUrl
-                    </div>
                     <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( p.Id, 1 ) )">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( p.PrimaryCategoryId, 1 ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="(async () => await RemoveCategory( p.Id, 1 ) )">
+                        <button class="btn btn-primary" @onclick="(async () => await RemoveCategory( p.PrimaryCategoryId, 1 ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>
@@ -55,29 +49,23 @@ else
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>Secondary</h4>
                 <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
-                    <i class="oi oi-plus"></i> Add New Primary Category
+                    <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-            @foreach ( SecondaryCategoryResponse s in Categories.Secondary )
+            @foreach ( CategorySecondaryViewDto s in _category.Secondary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
-                        @s.Id
+                        @s.SecondaryCategoryId
                     </div>
                     <div class="col">
                         @s.Name
                     </div>
-                    <div class="col">
-                        @s.Url
-                    </div>
-                    <div class="col">
-                        @s.ImageUrl
-                    </div>
                     <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( s.Id, 2 ) )">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( s.SecondaryCategoryId, 2 ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.Id, 2 ) )">
+                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.SecondaryCategoryId, 2 ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>
@@ -88,29 +76,23 @@ else
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>Primary</h4>
                 <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
-                    <i class="oi oi-plus"></i> Add New Primary Category
+                    <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-            @foreach ( TertiaryCategoryResponse t in Categories.Tertiary )
+            @foreach ( CategoryTertiaryViewDto t in _category.Tertiary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
-                        @t.Id
+                        @t.TertiaryCategoryId
                     </div>
                     <div class="col">
                         @t.Name
                     </div>
-                    <div class="col">
-                        @t.Url
-                    </div>
-                    <div class="col">
-                        @t.ImageUrl
-                    </div>
                     <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( t.Id, 3 ) )">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( t.TertiaryCategoryId, 3 ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.Id, 3 ) )">
+                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.TertiaryCategoryId, 3 ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>

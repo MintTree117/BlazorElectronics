@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.UserViews.Admin;
 
-public sealed partial class AdminCategoriesView
+public sealed partial class AdminCategoriesView : AdminView
 {
-    [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
-    [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
+    const string ERROR_GET_CATEGORIES_VIEW = "Failed to retireve Categories View with no message!";
     
-    CategoriesResponse? Categories;
+    [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
+
+    CategoryViewDto _category = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -20,35 +21,36 @@ public sealed partial class AdminCategoriesView
 
         if ( !PageIsAuthorized )
         {
-            Logger.LogError( "Not authorized!" );
+            Logger.LogError( ERROR_UNAUTHORIZED_ADMIN );
             StartPageRedirection();
             return;
         }
 
-        ApiReply<CategoriesResponse?> reply = await CategoryService.GetCategories();
+        ApiReply<CategoryViewDto?> reply = await AdminCategoryService.GetCategoriesView();
 
         PageIsLoaded = true;
         
         if ( !reply.Success || reply.Data is null )
         {
-            RazorViewMessage = reply.Message ??= "Failed to get Categories!";
+            Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
+            RazorViewMessage = reply.Message ??= ERROR_GET_CATEGORIES_VIEW;
             return;
         }
 
-        Categories = reply.Data;
+        _category = reply.Data;
     }
 
     void CreateNewCategory( int categoryTier )
     {
         NavManager.NavigateTo( $"admin/categories/edit?newCategory=true&categoryTier={categoryTier}" );
     }
-    void EditCategory( short categoryId, int categoryTier )
+    void EditCategory( int categoryId, int categoryTier )
     {
         NavManager.NavigateTo( $"admin/categories/edit?newCategory=false&categoryId={categoryId}&categoryTier={categoryTier}" );
     }
-    async Task<bool> RemoveCategory( short categoryId, int categoryTier )
+    async Task<bool> RemoveCategory( int categoryId, int categoryTier )
     {
-        var dto = new DeleteCategoryDto( categoryId, categoryTier );
+        var dto = new RemoveCategoryDto( categoryId, categoryTier );
         ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
 
         if ( !result.Success )
