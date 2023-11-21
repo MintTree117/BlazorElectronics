@@ -15,64 +15,51 @@ public class UserAccountController : UserController
     public UserAccountController( IUserAccountService userAccountService, ISessionService sessionService ) : base( userAccountService, sessionService ) { }
 
     [HttpPost( "register" )]
-    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Register( [FromBody] UserRegisterRequest request )
+    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Register( [FromBody] UserApiRequest? apiRequest )
     {
-        if ( !ValidateRegisterRequest( request ) )
-            return BadRequest( new ApiReply<UserSessionResponse>( BAD_REQUEST_MESSAGE ) );
+        if ( !ValidateRegisterRequest( apiRequest, out UserRegisterRequest? dto ) )
+            return BadRequest( BAD_REQUEST_MESSAGE );
         
-        ApiReply<UserSessionResponse> loginReply = await GetLogin(
-            await UserAccountService.Register( request.Username, request.Email, request.Password, request.Phone ), GetRequestDeviceInfo() );
-        
-        return Ok( loginReply );
+        return await GetLogin(
+            await UserAccountService.Register( dto!.Username, dto.Email, dto.Password, dto.Phone ), GetRequestDeviceInfo() );
     }
     [HttpPost( "login" )]
-    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Login( [FromBody] UserLoginRequest request )
+    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Login( [FromBody] UserApiRequest? apiRequest )
     {
-        if ( !ValidateLoginRequest( request ) )
-            return BadRequest( new ApiReply<UserSessionResponse>( BAD_REQUEST_MESSAGE ) );
+        if ( !ValidateLoginRequest( apiRequest, out UserLoginRequest? dto ) )
+            return BadRequest( BAD_REQUEST_MESSAGE );
         
-        ApiReply<UserSessionResponse> loginReply = await GetLogin( 
-            await UserAccountService.Login( request.EmailOrUsername, request.Password ), GetRequestDeviceInfo() );
-        
-        return Ok( loginReply );
+        return await GetLogin( 
+            await UserAccountService.Login( dto!.EmailOrUsername, dto.Password ), GetRequestDeviceInfo() );
     }
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] UserApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] UserApiRequest? apiRequest )
     {
-        if ( !ValidateSessionRequest( request ) )
-            return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
-        
-        ApiReply<int> sessionReply = await AuthorizeUserSession( request );
+        ApiReply<ValidatedUserApiRequest<object?>> reply = await TryValidateUserRequest<object>( apiRequest );
 
-        return sessionReply.Success
+        return reply.Success
             ? Ok( new ApiReply<bool>( true ) )
-            : Ok( new ApiReply<bool>( sessionReply.Message ) );
+            : BadRequest( reply.Message );
     }
     [HttpPost( "change-password" )]
-    public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserChangePasswordRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserApiRequest? apiRequest )
     {
-        ApiReply<int> validateReply = await AuthorizeUserSession( request.ApiRequest );
+        ApiReply<ValidatedUserApiRequest<UserChangePasswordRequest?>> validateReply = await TryValidateUserRequest<UserChangePasswordRequest>( apiRequest );
 
-        if ( !validateReply.Success )
-            return BadRequest( new ApiReply<bool>( validateReply.Message ) );
+        if ( !validateReply.Success || !ValidateChangePasswordRequest( validateReply.Data?.Dto ) )
+            return BadRequest( validateReply.Message );
 
-        ApiReply<bool> passwordReply = await UserAccountService.ChangePassword( validateReply.Data, request.Password );
-
-        return passwordReply.Success
-            ? Ok( passwordReply )
-            : Ok( new ApiReply<bool>( passwordReply.Message ) );
+        return await UserAccountService.ChangePassword( validateReply.Data!.UserId, validateReply.Data.Dto!.Password );
     }
     [HttpPost( "logout" )]
-    public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] UserApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] UserApiRequest? apiRequest )
     {
-        if ( !ValidateSessionRequest( request ) )
-            return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
+        ApiReply<ValidatedUserApiRequest<object?>> validateReply = await TryValidateUserRequest<object>( apiRequest );
 
-        ApiReply<bool> deleteReply = await SessionService.DeleteSession( request.SessionId );
+        if ( !validateReply.Success )
+            return BadRequest( validateReply.Message );
 
-        return deleteReply.Success
-            ? Ok( new ApiReply<bool>( true ) )
-            : Ok( new ApiReply<bool>( deleteReply.Message ) );
+        return await SessionService.DeleteSession( apiRequest!.SessionId );
     }
     
     async Task<ApiReply<UserSessionResponse>> GetLogin( ApiReply<UserLoginDto?> loginReply, UserDeviceInfoDto? deviceInfo )
@@ -98,19 +85,37 @@ public class UserAccountController : UserController
         return new ApiReply<UserSessionResponse>( response );
     }
 
-    static bool ValidateRegisterRequest( UserRegisterRequest request )
+    static bool ValidateRegisterRequest( UserApiRequest? apiRequest, out UserRegisterRequest? dto )
     {
-        bool validUsername = !string.IsNullOrWhiteSpace( request.Username );
-        bool validEmail = !string.IsNullOrWhiteSpace( request.Email );
-        bool validPassword = !string.IsNullOrWhiteSpace( request.Password );
+        dto = null;
+        
+        if ( !TryValidateUserApiRequestData( apiRequest, out dto ) )
+            return false;
+        
+        if ( dto is null )
+            return false;
+        
+        bool validUsername = !string.IsNullOrWhiteSpace( dto.Username );
+        bool validEmail = !string.IsNullOrWhiteSpace( dto.Email );
+        bool validPassword = !string.IsNullOrWhiteSpace( dto.Password );
 
         return validUsername && validEmail && validPassword;
     }
-    static bool ValidateLoginRequest( UserLoginRequest request )
+    static bool ValidateLoginRequest( UserApiRequest? apiRequest, out UserLoginRequest? dto )
     {
-        bool validEmailOrUsername = !string.IsNullOrWhiteSpace( request.EmailOrUsername );
-        bool validPassword = !string.IsNullOrWhiteSpace( request.Password );
+        if ( !TryValidateUserApiRequestData( apiRequest, out dto ) )
+            return false;
+        
+        if ( dto is null )
+            return false;
+        
+        bool validEmailOrUsername = !string.IsNullOrWhiteSpace( dto.EmailOrUsername );
+        bool validPassword = !string.IsNullOrWhiteSpace( dto.Password );
 
         return validEmailOrUsername && validPassword;
+    }
+    static bool ValidateChangePasswordRequest( UserChangePasswordRequest? dto )
+    {
+        return dto is not null && !string.IsNullOrWhiteSpace( dto.Password );
     }
 }

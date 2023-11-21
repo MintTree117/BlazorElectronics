@@ -19,32 +19,41 @@ public class UserController : ControllerBase
         SessionService = sessionService;
     }
 
-    protected async Task<ApiReply<int>> AuthorizeUserSession( UserApiRequest? request )
+    protected async Task<ApiReply<ValidatedUserApiRequest<T?>>> TryValidateUserRequest<T>( UserApiRequest? request ) where T : class
     {
-        if ( request is null )
-            return new ApiReply<int>( BAD_REQUEST_MESSAGE );
-        
-        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
-        
-        return sessionReply.Success
-            ? new ApiReply<int>( sessionReply.Data, true, "" )
-            : new ApiReply<int>( -1, false, sessionReply.Message );
+        if ( !TryValidateUserApiRequestData( request, out T? data ) )
+            return new ApiReply<ValidatedUserApiRequest<T?>>( "Failed to validate http request!" );
+
+        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+
+        if ( !sessionReply.Success )
+            return new ApiReply<ValidatedUserApiRequest<T?>>( sessionReply.Message );
+
+        var validatedRequest = new ValidatedUserApiRequest<T?>( sessionReply.Data, data );
+        return new ApiReply<ValidatedUserApiRequest<T?>>( validatedRequest );
     }
-    
+
     protected UserDeviceInfoDto GetRequestDeviceInfo()
     {
         IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
         var dto = new UserDeviceInfoDto( address?.ToString() );
         return dto;
     }
-    protected static bool ValidateSessionRequest( UserApiRequest? request )
+    protected static bool TryValidateUserApiRequestData<T>( UserApiRequest? request, out T? data ) where T : class
     {
+        data = default;
+        
         if ( request is null )
             return false;
 
-        bool validId = request.SessionId >= 0;
+        bool validId = request.SessionId >= 1;
         bool validToken = !string.IsNullOrWhiteSpace( request.SessionToken );
 
+        if ( !validId && validToken )
+            return false;
+
+        data = request.Data as T;
+        
         return validId && validToken;
     }
 }

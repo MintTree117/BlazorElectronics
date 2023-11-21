@@ -26,32 +26,29 @@ public class _AdminController : UserController
     }
 
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] UserApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] UserApiRequest? apiRequest )
     {
-        ApiReply<bool> reply = await ValidateAdminRequest( request, GetRequestDeviceInfo() );
+        ApiReply<ValidatedUserApiRequest<object?>> reply = await ValidateAdminRequest<object>( apiRequest );
 
         return reply.Success
             ? Ok( new ApiReply<bool>( true ) )
-            : Ok( new ApiReply<bool>( reply.Message ) );
+            : BadRequest( reply.Message );
     }
     
-    protected async Task<ApiReply<bool>> ValidateAdminRequest( UserApiRequest? request, UserDeviceInfoDto? deviceInfo )
+    protected async Task<ApiReply<ValidatedUserApiRequest<T?>>> ValidateAdminRequest<T>( UserApiRequest? request ) where T : class
     {
-        if ( !ValidateSessionRequest( request ) )
-            return new ApiReply<bool>( BAD_REQUEST_MESSAGE );
-        
-        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, deviceInfo );
+        ApiReply<ValidatedUserApiRequest<T?>> userRequestReply = await TryValidateUserRequest<T>( request );
 
-        if ( !sessionReply.Success )
-            return new ApiReply<bool>( sessionReply.Message );
-        
-        ApiReply<int> adminIdReply = await UserAccountService.VerifyAdminId( sessionReply.Data );
+        if ( !userRequestReply.Success || userRequestReply.Data is null )
+            return new ApiReply<ValidatedUserApiRequest<T?>>( userRequestReply.Message );
 
-        return adminIdReply.Success
-            ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( adminIdReply.Message );
+        ApiReply<int> adminReply = await UserAccountService.VerifyAdminId( userRequestReply.Data.UserId );
+
+        return adminReply.Success
+            ? userRequestReply
+            : new ApiReply<ValidatedUserApiRequest<T?>>( adminReply.Message );
     }
-    protected async Task<ApiReply<T?>> TryExecuteAdminQuery<T>( Delegate action, params object?[] args )
+    protected async Task<ApiReply<T?>> TryExecuteAdminRepoQuery<T>( Delegate action, params object?[] args )
     {
         object? actionResult = action.DynamicInvoke( args );
 
@@ -87,7 +84,7 @@ public class _AdminController : UserController
             return new ApiReply<T?>( ADMIN_TASK_INTERNAL_SERVER_ERROR );
         }
     }
-    protected async Task<ApiReply<bool>> TryExecuteAdminTransaction( Delegate action, params object?[] args )
+    protected async Task<ApiReply<bool>> TryExecuteAdminRepoTransaction( Delegate action, params object?[] args )
     {
         object? actionResult = action.DynamicInvoke( args );
 

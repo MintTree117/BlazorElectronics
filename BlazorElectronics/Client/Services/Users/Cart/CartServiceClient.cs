@@ -1,12 +1,11 @@
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
-using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Inbound.Cart;
 using BlazorElectronics.Shared.Mutual;
 using BlazorElectronics.Shared.Outbound.Users;
 
-namespace BlazorElectronics.Client.Services.Cart;
+namespace BlazorElectronics.Client.Services.Users.Cart;
 
 public class CartServiceClient : UserServiceClient, ICartServiceClient
 {
