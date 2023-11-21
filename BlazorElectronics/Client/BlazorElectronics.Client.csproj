@@ -25,8 +25,8 @@
       <AdditionalFiles Include="Pages\ProductDetails\ProductDetails.razor" />
       <AdditionalFiles Include="Pages\ProductSearch\ProductList.razor" />
       <AdditionalFiles Include="Pages\ProductSearch\ProductSearch.razor" />
-      <AdditionalFiles Include="Pages\UserViews\Admin\AdminCategoriesEdit.razor" />
-      <AdditionalFiles Include="Pages\UserViews\Admin\AdminCategoriesView.razor" />
+      <AdditionalFiles Include="Pages\User\Admin\AdminCategoriesEdit.razor" />
+      <AdditionalFiles Include="Pages\User\Admin\AdminCategoriesView.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -34,6 +34,7 @@
       <_ContentIncludedByDefault Remove="RazorComponents\Counter.razor" />
       <_ContentIncludedByDefault Remove="RazorComponents\FetchData.razor" />
       <_ContentIncludedByDefault Remove="RazorComponents\SurveyPrompt.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Cart\Cart.razor" />
     </ItemGroup>
 
 </Project>

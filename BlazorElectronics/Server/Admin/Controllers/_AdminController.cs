@@ -26,7 +26,7 @@ public class _AdminController : UserController
     }
 
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] UserApiRequest request )
     {
         ApiReply<bool> reply = await ValidateAdminRequest( request, GetRequestDeviceInfo() );
 
@@ -35,7 +35,7 @@ public class _AdminController : UserController
             : Ok( new ApiReply<bool>( reply.Message ) );
     }
     
-    protected async Task<ApiReply<bool>> ValidateAdminRequest( SessionApiRequest? request, UserDeviceInfoDto? deviceInfo )
+    protected async Task<ApiReply<bool>> ValidateAdminRequest( UserApiRequest? request, UserDeviceInfoDto? deviceInfo )
     {
         if ( !ValidateSessionRequest( request ) )
             return new ApiReply<bool>( BAD_REQUEST_MESSAGE );

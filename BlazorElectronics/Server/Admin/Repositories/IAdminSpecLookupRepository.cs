@@ -1,5 +1,4 @@
 using BlazorElectronics.Shared.Admin.Specs;
-using BlazorElectronics.Shared.Admin.Specs.SpecsSingle;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 

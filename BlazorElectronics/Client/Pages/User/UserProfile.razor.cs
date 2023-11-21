@@ -1,7 +1,7 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Inbound.Users;
 
-namespace BlazorElectronics.Client.Pages.UserViews;
+namespace BlazorElectronics.Client.Pages.User;
 
 public partial class UserProfile : UserView
 {

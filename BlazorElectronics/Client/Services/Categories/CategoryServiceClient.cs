@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Blazored.LocalStorage;
 using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Outbound.Categories;
@@ -7,14 +8,10 @@ namespace BlazorElectronics.Client.Services.Categories;
 
 public class CategoryServiceClient : ClientService, ICategoryServiceClient
 {
-    readonly HttpClient _http;
     CategoriesResponse? Categories;
 
-    public CategoryServiceClient( ILogger<ClientService> logger, HttpClient http )
-        : base( logger )
-    {
-        _http = http;
-    }
+    public CategoryServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
+        : base( logger, http, storage ) { }
 
     public async Task<ApiReply<CategoriesResponse?>> GetCategories()
     {
@@ -25,7 +22,7 @@ public class CategoryServiceClient : ClientService, ICategoryServiceClient
         
         try
         {
-            reply = await _http.GetFromJsonAsync<ApiReply<CategoriesResponse?>?>( "api/Category/categories" );
+            reply = await Http.GetFromJsonAsync<ApiReply<CategoriesResponse?>?>( "api/Category/categories" );
         }
         catch ( Exception e )
         {

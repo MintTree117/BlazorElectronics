@@ -19,7 +19,7 @@ public class UserController : ControllerBase
         SessionService = sessionService;
     }
 
-    protected async Task<ApiReply<int>> AuthorizeUserSession( SessionApiRequest? request )
+    protected async Task<ApiReply<int>> AuthorizeUserSession( UserApiRequest? request )
     {
         if ( request is null )
             return new ApiReply<int>( BAD_REQUEST_MESSAGE );
@@ -37,7 +37,7 @@ public class UserController : ControllerBase
         var dto = new UserDeviceInfoDto( address?.ToString() );
         return dto;
     }
-    protected static bool ValidateSessionRequest( SessionApiRequest? request )
+    protected static bool ValidateSessionRequest( UserApiRequest? request )
     {
         if ( request is null )
             return false;

@@ -4,10 +4,10 @@ using BlazorElectronics.Client;
 using BlazorElectronics.Client.Services.Categories;
 using BlazorElectronics.Client.Services.Products;
 using Blazored.LocalStorage;
-using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Client.Services.Features;
 using BlazorElectronics.Client.Services.Users;
+using BlazorElectronics.Client.Services.Users.Admin;
 
 var builder = WebAssemblyHostBuilder.CreateDefault( args );
 builder.RootComponents.Add<App>( "#app" );

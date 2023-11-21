@@ -3,7 +3,6 @@ using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Admin;
 using BlazorElectronics.Shared.Admin.Specs;
-using BlazorElectronics.Shared.Admin.Specs.SpecsSingle;
 using BlazorElectronics.Shared.Inbound.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +21,7 @@ public class AdminSpecLookupController : _AdminController
     }
 
     [HttpPost( "get-spec-lookup-view" )]
-    public async Task<ActionResult<ApiReply<bool>>> GetSpecLookupView( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> GetSpecLookupView( [FromBody] UserApiRequest request )
     {
         ApiReply<bool> sessionReply = await ValidateAdminRequest( request, GetRequestDeviceInfo() );
 

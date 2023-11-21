@@ -9,12 +9,12 @@ public class AdminRequest<T>
         
     }
     
-    public AdminRequest( SessionApiRequest request, T dto )
+    public AdminRequest( UserApiRequest request, T dto )
     {
         SessionApiRequest = request;
         Dto = dto;
     }
     
-    public SessionApiRequest? SessionApiRequest { get; init; }
+    public UserApiRequest? SessionApiRequest { get; init; }
     public T? Dto { get; init; }
 }

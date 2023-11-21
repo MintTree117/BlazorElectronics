@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Outbound.Features;
 
@@ -6,19 +7,14 @@ namespace BlazorElectronics.Client.Services.Features;
 
 public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
 {
-    readonly HttpClient _http;
+    public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
+        : base( logger, http, storage ) { }
 
-    public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http )
-        : base( logger )
-    {
-        _http = http;
-    }
-    
     public async Task<ApiReply<FeaturedProductsResponse?>?> GetFeaturedProducts()
     {
         try
         {
-            var response = await _http.GetFromJsonAsync<ApiReply<FeaturedProductsResponse?>>( "api/Features/products" );
+            var response = await Http.GetFromJsonAsync<ApiReply<FeaturedProductsResponse?>>( "api/Features/products" );
 
             if ( response == null )
                 return new ApiReply<FeaturedProductsResponse?>( null, false, "Service response is null!" );
@@ -36,7 +32,7 @@ public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
     {
         try
         {
-            var response = await _http.GetFromJsonAsync<ApiReply<FeaturedDealsResponse?>>( "api/Features/deals" );
+            var response = await Http.GetFromJsonAsync<ApiReply<FeaturedDealsResponse?>>( "api/Features/deals" );
 
             if ( response == null )
                 return new ApiReply<FeaturedDealsResponse?>( null, false, "Service response is null!" );

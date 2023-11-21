@@ -37,7 +37,7 @@ public class UserAccountController : UserController
         return Ok( loginReply );
     }
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] UserApiRequest request )
     {
         if ( !ValidateSessionRequest( request ) )
             return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );
@@ -63,7 +63,7 @@ public class UserAccountController : UserController
             : Ok( new ApiReply<bool>( passwordReply.Message ) );
     }
     [HttpPost( "logout" )]
-    public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] UserApiRequest request )
     {
         if ( !ValidateSessionRequest( request ) )
             return BadRequest( new ApiReply<bool>( BAD_REQUEST_MESSAGE ) );

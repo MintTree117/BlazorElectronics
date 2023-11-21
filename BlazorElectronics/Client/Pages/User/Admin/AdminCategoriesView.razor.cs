@@ -1,11 +1,9 @@
-using BlazorElectronics.Client.Services.Admin;
-using BlazorElectronics.Client.Services.Categories;
+using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
-using BlazorElectronics.Shared.Outbound.Categories;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.UserViews.Admin;
+namespace BlazorElectronics.Client.Pages.User.Admin;
 
 public sealed partial class AdminCategoriesView : AdminView
 {

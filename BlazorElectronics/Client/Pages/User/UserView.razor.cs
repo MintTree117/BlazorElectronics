@@ -3,7 +3,7 @@ using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Outbound.Users;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.UserViews;
+namespace BlazorElectronics.Client.Pages.User;
 
 public abstract class UserView : PageView
 {

@@ -1,10 +1,9 @@
-using BlazorElectronics.Client.Services.Admin;
+using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Specs;
-using BlazorElectronics.Shared.Admin.Specs.SpecsSingle;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.UserViews.Admin;
+namespace BlazorElectronics.Client.Pages.User.Admin;
 
 public sealed partial class AdminSpecsView : AdminView
 {
@@ -25,7 +24,7 @@ public sealed partial class AdminSpecsView : AdminView
             return;
         }
 
-        ApiReply<SpecsViewDto?> reply = await AdminSpecsService.GetSpecsView();
+        ApiReply<SpecsViewDto?> reply = await AdminSpecsService.GetView();
 
         PageIsLoaded = true;
 

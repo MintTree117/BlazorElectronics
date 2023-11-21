@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared.Admin.Specs.SpecsSingle;
+namespace BlazorElectronics.Shared.Admin.Specs;
 
 public enum SpecLookupType
 {

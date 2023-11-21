@@ -1,7 +1,6 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Shared.Admin.Specs;
-using BlazorElectronics.Shared.Admin.Specs.SpecsSingle;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -37,23 +36,23 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         "Delete_SpecLookupSingleBool",
         "Delete_SpecLookupMultiString"
     };
-
+    
     const string PROCEDURE_GET_SPECS_VIEW = "Get_SpecsAdminView";
-
+    
     const string PARAM_PRIMARY_CATEGORIES = "@PrimaryCategories";
     const string PARAM_IS_GLOBAL = "@IsGlobal";
     const string PARAM_SPEC_ID = "@SpecId";
     const string PARAM_SPEC_NAME = "@SpecName";
     const string PARAM_FILTER_VALUES = "@FilterValue";
     const string PARAM_SPEC_VALUES = "@SpecValues";
-
+    
     public AdminSpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
-
+    
     public async Task<SpecsViewDto?> GetSpecsView()
     {
         return await TryQueryAsync( GetSpecsViewQuery );
     }
-    public Task<EditSpecLookupDto?> GetSpecEdit( GetSpecLookupEditDto dto )
+    public async Task<EditSpecLookupDto?> GetSpecEdit( GetSpecLookupEditDto dto )
     {
         return null;
     }
@@ -79,7 +78,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
 
         return await TryAdminTransaction( procedure, parameters );
     }
-
+    
     static async Task<SpecsViewDto?> GetSpecsViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? result = await connection.QueryMultipleAsync( PROCEDURE_GET_SPECS_VIEW, commandType: CommandType.StoredProcedure );
@@ -100,7 +99,7 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
             MultiSpecs = intSpecs is not null ? multiSpecs.ToList() : new List<SpecView>()
         };
     }
-
+    
     static DynamicParameters GetAddParams( AddSpecLookupDto dto )
     {
         DynamicParameters parameters = GetUpdateParams( dto.EditDto );

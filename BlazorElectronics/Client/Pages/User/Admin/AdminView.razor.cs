@@ -1,8 +1,8 @@
-using BlazorElectronics.Client.Services.Admin;
+using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.UserViews.Admin;
+namespace BlazorElectronics.Client.Pages.User.Admin;
 
 public abstract class AdminView : UserView
 {

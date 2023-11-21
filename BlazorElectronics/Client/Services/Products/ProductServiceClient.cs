@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text;
+using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Inbound.Products;
@@ -26,14 +27,9 @@ public class ProductServiceClient : ClientService, IProductServiceClient
     const string PRODUCT_SEARCH_TEXT_URL = "api/Product/search-text";
     const string PRODUCT_DETAILS_URL = "api/Product/details";
 
-    readonly HttpClient _http;
+    public ProductServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
+        : base( logger, http, storage ) { }
 
-    public ProductServiceClient( ILogger<ClientService> logger, HttpClient http )
-        : base( logger )
-    {
-        _http = http;
-    }
-    
     public void ClearSearchRequest()
     {
         CategoryUrl = null;
@@ -124,7 +120,7 @@ public class ProductServiceClient : ClientService, IProductServiceClient
 
         try
         {
-            var response = await _http.GetFromJsonAsync<ApiReply<ProductSuggestionsResponse?>>( url );
+            var response = await Http.GetFromJsonAsync<ApiReply<ProductSuggestionsResponse?>>( url );
 
             if ( response == null )
                 return new ApiReply<ProductSuggestionsResponse?>( null, false, "Service response is null!" );
@@ -166,7 +162,7 @@ public class ProductServiceClient : ClientService, IProductServiceClient
         try
         {
             string url = $"{PRODUCT_DETAILS_URL}/{productId}";
-            var response = await _http.GetFromJsonAsync<ApiReply<ProductDetailsResponse?>>( url );
+            var response = await Http.GetFromJsonAsync<ApiReply<ProductDetailsResponse?>>( url );
 
             if ( response == null )
                 return new ApiReply<ProductDetailsResponse?>( null, false, "Service response is null!" );
@@ -183,7 +179,7 @@ public class ProductServiceClient : ClientService, IProductServiceClient
     
     async Task SearchProducts( string url )
     {
-        var result = await _http.GetFromJsonAsync<ApiReply<ProductSearchResponse?>>( url );
+        var result = await Http.GetFromJsonAsync<ApiReply<ProductSearchResponse?>>( url );
 
         if ( result == null )
         {

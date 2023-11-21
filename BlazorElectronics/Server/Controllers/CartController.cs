@@ -76,7 +76,7 @@ public class CartController : UserController
             : BadRequest( cartResponse );
     }
     [HttpGet( "count" )]
-    public async Task<ActionResult<ApiReply<int>>> GetCartItemsCount( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<int>>> GetCartItemsCount( [FromBody] UserApiRequest request )
     {
         ApiReply<int> validateReply = await AuthorizeUserSession( request );
 
@@ -90,7 +90,7 @@ public class CartController : UserController
             : BadRequest( cartResponse );
     }
     [HttpGet( "products")]
-    public async Task<ActionResult<ApiReply<CartResponse>>> GetCartProducts( [FromBody] SessionApiRequest request )
+    public async Task<ActionResult<ApiReply<CartResponse>>> GetCartProducts( [FromBody] UserApiRequest request )
     {
         ApiReply<int> validateReply = await AuthorizeUserSession( request );
 
