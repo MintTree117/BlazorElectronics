@@ -23,8 +23,8 @@ public abstract class AdminView : UserView
 
         if ( !PageIsAuthorized )
         {
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = ERROR_UNAUTHORIZED_ADMIN;   
+            ViewMessageClass = MESSAGE_FAILURE_CLASS;
+            ViewMessage = ERROR_UNAUTHORIZED_ADMIN;   
         }
     }
 }

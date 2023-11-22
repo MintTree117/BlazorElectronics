@@ -42,14 +42,11 @@ public sealed partial class AdminCategoriesView : AdminView
 
         if ( !result.Success )
         {
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = $"Failed to delete category {categoryId}. {result.Message}";
+            SetActionMessage( false, $"Failed to delete category {categoryId}. {result.Message}" );
             return;
         }
 
-        MessageCssClass = MESSAGE_SUCCESS_CLASS;
-        Message = $"Successfully deleted category {categoryId}.";
-
+        SetActionMessage( true, $"Successfully deleted category {categoryId}." );
         await LoadCategoriesView();
         StateHasChanged();
     }
@@ -64,12 +61,11 @@ public sealed partial class AdminCategoriesView : AdminView
         if ( !reply.Success || reply.Data is null )
         {
             Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = reply.Message ??= ERROR_GET_CATEGORIES_VIEW;
+            SetViewMessage( false, reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
             return;
         }
         
         _category = reply.Data;
-        Message = string.Empty;
+        ViewMessage = string.Empty;
     }
 }

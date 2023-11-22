@@ -11,8 +11,10 @@ public abstract class PageView : RazorView
     protected const string ERROR_INVALID_URL_PARAMS = "Invalid url paramters!";
     protected const string MESSAGE_SUCCESS_CLASS = "text-success";
     protected const string MESSAGE_FAILURE_CLASS = "text-danger";
-    protected string MessageCssClass = MESSAGE_FAILURE_CLASS;
-    protected string Message = "Loading Data...";
+    protected string ViewMessageClass = MESSAGE_FAILURE_CLASS;
+    protected string ActionMessageClass = MESSAGE_FAILURE_CLASS;
+    protected string ViewMessage = "Loading Data...";
+    protected string ActionMessage = string.Empty;
     
     const int PAGE_REDIRECTION_WAIT_MILLISECONDS = 3000;
     const string PAGE_RETURN_URL_PARAM = "returnUrl";
@@ -39,6 +41,16 @@ public abstract class PageView : RazorView
         PageRedirectTimer.Elapsed += CountdownTimerElapsed;
         PageRedirectTimer.AutoReset = true;
         PageRedirectTimer.Enabled = true;
+    }
+    protected void SetViewMessage( bool success, string message )
+    {
+        ViewMessageClass = success ? MESSAGE_SUCCESS_CLASS : MESSAGE_FAILURE_CLASS;
+        ViewMessage = message;
+    }
+    protected void SetActionMessage( bool success, string message )
+    {
+        ActionMessageClass = success ? MESSAGE_SUCCESS_CLASS : MESSAGE_FAILURE_CLASS;
+        ActionMessage = message;
     }
     
     void CountdownTimerElapsed( object? sender, System.Timers.ElapsedEventArgs e )

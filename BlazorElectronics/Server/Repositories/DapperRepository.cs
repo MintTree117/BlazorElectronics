@@ -58,11 +58,13 @@ public abstract class DapperRepository
     protected const string COL_PRODUCT_LAST_UPDATED = "LastUpdated";
     protected const string COL_PRODUCT_FILE_SIZE = "FileSize";
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
-
+    
+    // COLUMNS SPECS
     protected const string COL_SPEC_ID = "SpecId";
-    protected const string COL_FILTER_INT_ID = "FilterId";
+    protected const string COL_FILTER_INT_ID = "FilterValueId";
     protected const string COL_SPEC_VALUE_ID = "SpecValueId";
     protected const string COL_SPEC_VALUE = "SpecValue";
+    protected const string COL_FILTER_VALUE = "FilterValue";
 
     // COLUMNS PRODUCT VARIANTS
     protected const string COL_VARIANT_ID = "VariantId";
@@ -119,6 +121,23 @@ public abstract class DapperRepository
     protected const string PARAM_CATEGORY_API_URL = "@ApiUrl";
     protected const string PARAM_CATEGORY_IMAGE_URL = "@ImageUrl";
     protected const string PARAM_CATEGORY_DESCRIPTION = "@Description";
+    
+    // PARAM SPECS
+    protected const string PARAM_PRIMARY_CATEGORIES = "@PrimaryCategories";
+    protected const string PARAM_IS_GLOBAL = "@IsGlobal";
+    protected const string PARAM_SPEC_ID = "@SpecId";
+    protected const string PARAM_SPEC_NAME = "@SpecName";
+    protected const string PARAM_FILTER_VALUES = "@FilterValues";
+    protected const string PARAM_SPEC_VALUES = "@SpecValues";
+
+    protected const string PARAM_TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
+    protected const string PARAM_TVP_SPEC_VALUES = "TVP_SpecLookupValues";
+    protected const string PARAM_TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
+    
+    protected const string TVP_COL_SPEC_ID = "SpecValueId";
+    protected const string TVP_COL_FILTER_ID = "FilterValueId";
+    protected const string TVP_COL_SPEC_VALUE = "SpecValue";
+    protected const string TVP_COL_FILTER_VALUE = "FilterValue";
     
     // PARAM USER
     protected const string PARAM_USER_ID = "@UserId";

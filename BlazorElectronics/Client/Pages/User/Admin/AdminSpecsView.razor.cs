@@ -40,17 +40,15 @@ public sealed partial class AdminSpecsView : AdminView
         var dto = new RemoveSpecLookupDto( specType, specId );
         ApiReply<bool> reply = await AdminSpecsService.Remove( dto );
 
-        if ( reply.Success )
+        if ( !reply.Success )
         {
-            MessageCssClass = MESSAGE_SUCCESS_CLASS;
-            Message = $"Successfully removed spec {specId}.";
-            await LoadSpecsView();
+            SetActionMessage( false, $"Failed to remove spec {specId}. {reply.Message}" );
+            StateHasChanged();
+            return;
         }
-        else
-        {
-            MessageCssClass = MESSAGE_SUCCESS_CLASS;
-            Message = $"Failed to remove spec {specId}. {reply.Message}";
-        }
+        
+        SetActionMessage( true, $"Successfully removed spec {specId}." );
+        await LoadSpecsView();
     }
     async Task LoadSpecsView()
     {
@@ -63,12 +61,11 @@ public sealed partial class AdminSpecsView : AdminView
         if ( !reply.Success || reply.Data is null )
         {
             Logger.LogError( reply.Message ??= ERROR_GET_SPECS_VIEW );
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = reply.Message ??= ERROR_GET_SPECS_VIEW;
+            SetViewMessage( false, reply.Message ??= ERROR_GET_SPECS_VIEW );
             return;
         }
 
         _specs = reply.Data;
-        Message = string.Empty;
+        ViewMessage = string.Empty;
     }
 }

@@ -23,14 +23,15 @@ public sealed partial class AdminSpecsEdit : AdminView
 
         if ( !PageIsAuthorized )
         {
-            Logger.LogError( "Not authorized!" );
+            Logger.LogError( ERROR_UNAUTHORIZED_ADMIN );
+            SetViewMessage( false, ERROR_UNAUTHORIZED_ADMIN );
             StartPageRedirection();
             return;
         }
 
         if ( !TryParseUrlParameters() )
         {
-            Message = ERROR_INVALID_URL_PARAMS;
+            SetViewMessage( false, ERROR_INVALID_URL_PARAMS );
             Logger.LogError( ERROR_INVALID_URL_PARAMS );
             StartPageRedirection();
             return;
@@ -49,7 +50,7 @@ public sealed partial class AdminSpecsEdit : AdminView
         if ( !reply.Success || reply.Data is null )
         {
             Logger.LogError( reply.Message ??= "Failed to get spec lookup!" );
-            Message = reply.Message ??= "Failed to get spec lookup!";
+            SetViewMessage( false, reply.Message ??= "Failed to get spec lookup!" );
             StartPageRedirection();
             return;
         }
@@ -95,8 +96,7 @@ public sealed partial class AdminSpecsEdit : AdminView
 
         if ( !reply.Success )
         {
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = reply.Message ??= "Failed to insert spec, no response message!";
+            SetActionMessage( false, reply.Message ??= "Failed to insert spec, no response message!" );
             return;
         }
 
@@ -104,9 +104,7 @@ public sealed partial class AdminSpecsEdit : AdminView
         _specId = _dto.SpecId;
         _newSpec = false;
         
-        MessageCssClass = MESSAGE_SUCCESS_CLASS;
-        Message = "Successfully added spec.";
-        
+        SetActionMessage( true, "Successfully added spec." );
         StateHasChanged();
     }
     async Task SubmitUpdate()
@@ -115,14 +113,11 @@ public sealed partial class AdminSpecsEdit : AdminView
 
         if ( !reply.Success )
         {
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = reply.Message ??= "Failed to update spec, no response message!";
+            SetActionMessage( false, reply.Message ??= "Failed to update spec, no response message!" );
             return;
         }
-
-        MessageCssClass = MESSAGE_SUCCESS_CLASS;
-        Message = "Successfully updated spec.";
         
+        SetActionMessage( true, "Successfully updated spec." );
         StateHasChanged();
     }
 }

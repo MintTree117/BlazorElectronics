@@ -8,13 +8,13 @@
 {
     <div class="loading-container">
         <div class="loading-circle"></div>
-        <p>@Message</p>
+        <p>@ViewMessage</p>
         <p>Redirecting in @PageRedirectCountdown...</p>
     </div>
 }
 else if ( !PageIsReady() )
 {
-    <span>@Message</span>
+    <span>@ViewMessage</span>
 }
 else
 {

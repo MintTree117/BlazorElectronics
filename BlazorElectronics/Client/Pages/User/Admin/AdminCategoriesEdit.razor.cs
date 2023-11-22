@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
 
-public sealed partial class AdminCategoriesEdit
+public sealed partial class AdminCategoriesEdit : AdminView
 {
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
     
@@ -23,14 +23,14 @@ public sealed partial class AdminCategoriesEdit
 
         if ( !PageIsAuthorized )
         {
-            Logger.LogError( "Not authorized!" );
+            Logger.LogError( ERROR_UNAUTHORIZED_ADMIN );
             StartPageRedirection();
             return;
         }
 
         if ( !TryParseUrlParameters() )
         {
-            Message = ERROR_INVALID_URL_PARAMS;
+            SetViewMessage( false, ERROR_INVALID_URL_PARAMS );
             Logger.LogError( ERROR_INVALID_URL_PARAMS );
             StartPageRedirection();
             return;
@@ -49,7 +49,7 @@ public sealed partial class AdminCategoriesEdit
         if ( !reply.Success || reply.Data is null )
         {
             Logger.LogError( reply.Message ??= "Failed to get category!" );
-            Message = reply.Message ??= "Failed to get category!";
+            SetViewMessage( false, reply.Message ??= "Failed to get category!" );
             StartPageRedirection();
             return;
         }
@@ -106,17 +106,14 @@ public sealed partial class AdminCategoriesEdit
 
         if ( !reply.Success || reply.Data is null )
         {
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = $"Failed to add category! {reply.Message}";
+            SetActionMessage( false, $"Failed to add category! {reply.Message}" );
             return;
         }
 
         _newCategory = false;
         _dto = reply.Data;
 
-        MessageCssClass = MESSAGE_SUCCESS_CLASS;
-        Message = $"Successfully add category.";
-        
+        SetActionMessage( true, $"Successfully added category." );
         StateHasChanged();
     }
     async Task SubmitEdit()
@@ -125,14 +122,11 @@ public sealed partial class AdminCategoriesEdit
 
         if ( reply.Success )
         {
-            MessageCssClass = MESSAGE_FAILURE_CLASS;
-            Message = $"Failed to update category! {reply.Message}";
+            SetActionMessage( false, $"Failed to update category! {reply.Message}" );
             return;
         }
-
-        MessageCssClass = MESSAGE_SUCCESS_CLASS;
-        Message = $"Successfully updated category.";
         
+        SetActionMessage( true, $"Successfully updated category." );
         StateHasChanged();
     }
 }

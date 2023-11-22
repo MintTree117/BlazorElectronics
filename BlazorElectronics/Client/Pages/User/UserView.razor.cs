@@ -22,6 +22,6 @@ public abstract class UserView : PageView
         PageIsAuthorized = response.Data is not null;
         
         if ( !PageIsAuthorized )
-            Message = ERROR_UNAUTHORIZED_USER;
+            ViewMessage = ERROR_UNAUTHORIZED_USER;
     }
 }

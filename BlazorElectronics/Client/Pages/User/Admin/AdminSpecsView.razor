@@ -6,22 +6,29 @@
 {
     <div class="loading-container">
         <div class="loading-circle"></div>
-        <p>@Message</p>
+        <p>@ViewMessage</p>
         <p>Redirecting in @PageRedirectCountdown...</p>
     </div>
 }
 else if ( !PageIsReady() )
 {
-    <span>@Message</span>
+    <span>@ViewMessage</span>
 }
 else
 {
     <h3>Specifications View</h3>
 
-    if ( !string.IsNullOrWhiteSpace( Message ) )
+    if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
     {
-        <div class="@MessageCssClass">
-            <span>@Message</span>
+        <div class="@ViewMessageClass">
+            <span>@ViewMessage</span>
+        </div>
+    }
+
+    if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+    {
+        <div class="@ActionMessageClass">
+            <span>@ActionMessage</span>
         </div>
     }
     

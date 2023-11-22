@@ -82,6 +82,8 @@ public class AdminSpecLookupController : _AdminController
     [HttpPost( "remove-spec-lookup" )]
     public async Task<ActionResult<ApiReply<bool>>> DeleteSpecLookup( [FromBody] UserDataRequest<RemoveSpecLookupDto>? request )
     {
+        Logger.LogError( "hit" );
+        
         ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
         if ( !validateReply.Success )

@@ -6,13 +6,13 @@
     {
         <div class="loading-container">
             <div class="loading-circle"></div>
-            <p>@Message</p>
+            <p>@ViewMessage</p>
             <p>Redirecting in @PageRedirectCountdown...</p>
         </div>
     }
     else if ( !PageIsReady() )
     {
-        <span>@Message</span>
+        <span>@ViewMessage</span>
     }
     else
     {
@@ -47,10 +47,10 @@
             </button>
         </EditForm>
 
-        if ( !string.IsNullOrWhiteSpace( Message ) )
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
         {
-            <div class="@MessageCssClass">
-                <span>@Message</span>
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
             </div>
         }
     }
