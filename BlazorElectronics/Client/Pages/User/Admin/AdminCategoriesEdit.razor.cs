@@ -13,7 +13,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
     
     bool _newCategory;
     int _categoryId = -1;
-    int _categoryTier = -1;
+    CategoryType _categoryType = CategoryType.PRIMARY;
 
     EditCategoryDto _dto = new();
     
@@ -39,11 +39,11 @@ public sealed partial class AdminCategoriesEdit : AdminView
         if ( _newCategory )
         {
             PageIsLoaded = true;
-            _dto.Tier = _categoryTier;
+            _dto.Type = _categoryType;
             return;
         }
 
-        var request = new GetCategoryEditDto( _categoryId, _categoryTier );
+        var request = new GetCategoryEditDto( _categoryType, _categoryId );
         ApiReply<EditCategoryDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
 
         if ( !reply.Success || reply.Data is null )
@@ -56,6 +56,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
         
         PageIsLoaded = true;
         _dto = reply.Data;
+        Logger.LogError( _dto.Type.ToString() );
         StateHasChanged();
     }
     
@@ -69,7 +70,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
         string? categoryTierString = queryString.Get( "categoryTier" );
 
         bool parsed = !string.IsNullOrWhiteSpace( categoryTierString ) &&
-                      int.TryParse( categoryTierString, out _categoryTier ) &&
+                      Enum.TryParse( categoryTierString, out _categoryType ) &&
                       !string.IsNullOrWhiteSpace( newCategoryString ) &&
                       bool.TryParse( newCategoryString, out _newCategory );
 
@@ -80,16 +81,6 @@ public sealed partial class AdminCategoriesEdit : AdminView
             parsed = !string.IsNullOrWhiteSpace( categoryIdString ) && int.TryParse( categoryIdString, out _categoryId );
 
         return parsed;
-    }
-    string GetCategoryTypeName()
-    {
-        return _categoryTier switch
-        {
-            1 => "Primary",
-            2 => "Secondary",
-            3 => "Tertiary",
-            _ => "Invalid category tier!"
-        };
     }
 
     async Task Submit()
@@ -103,30 +94,30 @@ public sealed partial class AdminCategoriesEdit : AdminView
     {
         var request = new AddCategoryDto( _dto );
         ApiReply<EditCategoryDto?> reply = await AdminCategoryService.AddCategory( request );
-
+        
         if ( !reply.Success || reply.Data is null )
         {
-            SetActionMessage( false, $"Failed to add category! {reply.Message}" );
+            SetActionMessage( false, $"Failed to add {_dto.Type} category! {reply.Message}" );
             return;
         }
 
         _newCategory = false;
         _dto = reply.Data;
 
-        SetActionMessage( true, $"Successfully added category." );
+        SetActionMessage( true, $"Successfully added {_dto.Type} category." );
         StateHasChanged();
     }
     async Task SubmitEdit()
     {
         ApiReply<bool> reply = await AdminCategoryService.UpdateCategory( _dto );
 
-        if ( reply.Success )
+        if ( !reply.Success )
         {
-            SetActionMessage( false, $"Failed to update category! {reply.Message}" );
+            SetActionMessage( false, $"Failed to update {_dto.Type} category! {reply.Message}" );
             return;
         }
         
-        SetActionMessage( true, $"Successfully updated category." );
+        SetActionMessage( true, $"Successfully updated {_dto.Type} category." );
         StateHasChanged();
     }
 }

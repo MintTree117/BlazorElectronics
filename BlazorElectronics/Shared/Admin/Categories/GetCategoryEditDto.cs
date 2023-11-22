@@ -6,12 +6,12 @@ public sealed class GetCategoryEditDto
     {
         
     }
-    public GetCategoryEditDto( int id, int tier )
+    public GetCategoryEditDto( CategoryType type, int id )
     {
+        CategoryType = type;
         CategoryId = id;
-        CategoryTier = tier;
     }
-    
+
+    public CategoryType CategoryType { get; init; }
     public int CategoryId { get; init; }
-    public int CategoryTier { get; init; }
 }

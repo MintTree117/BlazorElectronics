@@ -6,5 +6,5 @@ public interface ICategoryRepository
 {
     Task<CategoriesModel?> GetCategories();
     Task<IEnumerable<string>?> GetPrimaryCategoryDescriptions();
-    Task<string?> GetCategoryDescription( int categoryId, int categoryTier );
+    Task<string?> GetCategoryDescription( CategoryType categoryType, int categoryId );
 }

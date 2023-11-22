@@ -65,7 +65,7 @@ public class CategoryService : ApiService, ICategoryService
 
         try
         {
-            string? descrReply = await _repository.GetCategoryDescription( idMap.CategoryId, idMap.CategoryTier );
+            string? descrReply = await _repository.GetCategoryDescription( idMap.CategoryType, idMap.CategoryId );
 
             return string.IsNullOrWhiteSpace( descrReply )
                 ? new ApiReply<string?>( NO_DATA_FOUND_MESSAGE )
@@ -329,10 +329,10 @@ public class CategoryService : ApiService, ICategoryService
     }
     static bool ValidateCategoryIdMap( CategoryIdMap map, CategoriesDto categories )
     {
-        return map.CategoryTier switch {
-            1 => categories.PrimaryIds.ContainsKey( map.CategoryId ),
-            2 => categories.SecondaryIds.ContainsKey( map.CategoryId ),
-            3 => categories.TertiaryIds.ContainsKey( map.CategoryId ),
+        return map.CategoryType switch {
+            CategoryType.PRIMARY => categories.PrimaryIds.ContainsKey( map.CategoryId ),
+            CategoryType.SECONDARY => categories.SecondaryIds.ContainsKey( map.CategoryId ),
+            CategoryType.TERTIARY => categories.TertiaryIds.ContainsKey( map.CategoryId ),
             _ => false
         };
     }

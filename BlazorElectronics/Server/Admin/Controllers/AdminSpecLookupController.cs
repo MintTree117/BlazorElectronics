@@ -57,6 +57,8 @@ public class AdminSpecLookupController : _AdminController
         if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
 
+        Logger.LogError( "add" + request.Payload.SpecType.ToString() );
+
         Func<EditSpecLookupDto, Task<int>> action = _lookupRepository.Insert;
         ApiReply<int> result = await TryExecuteAdminRepoQuery<int>( action, request!.Payload );
 
@@ -67,6 +69,8 @@ public class AdminSpecLookupController : _AdminController
     [HttpPost( "update-spec-lookup" )]
     public async Task<ActionResult<ApiReply<bool>>> UpdateSpecLookup( [FromBody] UserDataRequest<EditSpecLookupDto>? request )
     {
+        Logger.LogError( "update" + request.Payload.SpecType.ToString() );
+        
         ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
         if ( !validateReply.Success )
@@ -82,8 +86,6 @@ public class AdminSpecLookupController : _AdminController
     [HttpPost( "remove-spec-lookup" )]
     public async Task<ActionResult<ApiReply<bool>>> DeleteSpecLookup( [FromBody] UserDataRequest<RemoveSpecLookupDto>? request )
     {
-        Logger.LogError( "hit" );
-        
         ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
         if ( !validateReply.Success )

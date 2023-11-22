@@ -9,7 +9,7 @@ public sealed class AddCategoryDto
     public AddCategoryDto( EditCategoryDto dto )
     {
         Name = dto.Name;
-        Tier = dto.Tier;
+        Type = dto.Type;
         PrimaryCategoryId = dto.PrimaryCategoryId;
         SecondaryCategoryId = dto.SecondaryCategoryId;
         TertiaryCategoryId = dto.TertiaryCategoryId;
@@ -19,7 +19,7 @@ public sealed class AddCategoryDto
     }
     
     public string? Name { get; set; }
-    public int Tier { get; set; }
+    public CategoryType Type { get; set; }
     public int? PrimaryCategoryId { get; set; }
     public int? SecondaryCategoryId { get; set; }
     public int? TertiaryCategoryId { get; set; }

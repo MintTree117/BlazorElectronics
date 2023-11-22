@@ -22,11 +22,11 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
     {
         return await TryQueryAsync( GetPrimaryCategoryDescriptionsQuery );
     }
-    public async Task<string?> GetCategoryDescription( int categoryId, int categoryTier )
+    public async Task<string?> GetCategoryDescription( CategoryType categoryType, int categoryId )
     {
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( PARAM_CATEGORY_ID, categoryId );
-        dynamicParams.Add( PARAM_CATEGORY_TIER, categoryTier );
+        dynamicParams.Add( PARAM_CATEGORY_TYPE, ( int ) categoryType );
 
         return await TryQueryAsync( GetDescriptionQuery, dynamicParams );
     }

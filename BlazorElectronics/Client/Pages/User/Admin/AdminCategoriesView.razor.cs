@@ -26,27 +26,27 @@ public sealed partial class AdminCategoriesView : AdminView
 
         await LoadCategoriesView();
     }
-
-    void CreateNewCategory( int categoryTier )
+    
+    void CreateNewCategory( CategoryType categoryType )
     {
-        NavManager.NavigateTo( $"admin/categories/edit?newCategory=true&categoryTier={categoryTier}" );
+        NavManager.NavigateTo( $"admin/categories/edit?newCategory=true&categoryTier={categoryType}" );
     }
-    void EditCategory( int categoryId, int categoryTier )
+    void EditCategory( int categoryId, CategoryType categoryType )
     {
-        NavManager.NavigateTo( $"admin/categories/edit?newCategory=false&categoryId={categoryId}&categoryTier={categoryTier}" );
+        NavManager.NavigateTo( $"admin/categories/edit?newCategory=false&categoryId={categoryId}&categoryTier={categoryType}" );
     }
-    async Task RemoveCategory( int categoryId, int categoryTier )
+    async Task RemoveCategory( int categoryId, CategoryType categoryType )
     {
-        var dto = new RemoveCategoryDto( categoryId, categoryTier );
+        var dto = new RemoveCategoryDto( categoryId, categoryType );
         ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
 
         if ( !result.Success )
         {
-            SetActionMessage( false, $"Failed to delete category {categoryId}. {result.Message}" );
+            SetActionMessage( false, $"Failed to delete {categoryType} category {categoryId}. {result.Message}" );
             return;
         }
 
-        SetActionMessage( true, $"Successfully deleted category {categoryId}." );
+        SetActionMessage( true, $"Successfully deleted {categoryType} category {categoryId}." );
         await LoadCategoriesView();
         StateHasChanged();
     }

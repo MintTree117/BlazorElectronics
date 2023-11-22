@@ -113,7 +113,7 @@ public abstract class DapperRepository
     
     // PARAM CATEGORY
     protected const string PARAM_CATEGORY_ID = "@CategoryId";
-    protected const string PARAM_CATEGORY_TIER = "@CategoryTier";
+    protected const string PARAM_CATEGORY_TYPE = "@CategoryTier";
     protected const string PARAM_CATEGORY_PRIMARY_ID = "@PrimaryCategoryId";
     protected const string PARAM_CATEGORY_SECONDARY_ID = "@SecondaryCategoryId";
     protected const string PARAM_CATEGORY_TERTIARY_ID = "@TertiaryCategoryId";
@@ -131,7 +131,7 @@ public abstract class DapperRepository
     protected const string PARAM_SPEC_VALUES = "@SpecValues";
 
     protected const string PARAM_TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
-    protected const string PARAM_TVP_SPEC_VALUES = "TVP_SpecLookupValues";
+    protected const string PARAM_TVP_SPEC_VALUES = "TVP_SpecLookupStringValues";
     protected const string PARAM_TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
     
     protected const string TVP_COL_SPEC_ID = "SpecValueId";

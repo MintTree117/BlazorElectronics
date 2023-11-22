@@ -82,7 +82,7 @@ public sealed partial class AdminSpecsEdit : AdminView
 
         return parsed;
     }
-    
+
     async Task Submit()
     {
         if ( _newSpec )

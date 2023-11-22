@@ -1,5 +1,6 @@
 @page "/admin/categories/view"
 @using BlazorElectronics.Shared.Admin.Categories
+@using BlazorElectronics.Shared
 @inherits AdminView
 
 @if ( PageIsRedirecting )
@@ -35,8 +36,8 @@ else
     <div class="row">
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>Primary</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
+                <h4>@CategoryType.PRIMARY</h4>
+                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( CategoryType.PRIMARY ) )">
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
@@ -50,10 +51,10 @@ else
                         @p.Name
                     </div>
                     <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( p.PrimaryCategoryId, 1 ) )">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( p.PrimaryCategoryId, CategoryType.PRIMARY ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="(async () => await RemoveCategory( p.PrimaryCategoryId, 1 ) )">
+                        <button class="btn btn-primary" @onclick="(async () => await RemoveCategory( p.PrimaryCategoryId, CategoryType.PRIMARY ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>
@@ -62,8 +63,8 @@ else
         </div>
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>Secondary</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
+                <h4>@CategoryType.SECONDARY</h4>
+                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( CategoryType.SECONDARY ) )">
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
@@ -77,10 +78,10 @@ else
                         @s.Name
                     </div>
                     <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( s.SecondaryCategoryId, 2 ) )">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( s.SecondaryCategoryId, CategoryType.SECONDARY ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.SecondaryCategoryId, 2 ) )">
+                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.SecondaryCategoryId, CategoryType.SECONDARY ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>
@@ -89,8 +90,8 @@ else
         </div>
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>Primary</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( 1 ) )">
+                <h4>@CategoryType.TERTIARY</h4>
+                <button class="btn btn-primary" @onclick="( () => CreateNewCategory( CategoryType.TERTIARY ) )">
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
@@ -104,10 +105,10 @@ else
                         @t.Name
                     </div>
                     <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( t.TertiaryCategoryId, 3 ) )">
+                        <button class="btn btn-primary" @onclick="( () => EditCategory( t.TertiaryCategoryId, CategoryType.TERTIARY ) )">
                             <i class="oi oi-pencil"></i>
                         </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.TertiaryCategoryId, 3 ) )">
+                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.TertiaryCategoryId, CategoryType.TERTIARY ) )">
                             <i class="oi oi-trash"></i>
                         </button>
                     </div>

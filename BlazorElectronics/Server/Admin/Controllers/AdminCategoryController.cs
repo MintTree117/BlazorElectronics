@@ -73,6 +73,8 @@ public sealed class AdminCategoryController : _AdminController
         if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
         
+        Logger.LogError( request.Payload.Type.ToString() );
+        
         Func<EditCategoryDto, Task<bool>> action = _repository.UpdateCategory;
         ApiReply<bool> result = await TryExecuteAdminRepoTransaction( action, request!.Payload );
 

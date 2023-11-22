@@ -43,7 +43,7 @@ public sealed class CategoryUrlMap : LocallyCachedObject
     CategoryIdMap? TryGetPrimaryTier( string primaryUrl )
     {
         return PrimaryUrlMap.TryGetValue( primaryUrl, out short primaryId )
-            ? new CategoryIdMap( 1, primaryId )
+            ? new CategoryIdMap( CategoryType.PRIMARY, primaryId )
             : null;
     }
     CategoryIdMap? TryGetSecondaryTier( string primaryUrl, string secondaryUrl )
@@ -55,7 +55,7 @@ public sealed class CategoryUrlMap : LocallyCachedObject
             return null;
         
         return secondaryMap.TryGetValue( primaryId, out short secondaryId )
-            ? new CategoryIdMap( 2, secondaryId )
+            ? new CategoryIdMap( CategoryType.SECONDARY, secondaryId )
             : null;
     }
     CategoryIdMap? TryGetTertiaryTier( string primaryUrl, string secondaryUrl, string tertiaryUrl )
@@ -73,7 +73,7 @@ public sealed class CategoryUrlMap : LocallyCachedObject
             return null;
 
         return tertiaryMap.TryGetValue( secondaryId, out short tertiaryId )
-            ? new CategoryIdMap( 3, tertiaryId )
+            ? new CategoryIdMap( CategoryType.TERTIARY, tertiaryId )
             : null;
     }
 }

@@ -42,12 +42,12 @@ public sealed partial class AdminSpecsView : AdminView
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, $"Failed to remove spec {specId}. {reply.Message}" );
+            SetActionMessage( false, $"Failed to remove {specType} spec {specId}. {reply.Message}" );
             StateHasChanged();
             return;
         }
         
-        SetActionMessage( true, $"Successfully removed spec {specId}." );
+        SetActionMessage( true, $"Successfully removed {specType} spec {specId}." );
         await LoadSpecsView();
     }
     async Task LoadSpecsView()

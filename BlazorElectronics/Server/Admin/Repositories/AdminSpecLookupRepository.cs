@@ -61,7 +61,13 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
             _ => throw new Exception( "Invalid SpecLookupType!" )
         };
 
-        return await TryQueryAsync( method, parameters, procedure );
+        EditSpecLookupDto? edit = await TryQueryAsync( method, parameters, procedure );
+
+        if ( edit is null )
+            return null;
+        
+        edit.SpecType = dto.SpecType;
+        return edit;
     }
     public async Task<int> Insert( EditSpecLookupDto dto )
     {
@@ -177,25 +183,30 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         var parameters = new DynamicParameters();
 
         DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategoriesAsString );
-        DataTable valuesTable = GetSpecValuesTable( dto.SpecType, dto.ValuesByIdAsString );
+        DataTable? valuesTable = dto.SpecType is not SpecLookupType.BOOL
+            ? GetSpecValuesTable( dto.SpecType, dto.ValuesByIdAsString )
+            : null;
 
         parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
         parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable.AsTableValuedParameter( PARAM_TVP_PRIMARY_CATEGORIES ) );
+
+        if ( dto.SpecType is SpecLookupType.BOOL )
+            return parameters;
         
-        string paramValues = dto.SpecType switch
+        string paramNameValues = dto.SpecType switch
         {
             SpecLookupType.INT => PARAM_FILTER_VALUES,
             _ => PARAM_SPEC_VALUES
         };
         
-        string valueTableName = dto.SpecType switch
+        string paramTableName = dto.SpecType switch
         {
             SpecLookupType.INT => PARAM_TVP_FILTER_VALUES,
             _ => PARAM_TVP_SPEC_VALUES
         };
         
-        parameters.Add( paramValues, valuesTable.AsTableValuedParameter( valueTableName ) );
+        parameters.Add( paramNameValues, valuesTable.AsTableValuedParameter( paramTableName ) );
         
         return parameters;
     }
@@ -249,13 +260,13 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         switch ( type )
         {
             case SpecLookupType.INT:
-                idCol = TVP_COL_SPEC_ID;
-                valueCol = TVP_COL_SPEC_VALUE;
+                idCol = TVP_COL_FILTER_ID;
+                valueCol = TVP_COL_FILTER_VALUE;
                 break;
             case SpecLookupType.STRING:
             case SpecLookupType.MULTI:
-                idCol = TVP_COL_FILTER_ID;
-                valueCol = TVP_COL_FILTER_VALUE;
+                idCol = TVP_COL_SPEC_ID;
+                valueCol = TVP_COL_SPEC_VALUE;
                 break;
             case SpecLookupType.BOOL:
             default:

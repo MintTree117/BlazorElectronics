@@ -2,12 +2,12 @@ namespace BlazorElectronics.Shared.Mutual;
 
 public sealed class CategoryIdMap
 {
-    public CategoryIdMap( int categoryTier, short categoryId )
+    public CategoryIdMap( CategoryType categoryType, short categoryId )
     {
-        CategoryTier = categoryTier;
+        CategoryType = categoryType;
         CategoryId = categoryId;
     }
     
-    public int CategoryTier { get; set; }
+    public CategoryType CategoryType { get; set; }
     public short CategoryId { get; set; }
 }

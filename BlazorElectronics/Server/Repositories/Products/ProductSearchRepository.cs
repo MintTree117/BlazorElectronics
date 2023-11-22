@@ -31,12 +31,12 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     public ProductSearchRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     // PUBLIC API
-    public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText, int categoryTier, short categoryId )
+    public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText, CategoryType categoryType, short categoryId )
     {
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( PARAM_SEARCH_TEXT, searchText );
-        dynamicParams.Add( PARAM_CATEGORY_ID, categoryTier );
-        dynamicParams.Add( PARAM_CATEGORY_TIER, categoryId );
+        dynamicParams.Add( PARAM_CATEGORY_ID, categoryType );
+        dynamicParams.Add( PARAM_CATEGORY_TYPE, categoryId );
 
         try
         {
@@ -151,10 +151,10 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         if ( categoryMap is null )
             return;
         
-        builder.Append( $" AND ( {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_TIER_ID} = {PARAM_CATEGORY_TIER}" );
+        builder.Append( $" AND ( {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_TIER_ID} = {PARAM_CATEGORY_TYPE}" );
         builder.Append( $" AND {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_ID} = {PARAM_CATEGORY_ID} )" );
 
-        dynamicParams.Add( PARAM_CATEGORY_TIER, categoryMap.CategoryTier );
+        dynamicParams.Add( PARAM_CATEGORY_TYPE, categoryMap.CategoryType );
         dynamicParams.Add( PARAM_CATEGORY_ID, categoryMap.CategoryId );
     }
     static void AppendSearchTextCondition( StringBuilder builder, DynamicParameters dynamicParams, string? searchText )

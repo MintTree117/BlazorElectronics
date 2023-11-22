@@ -1,4 +1,5 @@
 @page "/admin/categories/edit"
+@using BlazorElectronics.Shared
 @inherits AdminView
 
 <div class="container-sm">
@@ -18,23 +19,23 @@
     {
         if ( _newCategory )
         {
-            <h3>Create New @GetCategoryTypeName() Category</h3>   
+            <h3>Create New @_dto.Type Category</h3>   
         }
         else
         {
-            <h3>Edit @GetCategoryTypeName() Category</h3>
+            <h3>Edit @_dto.Type Category</h3>
         }
 
         <EditForm Model="_dto" OnSubmit="( async () => await Submit() )">
-            @switch ( _dto.Tier )
+            @switch ( _dto.Type )
             {
-                case 2:
+                case CategoryType.SECONDARY:
                     <div class="mb-3">
                         <label for="PrimaryCategory" class="form-label">Primary Category ID</label>
                         <InputNumber @bind-Value="@_dto.PrimaryCategoryId" class="form-control" id="PrimaryCategory"/>
                     </div>
                     break;
-                case 3:
+                case CategoryType.TERTIARY:
                     <div class="mb-3">
                         <label for="PrimaryCategory" class="form-label">Primary Category ID</label>
                         <InputNumber @bind-Value="@_dto.PrimaryCategoryId" class="form-control" id="PrimaryCategory"/>

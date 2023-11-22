@@ -16,35 +16,49 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
     
     public AdminCategoryRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
-
+    
     public Task<CategoryViewDto?> GetCategoriesView()
     {
         return TryQueryAsync( GetCategoriesViewQuery );
     }
     public async Task<EditCategoryDto?> GetEditCategory( GetCategoryEditDto request )
     {
-        string procedure = GetProcedure( PROCEDURES_GET_CATEGORY, request.CategoryTier );
+        string procedure = GetProcedure( PROCEDURES_GET_CATEGORY, request.CategoryType );
         DynamicParameters parameters = GetEditParameters( request );
 
-        return await TryAdminQuerySingle<EditCategoryDto>( procedure, parameters );
+        var result = await TryAdminQuerySingle<EditCategoryDto>( procedure, parameters );
+
+        if ( result is null )
+            return null;
+        
+        result.Type = request.CategoryType;
+
+        return result;
     }
     public async Task<EditCategoryDto?> InsertCategory( AddCategoryDto dto )
     {
-        string procedure = GetProcedure( PROCEDURES_INSERT_CATEGORY, dto.Tier );
+        string procedure = GetProcedure( PROCEDURES_INSERT_CATEGORY, dto.Type );
         DynamicParameters parameters = GetAddParameters( dto );
 
-        return await TryAdminQueryTransaction<EditCategoryDto>( procedure, parameters );
+        var result = await TryAdminQueryTransaction<EditCategoryDto>( procedure, parameters );
+
+        if ( result is null )
+            return null;
+
+        result.Type = dto.Type;
+
+        return result;
     }
     public async Task<bool> UpdateCategory( EditCategoryDto dto )
     {
-        string procedure = GetProcedure( PROCEDURES_UPDATE_CATEGORY, dto.Tier );
+        string procedure = GetProcedure( PROCEDURES_UPDATE_CATEGORY, dto.Type );
         DynamicParameters parameters = GetUpdateParameters( dto );
 
         return await TryAdminTransaction( procedure, parameters );
     }
     public async Task<bool> DeleteCategory( RemoveCategoryDto dto )
     {
-        string procedure = GetProcedure( PROCEDURES_DELETE_CATEGORY, dto.CategoryTier );
+        string procedure = GetProcedure( PROCEDURES_DELETE_CATEGORY, dto.CategoryType );
         DynamicParameters parameters = GetDeleteParameters( dto );
         
         return await TryAdminTransaction( procedure, parameters );
@@ -69,19 +83,24 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         };
     }
 
-    static string GetProcedure( string[] procedures, int tier )
+    static string GetProcedure( string[] procedures, CategoryType type )
     {
-        return procedures[ tier - 1 ];
+        int index = ( int ) type - 1;
+
+        if ( index < 0 || index >= procedures.Length )
+            return string.Empty;
+        
+        return procedures[ index ];
     }
     static DynamicParameters GetEditParameters( GetCategoryEditDto request )
     {
         var parameters = new DynamicParameters();
 
-        string categoryIdName = request.CategoryTier switch
+        string categoryIdName = request.CategoryType switch
         {
-            1 => PARAM_CATEGORY_PRIMARY_ID,
-            2 => PARAM_CATEGORY_SECONDARY_ID,
-            3 => PARAM_CATEGORY_TERTIARY_ID,
+            CategoryType.PRIMARY => PARAM_CATEGORY_PRIMARY_ID,
+            CategoryType.SECONDARY => PARAM_CATEGORY_SECONDARY_ID,
+            CategoryType.TERTIARY => PARAM_CATEGORY_TERTIARY_ID,
             _ => throw new ServiceException( "Invalid category tier!", null )
         };
 
@@ -96,40 +115,54 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         parameters.Add( PARAM_CATEGORY_IMAGE_URL, dto.ImageUrl );
         parameters.Add( PARAM_CATEGORY_DESCRIPTION, dto.Description );
 
-        if ( dto.Tier > 1 )
-            parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
-
-        if ( dto.Tier > 2 )
-            parameters.Add( PARAM_CATEGORY_SECONDARY_ID, dto.SecondaryCategoryId );
-
+        switch ( dto.Type )
+        {
+            case CategoryType.SECONDARY:
+                parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
+                break;
+            case CategoryType.TERTIARY:
+                parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
+                parameters.Add( PARAM_CATEGORY_SECONDARY_ID, dto.SecondaryCategoryId );
+                break;
+        }
+        
         return parameters;
     }
     static DynamicParameters GetUpdateParameters( EditCategoryDto dto )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
         parameters.Add( PARAM_CATEGORY_NAME, dto.Name );
         parameters.Add( PARAM_CATEGORY_API_URL, dto.ApiUrl );
         parameters.Add( PARAM_CATEGORY_IMAGE_URL, dto.ImageUrl );
         parameters.Add( PARAM_CATEGORY_DESCRIPTION, dto.Description );
 
-        if ( dto.Tier > 1 )
-            parameters.Add( PARAM_CATEGORY_SECONDARY_ID, dto.SecondaryCategoryId );
-
-        if ( dto.Tier > 2 )
-            parameters.Add( PARAM_CATEGORY_TERTIARY_ID, dto.TertiaryCategoryId );
-
+        switch ( dto.Type )
+        {
+            case CategoryType.PRIMARY:
+                parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
+                break;
+            case CategoryType.SECONDARY:
+                parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
+                parameters.Add( PARAM_CATEGORY_SECONDARY_ID, dto.SecondaryCategoryId );
+                break;
+            case CategoryType.TERTIARY:
+                parameters.Add( PARAM_CATEGORY_PRIMARY_ID, dto.PrimaryCategoryId );
+                parameters.Add( PARAM_CATEGORY_SECONDARY_ID, dto.SecondaryCategoryId );
+                parameters.Add( PARAM_CATEGORY_TERTIARY_ID, dto.TertiaryCategoryId );
+                break;
+        }
+        
         return parameters;
     }
     static DynamicParameters GetDeleteParameters( RemoveCategoryDto dto )
     {
         var parameters = new DynamicParameters();
         
-        string paramName = dto.CategoryTier switch
+        string paramName = dto.CategoryType switch
         {
-            1 => PARAM_CATEGORY_PRIMARY_ID,
-            2 => PARAM_CATEGORY_SECONDARY_ID,
-            3 => PARAM_CATEGORY_TERTIARY_ID,
+            CategoryType.PRIMARY => PARAM_CATEGORY_PRIMARY_ID,
+            CategoryType.SECONDARY => PARAM_CATEGORY_SECONDARY_ID,
+            CategoryType.TERTIARY => PARAM_CATEGORY_TERTIARY_ID,
             _ => throw new ServiceException( "Invalid category tier!", null )
         };
         
