@@ -24,18 +24,7 @@ public sealed partial class AdminCategoriesView : AdminView
             return;
         }
 
-        ApiReply<CategoryViewDto?> reply = await AdminCategoryService.GetCategoriesView();
-
-        PageIsLoaded = true;
-        
-        if ( !reply.Success || reply.Data is null )
-        {
-            Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
-            RazorViewMessage = reply.Message ??= ERROR_GET_CATEGORIES_VIEW;
-            return;
-        }
-
-        _category = reply.Data;
+        await LoadCategoriesView();
     }
 
     void CreateNewCategory( int categoryTier )
@@ -46,19 +35,41 @@ public sealed partial class AdminCategoriesView : AdminView
     {
         NavManager.NavigateTo( $"admin/categories/edit?newCategory=false&categoryId={categoryId}&categoryTier={categoryTier}" );
     }
-    async Task<bool> RemoveCategory( int categoryId, int categoryTier )
+    async Task RemoveCategory( int categoryId, int categoryTier )
     {
         var dto = new RemoveCategoryDto( categoryId, categoryTier );
         ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
 
         if ( !result.Success )
         {
-            RazorViewMessage = result.Message ??= "Failed to delete category!";
-            return false;
+            MessageCssClass = MESSAGE_FAILURE_CLASS;
+            Message = $"Failed to delete category {categoryId}. {result.Message}";
+            return;
+        }
+
+        MessageCssClass = MESSAGE_SUCCESS_CLASS;
+        Message = $"Successfully deleted category {categoryId}.";
+
+        await LoadCategoriesView();
+        StateHasChanged();
+    }
+    async Task LoadCategoriesView()
+    {
+        PageIsLoaded = false;
+        
+        ApiReply<CategoryViewDto?> reply = await AdminCategoryService.GetCategoriesView();
+
+        PageIsLoaded = true;
+
+        if ( !reply.Success || reply.Data is null )
+        {
+            Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
+            MessageCssClass = MESSAGE_FAILURE_CLASS;
+            Message = reply.Message ??= ERROR_GET_CATEGORIES_VIEW;
+            return;
         }
         
-        StateHasChanged();
-        NavManager.NavigateTo( NavManager.Uri, true );
-        return true;
+        _category = reply.Data;
+        Message = string.Empty;
     }
 }

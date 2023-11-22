@@ -43,7 +43,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ApiReply<UserSessionResponse?>> AuthorizeUser()
     {
-        ApiReply<bool> apiReply = await TryUserApiRequest<bool>( API_ROUTE_AUTHORIZE );
+        ApiReply<bool> apiReply = await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
 
         return apiReply.Success
             ? new ApiReply<UserSessionResponse?>( _userSession )
@@ -51,14 +51,14 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ApiReply<bool>> Logout()
     {
-        ApiReply<bool> serverReply = await TryUserApiRequest<bool>( API_ROUTE_LOGOUT );
+        ApiReply<bool> serverReply = await TryUserRequest<bool>( API_ROUTE_LOGOUT );
         await Storage.RemoveItemAsync( SESSION_DATA_KEY );
         SessionChanged?.Invoke( null );
         return serverReply;
     }
-    public async Task<ApiReply<bool>> ChangePassword( UserChangePasswordRequest request )
+    public async Task<ApiReply<bool>> ChangePassword( PasswordChangeRequest request )
     {
-        return await TryUserApiRequest<bool>( API_ROUTE_CHANGE_PASSWORD, request );
+        return await TryUserRequest<PasswordChangeRequest, bool>( API_ROUTE_CHANGE_PASSWORD, request );
     }
     public async Task<ApiReply<UserSessionResponse?>> TryGetLocalUserSession()
     {
@@ -87,7 +87,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
         return new ApiReply<UserSessionResponse?>( _userSession );
     }
 
-    protected async Task<ApiReply<T?>> TryUserApiRequest<T>( string apiRoute, object? request = null )
+    protected async Task<ApiReply<T?>> TryUserRequest<T>( string apiRoute )
     {
         ApiReply<UserSessionResponse?> sessionReply = await TryGetLocalUserSession();
 
@@ -97,8 +97,21 @@ public class UserServiceClient : ClientService, IUserServiceClient
             return new ApiReply<T?>( sessionReply.Message );
         }
 
-        var apiRequest = new UserApiRequest( sessionReply.Data, request );
-        return await TryPostRequest<T?>( apiRoute, request );
+        var apiRequest = new UserRequest( sessionReply.Data );
+        return await TryPostRequest<T?>( apiRoute, apiRequest );
+    }
+    protected async Task<ApiReply<RESPONSE?>> TryUserRequest<REQUEST,RESPONSE>( string apiRoute, REQUEST payload ) where REQUEST : class
+    {
+        ApiReply<UserSessionResponse?> sessionReply = await TryGetLocalUserSession();
+
+        if ( !sessionReply.Success || sessionReply.Data is null )
+        {
+            Logger.LogError( sessionReply.Message );
+            return new ApiReply<RESPONSE?>( sessionReply.Message );
+        }
+
+        var apiRequest = new UserDataRequest<REQUEST>( sessionReply.Data, payload );
+        return await TryPostRequest<RESPONSE?>( apiRoute, apiRequest );
     }
     async Task<ApiReply<UserSessionResponse?>> TryGetSessionResponse<T>( string apiPath, T requestObject )
     {

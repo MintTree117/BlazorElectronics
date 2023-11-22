@@ -13,6 +13,6 @@ public class AdminServiceClient : UserServiceClient, IAdminServiceClient
 
     public async Task<ApiReply<bool>> AuthorizeAdmin()
     {
-        return await TryUserApiRequest<bool>( API_ROUTE_AUTHORIZE );
+        return await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
     }
 }

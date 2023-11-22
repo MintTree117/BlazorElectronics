@@ -18,22 +18,22 @@ public sealed class AdminCategoryServiceClient : AdminServiceClient, IAdminCateg
 
     public async Task<ApiReply<CategoryViewDto?>> GetCategoriesView()
     {
-        return await TryUserApiRequest<CategoryViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<CategoryViewDto?>( API_ROUTE_GET_VIEW );
     }
     public async Task<ApiReply<EditCategoryDto?>> GetCategoryEdit( GetCategoryEditDto data )
     {
-        return await TryUserApiRequest<EditCategoryDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<GetCategoryEditDto,EditCategoryDto?>( API_ROUTE_GET_EDIT, data );
     }
     public async Task<ApiReply<EditCategoryDto?>> AddCategory( AddCategoryDto data )
     {
-        return await TryUserApiRequest<EditCategoryDto?>( API_ROUTE_ADD, data );
+        return await TryUserRequest<AddCategoryDto,EditCategoryDto?>( API_ROUTE_ADD, data );
     }
     public async Task<ApiReply<bool>> UpdateCategory( EditCategoryDto data )
     {
-        return await TryUserApiRequest<bool>( API_ROUTE_UPDATE, data );
+        return await TryUserRequest<EditCategoryDto,bool>( API_ROUTE_UPDATE, data );
     }
     public async Task<ApiReply<bool>> RemoveCategory( RemoveCategoryDto data )
     {
-        return await TryUserApiRequest<bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<RemoveCategoryDto,bool>( API_ROUTE_REMOVE, data );
     }
 }

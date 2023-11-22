@@ -45,7 +45,7 @@
     readonly UserRegisterRequest _user = new();
     string _serverMessage = string.Empty;
     string _messageCssClass = "text-danger";
-
+    
     async Task HandleRegistration()
     {
         ApiReply<UserSessionResponse?> reply = await UserService.Register( _user );

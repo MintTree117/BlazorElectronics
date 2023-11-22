@@ -13,6 +13,6 @@ public interface IUserServiceClient
     Task<ApiReply<UserSessionResponse?>> Login( UserLoginRequest request );
     Task<ApiReply<UserSessionResponse?>> AuthorizeUser();
     Task<ApiReply<bool>> Logout();
-    Task<ApiReply<bool>> ChangePassword( UserChangePasswordRequest request );
+    Task<ApiReply<bool>> ChangePassword( PasswordChangeRequest request );
     Task<ApiReply<UserSessionResponse?>> TryGetLocalUserSession();
 }

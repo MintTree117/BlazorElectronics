@@ -12,48 +12,58 @@ public class UserController : ControllerBase
     protected const string BAD_REQUEST_MESSAGE = "Bad Request!";
     protected readonly IUserAccountService UserAccountService;
     protected readonly ISessionService SessionService;
-    
-    public UserController( IUserAccountService userAccountService, ISessionService sessionService )
+
+    protected readonly ILogger<UserController> Logger;
+
+    public UserController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService )
     {
+        Logger = logger;
         UserAccountService = userAccountService;
         SessionService = sessionService;
     }
 
-    protected async Task<ApiReply<ValidatedUserApiRequest<T?>>> TryValidateUserRequest<T>( UserApiRequest? request ) where T : class
+    protected async Task<ApiReply<int>> AuthorizeSessionRequest( UserRequest? request )
     {
-        if ( !TryValidateUserApiRequestData( request, out T? data ) )
-            return new ApiReply<ValidatedUserApiRequest<T?>>( "Failed to validate http request!" );
+        if ( !ValidateUserHttp( request ) )
+            return new ApiReply<int>( "Failed to validate http request!" );
 
-        ApiReply<int> sessionReply = await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
-
-        if ( !sessionReply.Success )
-            return new ApiReply<ValidatedUserApiRequest<T?>>( sessionReply.Message );
-
-        var validatedRequest = new ValidatedUserApiRequest<T?>( sessionReply.Data, data );
-        return new ApiReply<ValidatedUserApiRequest<T?>>( validatedRequest );
+        return await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
+    protected async Task<ApiReply<int>> AuthorizeSessionRequest<T>( UserDataRequest<T>? request ) where T : class
+    {
+        if ( !ValidateUserHttp( request ) )
+        {
+            return new ApiReply<int>( "Failed to validate http request!" );   
+        }
 
+        return await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+    }
+    
     protected UserDeviceInfoDto GetRequestDeviceInfo()
     {
         IPAddress? address = Request.HttpContext.Connection.RemoteIpAddress;
         var dto = new UserDeviceInfoDto( address?.ToString() );
         return dto;
     }
-    protected static bool TryValidateUserApiRequestData<T>( UserApiRequest? request, out T? data ) where T : class
+    static bool ValidateUserHttp( UserRequest? request )
     {
-        data = default;
-        
-        if ( request is null )
+        return request is not null && ValidateRequestSession( request.SessionId, request.SessionToken );
+    }
+    static bool ValidateUserHttp<T>( UserDataRequest<T>? request ) where T : class
+    {
+        if ( request?.Payload is null )
             return false;
 
-        bool validId = request.SessionId >= 1;
-        bool validToken = !string.IsNullOrWhiteSpace( request.SessionToken );
-
-        if ( !validId && validToken )
+        if ( !ValidateRequestSession( request.SessionId, request.SessionToken ) )
             return false;
-
-        data = request.Data as T;
         
+        return true;
+    }
+    static bool ValidateRequestSession( int sessionId, string? sessionToken )
+    {
+        bool validId = sessionId >= 1;
+        bool validToken = !string.IsNullOrWhiteSpace( sessionToken );
+
         return validId && validToken;
     }
 }

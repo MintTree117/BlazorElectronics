@@ -6,7 +6,7 @@ public interface IAdminSpecLookupRepository
 {
     Task<SpecsViewDto?> GetSpecsView();
     Task<EditSpecLookupDto?> GetSpecEdit( GetSpecLookupEditDto dto );
-    Task<EditSpecLookupDto?> Insert( AddSpecLookupDto dto );
+    Task<int> Insert( EditSpecLookupDto dto );
     Task<bool> Update( EditSpecLookupDto dto );
     Task<bool> Delete( RemoveSpecLookupDto dto );
 }

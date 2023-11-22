@@ -1,13 +1,13 @@
 namespace BlazorElectronics.Server.Dtos.Users;
 
-public sealed class ValidatedUserApiRequest<T>
+public sealed class ValidatedDataRequest<T>
 {
-    public ValidatedUserApiRequest()
+    public ValidatedDataRequest()
     {
         
     }
 
-    public ValidatedUserApiRequest( int userId, T? dto = default )
+    public ValidatedDataRequest( int userId, T? dto = default )
     {
         UserId = userId;
         Dto = dto;

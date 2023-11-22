@@ -16,12 +16,15 @@ public abstract class AdminView : UserView
         await AuthorizeAdmin();
     }
 
-    protected async Task AuthorizeAdmin()
+    async Task AuthorizeAdmin()
     {
         ApiReply<bool> response = await AdminService.AuthorizeAdmin();
         PageIsAuthorized = response.Data;
-        
+
         if ( !PageIsAuthorized )
-            RazorViewMessage = ERROR_UNAUTHORIZED_ADMIN;
+        {
+            MessageCssClass = MESSAGE_FAILURE_CLASS;
+            Message = ERROR_UNAUTHORIZED_ADMIN;   
+        }
     }
 }

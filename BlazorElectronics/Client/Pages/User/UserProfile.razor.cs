@@ -7,7 +7,7 @@ public partial class UserProfile : UserView
 {
     const string DEFAULT_FAIL_PASSWORD_CHANGE = "Failed to change password; no response message!";
     
-    readonly UserChangePasswordRequest _changePasswordRequest = new();
+    readonly PasswordChangeRequest _changeRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -23,7 +23,7 @@ public partial class UserProfile : UserView
 
     async Task ChangePassword()
     {
-        ApiReply<bool> result = await UserService.ChangePassword( _changePasswordRequest );
-        RazorViewMessage = result.Message ??= DEFAULT_FAIL_PASSWORD_CHANGE;
+        ApiReply<bool> result = await UserService.ChangePassword( _changeRequest );
+        Message = result.Message ??= DEFAULT_FAIL_PASSWORD_CHANGE;
     }
 }

@@ -10,9 +10,9 @@ public sealed partial class AdminSpecsView : AdminView
     const string ERROR_GET_SPECS_VIEW = "Failed to retireve Specs View with no message!";
     
     [Inject] IAdminSpecsServiceClient AdminSpecsService { get; init; } = default!;
-
+    
     SpecsViewDto _specs = new();
-
+    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -24,6 +24,38 @@ public sealed partial class AdminSpecsView : AdminView
             return;
         }
 
+        await LoadSpecsView();
+    }
+
+    void CreateNewSpec( SpecLookupType specType )
+    {
+        NavManager.NavigateTo( $"admin/specs/edit?newSpec=true&specType={specType}" );
+    }
+    void EditSpec( SpecLookupType specType, int specId )
+    {
+        NavManager.NavigateTo( $"admin/specs/edit?newSpec=false&specType={specType}&specId={specId}" );
+    }
+    async Task RemoveSpec( SpecLookupType specType, int specId )
+    {
+        var dto = new RemoveSpecLookupDto( specType, specId );
+        ApiReply<bool> reply = await AdminSpecsService.Remove( dto );
+
+        if ( reply.Success )
+        {
+            MessageCssClass = MESSAGE_SUCCESS_CLASS;
+            Message = $"Successfully removed spec {specId}.";
+            await LoadSpecsView();
+        }
+        else
+        {
+            MessageCssClass = MESSAGE_SUCCESS_CLASS;
+            Message = $"Failed to remove spec {specId}. {reply.Message}";
+        }
+    }
+    async Task LoadSpecsView()
+    {
+        PageIsLoaded = false;
+        
         ApiReply<SpecsViewDto?> reply = await AdminSpecsService.GetView();
 
         PageIsLoaded = true;
@@ -31,23 +63,12 @@ public sealed partial class AdminSpecsView : AdminView
         if ( !reply.Success || reply.Data is null )
         {
             Logger.LogError( reply.Message ??= ERROR_GET_SPECS_VIEW );
-            RazorViewMessage = reply.Message ??= ERROR_GET_SPECS_VIEW;
+            MessageCssClass = MESSAGE_FAILURE_CLASS;
+            Message = reply.Message ??= ERROR_GET_SPECS_VIEW;
             return;
         }
-        
-        _specs = reply.Data;
-    }
 
-    void CreateNewSpec( SpecLookupType specType )
-    {
-        
-    }
-    void EditSpec( SpecLookupType specType, int specId )
-    {
-        
-    }
-    async Task RemoveSpec( SpecLookupType specType, int specId )
-    {
-        
+        _specs = reply.Data;
+        Message = string.Empty;
     }
 }

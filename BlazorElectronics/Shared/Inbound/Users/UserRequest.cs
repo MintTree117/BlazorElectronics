@@ -2,28 +2,25 @@ using BlazorElectronics.Shared.Outbound.Users;
 
 namespace BlazorElectronics.Shared.Inbound.Users;
 
-public sealed class UserApiRequest
+public class UserRequest
 {
-    public UserApiRequest()
+    public UserRequest()
     {
         
     }
 
-    public UserApiRequest( UserSessionResponse session, object? data = null )
+    public UserRequest( UserSessionResponse session )
     {
         SessionId = session.SessionId;
         SessionToken = session.SessionToken;
-        Data = data;
     }
     
-    public UserApiRequest( int sessionId, string token, object? data = null )
+    public UserRequest( int sessionId, string token )
     {
         SessionId = sessionId;
         SessionToken = token;
-        Data = data;
     }
     
     public int SessionId { get; init; }
     public string SessionToken { get; init; } = string.Empty;
-    public object? Data { get; set; }
 }

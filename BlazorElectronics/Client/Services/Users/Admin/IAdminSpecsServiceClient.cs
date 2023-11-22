@@ -7,7 +7,7 @@ public interface IAdminSpecsServiceClient
 {
     Task<ApiReply<SpecsViewDto?>> GetView();
     Task<ApiReply<EditSpecLookupDto?>> GetEdit( GetSpecLookupEditDto dto );
-    Task<ApiReply<EditSpecLookupDto?>> Add( AddSpecLookupDto dto );
+    Task<ApiReply<int>> Add( EditSpecLookupDto dto );
     Task<ApiReply<bool>> Update( EditSpecLookupDto data );
     Task<ApiReply<bool>> Remove( RemoveSpecLookupDto data );
 }

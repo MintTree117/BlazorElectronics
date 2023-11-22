@@ -6,17 +6,23 @@
 {
     <div class="loading-container">
         <div class="loading-circle"></div>
-        <p>@RazorViewMessage</p>
+        <p>@Message</p>
         <p>Redirecting in @PageRedirectCountdown...</p>
     </div>
 }
 else if ( !PageIsReady() )
 {
-    <span>@RazorViewMessage</span>
+    <span>@Message</span>
 }
 else
 {
     <h3>Categories View</h3>
+    if ( !string.IsNullOrWhiteSpace( Message ) )
+    {
+        <div class="@MessageCssClass">
+            <span>@Message</span>
+        </div>
+    }
     <div class="row">
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">

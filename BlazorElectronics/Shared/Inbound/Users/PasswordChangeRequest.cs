@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BlazorElectronics.Shared.Inbound.Users;
 
-public sealed class UserChangePasswordRequest
+public sealed class PasswordChangeRequest
 {
-    public UserApiRequest? ApiRequest { get; set; }
+    public UserRequest? ApiRequest { get; set; }
 
     [Required, StringLength(100, MinimumLength = 6)]
     public string Password { get; set; } = string.Empty;

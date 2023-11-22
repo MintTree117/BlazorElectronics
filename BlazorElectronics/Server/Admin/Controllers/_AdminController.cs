@@ -13,40 +13,42 @@ namespace BlazorElectronics.Server.Admin.Controllers;
 public class _AdminController : UserController
 {
     protected const string NO_DATA_MESSAGE = "No data found!";
-    protected const string INVALID_ADMIN_TASK_MESSAGE = "Invalid Task Call!";
-    protected const string ADMIN_TASK_FAIL_MESSAGE = "Task Failed To Execute!";
-    protected const string ADMIN_TASK_INTERNAL_SERVER_ERROR = "An internal server error occured!";
+    
+    const string INVALID_ADMIN_TASK_MESSAGE = "Invalid Task Call!";
+    const string ADMIN_TASK_FAIL_MESSAGE = "Task Failed To Execute!";
+    const string ADMIN_TASK_INTERNAL_SERVER_ERROR = "An internal server error occured!";
 
-    protected readonly ILogger<_AdminController> Logger;
 
-    public _AdminController( ILogger<_AdminController> logger, IUserAccountService userAccountService, ISessionService sessionService )
-        : base( userAccountService, sessionService )
-    {
-        Logger = logger;
-    }
+    public _AdminController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService )
+        : base( logger, userAccountService, sessionService ) { }
 
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] UserApiRequest? apiRequest )
+    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] UserRequest? request )
     {
-        ApiReply<ValidatedUserApiRequest<object?>> reply = await ValidateAdminRequest<object>( apiRequest );
-
+        ApiReply<int> reply = await ValidateAdminRequest( request );
+        
         return reply.Success
             ? Ok( new ApiReply<bool>( true ) )
             : BadRequest( reply.Message );
     }
-    
-    protected async Task<ApiReply<ValidatedUserApiRequest<T?>>> ValidateAdminRequest<T>( UserApiRequest? request ) where T : class
+
+    protected async Task<ApiReply<int>> ValidateAdminRequest( UserRequest? request )
     {
-        ApiReply<ValidatedUserApiRequest<T?>> userRequestReply = await TryValidateUserRequest<T>( request );
+        ApiReply<int> userReply = await AuthorizeSessionRequest( request );
 
-        if ( !userRequestReply.Success || userRequestReply.Data is null )
-            return new ApiReply<ValidatedUserApiRequest<T?>>( userRequestReply.Message );
+        if ( !userReply.Success )
+            return userReply;
 
-        ApiReply<int> adminReply = await UserAccountService.VerifyAdminId( userRequestReply.Data.UserId );
+        return await UserAccountService.VerifyAdminId( userReply.Data );
+    }
+    protected async Task<ApiReply<int>> ValidateAdminRequest<T>( UserDataRequest<T>? request ) where T : class
+    {
+        ApiReply<int> userReply = await AuthorizeSessionRequest( request );
 
-        return adminReply.Success
-            ? userRequestReply
-            : new ApiReply<ValidatedUserApiRequest<T?>>( adminReply.Message );
+        if ( !userReply.Success )
+            return userReply;
+
+        return await UserAccountService.VerifyAdminId( userReply.Data );
     }
     protected async Task<ApiReply<T?>> TryExecuteAdminRepoQuery<T>( Delegate action, params object?[] args )
     {
@@ -65,22 +67,27 @@ public class _AdminController : UserController
         }
         catch ( ServiceException e )
         {
-            Logger.LogError( e.Message, e );
+            var ex = new ServiceException( e.Message, e );
+            
+            Logger.LogError( ex.Message );
             return new ApiReply<T?>( ADMIN_TASK_INTERNAL_SERVER_ERROR );
         }
-        catch ( IOException ioException )
+        catch ( IOException e )
         {
-            Logger.LogError( ioException.Message, ioException );
+            var ex = new ServiceException( e.Message, e );
+            Logger.LogError( ex.Message );
             return new ApiReply<T?>( ADMIN_TASK_INTERNAL_SERVER_ERROR );
         }
-        catch ( SqlException sqlException )
+        catch ( SqlException e )
         {
-            Logger.LogError( sqlException.Message, sqlException );
+            var ex = new ServiceException( e.Message, e );
+            Logger.LogError( ex.Message );
             return new ApiReply<T?>( ADMIN_TASK_INTERNAL_SERVER_ERROR );
         }
-        catch ( Exception exception )
+        catch ( Exception e )
         {
-            Logger.LogError( exception.Message, exception );
+            var ex = new ServiceException( e.Message, e );
+            Logger.LogError( ex.Message );
             return new ApiReply<T?>( ADMIN_TASK_INTERNAL_SERVER_ERROR );
         }
     }

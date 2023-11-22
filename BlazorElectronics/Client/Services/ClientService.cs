@@ -22,7 +22,7 @@ public abstract class ClientService
         try
         {
             HttpResponseMessage httpResponse = await Http.PostAsJsonAsync( apiPath, data );
-
+            
             if ( httpResponse.IsSuccessStatusCode )
             {
                 var apiReply = await httpResponse.Content.ReadFromJsonAsync<ApiReply<T>>();
@@ -30,20 +30,20 @@ public abstract class ClientService
             }
             else if ( httpResponse.StatusCode is System.Net.HttpStatusCode.BadRequest )
             {
-                var errorContent = await httpResponse.Content.ReadAsStringAsync();
-                Logger.LogError( $"Bad request: {errorContent}" );
+                string errorContent = await httpResponse.Content.ReadAsStringAsync();
+                Logger.LogError( $"TryPostRequest: Bad request: {errorContent}" );
                 return new ApiReply<T>( default, false, errorContent );
             }
             else
             {
-                var errorContent = await httpResponse.Content.ReadAsStringAsync();
-                Logger.LogError( $"Error: {httpResponse.StatusCode}, Content: {errorContent}" );
+                string errorContent = await httpResponse.Content.ReadAsStringAsync();
+                Logger.LogError( $"TryPostRequest: Error: {httpResponse.StatusCode}, Content: {errorContent}" );
                 return new ApiReply<T>( default, false, $"Error: {httpResponse.StatusCode}" );
             }
         }
         catch ( Exception e )
         {
-            Logger.LogError( e, "Exception occurred while sending API request." );
+            Logger.LogError( e, "TryPostRequest: Exception occurred while sending API request." );
             return new ApiReply<T>( default, false, e.Message );
         }
     }

@@ -1,4 +1,5 @@
 using System.Data;
+using BlazorElectronics.Server.Admin.Models;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Shared.Admin.Specs;
 using Dapper;
@@ -37,14 +38,19 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         "Delete_SpecLookupMultiString"
     };
     
-    const string PROCEDURE_GET_SPECS_VIEW = "Get_SpecsAdminView";
+    const string PROCEDURE_GET_SPECS_VIEW = "Get_SpecLookupView";
     
     const string PARAM_PRIMARY_CATEGORIES = "@PrimaryCategories";
     const string PARAM_IS_GLOBAL = "@IsGlobal";
     const string PARAM_SPEC_ID = "@SpecId";
     const string PARAM_SPEC_NAME = "@SpecName";
-    const string PARAM_FILTER_VALUES = "@FilterValue";
+    const string PARAM_FILTER_VALUES = "@FilterValues";
     const string PARAM_SPEC_VALUES = "@SpecValues";
+
+    const string TVP_COL_SPEC_ID = "SpecValueId";
+    const string TVP_COL_FILTER_ID = "FilterValueId";
+    const string TVP_COL_SPEC_VALUE = "SpecValue";
+    const string TVP_COL_FILTER_VALUE = "FilterValue";
     
     public AdminSpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
@@ -54,14 +60,18 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
     }
     public async Task<EditSpecLookupDto?> GetSpecEdit( GetSpecLookupEditDto dto )
     {
-        return null;
+        string procedure = GetProcedure( dto.SpecType, PROCEDURES_GET_EDIT );
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_SPEC_ID, dto.SpedId );
+
+        return await TryQueryAsync( GetIntSpecEditQuery, parameters );
     }
-    public async Task<EditSpecLookupDto?> Insert( AddSpecLookupDto dto )
+    public async Task<int> Insert( EditSpecLookupDto dto )
     {
-        string procedure = GetProcedure( dto.EditDto.SpecType, PROCEDURES_INSERT );
+        string procedure = GetProcedure( dto.SpecType, PROCEDURES_INSERT );
         DynamicParameters parameters = GetAddParams( dto );
 
-        return await TryAdminQueryTransaction<EditSpecLookupDto?>( procedure, parameters );
+        return await TryAdminQueryTransaction<int>( procedure, parameters );
     }
     public async Task<bool> Update( EditSpecLookupDto dto )
     {
@@ -99,51 +109,92 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
             MultiSpecs = intSpecs is not null ? multiSpecs.ToList() : new List<SpecView>()
         };
     }
-    
-    static DynamicParameters GetAddParams( AddSpecLookupDto dto )
+    static async Task<EditSpecLookupDto?> GetIntSpecEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        DynamicParameters parameters = GetUpdateParams( dto.EditDto );
-        parameters.Add( PARAM_SPEC_ID, dto.SpecId );
+        SqlMapper.GridReader? result = await connection.QueryMultipleAsync( PROCEDURE_GET_SPECS_VIEW, commandType: CommandType.StoredProcedure );
+
+        if ( result is null )
+            return null;
+
+        var specView = await result.ReadFirstOrDefaultAsync<SpecView>();
+        IEnumerable<int>? categories = await result.ReadAsync<int>();
+        bool isGlobal = await result.ReadFirstOrDefaultAsync<bool>();
+        IEnumerable<AdminSpecValueModel>? values = await result.ReadAsync<AdminSpecValueModel>();
+        
+        return new EditSpecLookupDto
+        {
+            SpecId = specView.SpecId,
+            SpecName = specView.SpecName,
+            SpecType = SpecLookupType.INT,
+            IsGlobal = isGlobal,
+            PrimaryCategoriesAsString = ConvertCategoriesToString( categories )
+        }
+    }
+    
+    static DynamicParameters GetAddParams( EditSpecLookupDto dto )
+    {
+        var parameters = new DynamicParameters();
+
+        DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategoriesAsString );
+        DataTable valuesTable = GetSpecValuesTable( dto.SpecType, dto.ValuesByIdAsString );
+
+        parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
+        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
+        parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable.AsTableValuedParameter( "TVP_PrimaryCategoryIds" ) );
+        
+        string paramValues = dto.SpecType switch
+        {
+            SpecLookupType.INT => PARAM_FILTER_VALUES,
+            _ => PARAM_SPEC_VALUES
+        };
+        
+        string valueTableName = dto.SpecType switch
+        {
+            SpecLookupType.INT => "TVP_SpecLookupIntFilters",
+            _ => "TVP_SpecLookupStringValues"
+        };
+        
+        parameters.Add( paramValues, valuesTable.AsTableValuedParameter( valueTableName ) );
         
         return parameters;
     }
     static DynamicParameters GetUpdateParams( EditSpecLookupDto dto )
     {
-        var parameters = new DynamicParameters();
-
-        DataTable categoriesTable = GetSpecCategoriesTable( dto.PrimaryCategoriesAsString );
-        DataTable valuesTable = GetSpecValuesTable( dto.SpecType, dto.ValuesByIdAsString );
-
-        parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
-        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
-        parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable );
-        parameters.Add( PARAM_SPEC_VALUES, valuesTable );
+        DynamicParameters parameters = GetAddParams( dto );
+        parameters.Add( PARAM_SPEC_ID, dto.SpecId );
 
         return parameters;
     }
-    static DataTable GetSpecCategoriesTable( string categoriesString )
+
+    static string ConvertCategoriesToString( IEnumerable<int>? categories )
     {
-        List<string> categoryStrings = categoriesString
-            .Split( ',' )
-            .Select( s => s.Trim() ) // Trims whitespace from each item.
-            .ToList();
+        string s = string.Empty;
 
-        var categories = new List<int>();
-
-        foreach ( string c in categoryStrings )
-        {
-            if ( int.TryParse( c, out int category ) )
-                categories.Add( category );
-        }
+        if ( categories is null )
+            return s;
         
-        var table = new DataTable();
-        table.Columns.Add( "PrimaryCategoryId", typeof( int ) );
+        foreach ( int id in categories )
+        {
+            s += $"{id},"
+        }
+
+        return s;
+    }
+    static string ConvertStringValuesToString( IEnumerable<string>? values )
+    {
+        string s = string.Empty;
+
+        if ( categories is null )
+            return s;
 
         foreach ( int id in categories )
-            table.Rows.Add( id );
-        
-        return table;
+        {
+            s += $"{id},"
+        }
+
+        return s;
     }
+    
     static DataTable GetSpecValuesTable( SpecLookupType type, string valuesString )
     {
         List<string> values = valuesString
@@ -153,24 +204,35 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
         
         var table = new DataTable();
 
+        string idCol;
+        string valueCol;
+        
         switch ( type )
         {
             case SpecLookupType.INT:
-                table.Columns.Add( "SpecId", typeof( int ) );
-                table.Columns.Add( "SpecValue", typeof( string ) );
+                idCol = TVP_COL_SPEC_ID;
+                valueCol = TVP_COL_SPEC_VALUE;
                 break;
             case SpecLookupType.STRING:
             case SpecLookupType.MULTI:
-                table.Columns.Add( "FilterId", typeof( int ) );
-                table.Columns.Add( "FilterValue", typeof( string ) );
+                idCol = TVP_COL_FILTER_ID;
+                valueCol = TVP_COL_FILTER_VALUE;
                 break;
             case SpecLookupType.BOOL:
             default:
                 throw new ServiceException( "Invalid SpecLookupType!", null );
         }
 
+        table.Columns.Add( idCol, typeof( int ) );
+        table.Columns.Add( valueCol, typeof( string ) );
+
         for ( int i = 0; i < values.Count; i++ )
-            table.Rows.Add( i, values[ i ] );
+        {
+            DataRow row = table.NewRow();
+            row[ idCol ] = i + 1;
+            row[ valueCol ] = values[ i ];
+            table.Rows.Add( row );
+        }
 
         return table;
     }

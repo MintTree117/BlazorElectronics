@@ -6,13 +6,13 @@
     {
         <div class="loading-container">
             <div class="loading-circle"></div>
-            <p>@RazorViewMessage</p>
+            <p>@Message</p>
             <p>Redirecting in @PageRedirectCountdown...</p>
         </div>
     }
     else if ( !PageIsReady() )
     {
-        <span>@RazorViewMessage</span>
+        <span>@Message</span>
     }
     else
     {
@@ -42,6 +42,16 @@
                 <label for="Values" class="form-label">Values, ordered by Id, separate by comma.</label>
                 <InputText @bind-Value="_dto.ValuesByIdAsString" class="form-control" id="Values"></InputText>
             </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="oi oi-cloud-upload"></i>
+            </button>
         </EditForm>
+
+        if ( !string.IsNullOrWhiteSpace( Message ) )
+        {
+            <div class="@MessageCssClass">
+                <span>@Message</span>
+            </div>
+        }
     }
 </div>

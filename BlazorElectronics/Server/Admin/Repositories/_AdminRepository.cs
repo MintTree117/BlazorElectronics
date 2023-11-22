@@ -121,4 +121,28 @@ public class _AdminRepository : DapperRepository
             throw new ServiceException( ex.Message, ex );
         }
     }
+    
+    protected static DataTable GetPrimaryCategoriesTable( string categoriesString )
+    {
+        List<string> categoryStrings = categoriesString
+            .Split( ',' )
+            .Select( s => s.Trim() ) // Trims whitespace from each item.
+            .ToList();
+
+        var categories = new List<int>();
+
+        foreach ( string c in categoryStrings )
+        {
+            if ( int.TryParse( c, out int category ) )
+                categories.Add( category );
+        }
+
+        var table = new DataTable();
+        table.Columns.Add( "PrimaryCategoryId", typeof( int ) );
+
+        foreach ( int id in categories )
+            table.Rows.Add( id );
+
+        return table;
+    }
 }

@@ -21,9 +21,9 @@ public sealed class AdminCategoryController : _AdminController
     }
 
     [HttpPost( "get-categories-view" )]
-    public async Task<ActionResult<ApiReply<CategoryViewDto?>>> GetCategoriesView( [FromBody] UserApiRequest? apiRequest )
+    public async Task<ActionResult<ApiReply<CategoryViewDto?>>> GetCategoriesView( [FromBody] UserRequest? request )
     {
-        ApiReply<ValidatedUserApiRequest<object?>> validateReply = await ValidateAdminRequest<object>( apiRequest );
+        ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
         if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
@@ -36,60 +36,60 @@ public sealed class AdminCategoryController : _AdminController
             : Ok( new ApiReply<CategoryViewDto?>( NO_DATA_MESSAGE ) );
     }
     [HttpPost("get-category-edit")]
-    public async Task<ActionResult<ApiReply<EditCategoryDto?>>> GetCategoryForEdit( [FromBody] UserApiRequest? apiRequest )
+    public async Task<ActionResult<ApiReply<EditCategoryDto?>>> GetCategoryForEdit( [FromBody] UserDataRequest<GetCategoryEditDto>? request )
     {
-        ApiReply<ValidatedUserApiRequest<GetCategoryEditDto?>> validateReply = await ValidateAdminRequest<GetCategoryEditDto>( apiRequest );
+        ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
-        if ( !validateReply.Success || validateReply.Data is null )
+        if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
 
         Func<GetCategoryEditDto, Task<EditCategoryDto?>> action = _repository.GetEditCategory;
-        ApiReply<EditCategoryDto?> result = await TryExecuteAdminRepoQuery<EditCategoryDto>( action, validateReply.Data );
+        ApiReply<EditCategoryDto?> result = await TryExecuteAdminRepoQuery<EditCategoryDto>( action, request!.Payload! );
 
         return result is { Success: true, Data: not null }
             ? Ok( new ApiReply<EditCategoryDto?>( result.Data ) )
             : Ok( new ApiReply<EditCategoryDto?>( NO_DATA_MESSAGE ) );
     }
     [HttpPost( "add-category" )]
-    public async Task<ActionResult<ApiReply<EditCategoryDto?>>> AddCategory( [FromBody] UserApiRequest? apiRequest )
+    public async Task<ActionResult<ApiReply<EditCategoryDto?>>> AddCategory( [FromBody] UserDataRequest<AddCategoryDto>? request )
     {
-        ApiReply<ValidatedUserApiRequest<AddCategoryDto?>> validateReply = await ValidateAdminRequest<AddCategoryDto>( apiRequest );
+        ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
-        if ( !validateReply.Success || validateReply.Data is null )
+        if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
 
         Func<AddCategoryDto, Task<EditCategoryDto?>> action = _repository.InsertCategory;
-        ApiReply<EditCategoryDto?> result = await TryExecuteAdminRepoQuery<EditCategoryDto>( action, validateReply.Data );
+        ApiReply<EditCategoryDto?> result = await TryExecuteAdminRepoQuery<EditCategoryDto>( action, request!.Payload );
 
         return result is { Success: true, Data: not null }
             ? Ok( new ApiReply<EditCategoryDto?>( result.Data ) )
             : Ok( new ApiReply<EditCategoryDto?>( result.Message ) );
     }
     [HttpPost( "update-category" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] UserApiRequest? apiRequest )
+    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] UserDataRequest<EditCategoryDto>? request )
     {
-        ApiReply<ValidatedUserApiRequest<EditCategoryDto?>> validateReply = await ValidateAdminRequest<EditCategoryDto>( apiRequest );
+        ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
-        if ( !validateReply.Success || validateReply.Data is null )
+        if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
         
         Func<EditCategoryDto, Task<bool>> action = _repository.UpdateCategory;
-        ApiReply<bool> result = await TryExecuteAdminRepoTransaction( action, validateReply.Data );
+        ApiReply<bool> result = await TryExecuteAdminRepoTransaction( action, request!.Payload );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )
             : Ok( new ApiReply<bool>( result.Message ) );
     }
     [HttpPost( "remove-category" )]
-    public async Task<ActionResult<ApiReply<bool>>> RemoveCategory( [FromBody] UserApiRequest? apiRequest )
+    public async Task<ActionResult<ApiReply<bool>>> RemoveCategory( [FromBody] UserDataRequest<RemoveCategoryDto>? request )
     {
-        ApiReply<ValidatedUserApiRequest<RemoveCategoryDto?>> validateReply = await ValidateAdminRequest<RemoveCategoryDto>( apiRequest );
+        ApiReply<int> validateReply = await ValidateAdminRequest( request );
 
-        if ( !validateReply.Success || validateReply.Data is null )
+        if ( !validateReply.Success )
             return BadRequest( validateReply.Message );
         
         Func<RemoveCategoryDto, Task<bool>> action = _repository.DeleteCategory;
-        ApiReply<bool> result = await TryExecuteAdminRepoTransaction( action, validateReply.Data );
+        ApiReply<bool> result = await TryExecuteAdminRepoTransaction( action, request!.Payload );
 
         return result.Success
             ? Ok( new ApiReply<bool>( true ) )

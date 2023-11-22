@@ -30,7 +30,7 @@ public sealed partial class AdminCategoriesEdit
 
         if ( !TryParseUrlParameters() )
         {
-            RazorViewMessage = ERROR_INVALID_URL_PARAMS;
+            Message = ERROR_INVALID_URL_PARAMS;
             Logger.LogError( ERROR_INVALID_URL_PARAMS );
             StartPageRedirection();
             return;
@@ -49,7 +49,7 @@ public sealed partial class AdminCategoriesEdit
         if ( !reply.Success || reply.Data is null )
         {
             Logger.LogError( reply.Message ??= "Failed to get category!" );
-            RazorViewMessage = reply.Message ??= "Failed to get category!";
+            Message = reply.Message ??= "Failed to get category!";
             StartPageRedirection();
             return;
         }
@@ -81,7 +81,24 @@ public sealed partial class AdminCategoriesEdit
 
         return parsed;
     }
-    
+    string GetCategoryTypeName()
+    {
+        return _categoryTier switch
+        {
+            1 => "Primary",
+            2 => "Secondary",
+            3 => "Tertiary",
+            _ => "Invalid category tier!"
+        };
+    }
+
+    async Task Submit()
+    {
+        if ( _newCategory )
+            await SubmitNew();
+        else
+            await SubmitEdit();
+    }
     async Task SubmitNew()
     {
         var request = new AddCategoryDto( _dto );
@@ -89,12 +106,16 @@ public sealed partial class AdminCategoriesEdit
 
         if ( !reply.Success || reply.Data is null )
         {
-            RazorViewMessage = reply.Message ??= "Failed to add category!";
+            MessageCssClass = MESSAGE_FAILURE_CLASS;
+            Message = $"Failed to add category! {reply.Message}";
             return;
         }
 
         _newCategory = false;
         _dto = reply.Data;
+
+        MessageCssClass = MESSAGE_SUCCESS_CLASS;
+        Message = $"Successfully add category.";
         
         StateHasChanged();
     }
@@ -103,9 +124,15 @@ public sealed partial class AdminCategoriesEdit
         ApiReply<bool> reply = await AdminCategoryService.UpdateCategory( _dto );
 
         if ( reply.Success )
+        {
+            MessageCssClass = MESSAGE_FAILURE_CLASS;
+            Message = $"Failed to update category! {reply.Message}";
             return;
-        
-        RazorViewMessage = reply.Message ??= "Failed to submit changes!";
+        }
 
+        MessageCssClass = MESSAGE_SUCCESS_CLASS;
+        Message = $"Successfully updated category.";
+        
+        StateHasChanged();
     }
 }
