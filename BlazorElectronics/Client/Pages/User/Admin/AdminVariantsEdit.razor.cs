@@ -54,7 +54,25 @@ public partial class AdminVariantsEdit : AdminView
         _dto = reply.Data;
         StateHasChanged();
     }
+    bool TryParseUrlParameters( out int variantId )
+    {
+        variantId = -1;
 
+        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
+        NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
+
+        string? newVariantString = queryString.Get( "newVariant" );
+        string? variantIdString = queryString.Get( "variantId" );
+
+        bool parsed = !string.IsNullOrWhiteSpace( newVariantString ) &&
+                      bool.TryParse( newVariantString, out _newVariant );
+        
+        if ( _newVariant )
+            return parsed;
+
+        return !string.IsNullOrWhiteSpace( variantIdString ) && int.TryParse( variantIdString, out variantId );
+    }
+    
     async Task Submit()
     {
         if ( _newVariant )
@@ -91,27 +109,5 @@ public partial class AdminVariantsEdit : AdminView
 
         SetActionMessage( true, $"Successfully updated variant." );
         StateHasChanged();
-    }
-
-    bool TryParseUrlParameters( out int variantId )
-    {
-        variantId = -1;
-        
-        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
-        NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
-
-        string? newVariantString = queryString.Get( "newVariant" );
-        string? variantIdString = queryString.Get( "variantId" );
-
-        bool parsed = !string.IsNullOrWhiteSpace( newVariantString ) &&
-                      bool.TryParse( newVariantString, out _newVariant );
-
-        if ( !parsed )
-            return false;
-
-        if ( _newVariant ) 
-            return parsed;
-        
-        return !string.IsNullOrWhiteSpace( variantIdString ) && int.TryParse( variantIdString, out variantId );
     }
 }

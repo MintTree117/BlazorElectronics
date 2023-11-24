@@ -12,9 +12,6 @@ public sealed partial class AdminCategoriesEdit : AdminView
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
     
     bool _newCategory;
-    int _categoryId = -1;
-    CategoryType _categoryType = CategoryType.PRIMARY;
-
     CategoryEditDto _dto = new();
     
     protected override async Task OnInitializedAsync()
@@ -28,7 +25,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
             return;
         }
 
-        if ( !TryParseUrlParameters() )
+        if ( !TryParseUrlParameters( out CategoryType type, out int id ) )
         {
             SetViewMessage( false, ERROR_INVALID_URL_PARAMS );
             Logger.LogError( ERROR_INVALID_URL_PARAMS );
@@ -39,11 +36,11 @@ public sealed partial class AdminCategoriesEdit : AdminView
         if ( _newCategory )
         {
             PageIsLoaded = true;
-            _dto.Type = _categoryType;
+            _dto.Type = type;
             return;
         }
 
-        var request = new CategoryGetEditDto( _categoryType, _categoryId );
+        var request = new CategoryGetEditDto( type, id );
         ApiReply<CategoryEditDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
 
         if ( !reply.Success || reply.Data is null )
@@ -56,12 +53,13 @@ public sealed partial class AdminCategoriesEdit : AdminView
         
         PageIsLoaded = true;
         _dto = reply.Data;
-        Logger.LogError( _dto.Type.ToString() );
         StateHasChanged();
     }
-    
-    bool TryParseUrlParameters()
+    bool TryParseUrlParameters( out CategoryType categoryType, out int categoryId )
     {
+        categoryType = CategoryType.PRIMARY;
+        categoryId = -1;
+        
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
 
@@ -70,17 +68,14 @@ public sealed partial class AdminCategoriesEdit : AdminView
         string? categoryTierString = queryString.Get( "categoryTier" );
 
         bool parsed = !string.IsNullOrWhiteSpace( categoryTierString ) &&
-                      Enum.TryParse( categoryTierString, out _categoryType ) &&
+                      Enum.TryParse( categoryTierString, out categoryType ) &&
                       !string.IsNullOrWhiteSpace( newCategoryString ) &&
                       bool.TryParse( newCategoryString, out _newCategory );
 
-        if ( !parsed )
-            return false;
-
-        if ( !_newCategory )
-            parsed = !string.IsNullOrWhiteSpace( categoryIdString ) && int.TryParse( categoryIdString, out _categoryId );
-
-        return parsed;
+        if ( _newCategory )
+            return parsed;
+        
+        return !string.IsNullOrWhiteSpace( categoryIdString ) && int.TryParse( categoryIdString, out categoryId );
     }
 
     async Task Submit()

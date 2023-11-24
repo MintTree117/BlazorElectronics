@@ -12,10 +12,7 @@ public sealed partial class AdminSpecsEdit : AdminView
     [Inject] IAdminSpecsServiceClient AdminSpecService { get; set; } = default!;
     
     SpecLookupEditDto _dto = new();
-    
     bool _newSpec;
-    int _specId;
-    SpecLookupType _specType;
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,7 +26,7 @@ public sealed partial class AdminSpecsEdit : AdminView
             return;
         }
 
-        if ( !TryParseUrlParameters() )
+        if ( !TryParseUrlParameters( out int specId, out SpecLookupType specType ) )
         {
             SetViewMessage( false, ERROR_INVALID_URL_PARAMS );
             Logger.LogError( ERROR_INVALID_URL_PARAMS );
@@ -40,11 +37,11 @@ public sealed partial class AdminSpecsEdit : AdminView
         if ( _newSpec )
         {
             PageIsLoaded = true;
-            _dto.SpecType = _specType;
+            _dto.SpecType = specType;
             return;
         }
 
-        var request = new SpecLookupGetEditDto( _specType, _specId );
+        var request = new SpecLookupGetEditDto( specType, specId );
         ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( request );
 
         if ( !reply.Success || reply.Data is null )
@@ -59,9 +56,11 @@ public sealed partial class AdminSpecsEdit : AdminView
         _dto = reply.Data;
         StateHasChanged();
     }
-    
-    bool TryParseUrlParameters()
+    bool TryParseUrlParameters( out int specId, out SpecLookupType specType )
     {
+        specId = -1;
+        specType = SpecLookupType.INT;
+        
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
 
@@ -70,17 +69,14 @@ public sealed partial class AdminSpecsEdit : AdminView
         string? specTypeString = queryString.Get( "specType" );
 
         bool parsed = !string.IsNullOrWhiteSpace( specTypeString ) &&
-                      Enum.TryParse( specTypeString, out _specType ) &&
+                      Enum.TryParse( specTypeString, out specType ) &&
                       !string.IsNullOrWhiteSpace( newSpecString ) &&
                       bool.TryParse( newSpecString, out _newSpec );
 
-        if ( !parsed )
-            return false;
-
-        if ( !_newSpec )
-            parsed = !string.IsNullOrWhiteSpace( specIdString ) && int.TryParse( specIdString, out _specId );
-
-        return parsed;
+        if ( _newSpec )
+            return parsed;
+        
+        return !string.IsNullOrWhiteSpace( specIdString ) && int.TryParse( specIdString, out specId );
     }
 
     async Task Submit()
@@ -101,7 +97,6 @@ public sealed partial class AdminSpecsEdit : AdminView
         }
 
         _dto.SpecId = reply.Data;
-        _specId = _dto.SpecId;
         _newSpec = false;
         
         SetActionMessage( true, "Successfully added spec." );

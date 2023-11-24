@@ -32,7 +32,7 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
     }
     public async Task<int> Insert( VariantAddDto dto )
     {
-        DynamicParameters parameters = GetInsertParameters( dto.VariantName, dto.VariantValues );
+        DynamicParameters parameters = GetInsertParameters( dto.PrimaryCategoryId, dto.VariantName, dto.VariantValues );
         return await TryQueryTransactionAsync( InsertQuery, parameters );
     }
     public async Task<bool> Update( VariantEditDto dto )
@@ -88,19 +88,20 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
        return rowsAffected > 0;
     }
     
-    static DynamicParameters GetInsertParameters( string name, string values )
+    static DynamicParameters GetInsertParameters( int primaryCategory, string name, string values )
     {
         var parameters = new DynamicParameters();
         
         DataTable valuesTableParam = GetStringValuesTable( values, TVP_COL_VARIANT_VALUE_ID, TVP_COL_VARIANT_VALUE );
         parameters.Add( PARAM_VARIANT_VALUES, valuesTableParam.AsTableValuedParameter( TVP_VARIANT_VALUES ) );
         parameters.Add( PARAM_VARIANT_NAME, name );
+        parameters.Add( PARAM_CATEGORY_PRIMARY_ID, primaryCategory );
         
         return parameters;
     }
     static DynamicParameters GetUpdateParameters( VariantEditDto dto )
     {
-        DynamicParameters parameters = GetInsertParameters( dto.VariantName, dto.VariantValues );
+        DynamicParameters parameters = GetInsertParameters( dto.PrimaryCategoryId, dto.VariantName, dto.VariantValues );
         parameters.Add( PARAM_VARIANT_ID, dto.VariantId );
         return parameters;
     }

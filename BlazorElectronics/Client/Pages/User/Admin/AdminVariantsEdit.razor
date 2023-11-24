@@ -32,6 +32,10 @@
                 <InputText @bind-Value="_dto.VariantName" class="form-control" id="Name"></InputText>
             </div>
             <div class="mb-3">
+                <label for="Category" class="form-label">Primary Category Id</label>
+                <InputNumber @bind-Value="_dto.PrimaryCategoryId" class="form-control" id="Category"></InputNumber>
+            </div>
+            <div class="mb-3">
                 <label for="Values" class="form-label">Values, Separate by Comma</label>
                 <InputTextArea @bind-Value="_dto.VariantValues" class="form-control" id="Values"></InputTextArea>
             </div>
