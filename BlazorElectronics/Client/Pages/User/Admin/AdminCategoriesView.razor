@@ -41,7 +41,7 @@ else
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-            @foreach ( CategoryPrimaryViewDto p in _category.Primary )
+            @foreach ( CategoryPrimaryViewDto p in _categorieses.Primary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
@@ -68,7 +68,7 @@ else
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-            @foreach ( CategorySecondaryViewDto s in _category.Secondary )
+            @foreach ( CategorySecondaryViewDto s in _categorieses.Secondary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">
@@ -95,7 +95,7 @@ else
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-            @foreach ( CategoryTertiaryViewDto t in _category.Tertiary )
+            @foreach ( CategoryTertiaryViewDto t in _categorieses.Tertiary )
             {
                 <div class="row admin-view-row align-items-center">
                     <div class="col">

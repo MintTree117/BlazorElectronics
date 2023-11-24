@@ -1,12 +1,12 @@
 namespace BlazorElectronics.Shared.Admin.Categories;
 
-public sealed class AddCategoryDto
+public sealed class CategoryAddDto
 {
-    public AddCategoryDto()
+    public CategoryAddDto()
     {
         
     }
-    public AddCategoryDto( EditCategoryDto dto )
+    public CategoryAddDto( CategoryEditDto dto )
     {
         Name = dto.Name;
         Type = dto.Type;

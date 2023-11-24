@@ -1,126 +1,11 @@
 using System.Data;
-using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories;
-using Dapper;
-using Microsoft.Data.SqlClient;
-
 namespace BlazorElectronics.Server.Admin.Repositories;
 
 public class _AdminRepository : DapperRepository
 {
     protected _AdminRepository( DapperContext dapperContext ) : base( dapperContext ) { }
-
-    protected async Task<T?> TryAdminQueryMulti<T>( string procedure, DynamicParameters paramters )
-    {
-        SqlConnection connection = await _dbContext.GetOpenConnection();
-
-        try
-        {
-            var result = await connection.QuerySingleOrDefaultAsync<T>( procedure, paramters, commandType: CommandType.StoredProcedure );
-            await connection.CloseAsync();
-            return result;
-        }
-        catch ( SqlException sqlEx )
-        {
-            await connection.CloseAsync();
-            throw new ServiceException( sqlEx.Message, sqlEx );
-        }
-        catch ( TimeoutException timeoutEx )
-        {
-            await connection.CloseAsync();
-            throw new ServiceException( timeoutEx.Message, timeoutEx );
-        }
-        catch ( Exception ex )
-        {
-            await connection.CloseAsync();
-            throw new ServiceException( ex.Message, ex );
-        }
-    }    
-    protected async Task<T?> TryAdminQuerySingle<T>( string procedure, DynamicParameters paramters )
-    {
-        SqlConnection connection = await _dbContext.GetOpenConnection();
-
-        try
-        {
-            var result = await connection.QuerySingleOrDefaultAsync<T>( procedure, paramters, commandType: CommandType.StoredProcedure );
-            await connection.CloseAsync();
-            return result;
-        }
-        catch ( SqlException sqlEx )
-        {
-            await connection.CloseAsync();
-            throw new ServiceException( sqlEx.Message, sqlEx );
-        }
-        catch ( TimeoutException timeoutEx )
-        {
-            await connection.CloseAsync();
-            throw new ServiceException( timeoutEx.Message, timeoutEx );
-        }
-        catch ( Exception ex )
-        {
-            await connection.CloseAsync();
-            throw new ServiceException( ex.Message, ex );
-        }
-    }
-    protected async Task<T?> TryAdminQueryTransaction<T>( string procedure, DynamicParameters paramters )
-    {
-        SqlConnection connection = await _dbContext.GetOpenConnection();
-        DbTransaction transaction = await connection.BeginTransactionAsync();
-
-        try
-        {
-            var result = await connection.QuerySingleOrDefaultAsync<T>( procedure, paramters, transaction, commandType: CommandType.StoredProcedure );
-            await transaction.CommitAsync();
-            await transaction.DisposeAsync();
-            await connection.CloseAsync();
-            return result;
-        }
-        catch ( SqlException sqlEx )
-        {
-            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-            throw new ServiceException( sqlEx.Message, sqlEx );
-        }
-        catch ( TimeoutException timeoutEx )
-        {
-            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-            throw new ServiceException( timeoutEx.Message, timeoutEx );
-        }
-        catch ( Exception ex )
-        {
-            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-            throw new ServiceException( ex.Message, ex );
-        }
-    }
-    protected async Task<bool> TryAdminTransaction( string procedure, DynamicParameters paramters )
-    {
-        SqlConnection connection = await _dbContext.GetOpenConnection();
-        DbTransaction transaction = await connection.BeginTransactionAsync();
-
-        try
-        {
-            int result = await connection.ExecuteAsync( procedure, paramters, transaction, commandType: CommandType.StoredProcedure ).ConfigureAwait( false );
-            await transaction.CommitAsync();
-            await transaction.DisposeAsync();
-            await connection.CloseAsync();
-            return result > 0;
-        }
-        catch ( SqlException sqlEx )
-        {
-            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-            throw new ServiceException( sqlEx.Message, sqlEx );
-        }
-        catch ( TimeoutException timeoutEx )
-        {
-            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-            throw new ServiceException( timeoutEx.Message, timeoutEx );
-        }
-        catch ( Exception ex )
-        {
-            await HandleConnectionTransactionRollbackDisposal( connection, transaction );
-            throw new ServiceException( ex.Message, ex );
-        }
-    }
     
     protected static DataTable GetPrimaryCategoriesTable( string categoriesString )
     {
@@ -138,10 +23,32 @@ public class _AdminRepository : DapperRepository
         }
 
         var table = new DataTable();
-        table.Columns.Add( "PrimaryCategoryId", typeof( int ) );
+        table.Columns.Add( COL_CATEGORY_PRIMARY_ID, typeof( int ) );
 
         foreach ( int id in categories )
             table.Rows.Add( id );
+
+        return table;
+    }
+    protected static DataTable GetStringValuesTable( string valuesString, string idCol, string valueCol )
+    {
+        List<string> values = valuesString
+            .Split( ',' )
+            .Select( s => s.Trim() ) // Trims whitespace from each item.
+            .ToList();
+
+        var table = new DataTable();
+
+        table.Columns.Add( idCol, typeof( int ) );
+        table.Columns.Add( valueCol, typeof( string ) );
+
+        for ( int i = 0; i < values.Count; i++ )
+        {
+            DataRow row = table.NewRow();
+            row[ idCol ] = i + 1;
+            row[ valueCol ] = values[ i ];
+            table.Rows.Add( row );
+        }
 
         return table;
     }

@@ -16,24 +16,24 @@ public sealed class AdminCategoryServiceClient : AdminServiceClient, IAdminCateg
     public AdminCategoryServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public async Task<ApiReply<CategoryViewDto?>> GetCategoriesView()
+    public async Task<ApiReply<CategoriesViewDto?>> GetCategoriesView()
     {
-        return await TryUserRequest<CategoryViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<CategoriesViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<EditCategoryDto?>> GetCategoryEdit( GetCategoryEditDto data )
+    public async Task<ApiReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data )
     {
-        return await TryUserRequest<GetCategoryEditDto,EditCategoryDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<CategoryGetEditDto,CategoryEditDto?>( API_ROUTE_GET_EDIT, data );
     }
-    public async Task<ApiReply<EditCategoryDto?>> AddCategory( AddCategoryDto data )
+    public async Task<ApiReply<CategoryEditDto?>> AddCategory( CategoryAddDto data )
     {
-        return await TryUserRequest<AddCategoryDto,EditCategoryDto?>( API_ROUTE_ADD, data );
+        return await TryUserRequest<CategoryAddDto,CategoryEditDto?>( API_ROUTE_ADD, data );
     }
-    public async Task<ApiReply<bool>> UpdateCategory( EditCategoryDto data )
+    public async Task<ApiReply<bool>> UpdateCategory( CategoryEditDto data )
     {
-        return await TryUserRequest<EditCategoryDto,bool>( API_ROUTE_UPDATE, data );
+        return await TryUserRequest<CategoryEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> RemoveCategory( RemoveCategoryDto data )
+    public async Task<ApiReply<bool>> RemoveCategory( CategoryRemoveDto data )
     {
-        return await TryUserRequest<RemoveCategoryDto,bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<CategoryRemoveDto,bool>( API_ROUTE_REMOVE, data );
     }
 }

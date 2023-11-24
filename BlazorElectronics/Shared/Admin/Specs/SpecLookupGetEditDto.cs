@@ -1,12 +1,12 @@
 namespace BlazorElectronics.Shared.Admin.Specs;
 
-public sealed class GetSpecLookupEditDto
+public sealed class SpecLookupGetEditDto
 {
-    public GetSpecLookupEditDto()
+    public SpecLookupGetEditDto()
     {
         
     }
-    public GetSpecLookupEditDto( SpecLookupType type, int id )
+    public SpecLookupGetEditDto( SpecLookupType type, int id )
     {
         SpecType = type;
         SpedId = id;

@@ -27,34 +27,6 @@ public class ProductController : ControllerBase
         _categoryService = categoryService;
         _specLookupService = specLookupService;
     }
-    
-    // TESTING
-    [HttpGet( "searchQueryBoth/{categoryUrl}/{searchText}" )]
-    public async Task<ActionResult<ApiReply<Products_DTO>>> GetSearchQuery( string categoryUrl, string searchText, [FromQuery] ProductSearchRequest? searchRequest )
-    {
-        /*searchRequest ??= new ProductSearchFilters();
-
-        Reply<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
-        return Ok( response );*/
-
-        return BadRequest();
-    }
-    [HttpGet( "searchQuery/{categoryUrl}" )]
-    public async Task<ActionResult<ApiReply<Products_DTO>>> GetSearchQuery( string categoryUrl, [FromQuery] ProductSearchRequest? searchRequest )
-    {
-        /*if ( searchRequest == null )
-            return BadRequest( new Reply<Products_DTO>( "Search request is null!" ) );
-
-        Reply<int> categoryResponse = await _categoryService.GetCategoryIdMapFromUrl( categoryUrl );
-
-        if ( !categoryResponse.Success )
-            return BadRequest( new Reply<Products_DTO>( "Invalid category!" ) );
-
-        Reply<string?> response = await _productService.GetProductSearchQueryString( searchRequest );
-        return Ok( response );*/
-        return BadRequest();
-    }
-    // END TESTING
 
     [HttpPost( "suggestions" )]
     public async Task<ActionResult<ApiReply<ProductSuggestionsResponse>>> GetProductSeachSuggestions( [FromBody] ProductSuggestionRequest request )

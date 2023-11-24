@@ -11,7 +11,7 @@ public sealed partial class AdminCategoriesView : AdminView
     
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
 
-    CategoryViewDto _category = new();
+    CategoriesViewDto _categorieses = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,7 +37,7 @@ public sealed partial class AdminCategoriesView : AdminView
     }
     async Task RemoveCategory( int categoryId, CategoryType categoryType )
     {
-        var dto = new RemoveCategoryDto( categoryId, categoryType );
+        var dto = new CategoryRemoveDto( categoryId, categoryType );
         ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
 
         if ( !result.Success )
@@ -54,7 +54,7 @@ public sealed partial class AdminCategoriesView : AdminView
     {
         PageIsLoaded = false;
         
-        ApiReply<CategoryViewDto?> reply = await AdminCategoryService.GetCategoriesView();
+        ApiReply<CategoriesViewDto?> reply = await AdminCategoryService.GetCategoriesView();
 
         PageIsLoaded = true;
 
@@ -65,7 +65,7 @@ public sealed partial class AdminCategoriesView : AdminView
             return;
         }
         
-        _category = reply.Data;
+        _categorieses = reply.Data;
         ViewMessage = string.Empty;
     }
 }

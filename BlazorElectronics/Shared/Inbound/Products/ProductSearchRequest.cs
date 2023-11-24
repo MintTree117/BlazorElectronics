@@ -6,7 +6,8 @@ public class ProductSearchRequest
     public int Rows { get; set; } = 10;
 
     public string? SearchText { get; set; } = null;
-    
+
+    public bool InStock { get; set; } = false;
     public bool MustHaveSale { get; set; } = false;
     
     public int? MinPrice { get; set; } = null;

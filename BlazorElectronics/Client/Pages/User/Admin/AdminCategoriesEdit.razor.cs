@@ -15,7 +15,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
     int _categoryId = -1;
     CategoryType _categoryType = CategoryType.PRIMARY;
 
-    EditCategoryDto _dto = new();
+    CategoryEditDto _dto = new();
     
     protected override async Task OnInitializedAsync()
     {
@@ -43,8 +43,8 @@ public sealed partial class AdminCategoriesEdit : AdminView
             return;
         }
 
-        var request = new GetCategoryEditDto( _categoryType, _categoryId );
-        ApiReply<EditCategoryDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
+        var request = new CategoryGetEditDto( _categoryType, _categoryId );
+        ApiReply<CategoryEditDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
 
         if ( !reply.Success || reply.Data is null )
         {
@@ -92,8 +92,8 @@ public sealed partial class AdminCategoriesEdit : AdminView
     }
     async Task SubmitNew()
     {
-        var request = new AddCategoryDto( _dto );
-        ApiReply<EditCategoryDto?> reply = await AdminCategoryService.AddCategory( request );
+        var request = new CategoryAddDto( _dto );
+        ApiReply<CategoryEditDto?> reply = await AdminCategoryService.AddCategory( request );
         
         if ( !reply.Success || reply.Data is null )
         {

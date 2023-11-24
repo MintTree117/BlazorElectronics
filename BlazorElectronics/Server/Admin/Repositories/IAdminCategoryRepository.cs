@@ -4,9 +4,9 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 
 public interface IAdminCategoryRepository
 {
-    Task<CategoryViewDto?> GetCategoriesView();
-    Task<EditCategoryDto?> GetEditCategory( GetCategoryEditDto request );
-    Task<EditCategoryDto?> InsertCategory( AddCategoryDto dto );
-    Task<bool> UpdateCategory( EditCategoryDto dto );
-    Task<bool> DeleteCategory( RemoveCategoryDto dto );
+    Task<CategoriesViewDto?> GetView();
+    Task<CategoryEditDto?> GetEdit( CategoryGetEditDto request );
+    Task<CategoryEditDto?> Insert( CategoryAddDto dto );
+    Task<bool> Update( CategoryEditDto dto );
+    Task<bool> Delete( CategoryRemoveDto dto );
 }

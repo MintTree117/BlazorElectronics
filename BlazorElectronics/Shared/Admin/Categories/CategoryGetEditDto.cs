@@ -1,12 +1,12 @@
 namespace BlazorElectronics.Shared.Admin.Categories;
 
-public sealed class GetCategoryEditDto
+public sealed class CategoryGetEditDto
 {
-    public GetCategoryEditDto()
+    public CategoryGetEditDto()
     {
         
     }
-    public GetCategoryEditDto( CategoryType type, int id )
+    public CategoryGetEditDto( CategoryType type, int id )
     {
         CategoryType = type;
         CategoryId = id;

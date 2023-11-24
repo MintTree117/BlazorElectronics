@@ -20,20 +20,20 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     {
         return await TryUserRequest<SpecsViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<EditSpecLookupDto?>> GetEdit( GetSpecLookupEditDto data )
+    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( SpecLookupGetEditDto data )
     {
-        return await TryUserRequest<GetSpecLookupEditDto,EditSpecLookupDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<SpecLookupGetEditDto,SpecLookupEditDto?>( API_ROUTE_GET_EDIT, data );
     }
-    public async Task<ApiReply<int>> Add( EditSpecLookupDto data )
+    public async Task<ApiReply<int>> Add( SpecLookupEditDto data )
     {
-        return await TryUserRequest<EditSpecLookupDto,int>( API_ROUTE_ADD, data );
+        return await TryUserRequest<SpecLookupEditDto,int>( API_ROUTE_ADD, data );
     }
-    public async Task<ApiReply<bool>> Update( EditSpecLookupDto data )
+    public async Task<ApiReply<bool>> Update( SpecLookupEditDto data )
     {
-        return await TryUserRequest<EditSpecLookupDto,bool>( API_ROUTE_UPDATE, data );
+        return await TryUserRequest<SpecLookupEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> Remove( RemoveSpecLookupDto data )
+    public async Task<ApiReply<bool>> Remove( SpecLookupRemoveDto data )
     {
-        return await TryUserRequest<RemoveSpecLookupDto,bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<SpecLookupRemoveDto,bool>( API_ROUTE_REMOVE, data );
     }
 }

@@ -4,9 +4,9 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 
 public interface IAdminSpecLookupRepository
 {
-    Task<SpecsViewDto?> GetSpecsView();
-    Task<EditSpecLookupDto?> GetSpecEdit( GetSpecLookupEditDto dto );
-    Task<int> Insert( EditSpecLookupDto dto );
-    Task<bool> Update( EditSpecLookupDto dto );
-    Task<bool> Delete( RemoveSpecLookupDto dto );
+    Task<SpecsViewDto?> GetView();
+    Task<SpecLookupEditDto?> GetEdit( SpecLookupGetEditDto dto );
+    Task<int> Insert( SpecLookupEditDto dto );
+    Task<bool> Update( SpecLookupEditDto dto );
+    Task<bool> Delete( SpecLookupRemoveDto dto );
 }

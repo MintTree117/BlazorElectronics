@@ -1,0 +1,21 @@
+@page "/admin/products/view/{primary}/{secondary}/{tertiary}"
+@page "/admin/products/view/{primary}/{secondary}"
+@page "/admin/products/view/{primary}"
+@page "/admin/products/view"
+
+@inherits AdminView
+
+@using BlazorElectronics.Client.Shared
+
+<h3>AdminProductsView</h3>
+
+<div class="container-md">
+    <div class="row">
+        <div class="col-3">
+            <ProductFilters></ProductFilters>
+        </div>
+        <div class="col-9">
+            <ProductSort></ProductSort>
+        </div>
+    </div>
+</div>

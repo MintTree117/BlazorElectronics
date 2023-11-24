@@ -1,13 +1,13 @@
 namespace BlazorElectronics.Shared.Admin.Specs;
 
-public sealed class RemoveSpecLookupDto
+public sealed class SpecLookupRemoveDto
 {
-    public RemoveSpecLookupDto()
+    public SpecLookupRemoveDto()
     {
         
     }
 
-    public RemoveSpecLookupDto( SpecLookupType type, int id )
+    public SpecLookupRemoveDto( SpecLookupType type, int id )
     {
         SpecType = type;
         SpecId = id;

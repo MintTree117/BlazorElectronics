@@ -11,7 +11,7 @@ public sealed partial class AdminSpecsEdit : AdminView
 {
     [Inject] IAdminSpecsServiceClient AdminSpecService { get; set; } = default!;
     
-    EditSpecLookupDto _dto = new();
+    SpecLookupEditDto _dto = new();
     
     bool _newSpec;
     int _specId;
@@ -44,8 +44,8 @@ public sealed partial class AdminSpecsEdit : AdminView
             return;
         }
 
-        var request = new GetSpecLookupEditDto( _specType, _specId );
-        ApiReply<EditSpecLookupDto?> reply = await AdminSpecService.GetEdit( request );
+        var request = new SpecLookupGetEditDto( _specType, _specId );
+        ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( request );
 
         if ( !reply.Success || reply.Data is null )
         {

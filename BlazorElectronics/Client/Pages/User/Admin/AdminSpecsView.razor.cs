@@ -37,7 +37,7 @@ public sealed partial class AdminSpecsView : AdminView
     }
     async Task RemoveSpec( SpecLookupType specType, int specId )
     {
-        var dto = new RemoveSpecLookupDto( specType, specId );
+        var dto = new SpecLookupRemoveDto( specType, specId );
         ApiReply<bool> reply = await AdminSpecsService.Remove( dto );
 
         if ( !reply.Success )

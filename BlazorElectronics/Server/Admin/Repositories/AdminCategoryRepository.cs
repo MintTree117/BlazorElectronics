@@ -1,4 +1,5 @@
 using System.Data;
+using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Shared.Admin.Categories;
 using Dapper;
@@ -9,62 +10,60 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepository
 {
     const string PROCEDURE_GET_VIEW = "Get_CategoriesView";
-    static readonly string[] PROCEDURES_GET_CATEGORY = { "Get_CategoryPrimaryEdit", "Get_CategorySecondaryEdit", "Get_CategoryTertiaryEdit" };
-    static readonly string[] PROCEDURES_INSERT_CATEGORY = { "Insert_CategoryPrimary", "Insert_CategorySecondary", "Insert_CategoryTertiary" };
-    static readonly string[] PROCEDURES_UPDATE_CATEGORY = { "Update_CategoryPrimary", "Update_CategorySecondary", "Update_CategoryTertiary" };
-    static readonly string[] PROCEDURES_DELETE_CATEGORY = { "Delete_CategoryPrimary", "Delete_CategorySecondary", "Delete_CategoryTertiary" };
+    static readonly string[] PROCEDURES_GET_EDIT = { "Get_CategoryPrimaryEdit", "Get_CategorySecondaryEdit", "Get_CategoryTertiaryEdit" };
+    static readonly string[] PROCEDURES_INSERT = { "Insert_CategoryPrimary", "Insert_CategorySecondary", "Insert_CategoryTertiary" };
+    static readonly string[] PROCEDURES_UPDATE = { "Update_CategoryPrimary", "Update_CategorySecondary", "Update_CategoryTertiary" };
+    static readonly string[] PROCEDURES_DELETE = { "Delete_CategoryPrimary", "Delete_CategorySecondary", "Delete_CategoryTertiary" };
     
     public AdminCategoryRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
-    public Task<CategoryViewDto?> GetCategoriesView()
+    public async Task<CategoriesViewDto?> GetView()
     {
-        return TryQueryAsync( GetCategoriesViewQuery );
+        return await TryQueryAsync( GetViewQuery );
     }
-    public async Task<EditCategoryDto?> GetEditCategory( GetCategoryEditDto request )
+    public async Task<CategoryEditDto?> GetEdit( CategoryGetEditDto request )
     {
-        string procedure = GetProcedure( PROCEDURES_GET_CATEGORY, request.CategoryType );
+        string procedure = GetProcedure( PROCEDURES_GET_EDIT, request.CategoryType );
         DynamicParameters parameters = GetEditParameters( request );
 
-        var result = await TryAdminQuerySingle<EditCategoryDto>( procedure, parameters );
+        CategoryEditDto? result = await TryQueryAsync( GetEditQuery, parameters, procedure );
 
         if ( result is null )
             return null;
         
         result.Type = request.CategoryType;
-
         return result;
     }
-    public async Task<EditCategoryDto?> InsertCategory( AddCategoryDto dto )
+    public async Task<CategoryEditDto?> Insert( CategoryAddDto dto )
     {
-        string procedure = GetProcedure( PROCEDURES_INSERT_CATEGORY, dto.Type );
+        string procedure = GetProcedure( PROCEDURES_INSERT, dto.Type );
         DynamicParameters parameters = GetAddParameters( dto );
 
-        var result = await TryAdminQueryTransaction<EditCategoryDto>( procedure, parameters );
+        CategoryEditDto? result = await TryQueryTransactionAsync( InsertQuery, parameters, procedure );
 
         if ( result is null )
             return null;
 
         result.Type = dto.Type;
-
         return result;
     }
-    public async Task<bool> UpdateCategory( EditCategoryDto dto )
+    public async Task<bool> Update( CategoryEditDto dto )
     {
-        string procedure = GetProcedure( PROCEDURES_UPDATE_CATEGORY, dto.Type );
+        string procedure = GetProcedure( PROCEDURES_UPDATE, dto.Type );
         DynamicParameters parameters = GetUpdateParameters( dto );
 
-        return await TryAdminTransaction( procedure, parameters );
+        return await TryQueryTransactionAsync( UpdateQuery, parameters, procedure );
     }
-    public async Task<bool> DeleteCategory( RemoveCategoryDto dto )
+    public async Task<bool> Delete( CategoryRemoveDto dto )
     {
-        string procedure = GetProcedure( PROCEDURES_DELETE_CATEGORY, dto.CategoryType );
+        string procedure = GetProcedure( PROCEDURES_DELETE, dto.CategoryType );
         DynamicParameters parameters = GetDeleteParameters( dto );
-        
-        return await TryAdminTransaction( procedure, parameters );
-    }
 
-    static async Task<CategoryViewDto?> GetCategoriesViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? parameters )
+        return await TryQueryTransactionAsync( DeleteQuery, parameters, procedure );
+    }
+    
+    static async Task<CategoriesViewDto?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? parameters )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_VIEW, commandType: CommandType.StoredProcedure );
 
@@ -75,14 +74,32 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         IEnumerable<CategorySecondaryViewDto>? secondary = await multi.ReadAsync<CategorySecondaryViewDto>();
         IEnumerable<CategoryTertiaryViewDto>? tertiary = await multi.ReadAsync<CategoryTertiaryViewDto>();
 
-        return new CategoryViewDto
+        return new CategoriesViewDto
         {
             Primary = primary is not null ? primary.ToList() : new List<CategoryPrimaryViewDto>(),
             Secondary = secondary is not null ? secondary.ToList() : new List<CategorySecondaryViewDto>(),
             Tertiary = tertiary is not null ? tertiary.ToList() : new List<CategoryTertiaryViewDto>()
         };
     }
-
+    static async Task<CategoryEditDto?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? parameters )
+    {
+        return await connection.QuerySingleOrDefaultAsync<CategoryEditDto>( dynamicSql, parameters, commandType: CommandType.StoredProcedure );
+    }
+    static async Task<CategoryEditDto?> InsertQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? parameters )
+    {
+        return await connection.QuerySingleOrDefaultAsync<CategoryEditDto>( dynamicSql, parameters, transaction, commandType: CommandType.StoredProcedure );
+    }
+    static async Task<bool> UpdateQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? parameters )
+    {
+        int rowsAffected = await connection.ExecuteAsync( dynamicSql, parameters, transaction, commandType: CommandType.StoredProcedure );
+        return rowsAffected > 0;
+    }
+    static async Task<bool> DeleteQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? parameters )
+    {
+        int rowsAffected = await connection.ExecuteAsync( dynamicSql, parameters, transaction, commandType: CommandType.StoredProcedure );
+        return rowsAffected > 0;
+    }
+    
     static string GetProcedure( string[] procedures, CategoryType type )
     {
         int index = ( int ) type - 1;
@@ -92,7 +109,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         
         return procedures[ index ];
     }
-    static DynamicParameters GetEditParameters( GetCategoryEditDto request )
+    static DynamicParameters GetEditParameters( CategoryGetEditDto request )
     {
         var parameters = new DynamicParameters();
 
@@ -107,7 +124,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         parameters.Add( categoryIdName, request.CategoryId );
         return parameters;
     }
-    static DynamicParameters GetAddParameters( AddCategoryDto dto )
+    static DynamicParameters GetAddParameters( CategoryAddDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_CATEGORY_NAME, dto.Name );
@@ -128,7 +145,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         
         return parameters;
     }
-    static DynamicParameters GetUpdateParameters( EditCategoryDto dto )
+    static DynamicParameters GetUpdateParameters( CategoryEditDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_CATEGORY_NAME, dto.Name );
@@ -154,7 +171,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         
         return parameters;
     }
-    static DynamicParameters GetDeleteParameters( RemoveCategoryDto dto )
+    static DynamicParameters GetDeleteParameters( CategoryRemoveDto dto )
     {
         var parameters = new DynamicParameters();
         

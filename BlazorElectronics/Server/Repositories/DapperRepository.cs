@@ -130,9 +130,9 @@ public abstract class DapperRepository
     protected const string PARAM_FILTER_VALUES = "@FilterValues";
     protected const string PARAM_SPEC_VALUES = "@SpecValues";
 
-    protected const string PARAM_TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
-    protected const string PARAM_TVP_SPEC_VALUES = "TVP_SpecLookupStringValues";
-    protected const string PARAM_TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
+    protected const string TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
+    protected const string TVP_SPEC_VALUES = "TVP_SpecLookupStringValues";
+    protected const string TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
     
     protected const string TVP_COL_SPEC_ID = "SpecValueId";
     protected const string TVP_COL_FILTER_ID = "FilterValueId";
@@ -158,13 +158,20 @@ public abstract class DapperRepository
     
     // PARAM PRODUCT
     protected const string PARAM_PRODUCT_ID = "@ProductId";
-    protected const string PARAM_VARIANT_ID = "@VariantId";
-    
+
     // PARAM CART
     protected const string PARAM_ITEM_QUANTITY = "@CartItemQuantity";
     protected const string PARAM_CART_PRODUCT_IDS = "@CartProductIds";
     protected const string PARAM_CART_VARIANT_IDS = "@CartVariantIds";
     protected const string PARAM_CART_ITEMS = "@CartItems";
+    
+    // PARAM VARIANTS
+    protected const string PARAM_VARIANT_ID = "@VariantId";
+    protected const string PARAM_VARIANT_NAME = "@VariantName";
+    protected const string PARAM_VARIANT_VALUES = "@VariantValues";
+    protected const string TVP_VARIANT_VALUES = "TVP_VariantValues";
+    protected const string TVP_COL_VARIANT_VALUE_ID = "VariantValueId";
+    protected const string TVP_COL_VARIANT_VALUE = "VariantValue";
     
     // EXCEPTION CONSTS
     const int MAX_RETRIES = 3;
@@ -261,13 +268,6 @@ public abstract class DapperRepository
         }
     }
     
-    protected static async Task HandleConnectionTransactionDisposal( SqlConnection? connection, DbTransaction? transaction = null )
-    {
-        if ( transaction != null )
-            await transaction.DisposeAsync();
-        if ( connection != null )
-            await connection.CloseAsync();
-    }
     protected static async Task HandleConnectionTransactionRollbackDisposal( SqlConnection? connection, DbTransaction? transaction = null )
     {
         if ( transaction != null )

@@ -15,7 +15,7 @@
             @foreach ( PrimaryCategoryResponse p in _categories.Primary )
             {
                 <li class="nav-item">
-                    <a class="nav-link category-nav-link" href="@p.Url">
+                    <a class="nav-link category-nav-link" href="/products/@p.Url">
                         @p.Name
                     </a>
                 </li>

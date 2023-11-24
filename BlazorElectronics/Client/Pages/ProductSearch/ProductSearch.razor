@@ -1,102 +1,20 @@
-@page "/{primary}/{secondary}/{tertiary}"
-@page "/{primary}/{secondary}"
-@page "/{primary}"
-@page "/search"
+@page "/products/{primary}/{secondary}/{tertiary}"
+@page "/products/{primary}/{secondary}"
+@page "/products/{primary}"
+@page "/products"
 
-@using BlazorElectronics.Client.Services.Products
-@using System.Collections.Specialized
-@using System.Reflection
-@using System.Text
-@using System.Web
-@using BlazorElectronics.Shared.Inbound.Products
+@inherits PageView
 
-@inject IProductServiceClient ProductService;
-@inject NavigationManager NavigationManager;
-@implements IDisposable
+@using BlazorElectronics.Client.Shared
 
-<span>_@_debugMessage</span>
-<span>@_nullSearch</span>
-<ProductList></ProductList>
-
-@code {
-    [Parameter]
-    public string? Primary { get; set; }
-    [Parameter]
-    public string? Secondary { get; set; }
-    [Parameter]
-    public string? Tertiary { get; set; }
-    
-    string _debugMessage = string.Empty;
-    string _nullSearch = string.Empty;
-    
-    protected override void OnInitialized()
-    {
-        ProductService.ProductSearchNullabillityTest += NullTest;
-    }
-    public void Dispose()
-    {
-        ProductService.ProductSearchNullabillityTest -= NullTest;
-    }
-
-    void NullTest( string s )
-    {
-        _nullSearch = s;
-    }
-    
-    protected override async Task OnParametersSetAsync()
-    {
-        Uri uri = NavigationManager.ToAbsoluteUri( NavigationManager.Uri );
-        NameValueCollection queryParameters = HttpUtility.ParseQueryString( uri.Query );
-
-        ProductSearchRequest filters = MapSearchQueryParameters( queryParameters );
-        
-        await ProductService.SearchProductsByCategory( filters, Primary, Secondary, Tertiary );
-        
-        StateHasChanged();
-    }
-
-    ProductSearchRequest MapSearchQueryParameters( NameValueCollection queryParameters )
-    {
-        var filtersDTO = new ProductSearchRequest();
-        Type type = typeof( ProductSearchRequest );
-
-        foreach ( string? key in queryParameters.AllKeys )
-        {
-            if ( string.IsNullOrEmpty( key ) )
-                continue;
-
-            var parsedKeyBuilder = new StringBuilder();
-            parsedKeyBuilder.Append( char.ToUpper( key[ 0 ] ) );
-
-            for ( int i = 1; i < key.Length; i++ )
-            {
-                if ( key[ i ] == '-' )
-                    continue;
-                if ( key[ i - 1 ] == '-' )
-                {
-                    parsedKeyBuilder.Append( char.ToUpper( key[ i ] ) );
-                    continue;
-                }
-                parsedKeyBuilder.Append( char.ToLower( key[ i ] ) );
-            }
-
-            string filterName = parsedKeyBuilder.ToString();
-            var stringValue = queryParameters[ key ];
-            PropertyInfo? propertyInfo = type.GetProperty( filterName );
-
-            if ( propertyInfo != null )
-            {
-                var convertedValue = Convert.ChangeType( stringValue, propertyInfo.PropertyType );
-                propertyInfo.SetValue( filtersDTO, convertedValue );
-                continue;
-            }
-
-            /*filtersDTO.SpecFilters.Add( new ProductSpecFilter_DTO {
-                SpecName = key,
-                SpecValue = Convert.ChangeType( stringValue, typeof( object ) )
-            } );*/
-        }
-
-        return filtersDTO;
-    }
-}
+<div class="container-md">
+    <h3>@_pageTitle</h3>
+    <div class="row">
+        <div class="col-3">
+            <ProductFilters></ProductFilters>
+        </div>
+        <div class="col-9">
+            <ProductSort></ProductSort>
+        </div>
+    </div>
+</div>
