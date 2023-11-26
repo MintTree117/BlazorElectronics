@@ -1,4 +1,5 @@
 using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Shared.Admin.Categories;
 

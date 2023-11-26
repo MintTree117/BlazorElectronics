@@ -1,7 +1,6 @@
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
-using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using Microsoft.AspNetCore.Components;
 
@@ -34,49 +33,6 @@ public sealed partial class AdminCategoriesView : AdminView
     {
         _activeCategory = type;
     }
-    
-    void CreateNewCategory( CategoryType categoryType )
-    {
-        NavManager.NavigateTo( $"admin/categories/edit?newCategory=true&categoryTier={categoryType}" );
-    }
-    void EditCategory( int categoryId, CategoryType categoryType )
-    {
-        NavManager.NavigateTo( $"admin/categories/edit?newCategory=false&categoryId={categoryId}&categoryTier={categoryType}" );
-    }
-    async Task RemoveCategory( int categoryId, CategoryType categoryType )
-    {
-        var dto = new CategoryRemoveDto( categoryId, categoryType );
-        ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
-
-        if ( !result.Success )
-        {
-            SetActionMessage( false, $"Failed to delete {categoryType} category {categoryId}. {result.Message}" );
-            return;
-        }
-
-        SetActionMessage( true, $"Successfully deleted {categoryType} category {categoryId}." );
-        await LoadCategoriesView();
-        StateHasChanged();
-    }
-    async Task LoadCategoriesView()
-    {
-        PageIsLoaded = false;
-        
-        ApiReply<CategoriesViewDto?> reply = await AdminCategoryService.GetCategoriesView();
-
-        PageIsLoaded = true;
-
-        if ( !reply.Success || reply.Data is null )
-        {
-            Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
-            SetViewMessage( false, reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
-            return;
-        }
-        
-        _categories = reply.Data;
-        ViewMessage = string.Empty;
-    }
-
     void SortById( CategoryType list, CategoryType categoryId )
     {
         List<CategoryViewDto> categories = list switch
@@ -131,5 +87,46 @@ public sealed partial class AdminCategoriesView : AdminView
         
         StateHasChanged();
     }
+    
+    void CreateNewCategory( CategoryType categoryType )
+    {
+        NavManager.NavigateTo( $"admin/categories/edit?newCategory=true&categoryTier={categoryType}" );
+    }
+    void EditCategory( int categoryId, CategoryType categoryType )
+    {
+        NavManager.NavigateTo( $"admin/categories/edit?newCategory=false&categoryId={categoryId}&categoryTier={categoryType}" );
+    }
+    async Task RemoveCategory( int categoryId, CategoryType categoryType )
+    {
+        var dto = new CategoryRemoveDto( categoryId, categoryType );
+        ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
 
+        if ( !result.Success )
+        {
+            SetActionMessage( false, $"Failed to delete {categoryType} category {categoryId}. {result.Message}" );
+            return;
+        }
+
+        SetActionMessage( true, $"Successfully deleted {categoryType} category {categoryId}." );
+        await LoadCategoriesView();
+        StateHasChanged();
+    }
+    async Task LoadCategoriesView()
+    {
+        PageIsLoaded = false;
+        
+        ApiReply<CategoriesViewDto?> reply = await AdminCategoryService.GetCategoriesView();
+
+        PageIsLoaded = true;
+
+        if ( !reply.Success || reply.Data is null )
+        {
+            Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
+            SetViewMessage( false, reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
+            return;
+        }
+        
+        _categories = reply.Data;
+        ViewMessage = string.Empty;
+    }
 }

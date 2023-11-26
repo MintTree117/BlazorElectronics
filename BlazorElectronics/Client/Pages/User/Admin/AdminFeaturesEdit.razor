@@ -1,0 +1,71 @@
+@page "/admin/features/edit"
+@using BlazorElectronics.Shared.Enums
+@inherits AdminView
+
+<div class="container-sm">
+    @if ( PageIsRedirecting )
+    {
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>@ViewMessage</p>
+            <p>Redirecting in @PageRedirectCountdown...</p>
+        </div>
+    }
+    else if ( !PageIsReady() )
+    {
+        <span>@ViewMessage</span>
+    }
+    else if ( _featureType == FeatureType.DEAL )
+    {
+        <h3>Add Featured Deal</h3>
+        
+        <EditForm Model="_dealProductId" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="DealProductId" class="form-label">Product Id</label>
+                <InputNumber @bind-Value="_dealProductId" class="form-control" id="DealProductId"></InputNumber>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="oi oi-cloud-upload"></i>
+            </button>
+        </EditForm>
+
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+        {
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
+            </div>
+        }
+    }
+    else if ( _featureType == FeatureType.PRODUCT )
+    {
+        if ( _newFeature )
+        {
+            <h3>Add Featured Product</h3>
+        }
+        else
+        {
+            <h3>Edit Featured Product @_productDto.ProductName</h3>
+        }
+
+        <EditForm Model="_productDto" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="ProductId" class="form-label">Product Id</label>
+                <InputNumber @bind-Value="_productDto.ProductId" class="form-control" id="ProductId"></InputNumber>
+            </div>
+            <div class="mb-3">
+                <label for="ImageUrl" class="form-label">Image Url (homepage)</label>
+                <InputText @bind-Value="_productDto.ImageUrl" class="form-control" id="ImageUrl"></InputText>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="oi oi-cloud-upload"></i>
+            </button>
+        </EditForm>
+
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+        {
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
+            </div>
+        }
+    }
+</div>

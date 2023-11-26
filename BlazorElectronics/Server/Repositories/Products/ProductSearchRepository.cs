@@ -5,6 +5,7 @@ using Dapper;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products;
 
 namespace BlazorElectronics.Server.Repositories.Products;

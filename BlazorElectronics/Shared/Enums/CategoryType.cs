@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared.Categories;
+namespace BlazorElectronics.Shared.Enums;
 
 public enum CategoryType
 {

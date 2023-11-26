@@ -3,7 +3,6 @@ using BlazorElectronics.Server.Controllers;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Admin.Features;
-using BlazorElectronics.Shared.SpecLookups;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,7 +65,7 @@ public sealed class AdminFeaturesController : _AdminController
         }
     }
     [HttpPost( "add-featured-deal" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddDeal( [FromBody] UserDataRequest<FeaturedDealEditDto>? request )
+    public async Task<ActionResult<ApiReply<bool>>> AddDeal( [FromBody] UserDataRequest<IdDto>? request )
     {
         HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
 
@@ -75,7 +74,7 @@ public sealed class AdminFeaturesController : _AdminController
 
         try
         {
-            bool result = await _repository.InsertFeaturedDeal( request!.Payload! );
+            bool result = await _repository.InsertFeaturedDeal( request!.Payload!.Id );
 
             return result
                 ? Ok( new ApiReply<bool>( true ) )

@@ -1,6 +1,6 @@
 @page "/admin/categories/view"
 @using BlazorElectronics.Shared.Admin.Categories
-@using BlazorElectronics.Shared.Categories
+@using BlazorElectronics.Shared.Enums
 @inherits AdminView
 
 <div class="container-sm">
@@ -34,7 +34,7 @@
             </div>
         }
         
-            <ul class="nav nav-tabs mb-3">
+        <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
                 <button class="nav-link @(_activeCategory == CategoryType.PRIMARY ? "active" : "")" @onclick="() => SetActiveCategory( CategoryType.PRIMARY )">Primary</button>
             </li>

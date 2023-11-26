@@ -2,6 +2,7 @@ using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Services.Categories;
 

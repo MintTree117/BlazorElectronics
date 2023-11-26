@@ -1,5 +1,6 @@
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Repositories.Categories;
 

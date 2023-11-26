@@ -23,6 +23,7 @@ builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
 builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCategoryServiceClient, AdminCategoryServiceClient>();
+builder.Services.AddScoped<IAdminFeaturesServiceClient, AdminFeaturesServiceClient>();
 builder.Services.AddScoped<IAdminSpecsServiceClient, AdminSpecsServiceClient>();
 builder.Services.AddScoped<IAdminVariantServiceClient, AdminVariantServiceClient>();
 

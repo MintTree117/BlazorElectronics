@@ -31,10 +31,10 @@ public class AdminFeaturesRepository : _AdminRepository, IAdminFeaturesRepositor
 
         return await TryQueryTransactionAsync( InsertProductQuery, parameters );
     }
-    public async Task<bool> InsertFeaturedDeal( FeaturedDealEditDto dto )
+    public async Task<bool> InsertFeaturedDeal( int productId )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, dto.ProductId );
+        parameters.Add( PARAM_PRODUCT_ID, productId );
         
         return await TryQueryTransactionAsync( InsertDealQuery, parameters );
     }
@@ -46,17 +46,17 @@ public class AdminFeaturesRepository : _AdminRepository, IAdminFeaturesRepositor
 
         return await TryQueryTransactionAsync( UpdateProductQuery, parameters );
     }
-    public async Task<bool> DeleteFeaturedProduct( int id )
+    public async Task<bool> DeleteFeaturedProduct( int productId )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, id );
+        parameters.Add( PARAM_PRODUCT_ID, productId );
 
         return await TryQueryTransactionAsync( DeleteProductQuery, parameters );
     }
-    public async Task<bool> DeleteFeaturedDeal( int id )
+    public async Task<bool> DeleteFeaturedDeal( int productId )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, id );
+        parameters.Add( PARAM_PRODUCT_ID, productId );
 
         return await TryQueryTransactionAsync( DeleteDealQuery, parameters );
     }
