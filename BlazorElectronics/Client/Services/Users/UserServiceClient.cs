@@ -1,7 +1,6 @@
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Inbound.Users;
-using BlazorElectronics.Shared.Outbound.Users;
+using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Client.Services.Users;
 

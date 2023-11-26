@@ -1,6 +1,6 @@
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Outbound.Features;
+using BlazorElectronics.Shared.Features;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;

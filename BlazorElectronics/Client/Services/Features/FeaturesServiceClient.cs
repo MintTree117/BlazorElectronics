@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Outbound.Features;
+using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Client.Services.Features;
 

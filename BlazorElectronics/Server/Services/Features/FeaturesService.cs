@@ -1,7 +1,7 @@
 using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Features;
-using BlazorElectronics.Shared.Outbound.Features;
+using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Services.Features;
 

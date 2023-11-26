@@ -2,11 +2,10 @@ using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Models.Products.Details;
 using BlazorElectronics.Server.Repositories.Products;
+using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.DtosOutbound.Products;
-using BlazorElectronics.Shared.Inbound.Products;
-using BlazorElectronics.Shared.Mutual;
-using BlazorElectronics.Shared.Outbound.Categories;
 using BlazorElectronics.Shared.Outbound.Products;
+using BlazorElectronics.Shared.Products;
 
 namespace BlazorElectronics.Server.Services.Products;
 
@@ -33,7 +32,8 @@ public class ProductService : ApiService, IProductService
     }
     public async Task<ApiReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
-        Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryType, request.CategoryIdMap.CategoryId );
+        return null;
+        /*Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryType, request.CategoryIdMap.CategoryId );
         ApiReply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 
         if ( !repoReply.Success )
@@ -43,7 +43,7 @@ public class ProductService : ApiService, IProductService
             Data = await MapSearchSuggestionsToResponse( repoReply.Data! ),
             Success = true,
             Message = "Found matching results."
-        };
+        };*/
     }
     public async Task<ApiReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request )
     {
@@ -66,7 +66,7 @@ public class ProductService : ApiService, IProductService
 
         return new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) );
     }
-    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesDto categoriesDto )
+    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CachedCategories cachedCategories )
     {
         ProductDetailsModel? model;
 
@@ -83,7 +83,7 @@ public class ProductService : ApiService, IProductService
         if ( model is null )
             return new ApiReply<ProductDetailsResponse?>( NO_DATA_FOUND_MESSAGE );
 
-        ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, categoriesDto );
+        ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, cachedCategories );
 
         return dto is not null
             ? new ApiReply<ProductDetailsResponse?>( dto )
@@ -156,7 +156,7 @@ public class ProductService : ApiService, IProductService
 
         return dto;
     }
-    static async Task<ProductDetailsResponse?> MapProductDetailsToResponse( ProductDetailsModel detailsModel, CategoriesDto categoriesDto )
+    static async Task<ProductDetailsResponse?> MapProductDetailsToResponse( ProductDetailsModel detailsModel, CachedCategories cachedCategories )
     {
         return await Task.Run( () =>
         {
@@ -188,18 +188,18 @@ public class ProductService : ApiService, IProductService
 
             var primaryCategory = new ProductCategoryResponse
             {
-                Name = categoriesDto.PrimaryResponses[ detailsModel.PrimaryCategory ].Name,
-                Url = categoriesDto.PrimaryResponses[ detailsModel.PrimaryCategory ].Url
+                Name = cachedCategories.PrimaryResponses[ detailsModel.PrimaryCategory ].Name,
+                Url = cachedCategories.PrimaryResponses[ detailsModel.PrimaryCategory ].Url
             };
 
-            List<ProductCategoryResponse>? parsedSecondaryCategories = ParseProductDetailsCategories( detailsModel.SecondaryCategories, categoriesDto.SecondaryIds, categoriesDto.SecondaryResponses );
-            List<ProductCategoryResponse>? parsedTertiaryCategories = ParseProductDetailsCategories( detailsModel.TertiaryCategories, categoriesDto.TertiaryIds, categoriesDto.TertiaryResponses );
+            //List<ProductCategoryResponse>? parsedSecondaryCategories = ParseProductDetailsCategories( detailsModel.SecondaryCategories, categoriesDto.SecondaryIds, categoriesDto.SecondaryResponses );
+            //List<ProductCategoryResponse>? parsedTertiaryCategories = ParseProductDetailsCategories( detailsModel.TertiaryCategories, categoriesDto.TertiaryIds, categoriesDto.TertiaryResponses );
 
             return new ProductDetailsResponse
             {
                 PrimaryCategory = primaryCategory,
-                SecondaryCategories = parsedSecondaryCategories ?? new List<ProductCategoryResponse>(),
-                TertiaryCategories = parsedTertiaryCategories ?? new List<ProductCategoryResponse>(),
+                //SecondaryCategories = parsedSecondaryCategories ?? new List<ProductCategoryResponse>(),
+                //TertiaryCategories = parsedTertiaryCategories ?? new List<ProductCategoryResponse>(),
                 Title = overviewModel.Title,
                 Rating = overviewModel.Rating,
                 ReleaseDate = overviewModel.ReleaseDate,

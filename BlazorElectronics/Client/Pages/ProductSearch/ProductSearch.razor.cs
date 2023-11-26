@@ -1,7 +1,7 @@
 using System.Collections.Specialized;
 using System.Reflection;
 using System.Text;
-using BlazorElectronics.Shared.Inbound.Products;
+using BlazorElectronics.Shared.Products;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.ProductSearch;

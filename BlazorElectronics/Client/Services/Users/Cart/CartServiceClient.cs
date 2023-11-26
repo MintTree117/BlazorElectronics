@@ -1,9 +1,8 @@
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Inbound.Cart;
-using BlazorElectronics.Shared.Mutual;
-using BlazorElectronics.Shared.Outbound.Users;
+using BlazorElectronics.Shared.Cart;
+using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Client.Services.Users.Cart;
 
@@ -89,7 +88,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         try
         {
-            var dto = new CartItemId_DTO {
+            var dto = new CartItemIdsDto {
                 ProductId = item.ProductId,
                 VariantId = item.VariantId,
                 Quantity = item.Quantity
@@ -135,7 +134,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         try
         {
-            var dto = new CartItemId_DTO {
+            var dto = new CartItemIdsDto {
                 ProductId = item.ProductId,
                 VariantId = item.VariantId,
                 Quantity = item.Quantity
@@ -178,7 +177,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         try
         {
-            var dto = new CartItemId_DTO {
+            var dto = new CartItemIdsDto {
                 ProductId = item.ProductId,
                 VariantId = item.VariantId,
                 Quantity = item.Quantity
@@ -253,7 +252,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         foreach ( CartProductResponse item in cart.Items )
         {
-            cartIds.Items.Add( new CartItemId_DTO {
+            cartIds.Items.Add( new CartItemIdsDto {
                 ProductId = item.ProductId,
                 VariantId = item.VariantId,
                 Quantity = item.Quantity

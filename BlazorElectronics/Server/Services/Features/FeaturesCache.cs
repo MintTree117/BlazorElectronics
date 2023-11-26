@@ -1,5 +1,5 @@
 using BlazorElectronics.Server.Caches;
-using BlazorElectronics.Shared.Outbound.Features;
+using BlazorElectronics.Shared.Features;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace BlazorElectronics.Server.Services.Features;

@@ -1,3 +1,5 @@
+using BlazorElectronics.Shared.Categories;
+
 namespace BlazorElectronics.Shared.Admin.Categories;
 
 public sealed class CategoryEditDto

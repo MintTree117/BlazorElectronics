@@ -1,4 +1,6 @@
 using System.Data;
+using System.Security.AccessControl;
+using BlazorElectronics.Server.Admin.Models.SpecLookups;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories;
 namespace BlazorElectronics.Server.Admin.Repositories;
@@ -51,5 +53,19 @@ public class _AdminRepository : DapperRepository
         }
 
         return table;
+    }
+
+    protected static string ConvertPrimaryCategoriesToString( IEnumerable<int> categories )
+    {
+        return string.Join( ",", categories );
+    }
+    protected static string ConvertSpecValuesToString( IEnumerable<AdminSpecValueModel> values )
+    {
+        List<string> specValues = values
+            .OrderBy( spec => spec.SpecValueId )
+            .Select( spec => spec.SpecValue )
+            .ToList();
+        
+        return string.Join( ",", specValues );
     }
 }

@@ -1,6 +1,6 @@
 using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Outbound.Users;
+using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User;

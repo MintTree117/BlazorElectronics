@@ -1,4 +1,5 @@
-@using BlazorElectronics.Shared.Outbound.Specs
+@using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.SpecLookups
 @inherits RazorView
 
 <div class="filter-container">
@@ -49,70 +50,5 @@
             }
         </div>
     </div>
-    
-    @foreach ( SpecFilterTableResponse filter in _specFilters.IntFilters )
-    {
-        <div class="mb-3">
-            <span>@filter.Name</span>
-        </div>
 
-        for ( int i = 0; i < filter.Values.Count; i++ )
-        {
-            string value = filter.Values[ i ];
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="@($"int-filter-{filter.Id}-{i}")"
-                       checked="@selectedIntFilters[ ( filter.Id, value ) ]"
-                       @onchange="() => OnIntFilterChanged( filter.Id, value, !selectedIntFilters[ ( filter.Id, value ) ] )">
-                <label class="form-check-label" for="@($"int-filter-{filter.Id}-{i}")">@value</label>
-            </div>
-        }
-    }
-    
-    @foreach ( SpecFilterTableResponse filter in _specFilters.StringFilters )
-    {
-        <div class="mb-3">
-            <span>@filter.Name</span>
-        </div>
-
-        for ( int i = 0; i < filter.Values.Count; i++ )
-        {
-            string value = filter.Values[ i ];
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="@($"string-filter-{filter.Id}-{i}")"
-                       checked="@selectedStringFilters[ ( filter.Id, value ) ]"
-                       @onchange="() => OnStringFilterChanged( filter.Id, value, !selectedStringFilters[ ( filter.Id, value ) ] )">
-                <label class="form-check-label" for="@($"string-filter-{filter.Id}-{i}")">@value</label>
-            </div>
-        }
-    }
-    
-    @for ( int i = 0; i < _specFilters.BoolFilters.Count; i++ )
-    {
-        int localIndex = i;
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="@($"bool-filter-{localIndex}")"
-                   checked="@selectedBoolFilters[ localIndex ]"
-                   @onchange="() => OnBoolFilterChanged( localIndex, !selectedBoolFilters[ localIndex ] )">
-            <label class="form-check-label" for="@($"bool-filter--{localIndex}")">@_specFilters.BoolFilters[ localIndex ]</label>
-        </div>
-    }
-            
-    @foreach ( SpecFilterTableResponse filter in _specFilters.MultiFilters )
-    {
-        <div class="mb-3">
-            <span>@filter.Name</span>
-        </div>
-
-        for ( int i = 0; i < filter.Values.Count; i++ )
-        {
-            string value = filter.Values[ i ];
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="@($"multi-filter-{filter.Id}-{i}")"
-                       checked="@selectedMultiFilters[ ( filter.Id, value ) ]"
-                       @onchange="() => OnMultiFilterChanged( filter.Id, value, !selectedMultiFilters[ ( filter.Id, value ) ] )">
-                <label class="form-check-label" for="@($"multi-filter-{filter.Id}-{i}")">@value</label>
-            </div>
-        }
-    }
-    
 </div>

@@ -1,6 +1,7 @@
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
+using BlazorElectronics.Shared.Categories;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -11,7 +12,7 @@ public sealed partial class AdminCategoriesView : AdminView
     
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
 
-    CategoriesViewDto _categorieses = new();
+    CategoriesViewDto _categories = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +66,63 @@ public sealed partial class AdminCategoriesView : AdminView
             return;
         }
         
-        _categorieses = reply.Data;
+        _categories = reply.Data;
         ViewMessage = string.Empty;
     }
+
+    void SortById( CategoryType list, CategoryType categoryId )
+    {
+        List<CategoryViewDto> categories = list switch
+        {
+            CategoryType.PRIMARY => _categories.Primary,
+            CategoryType.SECONDARY => _categories.Secondary,
+            CategoryType.TERTIARY => _categories.Tertiary,
+            _ => throw new ArgumentOutOfRangeException( nameof( list ), list, null )
+        };
+        
+        categories = categoryId switch
+        {
+            CategoryType.PRIMARY => categories.OrderBy( c => c.PrimaryCategory ).ToList(),
+            CategoryType.SECONDARY => categories.OrderBy( c => c.SecondaryCategory ).ToList(),
+            CategoryType.TERTIARY => categories.OrderBy( c => c.TertiaryCategory ).ToList(),
+            _ => throw new ArgumentOutOfRangeException( nameof( categoryId ), categoryId, null )
+        };
+        
+        switch ( list )
+        {
+            case CategoryType.PRIMARY:
+                _categories.Primary = categories;
+                break;
+            case CategoryType.SECONDARY:
+                _categories.Secondary = categories;
+                break;
+            case CategoryType.TERTIARY:
+                _categories.Tertiary = categories;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException( nameof( list ), list, null );
+        }
+
+        StateHasChanged();
+    }
+    void SortByName( CategoryType list )
+    {
+        switch ( list )
+        {
+            case CategoryType.PRIMARY:
+                _categories.Primary = _categories.Primary.OrderBy( c => c.Name ).ToList();
+                break;
+            case CategoryType.SECONDARY:
+                _categories.Secondary = _categories.Secondary.OrderBy( c => c.Name ).ToList();
+                break;
+            case CategoryType.TERTIARY:
+                _categories.Tertiary = _categories.Tertiary.OrderBy( c => c.Name ).ToList();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException( nameof( list ), list, null );
+        }
+        
+        StateHasChanged();
+    }
+
 }

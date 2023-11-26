@@ -1,14 +1,11 @@
 using BlazorElectronics.Server.Dtos.Categories;
-using BlazorElectronics.Server.Dtos.Specs;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
-using BlazorElectronics.Server.Services.Specs;
+using BlazorElectronics.Server.Services.SpecLookups;
+using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.DtosOutbound.Products;
-using BlazorElectronics.Shared.Inbound;
-using BlazorElectronics.Shared.Inbound.Products;
-using BlazorElectronics.Shared.Mutual;
-using BlazorElectronics.Shared.Outbound.Categories;
 using BlazorElectronics.Shared.Outbound.Products;
+using BlazorElectronics.Shared.Products;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
@@ -56,7 +53,7 @@ public class ProductController : ControllerBase
     [HttpGet( "details/{productId:int}" )]
     public async Task<ActionResult<ApiReply<ProductDetailsResponse?>>> GetProductDetails( int productId )
     {
-        ApiReply<CategoriesDto?> categoriesReply = await _categoryService.GetCategoriesDto();
+        ApiReply<CachedCategories?> categoriesReply = await _categoryService.GetCategoriesDto();
 
         if ( !categoriesReply.Success || categoriesReply.Data is null )
             return Ok( new ApiReply<ProductDetailsResponse?>( categoriesReply.Message ) );
@@ -70,11 +67,6 @@ public class ProductController : ControllerBase
 
         if ( !categoryReply.Success || categoryReply.Data is null )
             return BadRequest( categoryReply.Message );
-
-        ApiReply<CachedSpecData?> specDataReply = await _specLookupService.GetSpecDataDto();
-
-        if ( !specDataReply.Success || specDataReply.Data is null )
-            return Ok( specDataReply.Message );
 
         return Ok( await _productService.GetProductSearch( categoryReply.Data, request ) );
     }

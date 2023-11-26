@@ -1,5 +1,5 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Cart;
 
 namespace BlazorElectronics.Client.Services.Users.Cart;
 

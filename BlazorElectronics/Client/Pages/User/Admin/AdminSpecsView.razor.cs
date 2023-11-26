@@ -1,6 +1,7 @@
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Specs;
+using BlazorElectronics.Shared.Admin.SpecLookups;
+using BlazorElectronics.Shared.SpecLookups;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -11,7 +12,7 @@ public sealed partial class AdminSpecsView : AdminView
     
     [Inject] IAdminSpecsServiceClient AdminSpecsService { get; init; } = default!;
     
-    SpecsViewDto _specs = new();
+    List<SpecLookupViewDto> _specs = new();
     
     protected override async Task OnInitializedAsync()
     {
@@ -27,34 +28,33 @@ public sealed partial class AdminSpecsView : AdminView
         await LoadSpecsView();
     }
 
-    void CreateNewSpec( SpecLookupType specType )
+    void CreateNewSpec()
     {
-        NavManager.NavigateTo( $"admin/specs/edit?newSpec=true&specType={specType}" );
+        NavManager.NavigateTo( $"admin/specs/edit?newSpec=true" );
     }
-    void EditSpec( SpecLookupType specType, int specId )
+    void EditSpec( int specId )
     {
-        NavManager.NavigateTo( $"admin/specs/edit?newSpec=false&specType={specType}&specId={specId}" );
+        NavManager.NavigateTo( $"admin/specs/edit?newSpec=false&specId={specId}" );
     }
-    async Task RemoveSpec( SpecLookupType specType, int specId )
+    async Task RemoveSpec( int specId )
     {
-        var dto = new SpecLookupRemoveDto( specType, specId );
-        ApiReply<bool> reply = await AdminSpecsService.Remove( dto );
+        ApiReply<bool> reply = await AdminSpecsService.Remove( new IdDto( specId ) );
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, $"Failed to remove {specType} spec {specId}. {reply.Message}" );
+            SetActionMessage( false, $"Failed to remove Spec Lookup {specId}! {reply.Message}" );
             StateHasChanged();
             return;
         }
         
-        SetActionMessage( true, $"Successfully removed {specType} spec {specId}." );
+        SetActionMessage( true, $"Successfully removed Spec Lookup {specId}." );
         await LoadSpecsView();
     }
     async Task LoadSpecsView()
     {
         PageIsLoaded = false;
         
-        ApiReply<SpecsViewDto?> reply = await AdminSpecsService.GetView();
+        ApiReply<List<SpecLookupViewDto>?> reply = await AdminSpecsService.GetView();
 
         PageIsLoaded = true;
 
@@ -67,5 +67,14 @@ public sealed partial class AdminSpecsView : AdminView
 
         _specs = reply.Data;
         ViewMessage = string.Empty;
+    }
+
+    void SortById()
+    {
+        _specs = _specs.OrderBy( s => s.SpecId ).ToList();
+    }
+    void SortByName()
+    {
+        _specs = _specs.OrderBy( s => s.SpecName ).ToList();
     }
 }

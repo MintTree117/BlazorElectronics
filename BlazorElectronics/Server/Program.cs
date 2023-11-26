@@ -5,14 +5,14 @@ using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Sessions;
-using BlazorElectronics.Server.Repositories.Specs;
+using BlazorElectronics.Server.Repositories.SpecLookups;
 using BlazorElectronics.Server.Repositories.Users;
 using BlazorElectronics.Server.Services.Cart;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
-using BlazorElectronics.Server.Services.Specs;
+using BlazorElectronics.Server.Services.SpecLookups;
 using BlazorElectronics.Server.Services.Users;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -48,6 +48,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 builder.Services.AddScoped<IAdminCategoryRepository, AdminCategoryRepository>();
+builder.Services.AddScoped<IAdminFeaturesRepository, AdminFeaturesRepository>();
 builder.Services.AddScoped<IAdminSpecLookupRepository, AdminSpecLookupRepository>();
 builder.Services.AddScoped<IAdminVariantRepository, AdminVariantRepository>();
 

@@ -2,8 +2,7 @@ using BlazorElectronics.Server.Dtos.Sessions;
 using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Shared.Inbound.Users;
-using BlazorElectronics.Shared.Outbound.Users;
+using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
@@ -35,32 +34,29 @@ public class UserAccountController : UserController
     [HttpPost( "authorize" )]
     public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] UserRequest request )
     {
-        ApiReply<int> reply = await AuthorizeSessionRequest( request );
-
-        return reply.Success
-            ? Ok( new ApiReply<bool>( true ) )
-            : BadRequest( reply.Message );
+        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        return authorized.HttpError ?? Ok( new ApiReply<bool>( true ) );
     }
     [HttpPost( "change-password" )]
     public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserDataRequest<PasswordChangeRequest>? request )
     {
-        ApiReply<int> validateReply = await AuthorizeSessionRequest( request );
-        
-        if ( !validateReply.Success )
-            return BadRequest( validateReply.Message );
+        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+
+        if ( authorized.HttpError is not null )
+            return authorized.HttpError;
 
         if ( !ValidateChangePasswordRequest( request!.Payload ) )
             return BadRequest( "Invalid password request!" );
 
-        return await UserAccountService.ChangePassword( validateReply.Data, request.Payload!.Password );
+        return await UserAccountService.ChangePassword( authorized.UserId, request.Payload!.Password );
     }
     [HttpPost( "logout" )]
     public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] UserRequest? request )
     {
-        ApiReply<int> validateReply = await AuthorizeSessionRequest( request );
-        
-        if ( !validateReply.Success )
-            return BadRequest( validateReply.Message );
+        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+
+        if ( authorized.HttpError is not null )
+            return authorized.HttpError;
         
         return await SessionService.DeleteSession( request!.SessionId );
     }

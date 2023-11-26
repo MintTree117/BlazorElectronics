@@ -1,4 +1,4 @@
-using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Shared.Admin.Products;
 

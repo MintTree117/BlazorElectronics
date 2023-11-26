@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Specs;
+using BlazorElectronics.Shared.Admin.SpecLookups;
+using BlazorElectronics.Shared.SpecLookups;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 
@@ -16,13 +17,13 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     public AdminSpecsServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ApiReply<SpecsViewDto?>> GetView()
+    public async Task<ApiReply<List<SpecLookupViewDto>?>> GetView()
     {
-        return await TryUserRequest<SpecsViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<List<SpecLookupViewDto>?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( SpecLookupGetEditDto data )
+    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( IdDto data )
     {
-        return await TryUserRequest<SpecLookupGetEditDto,SpecLookupEditDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<IdDto,SpecLookupEditDto?>( API_ROUTE_GET_EDIT, data );
     }
     public async Task<ApiReply<int>> Add( SpecLookupEditDto data )
     {
@@ -32,8 +33,8 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     {
         return await TryUserRequest<SpecLookupEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> Remove( SpecLookupRemoveDto data )
+    public async Task<ApiReply<bool>> Remove( IdDto data )
     {
-        return await TryUserRequest<SpecLookupRemoveDto,bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<IdDto,bool>( API_ROUTE_REMOVE, data );
     }
 }

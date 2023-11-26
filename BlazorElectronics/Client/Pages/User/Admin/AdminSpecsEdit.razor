@@ -1,5 +1,4 @@
 @page "/admin/specs/edit"
-@using BlazorElectronics.Shared.Admin.Specs
 @inherits AdminView
 
 <div class="container-sm">
@@ -19,11 +18,11 @@
     {
         if ( _newSpec )
         {
-            <h3>Create New @_dto.SpecType Spec</h3>
+            <h3>Create New Spec Lookup</h3>
         }
         else
         {
-            <h3>Edit @_dto.SpecType Spec</h3>
+            <h3>Edit Spec Lookup</h3>
         }
         
         <EditForm Model="_dto" OnSubmit="( async () => await Submit() )">
@@ -39,15 +38,10 @@
                 <label for="Categories" class="form-label">Primary Categories, separate by comma.</label>
                 <InputText @bind-Value="_dto.PrimaryCategoriesAsString" class="form-control" id="Categories"></InputText>
             </div>
-            
-            @if ( _dto.SpecType != SpecLookupType.BOOL )
-            {
-                <div class="mb-3">
-                    <label for="Values" class="form-label">Values, ordered by Id, separate by comma.</label>
-                    <InputText @bind-Value="_dto.ValuesByIdAsString" class="form-control" id="Values"></InputText>
-                </div>   
-            }
-            
+            <div class="mb-3">
+                <label for="Values" class="form-label">Values, ordered by Id, separate by comma.</label>
+                <InputText @bind-Value="_dto.ValuesByIdAsString" class="form-control" id="Values"></InputText>
+            </div>
             <button type="submit" class="btn btn-primary">
                 <i class="oi oi-cloud-upload"></i>
             </button>

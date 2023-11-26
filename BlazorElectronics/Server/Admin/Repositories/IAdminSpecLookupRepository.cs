@@ -1,12 +1,13 @@
-using BlazorElectronics.Shared.Admin.Specs;
+using BlazorElectronics.Shared.Admin.SpecLookups;
+using BlazorElectronics.Shared.SpecLookups;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 
 public interface IAdminSpecLookupRepository
 {
-    Task<SpecsViewDto?> GetView();
-    Task<SpecLookupEditDto?> GetEdit( SpecLookupGetEditDto dto );
+    Task<List<SpecLookupViewDto>?> GetView();
+    Task<SpecLookupEditDto?> GetEdit( int specId );
     Task<int> Insert( SpecLookupEditDto dto );
     Task<bool> Update( SpecLookupEditDto dto );
-    Task<bool> Delete( SpecLookupRemoveDto dto );
+    Task<bool> Delete( int specId );
 }

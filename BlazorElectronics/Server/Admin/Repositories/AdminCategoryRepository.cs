@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Shared.Admin.Categories;
+using BlazorElectronics.Shared.Categories;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -70,15 +71,15 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         if ( multi is null )
             return null;
 
-        IEnumerable<CategoryPrimaryViewDto>? primary = await multi.ReadAsync<CategoryPrimaryViewDto>();
-        IEnumerable<CategorySecondaryViewDto>? secondary = await multi.ReadAsync<CategorySecondaryViewDto>();
-        IEnumerable<CategoryTertiaryViewDto>? tertiary = await multi.ReadAsync<CategoryTertiaryViewDto>();
+        IEnumerable<CategoryViewDto>? primary = await multi.ReadAsync<CategoryViewDto>();
+        IEnumerable<CategoryViewDto>? secondary = await multi.ReadAsync<CategoryViewDto>();
+        IEnumerable<CategoryViewDto>? tertiary = await multi.ReadAsync<CategoryViewDto>();
 
         return new CategoriesViewDto
         {
-            Primary = primary is not null ? primary.ToList() : new List<CategoryPrimaryViewDto>(),
-            Secondary = secondary is not null ? secondary.ToList() : new List<CategorySecondaryViewDto>(),
-            Tertiary = tertiary is not null ? tertiary.ToList() : new List<CategoryTertiaryViewDto>()
+            Primary = primary is not null ? primary.ToList() : new List<CategoryViewDto>(),
+            Secondary = secondary is not null ? secondary.ToList() : new List<CategoryViewDto>(),
+            Tertiary = tertiary is not null ? tertiary.ToList() : new List<CategoryViewDto>()
         };
     }
     static async Task<CategoryEditDto?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? parameters )

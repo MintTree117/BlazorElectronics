@@ -1,8 +1,7 @@
 using BlazorElectronics.Server.Models.Cart;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Cart;
-using BlazorElectronics.Shared.Inbound.Cart;
-using BlazorElectronics.Shared.Mutual;
+using BlazorElectronics.Shared.Cart;
 
 namespace BlazorElectronics.Server.Services.Cart;
 
@@ -15,7 +14,7 @@ public class CartService : ICartService
         _cartRepository = cartRepository;
     }
     
-    public async Task<ApiReply<CartResponse?>> PostCartItems( int userId, List<CartItemId_DTO> cartItemsDtos )
+    public async Task<ApiReply<CartResponse?>> PostCartItems( int userId, List<CartItemIdsDto> cartItemsDtos )
     {
         List<CartItem> models = MapItemIdsToModels( cartItemsDtos, userId );
         
@@ -54,7 +53,7 @@ public class CartService : ICartService
         CartResponse cartResponse = await MapProductsToCart( cartProducts!, cartItemsDtos );
         return new ApiReply<CartResponse?>( cartResponse, true, "Successfully inserted Cart Items to database, and retrieved Cart Products from database." );
     }
-    public async Task<ApiReply<bool>> AddToCart( int userId, CartItemId_DTO cartItem )
+    public async Task<ApiReply<bool>> AddToCart( int userId, CartItemIdsDto cartItem )
     {
         CartItem modelItem = MapItemIdsToModel( cartItem, userId );
 
@@ -69,7 +68,7 @@ public class CartService : ICartService
 
         return new ApiReply<bool>( true, true, "Successfully inserted Cart Item into database." );
     }
-    public async Task<ApiReply<bool>> UpdateQuantity( int userId, CartItemId_DTO cartItem )
+    public async Task<ApiReply<bool>> UpdateQuantity( int userId, CartItemIdsDto cartItem )
     {
         CartItem modelItem = MapItemIdsToModel( cartItem, userId );
 
@@ -84,7 +83,7 @@ public class CartService : ICartService
 
         return new ApiReply<bool>( true, true, "Successfully updated Cart Item Quantity in database." );
     }
-    public async Task<ApiReply<bool>> RemoveFromCart( int userId, CartItemId_DTO cartItem )
+    public async Task<ApiReply<bool>> RemoveFromCart( int userId, CartItemIdsDto cartItem )
     {
         CartItem modelItem = MapItemIdsToModel( cartItem, userId );
 
@@ -158,16 +157,16 @@ public class CartService : ICartService
             variantIds.Add( item.VariantId );
         }
     }
-    static List<CartItem> MapItemIdsToModels( List<CartItemId_DTO> cartItems, int userId )
+    static List<CartItem> MapItemIdsToModels( List<CartItemIdsDto> cartItems, int userId )
     {
         var models = new List<CartItem>();
 
-        foreach ( CartItemId_DTO dto in cartItems )
+        foreach ( CartItemIdsDto dto in cartItems )
             models.Add( MapItemIdsToModel( dto, userId ) );
 
         return models;
     }
-    static CartItem MapItemIdsToModel( CartItemId_DTO dto, int userId )
+    static CartItem MapItemIdsToModel( CartItemIdsDto dto, int userId )
     {
         return new CartItem {
             UserId = userId,
@@ -176,7 +175,7 @@ public class CartService : ICartService
             Quantity = dto.Quantity
         };
     }
-    static async Task<CartResponse> MapProductsToCart( IEnumerable<CartProductModel> products, List<CartItemId_DTO> dtos )
+    static async Task<CartResponse> MapProductsToCart( IEnumerable<CartProductModel> products, List<CartItemIdsDto> dtos )
     {
         var cartDto = new CartResponse();
 

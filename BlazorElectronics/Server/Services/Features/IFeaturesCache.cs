@@ -1,4 +1,4 @@
-using BlazorElectronics.Shared.Outbound.Features;
+using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Services.Features;
 

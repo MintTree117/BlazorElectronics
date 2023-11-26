@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Models.Categories;
+using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Server.Repositories.Categories;
 

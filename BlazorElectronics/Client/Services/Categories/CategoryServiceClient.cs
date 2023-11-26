@@ -2,7 +2,7 @@ using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Outbound.Categories;
+using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Categories;
 

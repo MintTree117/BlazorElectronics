@@ -2,7 +2,8 @@ using System.Collections.Specialized;
 using System.Web;
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Specs;
+using BlazorElectronics.Shared.Admin.SpecLookups;
+using BlazorElectronics.Shared.SpecLookups;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -26,7 +27,7 @@ public sealed partial class AdminSpecsEdit : AdminView
             return;
         }
 
-        if ( !TryParseUrlParameters( out int specId, out SpecLookupType specType ) )
+        if ( !TryParseUrlParameters( out int specId ) )
         {
             SetViewMessage( false, ERROR_INVALID_URL_PARAMS );
             Logger.LogError( ERROR_INVALID_URL_PARAMS );
@@ -37,12 +38,10 @@ public sealed partial class AdminSpecsEdit : AdminView
         if ( _newSpec )
         {
             PageIsLoaded = true;
-            _dto.SpecType = specType;
             return;
         }
-
-        var request = new SpecLookupGetEditDto( specType, specId );
-        ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( request );
+        
+        ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( new IdDto( specId ) );
 
         if ( !reply.Success || reply.Data is null )
         {
@@ -56,21 +55,17 @@ public sealed partial class AdminSpecsEdit : AdminView
         _dto = reply.Data;
         StateHasChanged();
     }
-    bool TryParseUrlParameters( out int specId, out SpecLookupType specType )
+    bool TryParseUrlParameters( out int specId )
     {
         specId = -1;
-        specType = SpecLookupType.INT;
-        
+
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
 
         string? newSpecString = queryString.Get( "newSpec" );
         string? specIdString = queryString.Get( "specId" );
-        string? specTypeString = queryString.Get( "specType" );
 
-        bool parsed = !string.IsNullOrWhiteSpace( specTypeString ) &&
-                      Enum.TryParse( specTypeString, out specType ) &&
-                      !string.IsNullOrWhiteSpace( newSpecString ) &&
+        bool parsed = !string.IsNullOrWhiteSpace( newSpecString ) &&
                       bool.TryParse( newSpecString, out _newSpec );
 
         if ( _newSpec )

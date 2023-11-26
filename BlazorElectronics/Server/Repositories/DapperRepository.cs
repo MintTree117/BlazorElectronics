@@ -158,6 +158,9 @@ public abstract class DapperRepository
     
     // PARAM PRODUCT
     protected const string PARAM_PRODUCT_ID = "@ProductId";
+    
+    // PARAM FEATURES
+    protected const string PARAM_FEATURE_IMAGE_URL = "@FeatureImageUrl";
 
     // PARAM CART
     protected const string PARAM_ITEM_QUANTITY = "@CartItemQuantity";

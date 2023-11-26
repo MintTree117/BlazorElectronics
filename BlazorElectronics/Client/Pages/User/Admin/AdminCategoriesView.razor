@@ -1,6 +1,7 @@
 @page "/admin/categories/view"
-@using BlazorElectronics.Shared.Admin.Categories
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Admin.Categories
+@using BlazorElectronics.Shared.Categories
 @inherits AdminView
 
 @if ( PageIsRedirecting )
@@ -34,86 +35,117 @@ else
     }
     
     <div class="row">
+        
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>@CategoryType.PRIMARY</h4>
                 <button class="btn btn-primary" @onclick="( () => CreateNewCategory( CategoryType.PRIMARY ) )">
-                    <i class="oi oi-plus"></i> Create New
+                    <i class="oi oi-plus"></i> Create New @CategoryType.PRIMARY
                 </button>
             </div>
-            @foreach ( CategoryPrimaryViewDto p in _categorieses.Primary )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @p.PrimaryCategoryId
-                    </div>
-                    <div class="col">
-                        @p.Name
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( p.PrimaryCategoryId, CategoryType.PRIMARY ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="(async () => await RemoveCategory( p.PrimaryCategoryId, CategoryType.PRIMARY ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
+            <table class="table">
+                <thead>
+                <tr>
+                    <th @onclick="() => SortById( CategoryType.PRIMARY, CategoryType.PRIMARY )">Primary Category ID</th>
+                    <th @onclick="() => SortByName( CategoryType.PRIMARY )">Name</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ( CategoryViewDto p in _categories.Primary )
+                {
+                    <tr>
+                        <td>@p.PrimaryCategory</td>
+                        <td>@p.Name</td>
+                        <td class="text-nowrap">
+                            <button class="btn btn-primary" @onclick="( () => EditCategory( p.PrimaryCategory, CategoryType.PRIMARY ) )">
+                                <i class="oi oi-pencil"></i>
+                            </button>
+                            <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( p.PrimaryCategory, CategoryType.PRIMARY ) )">
+                                <i class="oi oi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
+
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>@CategoryType.SECONDARY</h4>
                 <button class="btn btn-primary" @onclick="( () => CreateNewCategory( CategoryType.SECONDARY ) )">
-                    <i class="oi oi-plus"></i> Create New
+                    <i class="oi oi-plus"></i> Create New @CategoryType.SECONDARY
                 </button>
             </div>
-            @foreach ( CategorySecondaryViewDto s in _categorieses.Secondary )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @s.SecondaryCategoryId
-                    </div>
-                    <div class="col">
-                        @s.Name
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( s.SecondaryCategoryId, CategoryType.SECONDARY ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.SecondaryCategoryId, CategoryType.SECONDARY ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
+            <table class="table">
+                <thead>
+                <tr>
+                    <th @onclick="() => SortById( CategoryType.SECONDARY, CategoryType.PRIMARY )">Primary Category ID</th>
+                    <th @onclick="() => SortById( CategoryType.SECONDARY, CategoryType.SECONDARY )">Secondary Category ID</th>
+                    <th @onclick="() => SortByName( CategoryType.SECONDARY )">Name</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ( CategoryViewDto s in _categories.Primary )
+                {
+                    <tr>
+                        <td>@s.PrimaryCategory</td>
+                        <td>@s.SecondaryCategory!.Value</td>
+                        <td>@s.Name</td>
+                        <td class="text-nowrap">
+                            <button class="btn btn-primary" @onclick="( () => EditCategory( s.SecondaryCategory.Value, CategoryType.SECONDARY ) )">
+                                <i class="oi oi-pencil"></i>
+                            </button>
+                            <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( s.SecondaryCategory.Value, CategoryType.SECONDARY ) )">
+                                <i class="oi oi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
+        
         <div class="col-4 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>@CategoryType.TERTIARY</h4>
                 <button class="btn btn-primary" @onclick="( () => CreateNewCategory( CategoryType.TERTIARY ) )">
-                    <i class="oi oi-plus"></i> Create New
+                    <i class="oi oi-plus"></i> Create New @CategoryType.TERTIARY
                 </button>
             </div>
-            @foreach ( CategoryTertiaryViewDto t in _categorieses.Tertiary )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @t.TertiaryCategoryId
-                    </div>
-                    <div class="col">
-                        @t.Name
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditCategory( t.TertiaryCategoryId, CategoryType.TERTIARY ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.TertiaryCategoryId, CategoryType.TERTIARY ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
+            <table class="table">
+                <thead>
+                <tr>
+                    <th @onclick="() => SortById( CategoryType.TERTIARY, CategoryType.PRIMARY )">Primary Category ID</th>
+                    <th @onclick="() => SortById( CategoryType.TERTIARY, CategoryType.SECONDARY )">Secondary Category ID</th>
+                    <th @onclick="() => SortById( CategoryType.TERTIARY, CategoryType.TERTIARY )">Tertiary Category ID</th>
+                    <th @onclick="() => SortByName( CategoryType.TERTIARY )">Name</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ( CategoryViewDto t in _categories.Primary )
+                {
+                    <tr>
+                        <td>@t.PrimaryCategory</td>
+                        <td>@t.SecondaryCategory!.Value</td>
+                        <td>@t.TertiaryCategory!.Value</td>
+                        <td>@t.Name</td>
+                        <td class="text-nowrap">
+                            <button class="btn btn-primary" @onclick="( () => EditCategory( t.TertiaryCategory.Value, CategoryType.TERTIARY ) )">
+                                <i class="oi oi-pencil"></i>
+                            </button>
+                            <button class="btn btn-primary" @onclick="( async () => await RemoveCategory( t.TertiaryCategory.Value, CategoryType.TERTIARY ) )">
+                                <i class="oi oi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
+        
     </div>   
 }

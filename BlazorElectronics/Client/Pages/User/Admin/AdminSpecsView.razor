@@ -1,5 +1,6 @@
 @page "/admin/specs/view"
-@using BlazorElectronics.Shared.Admin.Specs
+@using BlazorElectronics.Shared.SpecLookups
+@using BlazorElectronics.Shared.Admin.SpecLookups
 @inherits AdminView
 
 @if ( PageIsRedirecting )
@@ -16,8 +17,6 @@ else if ( !PageIsReady() )
 }
 else
 {
-    <h3>Specifications View</h3>
-
     if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
     {
         <div class="@ViewMessageClass">
@@ -31,115 +30,42 @@ else
             <span>@ActionMessage</span>
         </div>
     }
-    
+
     <div class="row">
-        <div class="col-3 px-3">
+        <div class="col-12 px-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>@SpecLookupType.INT Specs</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewSpec( SpecLookupType.INT ) )">
+                <h3>Specifications View</h3>
+                <button class="btn btn-primary" @onclick="CreateNewSpec">
                     <i class="oi oi-plus"></i> Create New
                 </button>
             </div>
-           @foreach ( SpecView v in _specs.IntSpecs )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @v.SpecId
-                    </div>
-                    <div class="col">
-                        @v.SpecName
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditSpec( SpecLookupType.INT, v.SpecId ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveSpec( SpecLookupType.INT, v.SpecId ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="col-3 px-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>@SpecLookupType.STRING Specs</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewSpec( SpecLookupType.STRING ) )">
-                    <i class="oi oi-plus"></i> Create New
-                </button>
-            </div>
-            @foreach ( SpecView v in _specs.StringSpecs )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @v.SpecId
-                    </div>
-                    <div class="col">
-                        @v.SpecName
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditSpec( SpecLookupType.STRING, v.SpecId ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveSpec( SpecLookupType.STRING, v.SpecId ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="col-3 px-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>@SpecLookupType.BOOL Specs</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewSpec( SpecLookupType.BOOL ) )">
-                    <i class="oi oi-plus"></i> Create New
-                </button>
-            </div>
-            @foreach ( SpecView v in _specs.BoolSpecs )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @v.SpecId
-                    </div>
-                    <div class="col">
-                        @v.SpecName
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditSpec( SpecLookupType.BOOL, v.SpecId ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveSpec( SpecLookupType.BOOL, v.SpecId ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="col-3 px-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>@SpecLookupType.MULTI Specs</h4>
-                <button class="btn btn-primary" @onclick="( () => CreateNewSpec( SpecLookupType.MULTI ) )">
-                    <i class="oi oi-plus"></i> Create New
-                </button>
-            </div>
-            @foreach ( SpecView v in _specs.MultiSpecs )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @v.SpecId
-                    </div>
-                    <div class="col">
-                        @v.SpecName
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditSpec( SpecLookupType.MULTI, v.SpecId ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveSpec( SpecLookupType.MULTI, v.SpecId ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            }
+            <table class="table">
+                <thead>
+                <tr>
+                    <th @onclick="SortById">Spec ID</th>
+                    <th @onclick="SortByName">Spec Name</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ( SpecLookupViewDto v in _specs )
+                {
+                    <tr>
+                        <td>@v.SpecId</td>
+                        <td>@v.SpecName</td>
+                        <td class="text-nowrap">
+                            <button class="btn btn-primary" @onclick="( () => EditSpec( v.SpecId ) )">
+                                <i class="oi oi-pencil"></i>
+                            </button>
+                            <button class="btn btn-primary" @onclick="( async () => await RemoveSpec( v.SpecId ) )">
+                                <i class="oi oi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
     </div>
+
 }

@@ -1,5 +1,5 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Outbound.Categories;
+using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Categories;
 

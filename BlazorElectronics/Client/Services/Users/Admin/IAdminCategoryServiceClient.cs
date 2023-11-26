@@ -1,5 +1,6 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
+using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 

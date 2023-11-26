@@ -23,10 +23,10 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
     {
         return await TryQueryAsync( GetViewQuery );
     }
-    public async Task<VariantEditDto?> GetEdit( VariantGetEditDto dto )
+    public async Task<VariantEditDto?> GetEdit( int id )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_VARIANT_ID, dto.VariantId );
+        parameters.Add( PARAM_VARIANT_ID, id );
 
         return await TryQueryAsync( GetEditQuery, parameters );
     }
@@ -40,10 +40,10 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
         DynamicParameters parameters = GetUpdateParameters( dto );
         return await TryQueryTransactionAsync( UpdateQuery, parameters );
     }
-    public async Task<bool> Delete( VariantRemoveDto dto )
+    public async Task<bool> Delete( int id )
     {
         var parameters = new DynamicParameters();
-        parameters.Add( PARAM_VARIANT_ID, dto.VariantId );
+        parameters.Add( PARAM_VARIANT_ID, id );
         
         return await TryQueryTransactionAsync( DeleteQuery, parameters );
     }

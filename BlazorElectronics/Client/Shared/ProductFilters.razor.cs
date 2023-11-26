@@ -1,4 +1,5 @@
-using BlazorElectronics.Shared.Outbound.Specs;
+using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.SpecLookups;
 
 namespace BlazorElectronics.Client.Shared;
 
@@ -11,12 +12,8 @@ public partial class ProductFilters : RazorView
     int? MaxPrice { get; set; } = null;
     int? MinRating { get; set; } = null;
 
-    SpecFiltersResponse _specFilters = new();
-
-    Dictionary<(int FilterId, string Value), bool> selectedIntFilters = new();
-    Dictionary<(int FilterId, string Value), bool> selectedStringFilters = new();
-    Dictionary<int, bool> selectedBoolFilters = new();
-    Dictionary<(int FilterId, string Value), bool> selectedMultiFilters = new();
+    List<SpecLookupResponse> _specFilters = new();
+    Dictionary<(int specId, int specValueId), bool> _selectedFilters = new();
 
     void ApplyFilters()
     {
@@ -27,50 +24,12 @@ public partial class ProductFilters : RazorView
     {
         
     }
-
     void InitializeSpecFilters()
     {
-        foreach ( SpecFilterTableResponse filter in _specFilters.IntFilters )
-        {
-            foreach ( string value in filter.Values )
-            {
-                selectedIntFilters[ ( filter.Id, value ) ] = false;
-            }
-        }
-        foreach ( SpecFilterTableResponse filter in _specFilters.StringFilters )
-        {
-            foreach ( string value in filter.Values )
-            {
-                selectedStringFilters[ ( filter.Id, value ) ] = false;
-            }
-        }
-        for ( int i = 0; i < _specFilters.BoolFilters.Count; i++ )
-        {
-            selectedBoolFilters[ i ] = false;
-        }
-        foreach ( SpecFilterTableResponse filter in _specFilters.MultiFilters )
-        {
-            foreach ( string value in filter.Values )
-            {
-                selectedMultiFilters[ ( filter.Id, value ) ] = false;
-            }
-        }
+
     }
-    
-    void OnIntFilterChanged( int filterId, string value, bool isChecked )
+    void OnLookupFilterChanged( int specId, int specValueId, bool isChecked )
     {
-        selectedIntFilters[ ( filterId, value ) ] = isChecked;
-    }
-    void OnStringFilterChanged( int filterId, string value, bool isChecked )
-    {
-        selectedStringFilters[ ( filterId, value ) ] = isChecked;
-    }
-    void OnBoolFilterChanged( int filterId, bool isChecked )
-    {
-        selectedBoolFilters[ filterId ] = isChecked;
-    }
-    void OnMultiFilterChanged( int filterId, string value, bool isChecked )
-    {
-        selectedMultiFilters[ ( filterId, value ) ] = isChecked;
+        _selectedFilters[ ( specId, specValueId ) ] = isChecked;
     }
 }

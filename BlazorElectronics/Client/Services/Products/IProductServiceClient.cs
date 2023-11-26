@@ -1,7 +1,7 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosOutbound.Products;
-using BlazorElectronics.Shared.Inbound.Products;
 using BlazorElectronics.Shared.Outbound.Products;
+using BlazorElectronics.Shared.Products;
 
 namespace BlazorElectronics.Client.Services.Products;
 

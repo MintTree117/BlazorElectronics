@@ -1,7 +1,6 @@
-using BlazorElectronics.Server.Services.Categories;
-using BlazorElectronics.Server.Services.Specs;
-using BlazorElectronics.Shared.Mutual;
-using BlazorElectronics.Shared.Outbound.Specs;
+using BlazorElectronics.Server.Services.SpecLookups;
+using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.SpecLookups;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
@@ -11,27 +10,20 @@ namespace BlazorElectronics.Server.Controllers;
 public class SpecLookupController : ControllerBase
 {
     readonly ISpecLookupService _specLookupService;
-    readonly ICategoryService _categoryService;
 
-    public SpecLookupController( ISpecLookupService specLookupService, ICategoryService categoryService )
+    public SpecLookupController( ISpecLookupService specLookupService)
     {
         _specLookupService = specLookupService;
-        _categoryService = categoryService;
     }
 
-    [HttpGet( "global" )]
-    public async Task<ActionResult<ApiReply<SpecFiltersResponse>>> GetSpecLookupsGlobal()
+    [HttpGet( "get-spec-lookups-global" )]
+    public async Task<ActionResult<ApiReply<List<SpecLookupResponse>>>> GetSpecLookups()
     {
-        return Ok( await _specLookupService.GetSpecFiltersResponse() );
+        return Ok( await _specLookupService.GetSpecLookups() );
     }
-    [HttpGet( "category/{primaryCategoryUrl}" )]
-    public async Task<ActionResult<ApiReply<SpecFiltersResponse>>> GetSpecLookupsCategory( string primaryCategoryUrl )
+    [HttpGet( "get-spec-lookups-category")]
+    public async Task<ActionResult<ApiReply<List<SpecLookupResponse>>>> GetSpecLookups( PrimaryCategory category )
     {
-        ApiReply<CategoryIdMap?> categoryResponse = await _categoryService.GetCategoryIdMapFromUrl( primaryCategoryUrl );
-
-        if ( !categoryResponse.Success )
-            return BadRequest( new ApiReply<SpecFiltersResponse>( categoryResponse.Message ) );
-
-        return Ok( await _specLookupService.GetSpecFiltersResponse( categoryResponse.Data!.CategoryId ) );
+        return Ok( await _specLookupService.GetSpecLookups( category ) );
     }
 }
