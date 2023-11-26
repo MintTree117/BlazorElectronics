@@ -2,6 +2,20 @@
     padding: 10px 5px 10px 5px;
 }
 
+.sortable-header {
+    cursor: pointer;
+    background-color: #f8f9fa; /* Light grey background */
+    text-decoration: underline; /* Underline text to indicate it's clickable */
+}
+
+table.table-hover tbody tr:hover {
+    background-color: #e9ecef; /* Change color on hover */
+}
+
+.sortable-header:hover {
+    background-color: #e2e6ea; /* Slightly darker grey on hover */
+}
+
 /* Style for odd rows */
 .admin-view-row:nth-child(odd) {
     background-color: #f9f9f9; /* Light grey background */

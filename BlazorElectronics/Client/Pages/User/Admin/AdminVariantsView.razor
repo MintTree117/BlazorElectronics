@@ -3,66 +3,73 @@
 @using BlazorElectronics.Shared.Admin.Variants
 @inherits AdminView
 
-@if ( PageIsRedirecting )
-{
-    <div class="loading-container">
-        <div class="loading-circle"></div>
-        <p>@ViewMessage</p>
-        <p>Redirecting in @PageRedirectCountdown...</p>
-    </div>
-}
-else if ( !PageIsReady() )
-{
-    <span>@ViewMessage</span>
-}
-else
-{
-    <h3>Variants View</h3>
-
-    if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
+<div class="container-sm">
+    @if ( PageIsRedirecting )
     {
-        <div class="@ViewMessageClass">
-            <span>@ViewMessage</span>
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>@ViewMessage</p>
+            <p>Redirecting in @PageRedirectCountdown...</p>
         </div>
     }
-
-    if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+    else if ( !PageIsReady() )
     {
-        <div class="@ActionMessageClass">
-            <span>@ActionMessage</span>
-        </div>
+        <span>@ViewMessage</span>
     }
+    else
+    {
+        <h3>Variants View</h3>
     
-    <div class="row">
-        <div class="col-12 px-3">
-            
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h4>Variant Types</h4>
-                <button class="btn btn-primary" @onclick="( CreateNewVariant )">
-                    <i class="oi oi-plus"></i> Create New Variant
-                </button>
+        if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
+        {
+            <div class="@ViewMessageClass">
+                <span>@ViewMessage</span>
             </div>
-
-            @foreach ( VariantViewDto v in _dto.VariantTypes )
-            {
-                <div class="row admin-view-row align-items-center">
-                    <div class="col">
-                        @v.VariantId
-                    </div>
-                    <div class="col">
-                        @v.VariantName
-                    </div>
-                    <div class="col text-nowrap">
-                        <button class="btn btn-primary" @onclick="( () => EditVariant( v.VariantId ) )">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                        <button class="btn btn-primary" @onclick="( async () => await RemoveVariant( v.VariantId ) )">
-                            <i class="oi oi-trash"></i>
-                        </button>
-                    </div>
+        }
+    
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+        {
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
+            </div>
+        }
+    
+        <div class="row">
+            <div class="col-12 px-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <button class="btn btn-primary" @onclick="CreateNewVariant">
+                        <i class="oi oi-plus"></i> Create New Variant
+                    </button>
                 </div>
-            }
-
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="sortable-header" @onclick="SortById">Variant ID</th>
+                        <th class="sortable-header" @onclick="SortByCategory">Primary Category</th>
+                        <th class="sortable-header" @onclick="SortByName">Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ( VariantViewDto v in _dto )
+                    {
+                        <tr class="admin-view-row">
+                            <td>@v.VariantId</td>
+                            <td>@v.PrimaryCategoryId</td>
+                            <td>@v.VariantName</td>
+                            <td class="text-nowrap">
+                                <button class="btn btn-primary" @onclick="() => EditVariant( v.VariantId )">
+                                    <i class="oi oi-pencil"></i>
+                                </button>
+                                <button class="btn btn-primary" @onclick="async () => await RemoveVariant( v.VariantId )">
+                                    <i class="oi oi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-}
+    }
+</div>

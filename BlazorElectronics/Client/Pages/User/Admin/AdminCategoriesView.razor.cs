@@ -2,6 +2,7 @@ using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -13,6 +14,7 @@ public sealed partial class AdminCategoriesView : AdminView
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
 
     CategoriesViewDto _categories = new();
+    CategoryType _activeCategory = CategoryType.PRIMARY;
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,6 +28,11 @@ public sealed partial class AdminCategoriesView : AdminView
         }
 
         await LoadCategoriesView();
+    }
+
+    void SetActiveCategory( CategoryType type )
+    {
+        _activeCategory = type;
     }
     
     void CreateNewCategory( CategoryType categoryType )
@@ -82,9 +89,9 @@ public sealed partial class AdminCategoriesView : AdminView
         
         categories = categoryId switch
         {
-            CategoryType.PRIMARY => categories.OrderBy( c => c.PrimaryCategory ).ToList(),
-            CategoryType.SECONDARY => categories.OrderBy( c => c.SecondaryCategory ).ToList(),
-            CategoryType.TERTIARY => categories.OrderBy( c => c.TertiaryCategory ).ToList(),
+            CategoryType.PRIMARY => categories.OrderBy( c => c.PrimaryCategoryId ).ToList(),
+            CategoryType.SECONDARY => categories.OrderBy( c => c.SecondaryCategoryId ).ToList(),
+            CategoryType.TERTIARY => categories.OrderBy( c => c.TertiaryCategoryId ).ToList(),
             _ => throw new ArgumentOutOfRangeException( nameof( categoryId ), categoryId, null )
         };
         

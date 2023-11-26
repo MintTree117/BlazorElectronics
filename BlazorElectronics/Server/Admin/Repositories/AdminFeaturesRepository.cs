@@ -16,7 +16,7 @@ public class AdminFeaturesRepository : _AdminRepository, IAdminFeaturesRepositor
     const string PROCEDURE_DELETE_PRODUCT = "Delete_FeaturedProduct";
     const string PROCEDURE_DELETE_DEAL = "Delete_FeaturedDeal";
     
-    protected AdminFeaturesRepository( DapperContext dapperContext )
+    public AdminFeaturesRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
     public async Task<FeaturesViewDto?> GetView()

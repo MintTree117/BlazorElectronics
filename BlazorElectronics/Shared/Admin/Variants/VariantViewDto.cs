@@ -4,7 +4,7 @@ namespace BlazorElectronics.Shared.Admin.Variants;
 
 public sealed class VariantViewDto
 {
-    public PrimaryCategory PrimaryCategory { get; set; }
     public int VariantId { get; set; }
+    public PrimaryCategory PrimaryCategoryId { get; set; }
     public string VariantName { get; set; } = string.Empty;
 }

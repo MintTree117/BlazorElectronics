@@ -131,7 +131,7 @@ public abstract class DapperRepository
     protected const string PARAM_SPEC_VALUES = "@SpecValues";
 
     protected const string TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
-    protected const string TVP_SPEC_VALUES = "TVP_SpecLookupStringValues";
+    protected const string TVP_SPEC_VALUES = "TVP_SpecLookupValues";
     protected const string TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
     
     protected const string TVP_COL_SPEC_ID = "SpecValueId";

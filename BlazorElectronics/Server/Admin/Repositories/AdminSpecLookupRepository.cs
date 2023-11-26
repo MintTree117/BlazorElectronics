@@ -63,21 +63,22 @@ public class AdminSpecLookupRepository : _AdminRepository, IAdminSpecLookupRepos
             return null;
 
         var specModel = await result.ReadSingleOrDefaultAsync<AdminSpecModel>();
-        IEnumerable<int>? specCategories = await result.ReadAsync<int>();
+        bool global = ( await result.ReadFirstOrDefaultAsync<int>() ) > 0;
+        IEnumerable<AdminSpecCategoryModel>? specCategories = await result.ReadAsync<AdminSpecCategoryModel>();
         IEnumerable<AdminSpecValueModel>? specValues = await result.ReadAsync<AdminSpecValueModel>();
         
         return new SpecLookupEditDto
         {
             SpecId = specModel.SpecId,
             SpecName = specModel.SpecName,
-            IsGlobal = await result.ReadSingleOrDefaultAsync<bool>(),
-            PrimaryCategoriesAsString = ConvertPrimaryCategoriesToString( specCategories ),
+            IsGlobal = global,
+            PrimaryCategoriesAsString = ConvertPrimaryCategoriesToString( specCategories.Select( c => c.PrimaryCategoryId ) ),
             ValuesByIdAsString = ConvertSpecValuesToString( specValues )
         };
     }
     static async Task<int> InsertQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleOrDefaultAsync( PROCEDURE_INSERT, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+        return await connection.ExecuteScalarAsync<int>( PROCEDURE_INSERT, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> UpdateQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {

@@ -16,13 +16,13 @@ public sealed class AdminVariantServiceClient : AdminServiceClient, IAdminVarian
     public AdminVariantServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public async Task<ApiReply<VariantsViewDto?>> GetView()
+    public async Task<ApiReply<List<VariantViewDto>?>> GetView()
     {
-        return await TryUserRequest<VariantsViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<List<VariantViewDto>?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<VariantEditDto?>> GetEdit( VariantGetEditDto data )
+    public async Task<ApiReply<VariantEditDto?>> GetEdit( IdDto data )
     {
-        return await TryUserRequest<VariantGetEditDto, VariantEditDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<IdDto, VariantEditDto?>( API_ROUTE_GET_EDIT, data );
     }
     public async Task<ApiReply<int>> Add( VariantAddDto data )
     {
@@ -32,8 +32,8 @@ public sealed class AdminVariantServiceClient : AdminServiceClient, IAdminVarian
     {
         return await TryUserRequest<VariantEditDto, bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> Remove( VariantRemoveDto data )
+    public async Task<ApiReply<bool>> Remove( IdDto data )
     {
-        return await TryUserRequest<VariantRemoveDto, bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<IdDto, bool>( API_ROUTE_REMOVE, data );
     }
 }

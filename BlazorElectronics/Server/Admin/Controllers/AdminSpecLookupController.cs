@@ -43,14 +43,14 @@ public class AdminSpecLookupController : _AdminController
             return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
         }
     }
-    [HttpPost( "get-spec-edit" )]
+    [HttpPost( "get-spec-lookup-edit" )]
     public async Task<ActionResult<ApiReply<SpecLookupEditDto>>> GetEdit( [FromBody] UserDataRequest<IdDto>? request )
     {
         HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
 
         if ( authorized.HttpError is not null )
             return authorized.HttpError;
-
+        
         try
         {
             SpecLookupEditDto? result = await _repository.GetEdit( request!.Payload!.Id );

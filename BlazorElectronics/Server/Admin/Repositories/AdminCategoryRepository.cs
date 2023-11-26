@@ -74,7 +74,7 @@ public class AdminCategoryRepository : _AdminRepository, IAdminCategoryRepositor
         IEnumerable<CategoryViewDto>? primary = await multi.ReadAsync<CategoryViewDto>();
         IEnumerable<CategoryViewDto>? secondary = await multi.ReadAsync<CategoryViewDto>();
         IEnumerable<CategoryViewDto>? tertiary = await multi.ReadAsync<CategoryViewDto>();
-
+        
         return new CategoriesViewDto
         {
             Primary = primary is not null ? primary.ToList() : new List<CategoryViewDto>(),

@@ -4,7 +4,7 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 
 public interface IAdminVariantRepository
 {
-    Task<VariantsViewDto?> GetView();
+    Task<List<VariantViewDto>?> GetView();
     Task<VariantEditDto?> GetEdit( int id );
     Task<int> Insert( VariantAddDto dto );
     Task<bool> Update( VariantEditDto dto );

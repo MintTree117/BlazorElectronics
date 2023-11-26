@@ -11,7 +11,7 @@ public partial class AdminVariantsView : AdminView
     
     [Inject] IAdminVariantServiceClient AdminVariantServiceClient { get; set; } = default!;
 
-    VariantsViewDto _dto = new();
+    List<VariantViewDto> _dto = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,8 +37,7 @@ public partial class AdminVariantsView : AdminView
     }
     async Task RemoveVariant( int variantId )
     {
-        var removeDto = new VariantRemoveDto( variantId );
-        ApiReply<bool> reply = await AdminVariantServiceClient.Remove( removeDto );
+        ApiReply<bool> reply = await AdminVariantServiceClient.Remove( new IdDto( variantId ) );
 
         if ( !reply.Success )
         {
@@ -54,7 +53,7 @@ public partial class AdminVariantsView : AdminView
     {
         PageIsLoaded = false;
 
-        ApiReply<VariantsViewDto?> reply = await AdminVariantServiceClient.GetView();
+        ApiReply<List<VariantViewDto>?> reply = await AdminVariantServiceClient.GetView();
 
         PageIsLoaded = true;
 
@@ -67,5 +66,18 @@ public partial class AdminVariantsView : AdminView
 
         _dto = reply.Data;
         ViewMessage = string.Empty;
+    }
+
+    void SortById()
+    {
+        _dto = _dto.OrderBy( v => v.VariantId ).ToList();
+    }
+    void SortByCategory()
+    {
+        _dto = _dto.OrderBy( v => v.PrimaryCategoryId ).ToList();
+    }
+    void SortByName()
+    {
+        _dto = _dto.OrderBy( v => v.VariantName ).ToList();
     }
 }

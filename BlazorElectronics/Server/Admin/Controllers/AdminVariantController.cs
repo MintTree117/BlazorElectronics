@@ -21,7 +21,7 @@ public class AdminVariantController : _AdminController
     }
     
     [HttpPost( "get-variants-view" )]
-    public async Task<ActionResult<ApiReply<VariantsViewDto>>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<ApiReply<List<VariantViewDto>>>> GetView( [FromBody] UserRequest? request )
     {
         HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
 
@@ -30,10 +30,10 @@ public class AdminVariantController : _AdminController
 
         try
         {
-            VariantsViewDto? result = await _repository.GetView();
+            List<VariantViewDto>? result = await _repository.GetView();
 
             return result is not null
-                ? Ok( new ApiReply<VariantsViewDto>( result ) )
+                ? Ok( new ApiReply<List<VariantViewDto>>( result ) )
                 : NotFound( NO_DATA_MESSAGE );
         }
         catch ( ServiceException e )

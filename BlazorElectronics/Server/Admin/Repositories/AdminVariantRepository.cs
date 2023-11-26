@@ -3,6 +3,7 @@ using System.Data.Common;
 using BlazorElectronics.Server.Admin.Models;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Shared.Admin.Variants;
+using BlazorElectronics.Shared.Enums;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -19,7 +20,7 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
     public AdminVariantRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
-    public async Task<VariantsViewDto?> GetView()
+    public async Task<List<VariantViewDto>?> GetView()
     {
         return await TryQueryAsync( GetViewQuery );
     }
@@ -48,28 +49,30 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
         return await TryQueryTransactionAsync( DeleteQuery, parameters );
     }
 
-    static async Task<VariantsViewDto?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<List<VariantViewDto>?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         IEnumerable<VariantViewDto>? result = await connection.QueryAsync<VariantViewDto>( PROCEDURE_GET_VIEW, commandType: CommandType.StoredProcedure );
-
-        if ( result is null )
-            return null;
-        
-        return new VariantsViewDto
-        {
-            VariantTypes = result.ToList()
-        };
+        return result?.ToList();
     }
     static async Task<VariantEditDto?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
 
+        if ( multi is null )
+            return null;
+        
         var view = await multi.ReadFirstOrDefaultAsync<VariantViewDto>();
-        IEnumerable<AdminVariantValueModel>? values = await multi.ReadAsync<AdminVariantValueModel>();
 
+        if ( view is null )
+            return null;
+        
+        IEnumerable<AdminVariantValueModel>? values = await multi.ReadAsync<AdminVariantValueModel>();
+        
         return new VariantEditDto
         {
             VariantId = view.VariantId,
+            VariantName = view.VariantName,
+            PrimaryCategoryId = view.PrimaryCategoryId,
             VariantValues = ConvertVariantValuesToString( values )
         };
     }
@@ -88,7 +91,7 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
        return rowsAffected > 0;
     }
     
-    static DynamicParameters GetInsertParameters( int primaryCategory, string name, string values )
+    static DynamicParameters GetInsertParameters( PrimaryCategory primaryCategory, string name, string values )
     {
         var parameters = new DynamicParameters();
         
