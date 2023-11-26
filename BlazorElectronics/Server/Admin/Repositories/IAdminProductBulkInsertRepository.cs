@@ -4,7 +4,7 @@ using BlazorElectronics.Server.Dtos.SpecLookups;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 
-public interface IAdminProductDummyInsertRepository
+public interface IAdminProductBulkInsertRepository
 {
     Task<bool> Insert( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups );
 }

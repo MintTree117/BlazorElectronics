@@ -1,0 +1,72 @@
+@page "/admin/vendors/view"
+@using BlazorElectronics.Shared.Admin.Vendors
+@inherits AdminView
+
+<div class="container-sm">
+    @if ( PageIsRedirecting )
+    {
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>@ViewMessage</p>
+            <p>Redirecting in @PageRedirectCountdown...</p>
+        </div>
+    }
+    else if ( !PageIsReady() )
+    {
+        <span>@ViewMessage</span>
+    }
+    else
+    {
+        <h3>Vendors View</h3>
+    
+        if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
+        {
+            <div class="@ViewMessageClass">
+                <span>@ViewMessage</span>
+            </div>
+        }
+    
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+        {
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
+            </div>
+        }
+    
+        <div class="row">
+            <div class="col-12 px-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <button class="btn btn-primary" @onclick="AddNewVendor">
+                        <i class="oi oi-plus"></i> Add Vendor
+                    </button>
+                </div>
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="sortable-header" @onclick="SortById">Vendor Id</th>
+                        <th class="sortable-header" @onclick="SortByName">Vendor Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ( VendorEditDto v in _dto.Vendors )
+                    {
+                        <tr class="admin-view-row">
+                            <td>@v.VendorId</td>
+                            <td>@v.VendorName</td>
+                            <td class="text-nowrap">
+                                <button class="btn btn-primary" @onclick="() => EditVendor( v.VendorId )">
+                                    <i class="oi oi-pencil"></i>
+                                </button>
+                                <button class="btn btn-primary" @onclick="async () => await RemoveVendor( v.VendorId )">
+                                    <i class="oi oi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

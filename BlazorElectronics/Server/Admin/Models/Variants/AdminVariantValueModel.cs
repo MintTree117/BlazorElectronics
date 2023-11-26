@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Server.Admin.Models;
+namespace BlazorElectronics.Server.Admin.Models.Variants;
 
 public sealed class AdminVariantValueModel
 {

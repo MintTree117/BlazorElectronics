@@ -10,13 +10,14 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 
-public sealed class AdminProductDummyRepository : DapperRepository, IAdminProductDummyInsertRepository
+public sealed class AdminProductBulkRepository : DapperRepository, IAdminProductBulkInsertRepository
 {
-    int MAX_CATEGORIES = 3;
+    const int MAX_CATEGORIES = 3;
+    const int SAFETY = 200;
     
     readonly Random _random = new();
     
-    public AdminProductDummyRepository( DapperContext dapperContext )
+    public AdminProductBulkRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
     public async Task<bool> Insert( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups )
@@ -37,7 +38,8 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
         } );
     }
     
-    T GetBaseModel<T>( int category, int i, CachedCategories cachedCategories, CachedSpecLookupData specLookups ) where T : AdminProductModel, new()
+    // BASE MODEL
+    T GetBaseModel<T>( int category, int i, CachedCategories categories, CachedSpecLookupData lookups ) where T : AdminProductModel, new()
     {
         var model = new T
         {
@@ -48,16 +50,16 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
             NumberSold = GetRandomInt( 0, AdminProductData.MAX_NUM_SOLD ),
             HasDrm = GetRandomBoolean(),
             HasSale = GetRandomBoolean(),
-            //Languages = GetRandomSpecLookups( specLookups.Languages ),
-            //MatureContent = GetRandomSpecLookups( specLookups.MatureContent ),
+            Languages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.Language, lookups ), 8 ),
+            MatureContent = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MatureContent, lookups ), 8 ),
             PrimaryCategoryId = category,
-            SecondaryCategoryIds = GetRandomSecondaryCategories( category, cachedCategories ),
+            SecondaryCategoryIds = GetRandomSecondaryCategories( category, categories ),
         };
 
-        model.TertiaryCategoryIds = GetRandomTertiaryCategories( model.SecondaryCategoryIds, cachedCategories );
-
+        model.TertiaryCategoryIds = GetRandomTertiaryCategories( model.SecondaryCategoryIds, categories );
         return model;
     }
+    // SPECIFIC MODELS
     List<AdminBookModel> GetBookModels( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups )
     {
         var books = new List<AdminBookModel>();
@@ -165,18 +167,15 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
 
         return courses;
     }
-    
-    // UTILITY
+    // CATEGORY
     List<int> GetRandomSecondaryCategories( int primaryCategory, CachedCategories cachedCategoryData )
     {
-        int pcId = 0;// cachedCategoryData.PrimaryIds[ primaryCategory ];
-        PrimaryCategoryResponse response = cachedCategoryData.PrimaryResponses[ pcId ];
+        PrimaryCategoryResponse response = cachedCategoryData.PrimaryResponses[ primaryCategory ];
         
         var picked = new HashSet<int>();
         
         int maxIndex = response.ChildCategories.Count - 1;
-        int amount = Math.Min( GetRandomInt( 0, maxIndex ), MAX_CATEGORIES );
-        const int safety = 200;
+        int amount = GetRandomInt( 0, MAX_CATEGORIES );
         int count = 0;
         
         while ( picked.Count < amount )
@@ -186,7 +185,7 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
             if ( picked.Contains( i ) )
             {
                 count++;
-                if ( count > safety )
+                if ( count > SAFETY )
                     break;
             }
             
@@ -230,14 +229,14 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
         
         return tertiaryCategories;
     }
-    List<int> GetRandomSpecLookups( IReadOnlyList<CachedSpecLookupData> lookups )
+    // SPEC LOOKUP
+    List<int> GetRandomSpecLookups( int maxIndex, int maxAmount )
     {
         var alreadyPicked = new HashSet<int>();
-
-        int maxIndex = lookups.Count - 1;
-        int amount = GetRandomInt( 0, maxIndex );
-        int safety = 200;
+        
+        int amount = GetRandomInt( 0, maxAmount );
         int count = 0;
+        
         while ( alreadyPicked.Count < amount )
         {
             int i = GetRandomInt( 0, maxIndex );
@@ -245,7 +244,8 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
             if ( alreadyPicked.Contains( i ) )
             {
                 count++;
-                if ( count > safety )
+                
+                if ( count > SAFETY )
                     break;
             }
             
@@ -254,6 +254,11 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
 
         return alreadyPicked.ToList();
     }
+    int GetLookupMaxIndex( SpecLookupType type, CachedSpecLookupData lookups )
+    {
+        return lookups.ResponsesBySpecId[ ( int ) type ].Values.Count - 1;
+    }
+    // VARIANT
     VariantModel GetRandomVariant( int id, bool onSale )
     {
         decimal price = GetRandomDecimal( 0, AdminProductData.MAX_PRICE );
@@ -265,6 +270,7 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
             VariantSalePrice = onSale ? GetRandomDecimal( 0, price ) : null
         };
     }
+    // SPEC
     string GetRandomSpec( IReadOnlyList<string> list )
     {
         int index = GetRandomInt( 0, list.Count - 1 );
@@ -290,7 +296,7 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
 
         return string.Join( ",", specs.Values );
     }
-    
+    // RANDOM VALUES
     DateTime GetRandomDate()
     {
         // Convert to ticks
@@ -336,7 +342,7 @@ public sealed class AdminProductDummyRepository : DapperRepository, IAdminProduc
     {
         return 0;
     }
-
+    // MODELS
     class ProductModels
     {
         public List<AdminBookModel> Books { get; set; } = new();

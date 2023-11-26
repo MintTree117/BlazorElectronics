@@ -10,6 +10,7 @@ namespace BlazorElectronics.Server.Admin.Repositories;
 public class AdminFeaturesRepository : _AdminRepository, IAdminFeaturesRepository
 {
     const string PROCEDURE_GET_VIEW = "Get_FeaturesView";
+    const string PROCEDURE_GET_PRODUCT_EDIT = "Get_FeaturedProductEdit";
     const string PROCEDURE_INSERT_PRODUCT = "Insert_FeaturedProduct";
     const string PROCEDURE_INSERT_DEAL = "Insert_FeaturedDeal";
     const string PROCEDURE_UPDATE_PRODUCT = "Update_FeaturedProduct";
@@ -37,6 +38,13 @@ public class AdminFeaturesRepository : _AdminRepository, IAdminFeaturesRepositor
         parameters.Add( PARAM_PRODUCT_ID, productId );
         
         return await TryQueryTransactionAsync( InsertDealQuery, parameters );
+    }
+    public async Task<FeaturedProductEditDto?> GetFeaturedProductEdit( int productId )
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add( PARAM_PRODUCT_ID, productId );
+
+        return await TryQueryAsync( GetProductEditQuery );
     }
     public async Task<bool> UpdateFeaturedProduct( FeaturedProductEditDto dto )
     {
@@ -76,6 +84,10 @@ public class AdminFeaturesRepository : _AdminRepository, IAdminFeaturesRepositor
             FeaturedProducts = products is not null ? products.ToList() : new List<FeaturedProductEditDto>(),
             FeaturedDeals = deals is not null ? deals.ToList() : new List<FeaturedDealEditDto>()
         };
+    }
+    static async Task<FeaturedProductEditDto?> GetProductEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    {
+        return await connection.QuerySingleOrDefaultAsync<FeaturedProductEditDto>( PROCEDURE_GET_PRODUCT_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> InsertProductQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {

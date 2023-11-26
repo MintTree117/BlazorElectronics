@@ -16,17 +16,17 @@ public sealed class AdminVariantServiceClient : AdminServiceClient, IAdminVarian
     public AdminVariantServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public async Task<ApiReply<List<VariantViewDto>?>> GetView()
+    public async Task<ApiReply<VariantsViewDto?>> GetView()
     {
-        return await TryUserRequest<List<VariantViewDto>?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<VariantsViewDto?>( API_ROUTE_GET_VIEW );
     }
     public async Task<ApiReply<VariantEditDto?>> GetEdit( IdDto data )
     {
         return await TryUserRequest<IdDto, VariantEditDto?>( API_ROUTE_GET_EDIT, data );
     }
-    public async Task<ApiReply<int>> Add( VariantAddDto data )
+    public async Task<ApiReply<int>> Add( VariantEditDto data )
     {
-        return await TryUserRequest<VariantAddDto, int>( API_ROUTE_ADD, data );
+        return await TryUserRequest<VariantEditDto, int>( API_ROUTE_ADD, data );
     }
     public async Task<ApiReply<bool>> Update( VariantEditDto data )
     {

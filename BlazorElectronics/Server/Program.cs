@@ -51,6 +51,7 @@ builder.Services.AddScoped<IAdminCategoryRepository, AdminCategoryRepository>();
 builder.Services.AddScoped<IAdminFeaturesRepository, AdminFeaturesRepository>();
 builder.Services.AddScoped<IAdminSpecLookupRepository, AdminSpecLookupRepository>();
 builder.Services.AddScoped<IAdminVariantRepository, AdminVariantRepository>();
+builder.Services.AddScoped<IAdminVendorRepository, AdminVendorRepository>();
 
 WebApplication app = builder.Build();
 

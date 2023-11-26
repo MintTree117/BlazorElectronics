@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.Admin.Models;
+using BlazorElectronics.Server.Admin.Models.Variants;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Shared.Admin.Variants;
 using BlazorElectronics.Shared.Enums;
@@ -20,7 +21,7 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
     public AdminVariantRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
-    public async Task<List<VariantViewDto>?> GetView()
+    public async Task<VariantsViewDto?> GetView()
     {
         return await TryQueryAsync( GetViewQuery );
     }
@@ -31,7 +32,7 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
 
         return await TryQueryAsync( GetEditQuery, parameters );
     }
-    public async Task<int> Insert( VariantAddDto dto )
+    public async Task<int> Insert( VariantEditDto dto )
     {
         DynamicParameters parameters = GetInsertParameters( dto.PrimaryCategoryId, dto.VariantName, dto.VariantValues );
         return await TryQueryTransactionAsync( InsertQuery, parameters );
@@ -49,10 +50,17 @@ public sealed class AdminVariantRepository : _AdminRepository, IAdminVariantRepo
         return await TryQueryTransactionAsync( DeleteQuery, parameters );
     }
 
-    static async Task<List<VariantViewDto>?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<VariantsViewDto?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         IEnumerable<VariantViewDto>? result = await connection.QueryAsync<VariantViewDto>( PROCEDURE_GET_VIEW, commandType: CommandType.StoredProcedure );
-        return result?.ToList();
+
+        if ( result is null )
+            return null;
+
+        return new VariantsViewDto
+        {
+            Variants = result.ToList()
+        };
     }
     static async Task<VariantEditDto?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {

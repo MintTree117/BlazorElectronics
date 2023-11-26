@@ -11,7 +11,7 @@ public partial class AdminVariantsView : AdminView
     
     [Inject] IAdminVariantServiceClient AdminVariantServiceClient { get; set; } = default!;
 
-    List<VariantViewDto> _dto = new();
+    VariantsViewDto _dto = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,7 +53,7 @@ public partial class AdminVariantsView : AdminView
     {
         PageIsLoaded = false;
 
-        ApiReply<List<VariantViewDto>?> reply = await AdminVariantServiceClient.GetView();
+        ApiReply<VariantsViewDto?> reply = await AdminVariantServiceClient.GetView();
 
         PageIsLoaded = true;
 
@@ -70,14 +70,14 @@ public partial class AdminVariantsView : AdminView
 
     void SortById()
     {
-        _dto = _dto.OrderBy( v => v.VariantId ).ToList();
+        _dto.Variants = _dto.Variants.OrderBy( v => v.VariantId ).ToList();
     }
     void SortByCategory()
     {
-        _dto = _dto.OrderBy( v => v.PrimaryCategoryId ).ToList();
+        _dto.Variants = _dto.Variants.OrderBy( v => v.PrimaryCategoryId ).ToList();
     }
     void SortByName()
     {
-        _dto = _dto.OrderBy( v => v.VariantName ).ToList();
+        _dto.Variants = _dto.Variants.OrderBy( v => v.VariantName ).ToList();
     }
 }

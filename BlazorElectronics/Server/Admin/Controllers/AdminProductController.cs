@@ -9,7 +9,7 @@ namespace BlazorElectronics.Server.Admin.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class AdminProductController : _AdminController
+public sealed class AdminProductController : _AdminController
 {
     readonly IAdminProductRepository _repository;
     

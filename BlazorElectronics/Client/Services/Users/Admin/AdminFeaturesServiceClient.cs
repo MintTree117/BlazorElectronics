@@ -8,43 +8,23 @@ public class AdminFeaturesServiceClient : AdminServiceClient, IAdminFeaturesServ
 {
     const string API_ROUTE = "api/adminfeatures";
     const string API_ROUTE_GET_VIEW = API_ROUTE + "/get-features-view";
+    const string API_ROUTE_GET_PRODUCT_EDIT = API_ROUTE + "/get-featured-product-edit";
     const string API_ROUTE_ADD_DEAL = API_ROUTE + "/add-featured-deal";
     const string API_ROUTE_ADD_PRODUCT = API_ROUTE + "/add-featured-product";
     const string API_ROUTE_UPDATE_PRODUCT = API_ROUTE + "/update-featured-product";
     const string API_ROUTE_REMOVE_DEAL = API_ROUTE + "/remove-featured-deal";
     const string API_ROUTE_REMOVE_PRODUCT = API_ROUTE + "/remove-featured-product";
     
-    FeaturesViewDto? _features;
-    
     public AdminFeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
     public async Task<ApiReply<FeaturesViewDto?>> GetFeaturesView()
     {
-        ApiReply<FeaturesViewDto?> reply = await TryUserRequest<FeaturesViewDto?>( API_ROUTE_GET_VIEW );
-
-        if ( reply is { Success: true, Data: not null } )
-            _features = reply.Data;
-
-        return reply;
+        return await TryUserRequest<FeaturesViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( int productId )
+    public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( IdDto dto )
     {
-        FeaturedProductEditDto? featuredProduct = _features?.FeaturedProducts.First( p => p.ProductId == productId );
-
-        if ( featuredProduct != null )
-            return new ApiReply<FeaturedProductEditDto?>( featuredProduct );
-
-        ApiReply<FeaturesViewDto?> reply = await GetFeaturesView();
-
-        if ( !reply.Success || _features is null )
-            return new ApiReply<FeaturedProductEditDto?>( reply.Message );
-
-        featuredProduct = _features?.FeaturedProducts.First( p => p.ProductId == productId );
-
-        return featuredProduct is not null
-            ? new ApiReply<FeaturedProductEditDto?>( featuredProduct )
-            : new ApiReply<FeaturedProductEditDto?>( "Feature not found!" );
+        return await TryUserRequest<IdDto, FeaturedProductEditDto?>( API_ROUTE_GET_PRODUCT_EDIT, dto );
     }
     public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductEditDto dto )
     {

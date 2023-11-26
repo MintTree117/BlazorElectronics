@@ -3,6 +3,7 @@ using BlazorElectronics.Server.Controllers;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Admin.Variants;
+using BlazorElectronics.Shared.Admin.Vendors;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace BlazorElectronics.Server.Admin.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class AdminVariantController : _AdminController
+public sealed class AdminVariantController : _AdminController
 {
     readonly IAdminVariantRepository _repository;
     
@@ -21,7 +22,7 @@ public class AdminVariantController : _AdminController
     }
     
     [HttpPost( "get-variants-view" )]
-    public async Task<ActionResult<ApiReply<List<VariantViewDto>>>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<ApiReply<VariantsViewDto>>> GetView( [FromBody] UserRequest? request )
     {
         HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
 
@@ -30,10 +31,10 @@ public class AdminVariantController : _AdminController
 
         try
         {
-            List<VariantViewDto>? result = await _repository.GetView();
+            VariantsViewDto? result = await _repository.GetView();
 
             return result is not null
-                ? Ok( new ApiReply<List<VariantViewDto>>( result ) )
+                ? Ok( new ApiReply<VariantsViewDto>( result ) )
                 : NotFound( NO_DATA_MESSAGE );
         }
         catch ( ServiceException e )
@@ -65,7 +66,7 @@ public class AdminVariantController : _AdminController
         }
     }
     [HttpPost( "add-variant" )]
-    public async Task<ActionResult<ApiReply<int>>> Add( [FromBody] UserDataRequest<VariantAddDto>? request )
+    public async Task<ActionResult<ApiReply<int>>> Add( [FromBody] UserDataRequest<VariantEditDto>? request )
     {
         HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
 

@@ -81,8 +81,7 @@ public partial class AdminVariantsEdit : AdminView
     }
     async Task SubmitNew()
     {
-        var request = new VariantAddDto( _dto );
-        ApiReply<int> reply = await AdminVariantServiceClient.Add( request );
+        ApiReply<int> reply = await AdminVariantServiceClient.Add( _dto );
 
         if ( !reply.Success )
         {

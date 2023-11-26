@@ -21,7 +21,7 @@ public sealed class AdminFeaturesController : _AdminController
     }
     
     [HttpPost( "get-features-view" )]
-    public async Task<ActionResult<ApiReply<List<FeaturesViewDto>>>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<ApiReply<FeaturesViewDto>>> GetView( [FromBody] UserRequest? request )
     {
         HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
 
@@ -34,6 +34,28 @@ public sealed class AdminFeaturesController : _AdminController
 
             return result is not null
                 ? Ok( new ApiReply<FeaturesViewDto>( result ) )
+                : NotFound( NO_DATA_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
+        }
+    }
+    [HttpPost( "get-featured-product-edit" )]
+    public async Task<ActionResult<ApiReply<FeaturedProductEditDto>>> GetProductEdit( [FromBody] UserDataRequest<IdDto>? request )
+    {
+        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+
+        if ( authorized.HttpError is not null )
+            return authorized.HttpError;
+
+        try
+        {
+            FeaturedProductEditDto? result = await _repository.GetFeaturedProductEdit( request!.Payload!.Id );
+
+            return result is not null
+                ? Ok( new ApiReply<FeaturedProductEditDto>( result ) )
                 : NotFound( NO_DATA_MESSAGE );
         }
         catch ( ServiceException e )

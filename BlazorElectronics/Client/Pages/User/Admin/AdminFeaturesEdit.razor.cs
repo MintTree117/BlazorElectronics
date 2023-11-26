@@ -42,7 +42,7 @@ public partial class AdminFeaturesEdit : AdminView
             return;
         }
 
-        ApiReply<FeaturedProductEditDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( featureId );
+        ApiReply<FeaturedProductEditDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IdDto( featureId ) );
 
         if ( !reply.Success || reply.Data is null )
         {

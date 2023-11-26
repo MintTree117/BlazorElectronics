@@ -19,10 +19,7 @@ public static class AdminProductData
     public const int MAX_EPISODES = 1000;
 
     public const int MAX_COURSE_DURATION = 500;
-
-    public static readonly string[] LANGUAGES =
-        { };
-
+    
     public static readonly string[] NAMES =
     {
         "James Smith",
@@ -76,7 +73,6 @@ public static class AdminProductData
         "Walter Diaz",
         "Gloria Gray"
     };
-
     public static readonly string[] ISBNS =
     {
         "978-3-16-148410-0",
@@ -110,7 +106,6 @@ public static class AdminProductData
         "978-0-06-083865-2",
         "978-0-7615-3643-7"
     };
-
     public static readonly string[] PUBLISHERS =
     {
         "Penguin Random House",
@@ -144,7 +139,6 @@ public static class AdminProductData
         "Chronicle Books",
         "Zondervan"
     };
-
     public static readonly string[] DIRECTORS =
     {
         "Steven Spielberg",
@@ -178,7 +172,6 @@ public static class AdminProductData
         "John Woo",
         "Zack Snyder"
     };
-
     public static readonly string[] ACTORS =
     {
         "Tom Hanks",
@@ -232,7 +225,6 @@ public static class AdminProductData
         "Michael Fassbender",
         "Saoirse Ronan"
     };
-
     public static readonly string[] SOFTWARE_VERSIONS =
     {
         "1.0.0",
@@ -266,7 +258,6 @@ public static class AdminProductData
         "8.0.0",
         "8.1.0"
     };
-
     public static readonly string[] SOFTWARE_DEVELOPERS =
     {
         "Bill Gates",
@@ -300,7 +291,6 @@ public static class AdminProductData
         "Gabe Newell",
         "Tommy Refenes"
     };
-
     public static readonly string[] GAME_DEVELOPERS =
     {
         "Nintendo",
@@ -334,9 +324,7 @@ public static class AdminProductData
         "Obsidian Entertainment",
         "Respawn Entertainment"
     };
-    
-
-public static readonly string[] SOFTWARE_DEPENDENCIES =
+    public static readonly string[] SOFTWARE_DEPENDENCIES =
     {
         "Newtonsoft.Json",
         "Entity Framework",
@@ -369,7 +357,6 @@ public static readonly string[] SOFTWARE_DEPENDENCIES =
         "PHPUnit",
         "Apache Commons"
     };
-
     public static readonly string[] SOFTWARE_TRIAL_LIMITATIONS =
     {
         "Time-Limited Usage",
@@ -383,7 +370,6 @@ public static readonly string[] SOFTWARE_DEPENDENCIES =
         "Restricted File Saving",
         "Limited Number of Records"
     };
-
     public static readonly string[] COURSE_REQUIREMENTS =
     {
         "Basic Understanding of Subject Matter",
@@ -407,5 +393,4 @@ public static readonly string[] SOFTWARE_DEPENDENCIES =
         "Payment of Course Fee",
         "Signed Student Agreement"
     };
-
 }

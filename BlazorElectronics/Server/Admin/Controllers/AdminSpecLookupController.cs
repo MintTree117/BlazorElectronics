@@ -11,7 +11,7 @@ namespace BlazorElectronics.Server.Admin.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class AdminSpecLookupController : _AdminController
+public sealed class AdminSpecLookupController : _AdminController
 {
     readonly IAdminSpecLookupRepository _repository;
 

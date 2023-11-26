@@ -110,7 +110,7 @@ public abstract class DapperRepository
     protected const string COL_USER_HASH = "PasswordHash";
     protected const string COL_USER_SALT = "PasswordSalt";
     protected const string COL_USER_DATE = "DateCreated";
-    
+
     // PARAM CATEGORY
     protected const string PARAM_CATEGORY_ID = "@CategoryId";
     protected const string PARAM_CATEGORY_TYPE = "@CategoryTier";
@@ -121,16 +121,17 @@ public abstract class DapperRepository
     protected const string PARAM_CATEGORY_API_URL = "@ApiUrl";
     protected const string PARAM_CATEGORY_IMAGE_URL = "@ImageUrl";
     protected const string PARAM_CATEGORY_DESCRIPTION = "@Description";
-    
-    // PARAM SPECS
+
+    protected const string TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
     protected const string PARAM_PRIMARY_CATEGORIES = "@PrimaryCategories";
     protected const string PARAM_IS_GLOBAL = "@IsGlobal";
+    
+    // PARAM SPECS
     protected const string PARAM_SPEC_ID = "@SpecId";
     protected const string PARAM_SPEC_NAME = "@SpecName";
     protected const string PARAM_FILTER_VALUES = "@FilterValues";
     protected const string PARAM_SPEC_VALUES = "@SpecValues";
-
-    protected const string TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
+    
     protected const string TVP_SPEC_VALUES = "TVP_SpecLookupValues";
     protected const string TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
     
@@ -176,6 +177,11 @@ public abstract class DapperRepository
     protected const string TVP_COL_VARIANT_VALUE_ID = "VariantValueId";
     protected const string TVP_COL_VARIANT_VALUE = "VariantValue";
     
+    // PARAM VENDORS
+    protected const string PARAM_VENDOR_ID = "@VendorId";
+    protected const string PARAM_VENDOR_NAME = "@VendorName";
+    protected const string PARAM_VENDOR_URL = "@VendorUrl";
+
     // EXCEPTION CONSTS
     const int MAX_RETRIES = 3;
     const int RETRY_DELAY_MILLISECONDS = 1000;

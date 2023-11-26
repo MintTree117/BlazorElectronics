@@ -1,0 +1,53 @@
+@page "/admin/vendors/edit"
+@inherits AdminView
+
+<div class="container-sm">
+    @if ( PageIsRedirecting )
+    {
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>@ViewMessage</p>
+            <p>Redirecting in @PageRedirectCountdown...</p>
+        </div>
+    }
+    else if ( !PageIsReady() )
+    {
+        <span>@ViewMessage</span>
+    }
+    else
+    {
+        if ( _newVendor )
+        {
+            <h3>Add New Vendor</h3>
+        }
+        else
+        {
+            <h3>Edit Vendor</h3>
+        }
+
+        <EditForm Model="_dto" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="Name" class="form-label">Vendor Name</label>
+                <InputText @bind-Value="_dto.VendorName" class="form-control" id="Name"></InputText>
+            </div>
+            <div class="mb-3">
+                <label for="Url" class="form-label">Vendor Url</label>
+                <InputText @bind-Value="_dto.VendorUrl" class="form-control" id="Url"></InputText>
+            </div>
+            <div class="mb-3">
+                <label for="Categories" class="form-label">Primary Categories, Separate by Comma</label>
+                <InputTextArea @bind-Value="_dto.PrimaryCategories" class="form-control" id="Categories"></InputTextArea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="oi oi-cloud-upload"></i>
+            </button>
+        </EditForm>
+
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+        {
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
+            </div>
+        }
+    }
+</div>
