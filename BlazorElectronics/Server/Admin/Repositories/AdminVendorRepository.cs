@@ -126,7 +126,7 @@ public class AdminVendorRepository : _AdminRepository, IAdminVendorRepository
         int rowsAffected = await connection.ExecuteAsync( PROCEDURE_DELETE, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
         return rowsAffected > 0;
     }
-
+    
     static DynamicParameters GetInsertParameters( VendorEditDto dto )
     {
         var parameters = new DynamicParameters();

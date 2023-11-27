@@ -1,15 +1,18 @@
 namespace BlazorElectronics.Server.Admin.Services;
 
-public static class AdminProductData
+public static class ProductSeedData
 {
-    public static readonly string[] PRODUCT_TITLES =
-        { "Book", "Software", "Video Game", "Movie/Tv", "Course" };
-    public static readonly string[] PRODUCT_IMAGES =
-        { "Book", "Software", "Video Game", "Movie/Tv", "Course" };
-    public static readonly DateTime MIN_RELEASE_DATE = new();
+    public static readonly string[] PRODUCT_TITLES = { "Book", "Software", "Video Game", "Movie/Tv", "Course" };
+    public static readonly string[] PRODUCT_IMAGES = { "Book.jpg", "Software.jpg", "VideoGame.jpg", "MovieTv.jpg", "Course.jpg" };
+
+    public const int MAX_CATEGORIES = 3;
+    
+    public static readonly DateTime MIN_RELEASE_DATE = new ( 2000, 1, 1 );
     public static readonly DateTime MAX_RELEASE_DATE = DateTime.Now;
+    
     public const int MAX_NUM_SOLD = 100000;
-    public const decimal MAX_PRICE = 9999;
+    public const double MIN_PRICE = 0.99;
+    public const double MAX_PRICE = 9999.99;
     public const float MAX_RATING = 5.0f;
 
     public const int MAX_PAGE_LENGTH = 1000;
@@ -19,7 +22,41 @@ public static class AdminProductData
     public const int MAX_EPISODES = 1000;
 
     public const int MAX_COURSE_DURATION = 500;
-    
+
+    public const int MIN_FILE_SIZE = 1;
+    public const int MAX_FILE_SIZE = 100000;
+
+    public static readonly string[] BOOK_DESCR =
+    {
+        "Dive into the epic fantasy realm of 'Thrones of Destiny,' an Ebook that weaves a tale of power, betrayal, and magic. Follow the journey of a young hero who must navigate the treacherous alliances of the court to claim their rightful throne and save their kingdom from darkness.",
+        "Unlock the mysteries of productivity with 'The Efficient You,' an Ebook designed to transform your work ethic. This guide offers practical advice on managing time, optimizing your workspace, and harnessing the power of habits to unlock your full potential.",
+        "Explore the culinary delights of 'Flavors of the World' from the comfort of your home. This Ebook brings you a collection of recipes that takes you on a gastronomic tour, featuring dishes from the bustling streets of Bangkok to the quaint bistros of Paris."
+    };
+    public static readonly string[] SOFTWARE_DESCR =
+    {
+        "Introducing 'CodeMaster Pro,' a revolutionary software that streamlines the development process. It comes equipped with an intuitive interface, intelligent code completion, and robust debugging tools to enhance your coding efficiency.",
+        "Discover 'BeatGuru,' the ultimate music production software for both aspiring and professional producers. With an extensive sound library, intuitive mixing console, and advanced mastering tools, create music that resonates with your unique style.",
+        "Streamline your business with 'TaskFlow,' a task management software designed to optimize workflow. It features customizable boards, detailed analytics, and collaboration tools that help teams stay on track and deliver projects on time."
+    };
+    public static readonly string[] GAME_DESCR =
+    {
+        "Embark on an interstellar adventure with 'Galaxy Quest,' a video game that takes you on a thrilling journey across the universe. Command your own spacecraft, encounter alien species, and uncover cosmic mysteries in this expansive space exploration game.",
+        "Step into the boots of a medieval knight in 'Castle Siege,' a strategy video game where you defend your stronghold against invading forces. Manage resources, lead your army, and strategize your way to victory in epic battles.",
+        "Solve mind-bending puzzles in 'Quantum Conundrum,' a video game that challenges your perception of physics. Navigate through a mansion filled with inventive contraptions and alternate dimensions to uncover the secrets within."
+    };
+    public static readonly string[] MOVESTV_DESCR =
+    {
+        "Watch the heartwarming story unfold in 'The Last Sunset,' a movie about a retired pilot who embarks on a journey to reconnect with his estranged children, finding redemption and love along the way.",
+        "Tune into 'Space Cadets,' a TV series that follows the misadventures of a ragtag team of astronauts as they navigate the perils of deep space, discovering friendship and laughter amidst the stars.",
+        "Experience the suspense in 'Undercover Tales,' a movie that delves into the life of a detective going deep undercover to dismantle a crime syndicate, testing the limits of loyalty and justice."
+    };
+    public static readonly string[] COURSE_DESCR =
+    {
+        "Enroll in 'Creative Writing Essentials,' a course designed to unleash your storytelling potential. Learn from acclaimed authors about developing plots, creating characters, and building worlds that captivate readers.",
+        "Master the art of digital marketing with our 'Online Influence Builder' course. Gain expertise in social media strategy, SEO, content marketing, and analytics to elevate your brand's online presence.",
+        "Improve your physical and mental well-being with 'Yoga for Life,' a course offering a holistic approach to yoga. Discover various asanas, breathing techniques, and mindfulness practices to enhance your daily routine."
+    };
+
     public static readonly string[] NAMES =
     {
         "James Smith",

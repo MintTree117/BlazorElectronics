@@ -7,5 +7,7 @@ public sealed class AdminMoviesTvModel : AdminProductModel
     public int RuntimeMinutes { get; set; }
     public int Episodes { get; set; }
     public bool HasSubtitles { get; set; }
+    public List<int> VideoFormats { get; set; } = new();
+    public List<int> Accessibility { get; set; } = new();
     public List<int> Awards { get; set; } = new();
 }

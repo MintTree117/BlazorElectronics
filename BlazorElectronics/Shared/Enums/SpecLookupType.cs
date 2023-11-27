@@ -2,8 +2,9 @@ namespace BlazorElectronics.Shared.Enums;
 
 public enum SpecLookupType
 {
+    AudioBookFormat,
     CourseCertificate,
-    CpuRequirement,
+    EbookAccessibility,
     EbookFormat,
     Language,
     MatureContent,
@@ -11,5 +12,6 @@ public enum SpecLookupType
     MultiplayerDetail,
     OsRequirement,
     SoftwareLanguage,
+    VideoAccessibility,
     VideoFormat
 }

@@ -1,8 +1,6 @@
 using BlazorElectronics.Server.Admin.Repositories;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Shared.Admin;
-using BlazorElectronics.Shared.Admin.Products;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Admin.Controllers;

@@ -9,7 +9,8 @@ public sealed class AdminBookModel : AdminProductModel
     public int Pages { get; set; }
     public bool HasAudio { get; set; }
     public int AudioLength { get; set; }
-    
+
+    public List<int> Accessibility { get; set; } = new();
     public List<int> EbookFormats { get; set; } = new();
     public List<int> AudioBookFormats { get; set; } = new();
 }

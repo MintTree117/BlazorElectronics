@@ -1,5 +1,4 @@
 using BlazorElectronics.Server.Admin.Models.Products;
-using BlazorElectronics.Server.Admin.Models.Variants;
 using BlazorElectronics.Server.Admin.Services;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Dtos.Categories;
@@ -10,28 +9,27 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Admin.Repositories;
 
-public sealed class AdminProductBulkRepository : DapperRepository, IAdminProductBulkInsertRepository
+public sealed class AdminProductSeedRepository : DapperRepository, IAdminProductSeedRepository
 {
-    const int MAX_CATEGORIES = 3;
     const int SAFETY = 200;
     
     readonly Random _random = new();
     
-    public AdminProductBulkRepository( DapperContext dapperContext )
+    public AdminProductSeedRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
-    public async Task<bool> Insert( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups )
+    public async Task<bool> Insert( int amount, CachedCategories cachedCategories, CachedSpecLookupData specLookups )
     {
-        ProductModels products = await GetProducts( amount, cachedCategories, variants, specLookups );
+        ProductModels products = await GetProducts( amount, cachedCategories, specLookups );
         return false;
     }
 
-    async Task<ProductModels> GetProducts( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups )
+    async Task<ProductModels> GetProducts( int amount, CachedCategories cachedCategories, CachedSpecLookupData specLookups )
     {
         return await Task.Run( () => new ProductModels
         {
-            Books = GetBookModels( amount, cachedCategories, variants, specLookups ),
-            Software = GetSoftwareModels( amount, cachedCategories, variants, specLookups ),
+            Books = GetBookModels( amount, cachedCategories, specLookups ),
+            Software = GetSoftwareModels( amount, cachedCategories, specLookups ),
             Games = GetGamesModels( amount, cachedCategories, specLookups ),
             MoviesTv = GetMoviesTvModels( amount, cachedCategories, specLookups ),
             Courses = GetCoursesModels( amount, cachedCategories, specLookups )
@@ -43,126 +41,138 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
     {
         var model = new T
         {
-            Title = AdminProductData.PRODUCT_TITLES[ category ] + " " + i,
-            ThumbnailUrl = AdminProductData.PRODUCT_IMAGES[ category ],
-            Rating = GetRandomFloat( 0, AdminProductData.MAX_RATING ),
-            ReleaseDate = GetRandomDate(),
-            NumberSold = GetRandomInt( 0, AdminProductData.MAX_NUM_SOLD ),
+            Title = ProductSeedData.PRODUCT_TITLES[ category ] + " " + i,
+            ThumbnailUrl = ProductSeedData.PRODUCT_IMAGES[ category ],
+            Price = GetRandomDecimal( ProductSeedData.MIN_PRICE, ProductSeedData.MAX_PRICE ),
+            Rating = GetRandomFloat( 0, ProductSeedData.MAX_RATING ),
+            ReleaseDate = GetRandomDate( ProductSeedData.MIN_RELEASE_DATE, ProductSeedData.MAX_RELEASE_DATE ),
+            NumberSold = GetRandomInt( 0, ProductSeedData.MAX_NUM_SOLD ),
             HasDrm = GetRandomBoolean(),
             HasSale = GetRandomBoolean(),
+            Description = GetRandomDescription( ( PrimaryCategory ) category ),
             Languages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.Language, lookups ), 8 ),
             MatureContent = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MatureContent, lookups ), 8 ),
             PrimaryCategoryId = category,
             SecondaryCategoryIds = GetRandomSecondaryCategories( category, categories ),
         };
 
+        if ( model.HasSale )
+            model.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) model.Price );
+
         model.TertiaryCategoryIds = GetRandomTertiaryCategories( model.SecondaryCategoryIds, categories );
         return model;
     }
+    // DESCRIPTIONS
+    string GetRandomDescription( PrimaryCategory category )
+    {
+        return category switch
+        {
+            PrimaryCategory.BOOKS => ProductSeedData.BOOK_DESCR[ GetRandomInt( 0, ProductSeedData.BOOK_DESCR.Length - 1 ) ],
+            PrimaryCategory.SOFTWARE => ProductSeedData.SOFTWARE_DESCR[ GetRandomInt( 0, ProductSeedData.SOFTWARE_DESCR.Length - 1 ) ],
+            PrimaryCategory.VIDEOGAMES => ProductSeedData.GAME_DESCR[ GetRandomInt( 0, ProductSeedData.GAME_DESCR.Length - 1 ) ],
+            PrimaryCategory.MOVIESTV => ProductSeedData.MOVESTV_DESCR[ GetRandomInt( 0, ProductSeedData.MOVESTV_DESCR.Length - 1 ) ],
+            PrimaryCategory.COURSES => ProductSeedData.COURSE_DESCR[ GetRandomInt( 0, ProductSeedData.COURSE_DESCR.Length - 1 ) ],
+            _ => string.Empty
+        };
+    }
     // SPECIFIC MODELS
-    List<AdminBookModel> GetBookModels( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups )
+    List<AdminBookModel> GetBookModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups )
     {
         var books = new List<AdminBookModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var book = GetBaseModel<AdminBookModel>( amount, i, cachedCategories, specLookups );
-            book.Author = GetRandomSpec( AdminProductData.NAMES );
-            book.Publisher = GetRandomSpec( AdminProductData.PUBLISHERS );
-            book.ISBN = GetRandomSpec( AdminProductData.ISBNS );
-            book.Pages = GetRandomInt( 0, AdminProductData.MAX_PAGE_LENGTH );
+            var book = GetBaseModel<AdminBookModel>( amount, i, cachedCategories, lookups );
+            book.Author = GetRandomSpec( ProductSeedData.NAMES );
+            book.Publisher = GetRandomSpec( ProductSeedData.PUBLISHERS );
+            book.ISBN = GetRandomSpec( ProductSeedData.ISBNS );
+            book.Pages = GetRandomInt( 0, ProductSeedData.MAX_PAGE_LENGTH );
             book.HasAudio = GetRandomBoolean();
-            //book.EbookFormats = GetRandomSpecLookups( specLookups.EbookFormats );
+            book.EbookFormats = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.EbookFormat, lookups ), 4 );
+            book.Accessibility = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.EbookAccessibility, lookups ), 2 );
 
-            book.Variants.Add( GetRandomVariant( ( int ) VariantsBooks.EBook , book.HasSale ) );
-            
             if ( !book.HasAudio ) 
                 continue;
             
-            book.Narrator = GetRandomSpec( AdminProductData.NAMES );
-            book.AudioLength = GetRandomInt( 0, AdminProductData.MAX_AUDIO_LENGTH );
-            //book.AudioBookFormats = GetRandomSpecLookups( specLookups.AudioBookFormats );
-
-            book.Variants.Add( GetRandomVariant( ( int ) VariantsBooks.AudioBook, book.HasSale ) );
+            book.Narrator = GetRandomSpec( ProductSeedData.NAMES );
+            book.AudioLength = GetRandomInt( 0, ProductSeedData.MAX_AUDIO_LENGTH );
+            book.AudioBookFormats = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.AudioBookFormat, lookups ), 4 );
         }
         
         return books;
     }
-    List<AdminSoftwareModel> GetSoftwareModels( int amount, CachedCategories cachedCategories, VariantsModel variants, CachedSpecLookupData specLookups )
+    List<AdminSoftwareModel> GetSoftwareModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups )
     {
         var softwares = new List<AdminSoftwareModel>();
         
         for ( int i = 0; i < amount; i++ )
         {
-            var software = GetBaseModel<AdminSoftwareModel>( amount, i, cachedCategories, specLookups );
-            software.Version = GetRandomSpec( AdminProductData.SOFTWARE_VERSIONS );
-            software.Developer = GetRandomSpec( AdminProductData.SOFTWARE_DEVELOPERS );
-            software.Dependencies = GetRandomSpecs( AdminProductData.SOFTWARE_DEPENDENCIES, 5 );
-            software.TrialLimitations = GetRandomSpecs( AdminProductData.SOFTWARE_TRIAL_LIMITATIONS, 5 );
-            //software.OsRequirements = GetRandomSpecLookups( specLookups.OsRequirements );
-
-            software.Variants.Add( GetRandomVariant( ( int ) VariantsSoftware.Personal, software.HasSale ) );
-            if ( GetRandomBoolean() )
-                software.Variants.Add( GetRandomVariant( ( int ) VariantsSoftware.Commercial, software.HasSale ) );
+            var software = GetBaseModel<AdminSoftwareModel>( amount, i, cachedCategories, lookups );
+            software.Version = GetRandomSpec( ProductSeedData.SOFTWARE_VERSIONS );
+            software.Developer = GetRandomSpec( ProductSeedData.SOFTWARE_DEVELOPERS );
+            software.Dependencies = GetRandomSpecs( ProductSeedData.SOFTWARE_DEPENDENCIES, 5 );
+            software.TrialLimitations = GetRandomSpecs( ProductSeedData.SOFTWARE_TRIAL_LIMITATIONS, 5 );
+            software.OsRequirements = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.OsRequirement, lookups ), 3 );
+            software.SoftwareLanguages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.SoftwareLanguage, lookups ), 4 );
         }
         
         return softwares;
     }
-    List<AdminGamesModel> GetGamesModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData specLookups )
+    List<AdminGamesModel> GetGamesModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups )
     {
         var games = new List<AdminGamesModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var game = GetBaseModel<AdminGamesModel>( amount, i, cachedCategories, specLookups );
-            game.Developer = GetRandomSpec( AdminProductData.GAME_DEVELOPERS );
+            var game = GetBaseModel<AdminGamesModel>( amount, i, cachedCategories, lookups );
+            game.Developer = GetRandomSpec( ProductSeedData.GAME_DEVELOPERS );
             game.HasMultiplayer = GetRandomBoolean();
             game.HasOfflineMode = GetRandomBoolean();
             game.HasInGamePurchases = GetRandomBoolean();
             game.HasControllerSupport = GetRandomBoolean();
+            game.FileSizeMb = GetRandomInt( ProductSeedData.MIN_FILE_SIZE, ProductSeedData.MAX_FILE_SIZE );
+            game.OsRequirements = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.OsRequirement, lookups ), 3 );
 
             if ( game.HasMultiplayer )
             {
-                //game.MultiplayerDetails = GetRandomSpecLookups( specLookups.MultiplayerDetails );
+                game.MultiplayerDetails = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MultiplayerDetail, lookups ), 6 );
             }
-
-            game.Variants.Add( GetRandomVariant( 1, game.HasSale ) );
         }
 
         return games;
     }
-    List<AdminMoviesTvModel> GetMoviesTvModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData specLookups )
+    List<AdminMoviesTvModel> GetMoviesTvModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups )
     {
         var moviesTv = new List<AdminMoviesTvModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var movieTv = GetBaseModel<AdminMoviesTvModel>( amount, i, cachedCategories, specLookups );
-            movieTv.Director = GetRandomSpec( AdminProductData.DIRECTORS );
-            movieTv.Cast = GetRandomSpecs( AdminProductData.ACTORS, 10 );
-            movieTv.RuntimeMinutes = GetRandomInt( 0, AdminProductData.MAX_RUNTIME );
-            movieTv.Episodes = GetRandomInt( 0, AdminProductData.MAX_EPISODES );
+            var movieTv = GetBaseModel<AdminMoviesTvModel>( amount, i, cachedCategories, lookups );
+            movieTv.Director = GetRandomSpec( ProductSeedData.DIRECTORS );
+            movieTv.Cast = GetRandomSpecs( ProductSeedData.ACTORS, 10 );
+            movieTv.RuntimeMinutes = GetRandomInt( 0, ProductSeedData.MAX_RUNTIME );
+            movieTv.Episodes = GetRandomInt( 0, ProductSeedData.MAX_EPISODES );
             movieTv.HasSubtitles = GetRandomBoolean();
-            //movieTv.Awards = GetRandomSpecLookups( specLookups.MoviesTvAwards );
-
-            movieTv.Variants.Add( GetRandomVariant( 1, movieTv.HasSale ) );
+            movieTv.VideoFormats = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.VideoFormat, lookups ), 3 );
+            movieTv.Accessibility = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.VideoAccessibility, lookups ), 3 );
+            movieTv.Awards = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MoviesTvAward, lookups ), 5 );
         }
 
         return moviesTv;
     }
-    List<AdminCourseModel> GetCoursesModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData specLookups )
+    List<AdminCourseModel> GetCoursesModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups )
     {
         var courses = new List<AdminCourseModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var course = GetBaseModel<AdminCourseModel>( amount, i, cachedCategories, specLookups );
-            course.Instructors = GetRandomSpecs( AdminProductData.NAMES, 3 );
-            course.Requirements = GetRandomSpecs( AdminProductData.COURSE_REQUIREMENTS, 5 );
-            course.DurationWeeks = GetRandomInt( 1, AdminProductData.MAX_COURSE_DURATION );
+            var course = GetBaseModel<AdminCourseModel>( amount, i, cachedCategories, lookups );
+            course.Instructors = GetRandomSpecs( ProductSeedData.NAMES, 3 );
+            course.Requirements = GetRandomSpecs( ProductSeedData.COURSE_REQUIREMENTS, 5 );
+            course.DurationWeeks = GetRandomInt( 1, ProductSeedData.MAX_COURSE_DURATION );
             course.HasSubtitles = GetRandomBoolean();
-
-            course.Variants.Add( GetRandomVariant( 1, course.HasSale ) );
+            course.Certifications = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.CourseCertificate, lookups ), 3 );
+            course.VideoAccessibility = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.VideoAccessibility, lookups ), 3 );
         }
 
         return courses;
@@ -175,7 +185,7 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
         var picked = new HashSet<int>();
         
         int maxIndex = response.ChildCategories.Count - 1;
-        int amount = GetRandomInt( 0, MAX_CATEGORIES );
+        int amount = GetRandomInt( 1, ProductSeedData.MAX_CATEGORIES );
         int count = 0;
         
         while ( picked.Count < amount )
@@ -200,13 +210,12 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
 
         foreach ( int secondaryCategory in secondaryCategories )
         {
-            int scId = 0; //cachedCategoryData.SecondaryIds[ secondaryCategory ];
-            SecondaryCategoryResponse response = cachedCategoryData.SecondaryResponses[ scId ];
+            SecondaryCategoryResponse response = cachedCategoryData.SecondaryResponses[ secondaryCategory ];
 
             var picked = new HashSet<int>();
 
             int maxIndex = response.ChildCategories.Count - 1;
-            int amount = Math.Min( GetRandomInt( 0, maxIndex ), MAX_CATEGORIES );
+            int amount = Math.Min( 0, ProductSeedData.MAX_CATEGORIES );
             const int safety = 200;
             int count = 0;
 
@@ -258,18 +267,6 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
     {
         return lookups.ResponsesBySpecId[ ( int ) type ].Values.Count - 1;
     }
-    // VARIANT
-    VariantModel GetRandomVariant( int id, bool onSale )
-    {
-        decimal price = GetRandomDecimal( 0, AdminProductData.MAX_PRICE );
-
-        return new VariantModel()
-        {
-            VariantValueId = ( int ) VariantsBooks.EBook,
-            VariantPrice = price,
-            VariantSalePrice = onSale ? GetRandomDecimal( 0, price ) : null
-        };
-    }
     // SPEC
     string GetRandomSpec( IReadOnlyList<string> list )
     {
@@ -297,13 +294,13 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
         return string.Join( ",", specs.Values );
     }
     // RANDOM VALUES
-    DateTime GetRandomDate()
+    DateTime GetRandomDate( DateTime min, DateTime max )
     {
         // Convert to ticks
-        long range = AdminProductData.MAX_RELEASE_DATE.Ticks - AdminProductData.MIN_RELEASE_DATE.Ticks;
+        long range = max.Ticks - min.Ticks;
 
         // Create a random range between them
-        long randomTicks = ( long ) ( _random.NextDouble() * range ) + AdminProductData.MIN_RELEASE_DATE.Ticks;
+        long randomTicks = ( long ) ( _random.NextDouble() * range ) + ProductSeedData.MIN_RELEASE_DATE.Ticks;
 
         // Convert back to DateTime
         return new DateTime( randomTicks );
@@ -314,7 +311,7 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
         double randomDouble = _random.NextDouble();
 
         // Adjust the range of the double number
-        double range = ( double ) ( AdminProductData.MAX_NUM_SOLD );
+        double range = ( double ) ( ProductSeedData.MAX_NUM_SOLD );
         double randomInRange = ( randomDouble * range );
 
         // Convert to decimal and return
@@ -338,9 +335,12 @@ public sealed class AdminProductBulkRepository : DapperRepository, IAdminProduct
         // Generate a random integer (0 or 1) and convert it to a boolean
         return _random.Next( 2 ) == 1;
     }
-    decimal GetRandomDecimal( decimal min, decimal max )
+    decimal GetRandomDecimal( double min, double max )
     {
-        return 0;
+        double range = ( max - min );
+        double sample = _random.NextDouble();
+        double scaled = ( sample * range ) + min;
+        return ( decimal ) scaled;
     }
     // MODELS
     class ProductModels
