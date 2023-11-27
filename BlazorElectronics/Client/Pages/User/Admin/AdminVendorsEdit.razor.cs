@@ -39,7 +39,7 @@ public partial class AdminVendorsEdit : AdminView
             return;
         }
 
-        ApiReply<VendorEditDto?> reply = await AdminVendorServiceClient.GetEdit( new IdDto( variantId ) );
+        ApiReply<VendorEditDto?> reply = await AdminVendorServiceClient.GetEdit( new IntDto( variantId ) );
 
         if ( !reply.Success || reply.Data is null )
         {

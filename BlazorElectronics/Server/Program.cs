@@ -1,12 +1,13 @@
 global using BlazorElectronics.Shared;
-using BlazorElectronics.Server.Admin.Repositories;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Server.Repositories.Categories;
+using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Sessions;
 using BlazorElectronics.Server.Repositories.SpecLookups;
 using BlazorElectronics.Server.Repositories.Users;
+using BlazorElectronics.Server.Repositories.Vendors;
 using BlazorElectronics.Server.Services.Cart;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Features;
@@ -25,7 +26,6 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<DapperContext>();
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddSingleton<IFeaturesCache, FeaturesCache>();
@@ -35,7 +35,6 @@ builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>(
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
 builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
@@ -47,11 +46,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
-builder.Services.AddScoped<IAdminCategoryRepository, AdminCategoryRepository>();
-builder.Services.AddScoped<IAdminFeaturesRepository, AdminFeaturesRepository>();
-builder.Services.AddScoped<IAdminSpecLookupRepository, AdminSpecLookupRepository>();
-builder.Services.AddScoped<IAdminVariantRepository, AdminVariantRepository>();
-builder.Services.AddScoped<IAdminVendorRepository, AdminVendorRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
+builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 
 WebApplication app = builder.Build();
 

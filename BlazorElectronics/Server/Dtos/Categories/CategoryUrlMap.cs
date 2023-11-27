@@ -8,7 +8,7 @@ public sealed class CategoryUrlMap : LocallyCachedObject
     IReadOnlyDictionary<string, int> PrimaryUrlMap { get; }
     IReadOnlyDictionary<string, IReadOnlyDictionary<int, int>> SecondaryUrlMap { get; }
     IReadOnlyDictionary<string, IReadOnlyDictionary<int, int>> TertiaryUrlMap { get; }
-
+    
     public CategoryUrlMap( Dictionary<string, int> primary, Dictionary<string, Dictionary<int, int>> secondary, Dictionary<string, Dictionary<int, int>> tertiary )
     {
         PrimaryUrlMap = new Dictionary<string, int>( primary );

@@ -41,7 +41,7 @@ public sealed partial class AdminSpecsEdit : AdminView
             return;
         }
         
-        ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( new IdDto( specId ) );
+        ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( new IntDto( specId ) );
 
         if ( !reply.Success || reply.Data is null )
         {

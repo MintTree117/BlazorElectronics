@@ -18,14 +18,14 @@ public class SpecLookupService : ApiService, ISpecLookupService
         _repository = repository;
     }
 
-    public async Task<ApiReply<List<SpecLookupResponse>?>> GetSpecLookups()
+    public async Task<ApiReply<CachedSpecLookupData?>> GetSpecLookups()
     {
         ApiReply<CachedSpecLookupData?> getReply = await TryGetSpecLookups();
 
         if ( !getReply.Success || getReply.Data is null )
-            return new ApiReply<List<SpecLookupResponse>?>( getReply.Message );
+            return new ApiReply<CachedSpecLookupData?>( getReply.Message );
 
-        return new ApiReply<List<SpecLookupResponse>?>( getReply.Data.GetGlobalResponses() );
+        return new ApiReply<CachedSpecLookupData?>( getReply.Data );
     }
     public async Task<ApiReply<List<SpecLookupResponse>?>> GetSpecLookups( PrimaryCategory category )
     {
@@ -46,7 +46,7 @@ public class SpecLookupService : ApiService, ISpecLookupService
         
         try
         {
-            model = await _repository.GetSpecLookupData();
+            model = await _repository.Get();
         }
         catch ( ServiceException e )
         {
@@ -82,7 +82,7 @@ public class SpecLookupService : ApiService, ISpecLookupService
             };
             foreach ( SpecLookupCategoryModel sc in model.SpecCategories )
             {
-                idsByCategory[ sc.PrimaryCategory ].Add( sc.SpecId );
+                idsByCategory[ ( PrimaryCategory ) sc.PrimaryCategory ].Add( sc.SpecId );
             }
 
             var responsesById = new Dictionary<int, SpecLookupResponse>();

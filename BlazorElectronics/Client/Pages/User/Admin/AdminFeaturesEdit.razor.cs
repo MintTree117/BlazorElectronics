@@ -42,7 +42,7 @@ public partial class AdminFeaturesEdit : AdminView
             return;
         }
 
-        ApiReply<FeaturedProductEditDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IdDto( featureId ) );
+        ApiReply<FeaturedProductEditDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IntDto( featureId ) );
 
         if ( !reply.Success || reply.Data is null )
         {
@@ -88,7 +88,7 @@ public partial class AdminFeaturesEdit : AdminView
     async Task SubmitNew()
     {
         ApiReply<bool> reply = _featureType == FeatureType.DEAL
-            ? await AdminFeaturesServiceClient.AddFeaturedDeal( new IdDto( _dealProductId ) )
+            ? await AdminFeaturesServiceClient.AddFeaturedDeal( new IntDto( _dealProductId ) )
             : await AdminFeaturesServiceClient.AddFeaturedProduct( _productDto );
         
         if ( !reply.Success )

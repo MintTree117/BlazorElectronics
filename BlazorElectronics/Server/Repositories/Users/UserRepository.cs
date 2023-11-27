@@ -55,7 +55,7 @@ public class UserRepository : DapperRepository, IUserRepository
 
         return await TryQueryAsync( GetUserExistsQuery, parameters );
     }
-    public async Task<User?> AddUser( string username, string email, int? phone, byte[] hash, byte[] salt )
+    public async Task<User?> InsertUser( string username, string email, string? phone, byte[] hash, byte[] salt )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_USER_NAME, username );

@@ -37,7 +37,7 @@ public partial class AdminVendorsView : AdminView
     }
     async Task RemoveVendor( int vendorId )
     {
-        ApiReply<bool> reply = await AdminVendorServiceClient.Remove( new IdDto( vendorId ) );
+        ApiReply<bool> reply = await AdminVendorServiceClient.Remove( new IntDto( vendorId ) );
 
         if ( !reply.Success )
         {

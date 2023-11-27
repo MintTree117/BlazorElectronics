@@ -39,7 +39,7 @@ public class UserAccountService : ApiService, IUserAccountService
             ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Username, user.Email, user.IsAdmin ) )
             : new ApiReply<UserLoginDto?>( BAD_PASSWORD_MESSAGE );
     }
-    public async Task<ApiReply<UserLoginDto?>> Register( string username, string email, string password, int? phone )
+    public async Task<ApiReply<UserLoginDto?>> Register( string username, string email, string password, string? phone )
     {
         try
         {
@@ -59,9 +59,7 @@ public class UserAccountService : ApiService, IUserAccountService
 
         try
         {
-            insertedUser = await _userRepository.AddUser( username, email, phone, hash, salt );
-
-            Logger.LogError( insertedUser.UserId.ToString() );
+            insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
             
             if ( insertedUser is null )
                 return new ApiReply<UserLoginDto?>( NO_DATA_FOUND_MESSAGE );

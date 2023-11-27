@@ -76,7 +76,7 @@ public partial class AdminFeaturesView : AdminView
     }
     async Task RemoveFeature( FeatureType featureType, int featureId )
     {
-        var idDto = new IdDto( featureId );
+        var idDto = new IntDto( featureId );
 
         ApiReply<bool> result = featureType switch
         {

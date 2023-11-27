@@ -12,7 +12,7 @@
     else
     {
         <ul class="nav flex-column">
-            @foreach ( PrimaryCategoryResponse p in _categories.Primary )
+            @foreach ( CategoryResponse p in _categories.Primary )
             {
                 <li class="nav-item">
                     <a class="nav-link category-nav-link" href="/products/@p.Url">

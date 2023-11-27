@@ -7,17 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;
 
-public class UserController : ControllerBase
+public class UserController : _Controller
 {
-    protected const string BAD_REQUEST_MESSAGE = "Bad Request!";
     protected readonly IUserAccountService UserAccountService;
     protected readonly ISessionService SessionService;
-
-    protected readonly ILogger<UserController> Logger;
-
+    
     public UserController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService )
+        : base( logger )
     {
-        Logger = logger;
         UserAccountService = userAccountService;
         SessionService = sessionService;
     }

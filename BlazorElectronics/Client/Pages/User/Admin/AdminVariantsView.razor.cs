@@ -37,7 +37,7 @@ public partial class AdminVariantsView : AdminView
     }
     async Task RemoveVariant( int variantId )
     {
-        ApiReply<bool> reply = await AdminVariantServiceClient.Remove( new IdDto( variantId ) );
+        ApiReply<bool> reply = await AdminVariantServiceClient.Remove( new IntDto( variantId ) );
 
         if ( !reply.Success )
         {

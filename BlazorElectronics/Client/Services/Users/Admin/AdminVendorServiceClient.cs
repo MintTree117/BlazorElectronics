@@ -20,9 +20,9 @@ public class AdminVendorServiceClient : AdminServiceClient, IAdminVendorServiceC
     {
         return await TryUserRequest<VendorsViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<VendorEditDto?>> GetEdit( IdDto dto )
+    public async Task<ApiReply<VendorEditDto?>> GetEdit( IntDto dto )
     {
-        return await TryUserRequest<IdDto, VendorEditDto?>( API_ROUTE_GET_EDIT, dto );
+        return await TryUserRequest<IntDto, VendorEditDto?>( API_ROUTE_GET_EDIT, dto );
     }
     public async Task<ApiReply<int>> Add( VendorEditDto dto )
     {
@@ -32,8 +32,8 @@ public class AdminVendorServiceClient : AdminServiceClient, IAdminVendorServiceC
     {
         return await TryUserRequest<VendorEditDto, bool>( API_ROUTE_UPDATE, dto );
     }
-    public async Task<ApiReply<bool>> Remove( IdDto dto )
+    public async Task<ApiReply<bool>> Remove( IntDto dto )
     {
-        return await TryUserRequest<IdDto, bool>( API_ROUTE_REMOVE, dto );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE, dto );
     }
 }

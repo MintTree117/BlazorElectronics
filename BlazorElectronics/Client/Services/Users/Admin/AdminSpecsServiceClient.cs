@@ -21,9 +21,9 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     {
         return await TryUserRequest<List<SpecLookupViewDto>?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( IdDto data )
+    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( IntDto data )
     {
-        return await TryUserRequest<IdDto,SpecLookupEditDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<IntDto,SpecLookupEditDto?>( API_ROUTE_GET_EDIT, data );
     }
     public async Task<ApiReply<int>> Add( SpecLookupEditDto data )
     {
@@ -33,8 +33,8 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     {
         return await TryUserRequest<SpecLookupEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> Remove( IdDto data )
+    public async Task<ApiReply<bool>> Remove( IntDto data )
     {
-        return await TryUserRequest<IdDto,bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<IntDto,bool>( API_ROUTE_REMOVE, data );
     }
 }

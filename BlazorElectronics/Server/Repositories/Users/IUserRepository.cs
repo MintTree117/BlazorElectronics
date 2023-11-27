@@ -9,6 +9,6 @@ public interface IUserRepository
     Task<User?> GetByEmail( string email );
     Task<User?> GetByEmailOrUsername( string emailOrUsername );
     Task<UserExists?> GetUserExists( string username, string email );
-    Task<User?> AddUser( string username, string email, int? phone, byte[] hash, byte[] salt );
+    Task<User?> InsertUser( string username, string email, string? phone, byte[] hash, byte[] salt );
     Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt );
 }

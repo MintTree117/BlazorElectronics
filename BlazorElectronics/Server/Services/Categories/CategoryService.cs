@@ -76,9 +76,8 @@ public class CategoryService : ApiService, ICategoryService
         
         if ( !categoriesResponse.Success || categoriesResponse.Data is null )
             return new ApiReply<CategoryUrlMap?>( categoriesResponse.Message );
-
-        _cachedUrlMap = await MapResponseToUrlMap( categoriesResponse.Data );
-
+        
+        _cachedUrlMap = await CreateUrlMap( categoriesResponse.Data );
         return new ApiReply<CategoryUrlMap?>( _cachedUrlMap );
     }
     async Task<ApiReply<CachedCategories?>> TryGetCategoriesDto()
@@ -90,7 +89,7 @@ public class CategoryService : ApiService, ICategoryService
 
         try
         {
-            repositoryResponse = await _repository.GetCategories();
+            repositoryResponse = await _repository.Get();
 
             if ( repositoryResponse is null )
                 return new ApiReply<CachedCategories?>( NO_DATA_FOUND_MESSAGE );
@@ -101,12 +100,12 @@ public class CategoryService : ApiService, ICategoryService
             return new ApiReply<CachedCategories?>( INTERNAL_SERVER_ERROR_MESSAGE);
         }
 
-        _cahcedCategories = await MapCategoriesModelToDto( repositoryResponse );
+        _cahcedCategories = await CreateCacheFromModel( repositoryResponse );
         
         return new ApiReply<CachedCategories?>( _cahcedCategories );
     }
     
-    static async Task<CachedCategories?> MapCategoriesModelToDto( CategoriesModel model )
+    static async Task<CachedCategories?> CreateCacheFromModel( CategoriesModel model )
     {
         return await Task.Run( () =>
         {
@@ -117,61 +116,64 @@ public class CategoryService : ApiService, ICategoryService
             var secondaryIds = new Dictionary<int, int>();
             var tertiaryIds = new Dictionary<int, int>();
             
-            var primary = new List<PrimaryCategoryResponse>();
-            var secondary = new List<SecondaryCategoryResponse>();
-            var tertiary = new List<TertiaryCategoryResponse>();
+            var primary = new List<CategoryResponse>();
+            var secondary = new List<CategoryResponse>();
+            var tertiary = new List<CategoryResponse>();
 
             short count = 0;
-            foreach ( PrimaryCategoryModel p in model.Primary )
+            foreach ( CategoryModel p in model.Primary )
             {
                 if ( !primaryIds.TryAdd( p.PrimaryCategoryId, count ) )
                     continue;
                 
-                primary.Add( new PrimaryCategoryResponse
+                primary.Add( new CategoryResponse
                 {
                     Id = p.PrimaryCategoryId,
                     Name = p.Name,
                     Url = p.ApiUrl,
                     ImageUrl = p.ImageUrl,
-                    ChildCategories = new List<int>(),
+                    Children = new List<int>(),
                 });
                 
                 count++;
             }
             
             count = 0;
-            foreach ( SecondaryCategoryModel s in model.Secondary )
+            foreach ( CategoryModel s in model.Secondary )
             {
-                if ( !primaryIds.ContainsKey( s.PrimaryCategoryId ) )
+                bool valid =
+                    primaryIds.ContainsKey( s.PrimaryCategoryId ) &&
+                    secondaryIds.TryAdd( s.SecondaryCategoryId, count );
+
+                if ( !valid )
                     continue;
-                if ( !secondaryIds.TryAdd( s.SecondaryCategoryId, count ) )
-                    continue;
-                 
-                secondary.Add( new SecondaryCategoryResponse
+
+                secondary.Add( new CategoryResponse
                 {
                     Id = s.SecondaryCategoryId,
                     ParentId = s.PrimaryCategoryId,
                     Name = s.Name,
                     Url = s.ApiUrl,
                     ImageUrl = s.ImageUrl,
-                    ChildCategories = new List<int>()
+                    Children = new List<int>()
                 } );
                 
-                primary[ primaryIds[ s.PrimaryCategoryId ] ].ChildCategories.Add( s.SecondaryCategoryId );
+                primary[ primaryIds[ s.PrimaryCategoryId ] ].Children.Add( s.SecondaryCategoryId );
                 count++;
             }
             count = 0;
             
-            foreach ( TertiaryCategoryModel t in model.Tertiary )
+            foreach ( CategoryModel t in model.Tertiary )
             {
-                if ( !primaryIds.ContainsKey( t.PrimaryCategoryId ) )
-                    continue;
-                if ( !secondaryIds.ContainsKey( t.SecondaryCategoryId ) )
-                    continue;
-                if ( !tertiaryIds.TryAdd( t.TertiaryCategoryId, count ) )
+                bool valid = 
+                    primaryIds.ContainsKey( t.PrimaryCategoryId ) &&
+                    secondaryIds.ContainsKey( t.SecondaryCategoryId ) &&
+                    tertiaryIds.TryAdd( t.TertiaryCategoryId, count );
+
+                if ( !valid )
                     continue;
 
-                tertiary.Add( new TertiaryCategoryResponse
+                tertiary.Add( new CategoryResponse
                 {
                     Id = t.TertiaryCategoryId,
                     ParentId = t.SecondaryCategoryId,
@@ -180,7 +182,7 @@ public class CategoryService : ApiService, ICategoryService
                     ImageUrl = t.ImageUrl
                 });
                 
-                secondary[ secondaryIds[ t.SecondaryCategoryId ] ].ChildCategories.Add( t.TertiaryCategoryId );
+                secondary[ secondaryIds[ t.SecondaryCategoryId ] ].Children.Add( t.TertiaryCategoryId );
                 count++;
             }
 
@@ -195,7 +197,7 @@ public class CategoryService : ApiService, ICategoryService
             };
         } );
     }
-    static async Task<CategoryUrlMap> MapResponseToUrlMap( CachedCategories dto )
+    static async Task<CategoryUrlMap> CreateUrlMap( CachedCategories dto )
     {
         return await Task.Run( () =>
         {
@@ -203,12 +205,12 @@ public class CategoryService : ApiService, ICategoryService
             var secondary = new Dictionary<string, Dictionary<int, int>>();
             var tertiary = new Dictionary<string, Dictionary<int, int>>();
             
-            foreach ( PrimaryCategoryResponse p in dto.PrimaryResponses )
+            foreach ( CategoryResponse p in dto.PrimaryResponses )
             {
                 primary.TryAdd( p.Url, p.Id );
             }
 
-            foreach ( SecondaryCategoryResponse s in dto.SecondaryResponses )
+            foreach ( CategoryResponse s in dto.SecondaryResponses )
             {
                 if ( !secondary.TryGetValue( s.Url, out Dictionary<int, int>? secondaryMap ) )
                 {
@@ -219,7 +221,7 @@ public class CategoryService : ApiService, ICategoryService
                 secondaryMap.TryAdd( s.ParentId, s.Id );
             }
 
-            foreach ( TertiaryCategoryResponse t in dto.TertiaryResponses )
+            foreach ( CategoryResponse t in dto.TertiaryResponses )
             {
                 if ( !tertiary.TryGetValue( t.Url, out Dictionary<int, int>? tertiaryMap ) )
                 {
@@ -233,6 +235,7 @@ public class CategoryService : ApiService, ICategoryService
             return new CategoryUrlMap( primary, secondary, tertiary );
         } );
     }
+    
     static bool ValidateCategoryIdMap( CategoryIdMap map, CachedCategories cachedCategories )
     {
         return map.CategoryType switch {

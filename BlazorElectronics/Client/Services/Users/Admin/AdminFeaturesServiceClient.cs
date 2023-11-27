@@ -22,28 +22,28 @@ public class AdminFeaturesServiceClient : AdminServiceClient, IAdminFeaturesServ
     {
         return await TryUserRequest<FeaturesViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( IdDto dto )
+    public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( IntDto dto )
     {
-        return await TryUserRequest<IdDto, FeaturedProductEditDto?>( API_ROUTE_GET_PRODUCT_EDIT, dto );
+        return await TryUserRequest<IntDto, FeaturedProductEditDto?>( API_ROUTE_GET_PRODUCT_EDIT, dto );
     }
     public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductEditDto dto )
     {
         return await TryUserRequest<FeaturedProductEditDto, bool>( API_ROUTE_ADD_PRODUCT, dto );
     }
-    public async Task<ApiReply<bool>> AddFeaturedDeal( IdDto dto )
+    public async Task<ApiReply<bool>> AddFeaturedDeal( IntDto dto )
     {
-        return await TryUserRequest<IdDto, bool>( API_ROUTE_ADD_DEAL, dto );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_ADD_DEAL, dto );
     }
     public async Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductEditDto dto )
     {
         return await TryUserRequest<FeaturedProductEditDto, bool>( API_ROUTE_UPDATE_PRODUCT, dto );
     }
-    public async Task<ApiReply<bool>> RemoveFeaturedProduct( IdDto dto )
+    public async Task<ApiReply<bool>> RemoveFeaturedProduct( IntDto dto )
     {
-        return await TryUserRequest<IdDto, bool>( API_ROUTE_REMOVE_PRODUCT, dto );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE_PRODUCT, dto );
     }
-    public async Task<ApiReply<bool>> RemoveFeaturedDeal( IdDto dto )
+    public async Task<ApiReply<bool>> RemoveFeaturedDeal( IntDto dto )
     {
-        return await TryUserRequest<IdDto, bool>( API_ROUTE_REMOVE_DEAL, dto );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE_DEAL, dto );
     }
 }

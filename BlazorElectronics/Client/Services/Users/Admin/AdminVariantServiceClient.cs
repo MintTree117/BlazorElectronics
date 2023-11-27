@@ -20,9 +20,9 @@ public sealed class AdminVariantServiceClient : AdminServiceClient, IAdminVarian
     {
         return await TryUserRequest<VariantsViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<VariantEditDto?>> GetEdit( IdDto data )
+    public async Task<ApiReply<VariantEditDto?>> GetEdit( IntDto data )
     {
-        return await TryUserRequest<IdDto, VariantEditDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<IntDto, VariantEditDto?>( API_ROUTE_GET_EDIT, data );
     }
     public async Task<ApiReply<int>> Add( VariantEditDto data )
     {
@@ -32,8 +32,8 @@ public sealed class AdminVariantServiceClient : AdminServiceClient, IAdminVarian
     {
         return await TryUserRequest<VariantEditDto, bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> Remove( IdDto data )
+    public async Task<ApiReply<bool>> Remove( IntDto data )
     {
-        return await TryUserRequest<IdDto, bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE, data );
     }
 }
