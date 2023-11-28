@@ -9,6 +9,7 @@ namespace BlazorElectronics.Server.Repositories.Users;
 
 public class UserRepository : DapperRepository, IUserRepository
 {
+    const string PROCEDURE_GET_ALL_IDS = "Get_UserIds";
     const string PROCEDURE_GET_USER_BY_ID = "Get_UserAccountById";
     const string PROCEDURE_GET_USER_BY_USERNAME = "Get_UserAccountByUsername";
     const string PROCEDURE_GET_USER_BY_EMAIL = "Get_UserAccountByEmail";
@@ -18,12 +19,16 @@ public class UserRepository : DapperRepository, IUserRepository
     const string PROCEDURE_UPDATE_PASSWORD = "Update_UserAccountPassword";
 
     public UserRepository( DapperContext dapperContext ) : base( dapperContext ) { }
-    
+
+    public async Task<List<int>?> GetAllIds()
+    {
+        return await TryQueryAsync( GetAllIdsQuery );
+    }
     public async Task<User?> GetById( int id )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_USER_ID, id );
-        
+
         return await TryQueryAsync( GetByIdQuery, parameters );
     }
     public async Task<User?> GetByUsername( string username )
@@ -75,7 +80,12 @@ public class UserRepository : DapperRepository, IUserRepository
 
         return await TryQueryTransactionAsync( UpdateUserPasswordQuery, parameters );
     }
-    
+
+    static async Task<List<int>?> GetAllIdsQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    {
+        IEnumerable<int>? ids = await connection.QueryAsync<int>( PROCEDURE_GET_ALL_IDS, dynamicParams, commandType: CommandType.StoredProcedure );
+        return ids.ToList();
+    }
     static async Task<User?> GetByIdQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         return await connection.QuerySingleOrDefaultAsync<User>( PROCEDURE_GET_USER_BY_ID, dynamicParams, commandType: CommandType.StoredProcedure );

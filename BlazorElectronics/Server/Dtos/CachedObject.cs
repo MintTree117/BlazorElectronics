@@ -1,11 +1,13 @@
 namespace BlazorElectronics.Server.Dtos;
 
-public abstract class LocallyCachedObject
+public class CachedObject<T>
 {
+    public readonly T Object;
     readonly DateTime LastFetched;
 
-    protected LocallyCachedObject()
+    public CachedObject( T o )
     {
+        Object = o;
         LastFetched = DateTime.Now;
     }
 

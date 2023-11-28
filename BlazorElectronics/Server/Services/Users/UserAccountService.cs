@@ -18,6 +18,22 @@ public class UserAccountService : ApiService, IUserAccountService
         _userRepository = userRepository;
     }
 
+    public async Task<ApiReply<List<int>?>> GetIds()
+    {
+        try
+        {
+            List<int>? reply = await _userRepository.GetAllIds();
+
+            return reply is not null
+                ? new ApiReply<List<int>?>( reply )
+                : new ApiReply<List<int>?>( NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( Exception e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<List<int>?>( INTERNAL_SERVER_ERROR_MESSAGE );
+        }
+    }
     public async Task<ApiReply<UserLoginDto?>> Login( string emailOrUsername, string password )
     {
         User? user;

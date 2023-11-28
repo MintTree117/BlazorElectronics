@@ -1,9 +1,8 @@
 using BlazorElectronics.Server.Dtos.Categories;
+using BlazorElectronics.Server.Repositories.SpecLookups;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
-using BlazorElectronics.Server.Services.SpecLookups;
 using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +15,13 @@ public class ProductController : ControllerBase
 {
     readonly IProductService _productService;
     readonly ICategoryService _categoryService;
-    readonly ISpecLookupService _specLookupService;
+    readonly ISpecLookupRepository _repository;
     
-    public ProductController( IProductService productService, ICategoryService categoryService, ISpecLookupService specLookupService )
+    public ProductController( IProductService productService, ICategoryService categoryService, ISpecLookupRepository specLookupRepository )
     {
         _productService = productService;
         _categoryService = categoryService;
-        _specLookupService = specLookupService;
+        _repository = specLookupRepository;
     }
 
     [HttpPost( "suggestions" )]
@@ -53,7 +52,7 @@ public class ProductController : ControllerBase
     [HttpGet( "details/{productId:int}" )]
     public async Task<ActionResult<ApiReply<ProductDetailsResponse?>>> GetProductDetails( int productId )
     {
-        ApiReply<CachedCategories?> categoriesReply = await _categoryService.GetCategoriesDto();
+        ApiReply<CategoriesResponse?> categoriesReply = await _categoryService.GetCategoriesResponse();
 
         if ( !categoriesReply.Success || categoriesReply.Data is null )
             return Ok( new ApiReply<ProductDetailsResponse?>( categoriesReply.Message ) );

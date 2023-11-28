@@ -1,3 +1,4 @@
+using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Server.Repositories.Categories;
@@ -8,83 +9,56 @@ namespace BlazorElectronics.Server.Services.Categories;
 
 public class CategoryService : ApiService, ICategoryService
 {
+    const int CACHE_LIFE = 4;
+    const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
     readonly ICategoryRepository _repository;
 
-    const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
-
-    CategoryUrlMap? _cachedUrlMap;
-    CachedCategories? _cahcedCategories;
+    CachedObject<CategoryData>? _cachedData;
 
     public CategoryService( ILogger<ApiService> logger, ICategoryRepository repository ) : base( logger )
     {
         _repository = repository;
     }
-
-    public async Task<ApiReply<CachedCategories?>> GetCategoriesDto()
-    {
-        ApiReply<CachedCategories?> categoriesReply = await TryGetCategoriesDto();
-
-        return categoriesReply.Success
-            ? new ApiReply<CachedCategories?>( _cahcedCategories )
-            : new ApiReply<CachedCategories?>( categoriesReply.Message );
-    }
+    
     public async Task<ApiReply<CategoriesResponse?>> GetCategoriesResponse()
     {
-        ApiReply<CachedCategories?> categoriesReply = await TryGetCategoriesDto();
+        ApiReply<bool> getReply = await TryGetData();
 
-        if ( !categoriesReply.Success || _cahcedCategories is null )
-            return new ApiReply<CategoriesResponse?>( categoriesReply.Message );
-
-        var response = new CategoriesResponse( _cahcedCategories.PrimaryResponses, _cahcedCategories.SecondaryResponses, _cahcedCategories.TertiaryResponses );
-        return new ApiReply<CategoriesResponse?>( response );
+        return getReply.Success && _cachedData is not null
+            ? new ApiReply<CategoriesResponse?>( _cachedData.Object.Response )
+            : new ApiReply<CategoriesResponse?>( getReply.Message );
     }
     public async Task<ApiReply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
-        ApiReply<CategoryUrlMap?> urlMapReply = await TryGetCategoryUrlMap();
+        ApiReply<bool> getReply = await TryGetData();
 
-        if ( !urlMapReply.Success || urlMapReply.Data is null )
-            return new ApiReply<CategoryIdMap?>( urlMapReply.Message );
+        if ( !getReply.Success || _cachedData is null )
+            return new ApiReply<CategoryIdMap?>( getReply.Message );
 
         List<string> urlList = GetCategoryUrlList( primaryUrl, secondaryUrl, tertiaryUrl );
-        CategoryIdMap? idMap = urlMapReply.Data.GetCategoryIdMapFromUrl( urlList );
+        CategoryIdMap? idMap = _cachedData.Object.Urls.GetCategoryIdMapFromUrl( urlList );
 
         return idMap is not null
             ? new ApiReply<CategoryIdMap?>( idMap )
             : new ApiReply<CategoryIdMap?>( INVALID_CATEGORY_MESSAGE );
     }
-    public async Task<ApiReply<bool>> ValidateCategoryIdMap( CategoryIdMap? idMap )
+    public async Task<ApiReply<bool>> ValidateCategoryIdMap( CategoryIdMap idMap )
     {
-        if ( idMap is null )
-            return new ApiReply<bool>( "CategoryIds are null!" );
-
-        ApiReply<CachedCategories?> categoriesReply = await TryGetCategoriesDto();
+        ApiReply<bool> getReply = await TryGetData();
         
-        if ( !categoriesReply.Success || categoriesReply.Data is null )
-            return new ApiReply<bool>( categoriesReply.Message );
+        if ( !getReply.Success || _cachedData is null )
+            return new ApiReply<bool>( getReply.Message );
 
-        return ValidateCategoryIdMap( idMap, categoriesReply.Data )
+        return ValidateCategoryIdMap( idMap, _cachedData.Object.Ids )
             ? new ApiReply<bool>( true )
             : new ApiReply<bool>( "Invalid Category!" );
     }
-
-    async Task<ApiReply<CategoryUrlMap?>> TryGetCategoryUrlMap()
+    
+    async Task<ApiReply<bool>> TryGetData()
     {
-        if ( _cachedUrlMap is not null )
-            return new ApiReply<CategoryUrlMap?>( _cachedUrlMap );
+        if ( _cachedData is not null && _cachedData.IsValid( CACHE_LIFE ) )
+            return new ApiReply<bool>( true );
 
-        ApiReply<CachedCategories?> categoriesResponse = await TryGetCategoriesDto();
-        
-        if ( !categoriesResponse.Success || categoriesResponse.Data is null )
-            return new ApiReply<CategoryUrlMap?>( categoriesResponse.Message );
-        
-        _cachedUrlMap = await CreateUrlMap( categoriesResponse.Data );
-        return new ApiReply<CategoryUrlMap?>( _cachedUrlMap );
-    }
-    async Task<ApiReply<CachedCategories?>> TryGetCategoriesDto()
-    {
-        if ( _cahcedCategories is not null )
-            return new ApiReply<CachedCategories?>( _cahcedCategories );
-        
         CategoriesModel? repositoryResponse;
 
         try
@@ -92,26 +66,29 @@ public class CategoryService : ApiService, ICategoryService
             repositoryResponse = await _repository.Get();
 
             if ( repositoryResponse is null )
-                return new ApiReply<CachedCategories?>( NO_DATA_FOUND_MESSAGE );
+                return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CachedCategories?>( INTERNAL_SERVER_ERROR_MESSAGE);
+            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE);
         }
 
-        _cahcedCategories = await CreateCacheFromModel( repositoryResponse );
-        
-        return new ApiReply<CachedCategories?>( _cahcedCategories );
+        if ( repositoryResponse.Primary is null || repositoryResponse.Secondary is null || repositoryResponse.Tertiary is null )
+            return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
+
+        await CreateCacheFromModel( repositoryResponse );
+        return new ApiReply<bool>( true );
     }
     
-    static async Task<CachedCategories?> CreateCacheFromModel( CategoriesModel model )
+    async Task CreateCacheFromModel( CategoriesModel model )
     {
-        return await Task.Run( () =>
+        CategoryIds ids = null;
+        CategoriesResponse response = null;
+        CategoryUrlMap map;
+        
+        await Task.Run( () =>
         {
-            if ( model.Primary is null || model.Secondary is null || model.Tertiary is null )
-                return null;
-            
             var primaryIds = new Dictionary<int, int>();
             var secondaryIds = new Dictionary<int, int>();
             var tertiaryIds = new Dictionary<int, int>();
@@ -121,7 +98,7 @@ public class CategoryService : ApiService, ICategoryService
             var tertiary = new List<CategoryResponse>();
 
             short count = 0;
-            foreach ( CategoryModel p in model.Primary )
+            foreach ( CategoryModel p in model.Primary! )
             {
                 if ( !primaryIds.TryAdd( p.PrimaryCategoryId, count ) )
                     continue;
@@ -139,7 +116,7 @@ public class CategoryService : ApiService, ICategoryService
             }
             
             count = 0;
-            foreach ( CategoryModel s in model.Secondary )
+            foreach ( CategoryModel s in model.Secondary! )
             {
                 bool valid =
                     primaryIds.ContainsKey( s.PrimaryCategoryId ) &&
@@ -163,7 +140,7 @@ public class CategoryService : ApiService, ICategoryService
             }
             count = 0;
             
-            foreach ( CategoryModel t in model.Tertiary )
+            foreach ( CategoryModel t in model.Tertiary! )
             {
                 bool valid = 
                     primaryIds.ContainsKey( t.PrimaryCategoryId ) &&
@@ -186,18 +163,34 @@ public class CategoryService : ApiService, ICategoryService
                 count++;
             }
 
-            return new CachedCategories
+            ids = new CategoryIds
             {
                 PrimarySet = new HashSet<int>( primaryIds.Keys ),
                 SecondarySet = new HashSet<int>( secondaryIds.Keys ),
                 TertiarySet = new HashSet<int>( tertiaryIds.Keys ),
-                PrimaryResponses = primary,
-                SecondaryResponses = secondary,
-                TertiaryResponses = tertiary
+            };
+
+            response = new CategoriesResponse
+            {
+
+                Primary = primary,
+                Secondary = secondary,
+                Tertiary = tertiary
             };
         } );
+
+        map = await CreateUrlMap( response! );
+
+        var data = new CategoryData
+        {
+            Ids = ids!,
+            Response = response!,
+            Urls = map
+        };
+
+        _cachedData = new CachedObject<CategoryData>( data );
     }
-    static async Task<CategoryUrlMap> CreateUrlMap( CachedCategories dto )
+    async Task<CategoryUrlMap> CreateUrlMap( CategoriesResponse dto )
     {
         return await Task.Run( () =>
         {
@@ -205,12 +198,12 @@ public class CategoryService : ApiService, ICategoryService
             var secondary = new Dictionary<string, Dictionary<int, int>>();
             var tertiary = new Dictionary<string, Dictionary<int, int>>();
             
-            foreach ( CategoryResponse p in dto.PrimaryResponses )
+            foreach ( CategoryResponse p in dto.Primary )
             {
                 primary.TryAdd( p.Url, p.Id );
             }
 
-            foreach ( CategoryResponse s in dto.SecondaryResponses )
+            foreach ( CategoryResponse s in dto.Secondary )
             {
                 if ( !secondary.TryGetValue( s.Url, out Dictionary<int, int>? secondaryMap ) )
                 {
@@ -221,7 +214,7 @@ public class CategoryService : ApiService, ICategoryService
                 secondaryMap.TryAdd( s.ParentId, s.Id );
             }
 
-            foreach ( CategoryResponse t in dto.TertiaryResponses )
+            foreach ( CategoryResponse t in dto.Tertiary )
             {
                 if ( !tertiary.TryGetValue( t.Url, out Dictionary<int, int>? tertiaryMap ) )
                 {
@@ -231,17 +224,17 @@ public class CategoryService : ApiService, ICategoryService
 
                 tertiaryMap.TryAdd( t.ParentId, t.Id );
             }
-            
+
             return new CategoryUrlMap( primary, secondary, tertiary );
         } );
     }
     
-    static bool ValidateCategoryIdMap( CategoryIdMap map, CachedCategories cachedCategories )
+    static bool ValidateCategoryIdMap( CategoryIdMap map, CategoryIds ids )
     {
         return map.CategoryType switch {
-            CategoryType.PRIMARY => cachedCategories.PrimarySet.Contains( map.CategoryId ),
-            CategoryType.SECONDARY => cachedCategories.SecondarySet.Contains( map.CategoryId ),
-            CategoryType.TERTIARY => cachedCategories.TertiarySet.Contains( map.CategoryId ),
+            CategoryType.PRIMARY => ids.PrimarySet.Contains( map.CategoryId ),
+            CategoryType.SECONDARY => ids.SecondarySet.Contains( map.CategoryId ),
+            CategoryType.TERTIARY => ids.TertiarySet.Contains( map.CategoryId ),
             _ => false
         };
     }

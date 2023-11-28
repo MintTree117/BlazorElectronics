@@ -1,5 +1,4 @@
-using BlazorElectronics.Server.Services.SpecLookups;
-using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Server.Repositories.SpecLookups;
 using BlazorElectronics.Shared.SpecLookups;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,21 +8,16 @@ namespace BlazorElectronics.Server.Controllers;
 [ApiController]
 public class SpecLookupController : ControllerBase
 {
-    readonly ISpecLookupService _specLookupService;
+    readonly ISpecLookupRepository _repository;
 
-    public SpecLookupController( ISpecLookupService specLookupService)
+    public SpecLookupController( ISpecLookupRepository repository)
     {
-        _specLookupService = specLookupService;
+        _repository = repository;
     }
 
-    [HttpGet( "get-spec-lookups-global" )]
-    public async Task<ActionResult<ApiReply<List<SpecLookupResponse>>>> GetSpecLookups()
+    [HttpGet( "get-spec-lookups" )]
+    public async Task<ActionResult<ApiReply<SpecLookupsResponse>>> GetSpecLookups()
     {
-        return Ok( await _specLookupService.GetSpecLookups() );
-    }
-    [HttpGet( "get-spec-lookups-category")]
-    public async Task<ActionResult<ApiReply<List<SpecLookupResponse>>>> GetSpecLookups( PrimaryCategory category )
-    {
-        return Ok( await _specLookupService.GetSpecLookups( category ) );
+        return Ok( await _repository.Get() );
     }
 }

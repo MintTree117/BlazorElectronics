@@ -6,7 +6,7 @@ namespace BlazorElectronics.Client.Services.SpecLookups;
 
 public sealed class SpecLookupServiceClient : ClientService, ISpecLookupServiceClient
 {
-    Dictionary<int, SpecLookupResponse> _responsesBySpecId;
+    Dictionary<int, SpecLookupDto> _responsesBySpecId;
     Dictionary<PrimaryCategory, List<int>> _responseIdsByCategory;
 
     public SpecLookupServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )

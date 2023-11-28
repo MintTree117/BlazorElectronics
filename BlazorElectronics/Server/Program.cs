@@ -13,7 +13,6 @@ using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
-using BlazorElectronics.Server.Services.SpecLookups;
 using BlazorElectronics.Server.Services.Users;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -34,8 +33,6 @@ builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
-
-builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();

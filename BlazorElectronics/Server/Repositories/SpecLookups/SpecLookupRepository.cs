@@ -21,7 +21,7 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
     
     public async Task<SpecLookupsModel?> Get()
     {
-        return await TryQueryAsync( GetSpecLookupData );
+        return await TryQueryAsync( GetQuery );
     }
     public async Task<List<SpecLookupViewDto>?> GetView()
     {
@@ -53,8 +53,8 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
 
         return await TryQueryTransactionAsync( DeleteQuery, parameters );
     }
-
-    static async Task<SpecLookupsModel?> GetSpecLookupData( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    
+    static async Task<SpecLookupsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, commandType: CommandType.StoredProcedure );
 
@@ -132,4 +132,6 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         
         return parameters;
     }
+
+
 }

@@ -1,9 +1,8 @@
-using BlazorElectronics.Server.Dtos.Categories;
-using BlazorElectronics.Server.Dtos.SpecLookups;
 using BlazorElectronics.Server.Models.Products.Seed;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.SpecLookups;
 using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Services.Products;
@@ -21,15 +20,15 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         _repository = repository;
     }
     
-    public async Task<ApiReply<bool>> SeedProducts( int amount, CachedCategories cachedCategories, CachedSpecLookupData specLookups, VendorsResponse vendors, List<int> users )
+    public async Task<ApiReply<bool>> SeedProducts( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse specLookups, VendorsResponse vendors, List<int> users )
     {
         ProductSeedModels seeds = await Task.Run( () => new ProductSeedModels
         {
-            Books = GetBookModels( amount, cachedCategories, specLookups, vendors ),
-            Software = GetSoftwareModels( amount, cachedCategories, specLookups, vendors ),
-            Games = GetGamesModels( amount, cachedCategories, specLookups, vendors ),
-            MoviesTv = GetMoviesTvModels( amount, cachedCategories, specLookups, vendors ),
-            Courses = GetCoursesModels( amount, cachedCategories, specLookups, vendors )
+            Books = GetBookModels( amount, categoriesResponse, specLookups, vendors ),
+            Software = GetSoftwareModels( amount, categoriesResponse, specLookups, vendors ),
+            Games = GetGamesModels( amount, categoriesResponse, specLookups, vendors ),
+            MoviesTv = GetMoviesTvModels( amount, categoriesResponse, specLookups, vendors ),
+            Courses = GetCoursesModels( amount, categoriesResponse, specLookups, vendors )
         } );
 
         try
@@ -45,7 +44,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     
     // BASE MODEL
-    T GetBaseModel<T>( int category, int i, CachedCategories categories, CachedSpecLookupData lookups, VendorsResponse vendors ) where T : ProductSeedModel, new()
+    T GetBaseModel<T>( int category, int i, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors ) where T : ProductSeedModel, new()
     {
         var model = new T
         {
@@ -60,13 +59,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             Languages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.Language, lookups ), 8 ),
             MatureContent = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MatureContent, lookups ), 8 ),
             PrimaryCategoryId = category,
-            SecondaryCategoryIds = GetRandomSecondaryCategories( category, categories ),
+            SecondaryCategoryIds = GetRandomSecondaryCategories( category, categoriesResponse ),
         };
 
         if ( GetRandomBoolean() )
             model.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) model.Price );
         
-        model.TertiaryCategoryIds = GetRandomTertiaryCategories( model.SecondaryCategoryIds, categories );
+        model.TertiaryCategoryIds = GetRandomTertiaryCategories( model.SecondaryCategoryIds, categoriesResponse );
         return model;
     }
     // DESCRIPTIONS
@@ -83,13 +82,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         };
     }
     // SPECIFIC MODELS
-    List<BookSeedModel> GetBookModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups, VendorsResponse vendors )
+    List<BookSeedModel> GetBookModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
     {
         var books = new List<BookSeedModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var book = GetBaseModel<BookSeedModel>( amount, i, cachedCategories, lookups, vendors );
+            var book = GetBaseModel<BookSeedModel>( amount, i, categoriesResponse, lookups, vendors );
             book.Author = GetRandomSpec( ProductSeedData.NAMES );
             book.Publisher = GetRandomSpec( ProductSeedData.PUBLISHERS );
             book.ISBN = GetRandomSpec( ProductSeedData.ISBNS );
@@ -108,13 +107,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         
         return books;
     }
-    List<SoftwareSeedSeedModel> GetSoftwareModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups, VendorsResponse vendors )
+    List<SoftwareSeedSeedModel> GetSoftwareModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
     {
         var softwares = new List<SoftwareSeedSeedModel>();
         
         for ( int i = 0; i < amount; i++ )
         {
-            var software = GetBaseModel<SoftwareSeedSeedModel>( amount, i, cachedCategories, lookups, vendors );
+            var software = GetBaseModel<SoftwareSeedSeedModel>( amount, i, categoriesResponse, lookups, vendors );
             software.Version = GetRandomSpec( ProductSeedData.SOFTWARE_VERSIONS );
             software.Developer = GetRandomSpec( ProductSeedData.SOFTWARE_DEVELOPERS );
             software.Dependencies = GetRandomSpecs( ProductSeedData.SOFTWARE_DEPENDENCIES, 5 );
@@ -125,13 +124,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         
         return softwares;
     }
-    List<GamesSeedModel> GetGamesModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups, VendorsResponse vendors )
+    List<GamesSeedModel> GetGamesModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
     {
         var games = new List<GamesSeedModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var game = GetBaseModel<GamesSeedModel>( amount, i, cachedCategories, lookups, vendors );
+            var game = GetBaseModel<GamesSeedModel>( amount, i, categoriesResponse, lookups, vendors );
             game.Developer = GetRandomSpec( ProductSeedData.GAME_DEVELOPERS );
             game.HasMultiplayer = GetRandomBoolean();
             game.HasOfflineMode = GetRandomBoolean();
@@ -148,13 +147,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         return games;
     }
-    List<MoviesTvSeedModel> GetMoviesTvModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups, VendorsResponse vendors )
+    List<MoviesTvSeedModel> GetMoviesTvModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
     {
         var moviesTv = new List<MoviesTvSeedModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var movieTv = GetBaseModel<MoviesTvSeedModel>( amount, i, cachedCategories, lookups, vendors );
+            var movieTv = GetBaseModel<MoviesTvSeedModel>( amount, i, categoriesResponse, lookups, vendors );
             movieTv.Director = GetRandomSpec( ProductSeedData.DIRECTORS );
             movieTv.Cast = GetRandomSpecs( ProductSeedData.ACTORS, 10 );
             movieTv.RuntimeMinutes = GetRandomInt( 0, ProductSeedData.MAX_RUNTIME );
@@ -167,13 +166,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         return moviesTv;
     }
-    List<CourseSeedModel> GetCoursesModels( int amount, CachedCategories cachedCategories, CachedSpecLookupData lookups, VendorsResponse vendors )
+    List<CourseSeedModel> GetCoursesModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
     {
         var courses = new List<CourseSeedModel>();
 
         for ( int i = 0; i < amount; i++ )
         {
-            var course = GetBaseModel<CourseSeedModel>( amount, i, cachedCategories, lookups, vendors );
+            var course = GetBaseModel<CourseSeedModel>( amount, i, categoriesResponse, lookups, vendors );
             course.Instructors = GetRandomSpecs( ProductSeedData.NAMES, 3 );
             course.Requirements = GetRandomSpecs( ProductSeedData.COURSE_REQUIREMENTS, 5 );
             course.DurationWeeks = GetRandomInt( 1, ProductSeedData.MAX_COURSE_DURATION );
@@ -185,22 +184,22 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return courses;
     }
     // CATEGORY
-    List<int> GetRandomSecondaryCategories( int primaryCategory, CachedCategories cachedCategoryData )
+    List<int> GetRandomSecondaryCategories( int primaryCategory, CategoriesResponse categoryResponseData )
     {
-        CategoryResponse? response = cachedCategoryData.PrimaryResponses.FirstOrDefault( p => p.Id == primaryCategory );
+        CategoryResponse? response = categoryResponseData.Primary.FirstOrDefault( p => p.Id == primaryCategory );
 
         return response is null 
             ? new List<int>() 
             : PickRandomCategories( response ).ToList();
     }
-    List<int> GetRandomTertiaryCategories( List<int> secondaryCategories, CachedCategories cachedCategoryData )
+    List<int> GetRandomTertiaryCategories( List<int> secondaryCategories, CategoriesResponse categoryResponseData )
     {
         var tertiaryCategories = new List<int>();
         var secondary = new List<CategoryResponse>();
 
         foreach ( int secondaryCategory in secondaryCategories )
         {
-            CategoryResponse? r = cachedCategoryData.SecondaryResponses.FirstOrDefault( s => s.Id == secondaryCategory );
+            CategoryResponse? r = categoryResponseData.Secondary.FirstOrDefault( s => s.Id == secondaryCategory );
 
             if ( r is not null )
                 secondary.Add( r );
@@ -268,7 +267,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         return alreadyPicked.ToList();
     }
-    int GetLookupMaxIndex( SpecLookupType type, CachedSpecLookupData lookups )
+    int GetLookupMaxIndex( SpecLookupType type, SpecLookupsResponse lookups )
     {
         return lookups.ResponsesBySpecId[ ( int ) type ].Values.Count - 1;
     }

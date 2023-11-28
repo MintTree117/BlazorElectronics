@@ -1,6 +1,4 @@
-using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
 
@@ -11,5 +9,5 @@ public interface IProductService
     Task<ApiReply<string?>> GetProductSearchQueryString( ProductSearchRequest request );
     Task<ApiReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request );
     Task<ApiReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? idMap, ProductSearchRequest? request );
-    Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CachedCategories cachedCategories );
+    Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse );
 }

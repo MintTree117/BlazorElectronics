@@ -18,19 +18,13 @@ public class VendorRepository : DapperRepository, IVendorRepository
     const string PROCEDURE_INSERT = "Insert_Vendor";
     const string PROCEDURE_UPDATE = "Update_Vendor";
     const string PROCEDURE_DELETE = "Delete_Vendor";
-
-    VendorsResponse? _response;
     
     public VendorRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<VendorsResponse?> Get()
-    {
-        if ( _response is not null )
-            return _response;
-
-        _response = await TryQueryAsync( GetQuery );
-        return _response;
+    public async Task<VendorsModel?> Get()
+    { 
+        return await TryQueryAsync( GetQuery );
     }
     public Task<VendorsViewDto?> GetView()
     {
@@ -63,7 +57,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
         return TryQueryTransactionAsync( RemoveQuery, parameters );
     }
 
-    static async Task<VendorsResponse?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<VendorsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_VENDORS, commandType: CommandType.StoredProcedure );
 
@@ -73,32 +67,11 @@ public class VendorRepository : DapperRepository, IVendorRepository
         IEnumerable<VendorModel>? vendors = await multi.ReadAsync<VendorModel>();
         List<VendorCategoryModel> categories = ( await multi.ReadAsync<VendorCategoryModel>() ).ToList();
 
-        var response = new VendorsResponse();
-
-        foreach ( VendorModel v in vendors )
+        return new VendorsModel
         {
-            response.VendorsById.TryAdd( v.VendorId, new VendorDto
-            {
-                VendorId = v.VendorId,
-                VendorName = v.VendorName,
-                VendorUrl = v.VendorUrl
-            } );
-        }
-
-        foreach ( VendorCategoryModel c in categories )
-        {
-            var pc = ( PrimaryCategory ) c.PrimaryCategoryId;
-
-            if ( !response.VendorIdsByCategory.TryGetValue( pc, out List<int>? ids ) )
-            {
-                ids = new List<int>();
-                response.VendorIdsByCategory.Add( pc, ids );
-            }
-
-            ids.Add( c.PrimaryCategoryId );
-        }
-
-        return response;
+            Vendors = vendors,
+            Categories = categories
+        };
     }
     static async Task<VendorsViewDto?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {

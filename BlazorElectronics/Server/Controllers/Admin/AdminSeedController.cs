@@ -1,11 +1,15 @@
 using BlazorElectronics.Server.Dtos.Categories;
-using BlazorElectronics.Server.Dtos.SpecLookups;
+using BlazorElectronics.Server.Repositories.SpecLookups;
+using BlazorElectronics.Server.Repositories.Users;
 using BlazorElectronics.Server.Repositories.Vendors;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.SpecLookups;
 using BlazorElectronics.Server.Services.Users;
+using BlazorElectronics.Server.Services.Vendors;
+using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.SpecLookups;
 using BlazorElectronics.Shared.Users;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Mvc;
@@ -16,20 +20,28 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 [ApiController]
 public class AdminSeedController : _AdminController
 {
-    readonly IVendorRepository _vendorRepository;
+    readonly IVendorService _vendorService;
     readonly ICategoryService _categoryService;
-    readonly ISpecLookupService _specService;
+    readonly ISpecLookupService _lookupService;
     readonly IUserSeedService _userSeedService;
     readonly IProductSeedService _productSeedService;
 
-    public AdminSeedController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IVendorRepository vendorRepository, ICategoryService categoryService, ISpecLookupService specService, IUserSeedService userSeedService, IProductSeedService productSeedService )
+    public AdminSeedController( 
+        ILogger<UserController> logger, 
+        IUserAccountService userAccountService, 
+        ISessionService sessionService,
+        ICategoryService categoryService,
+        IUserSeedService userSeedService, 
+        IProductSeedService productSeedService, 
+        IVendorService vendorService, 
+        ISpecLookupService lookupService )
         : base( logger, userAccountService, sessionService )
     {
-        _vendorRepository = vendorRepository;
         _categoryService = categoryService;
-        _specService = specService;
         _userSeedService = userSeedService;
         _productSeedService = productSeedService;
+        _vendorService = vendorService;
+        _lookupService = lookupService;
     }
 
     [HttpPost( "seed-products" )]
@@ -40,25 +52,19 @@ public class AdminSeedController : _AdminController
         if ( authorized.HttpError is not null )
             return authorized.HttpError;
 
-        VendorsResponse? vendors = await _vendorRepository.Get();
-        ApiReply<CachedCategories?> categories = await _categoryService.GetCategoriesDto();
-        ApiReply<CachedSpecLookupData?> lookups = await _specService.GetSpecLookups();
-        var users = new List<int>();
+        ApiReply<CategoriesResponse?> categories = await _categoryService.GetCategoriesResponse();
+        ApiReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups();
+        ApiReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
+        ApiReply<List<int>?> users = await UserAccountService.GetIds();
 
-        if ( vendors is null )
-            return NotFound( "Vendors " + NOT_FOUND_MESSAGE );
+        if ( !categories.Success || !lookups.Success || !vendors.Success || !users.Success )
+            return NotFound( NOT_FOUND_MESSAGE );
 
-        if ( !categories.Success || categories.Data is null )
-            return NotFound( categories.Message );
+        ApiReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data, lookups.Data, vendors.Data, users.Data );
 
-        if ( !lookups.Success || lookups.Data is null )
-            return NotFound( lookups.Message );
-
-        ApiReply<bool> result = await _productSeedService.SeedProducts( request!.Payload!.Value, categories.Data, lookups.Data, vendors, users );
-
-        return result.Success
-            ? Ok( new ApiReply<bool>( true ) )
-            : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
+        return seedResult.Success
+            ? Ok( seedResult )
+            : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR + seedResult.Message );
     }
 
     [HttpPost( "seed-users" )]

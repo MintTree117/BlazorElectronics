@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Dtos.Categories;
 
-public sealed class CategoryUrlMap : LocallyCachedObject
+public sealed class CategoryUrlMap
 {
     IReadOnlyDictionary<string, int> PrimaryUrlMap { get; }
     IReadOnlyDictionary<string, IReadOnlyDictionary<int, int>> SecondaryUrlMap { get; }

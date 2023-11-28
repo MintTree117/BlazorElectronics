@@ -1,4 +1,3 @@
-using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Models.Products.Details;
 using BlazorElectronics.Server.Repositories.Products;
@@ -66,7 +65,7 @@ public class ProductService : ApiService, IProductService
 
         return new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) );
     }
-    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CachedCategories cachedCategories )
+    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse )
     {
         ProductDetailsModel? model;
 
@@ -83,7 +82,7 @@ public class ProductService : ApiService, IProductService
         if ( model is null )
             return new ApiReply<ProductDetailsResponse?>( NO_DATA_FOUND_MESSAGE );
 
-        ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, cachedCategories );
+        ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, categoriesResponse );
 
         return dto is not null
             ? new ApiReply<ProductDetailsResponse?>( dto )
@@ -156,7 +155,7 @@ public class ProductService : ApiService, IProductService
 
         return dto;
     }
-    static async Task<ProductDetailsResponse?> MapProductDetailsToResponse( ProductDetailsModel detailsModel, CachedCategories cachedCategories )
+    static async Task<ProductDetailsResponse?> MapProductDetailsToResponse( ProductDetailsModel detailsModel, CategoriesResponse categoriesResponse )
     {
         return await Task.Run( () =>
         {
@@ -188,8 +187,8 @@ public class ProductService : ApiService, IProductService
 
             var primaryCategory = new ProductCategoryResponse
             {
-                Name = cachedCategories.PrimaryResponses[ detailsModel.PrimaryCategory ].Name,
-                Url = cachedCategories.PrimaryResponses[ detailsModel.PrimaryCategory ].Url
+                Name = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Name,
+                Url = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Url
             };
 
             //List<ProductCategoryResponse>? parsedSecondaryCategories = ParseProductDetailsCategories( detailsModel.SecondaryCategories, categoriesDto.SecondaryIds, categoriesDto.SecondaryResponses );

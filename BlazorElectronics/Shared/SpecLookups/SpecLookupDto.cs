@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Shared.SpecLookups;
 
-public sealed class SpecLookupResponse
+public sealed class SpecLookupDto
 {
     public int SpecId { get; set; }
     public string SpecName { get; set; } = string.Empty;
