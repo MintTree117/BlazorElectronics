@@ -2,7 +2,7 @@ using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Shared.Admin.Features;
+using BlazorElectronics.Shared.Features;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,18 +32,18 @@ public sealed class AdminFeaturesController : _AdminController
         return GetReturnFromApi( reply );
     }
     [HttpPost( "get-featured-product-edit" )]
-    public async Task<ActionResult<FeaturedProductEditDto?>> GetProductEdit( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<FeaturedProductDto?>> GetProductEdit( [FromBody] UserDataRequest<IntDto>? request )
     {
         ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ApiReply<FeaturedProductEditDto?> reply = await _featuresService.GetFeaturedProductEdit( request!.Payload!.Value );
+        ApiReply<FeaturedProductDto?> reply = await _featuresService.GetFeaturedProductEdit( request!.Payload!.Value );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "add-featured-product" )]
-    public async Task<ActionResult<bool>> AddProduct( [FromBody] UserDataRequest<FeaturedProductEditDto>? request )
+    public async Task<ActionResult<bool>> AddProduct( [FromBody] UserDataRequest<FeaturedProductDto>? request )
     {
         ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
@@ -65,7 +65,7 @@ public sealed class AdminFeaturesController : _AdminController
         return GetReturnFromApi( reply );
     }
     [HttpPost( "update-featured-product" )]
-    public async Task<ActionResult<bool>> UpdateProduct( [FromBody] UserDataRequest<FeaturedProductEditDto>? request )
+    public async Task<ActionResult<bool>> UpdateProduct( [FromBody] UserDataRequest<FeaturedProductDto>? request )
     {
         ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 

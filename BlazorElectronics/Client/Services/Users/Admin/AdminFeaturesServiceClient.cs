@@ -1,6 +1,6 @@
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Features;
+using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 
@@ -22,21 +22,21 @@ public class AdminFeaturesServiceClient : AdminServiceClient, IAdminFeaturesServ
     {
         return await TryUserRequest<FeaturesResponse?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( IntDto dto )
+    public async Task<ApiReply<FeaturedProductDto?>> GetFeaturedProductEdit( IntDto dto )
     {
-        return await TryUserRequest<IntDto, FeaturedProductEditDto?>( API_ROUTE_GET_PRODUCT_EDIT, dto );
+        return await TryUserRequest<IntDto, FeaturedProductDto?>( API_ROUTE_GET_PRODUCT_EDIT, dto );
     }
-    public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductEditDto dto )
+    public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductDto dto )
     {
-        return await TryUserRequest<FeaturedProductEditDto, bool>( API_ROUTE_ADD_PRODUCT, dto );
+        return await TryUserRequest<FeaturedProductDto, bool>( API_ROUTE_ADD_PRODUCT, dto );
     }
     public async Task<ApiReply<bool>> AddFeaturedDeal( IntDto dto )
     {
         return await TryUserRequest<IntDto, bool>( API_ROUTE_ADD_DEAL, dto );
     }
-    public async Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductEditDto dto )
+    public async Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto )
     {
-        return await TryUserRequest<FeaturedProductEditDto, bool>( API_ROUTE_UPDATE_PRODUCT, dto );
+        return await TryUserRequest<FeaturedProductDto, bool>( API_ROUTE_UPDATE_PRODUCT, dto );
     }
     public async Task<ApiReply<bool>> RemoveFeaturedProduct( IntDto dto )
     {

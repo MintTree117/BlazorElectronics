@@ -1,6 +1,6 @@
-namespace BlazorElectronics.Shared.Admin.Features;
+namespace BlazorElectronics.Shared.Features;
 
-public sealed class FeaturedProductEditDto
+public sealed class FeaturedProductDto
 {
     public int ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;

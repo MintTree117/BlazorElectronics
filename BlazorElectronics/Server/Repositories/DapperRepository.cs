@@ -15,12 +15,7 @@ public abstract class DapperRepository
     protected const string TABLE_PRODUCT_DESCRIPTIONS = "Product_Descriptions";
     protected const string TABLE_PRODUCT_IMAGES = "Product_Images";
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
-    protected const string TABLE_PRODUCT_VARIANTS = "Product_Variants";
-    protected const string TABLE_PRODUCT_SPECS_INT_FILTERS = "Product_Specs_Lookup_Single_Int_Filters";
-    protected const string TABLE_PRODUCT_SPECS_INT = "Product_Specs_Lookup_Single_Int_Values";
-    protected const string TABLE_PRODUCT_SPECS_STRING = "Product_Specs_Lookup_Single_String_Values";
-    protected const string TABLE_PRODUCT_SPECS_BOOL = "Product_Specs_Lookup_Single_Bool_Values";
-    protected const string TABLE_PRODUCT_SPECS_MULTI = "Product_Specs_Lookup_Multi_String_Values";
+    protected const string TABLE_PRODUCT_SPEC_LOOKUPS = "Product_Specs_Lookup";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
@@ -51,14 +46,16 @@ public abstract class DapperRepository
     protected const string COL_PRODUCT_IMAGE_ID = "ImageId";
     protected const string COL_PRODUCT_REVIEW_ID = "ReviewId";
     protected const string COL_PRODUCT_THUMBNAIL = "Thumbnail";
-    protected const string COL_PRODUCT_HAS_SALE = "HasSale";
     protected const string COL_PRODUCT_DESCRIPTION_ID_COLUMN = "DescriptionId";
     protected const string COL_PRODUCT_DESCR_BODY = "DescriptionBody";
-    protected const string COL_PRODUCT_LOWEST_PRICE = "ProductLowestPrice";
-    protected const string COL_PRODUCT_HIGHEST_PRICE = "ProductHighestPrice";
+    protected const string COL_PRODUCT_PRICE = "Price";
+    protected const string COL_PRODUCT_SALE_PRICE = "SalePrice";
     protected const string COL_PRODUCT_LAST_UPDATED = "LastUpdated";
     protected const string COL_PRODUCT_FILE_SIZE = "FileSize";
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
+    
+    // COLUMNS VENDORS
+    protected const string COL_VENDOR_ID = "VendorId";
     
     // COLUMNS SPECS
     protected const string COL_SPEC_ID = "SpecId";
@@ -165,11 +162,12 @@ public abstract class DapperRepository
     protected const string PARAM_FEATURE_IMAGE_URL = "@FeatureImageUrl";
 
     // PARAM CART
-    protected const string PARAM_ITEM_QUANTITY = "@CartItemQuantity";
-    protected const string PARAM_CART_PRODUCT_IDS = "@CartProductIds";
-    protected const string PARAM_CART_VARIANT_IDS = "@CartVariantIds";
-    protected const string PARAM_CART_ITEMS = "@CartItems";
-    
+    protected const string PARAM_CART_REQUEST = "@CartRequest";
+    protected const string PARAM_CART_QUANTITY = "@Quantity";
+    protected const string TVP_CART_ITEMS = "TVP_CartItems";
+    protected const string TVP_COL_CART_PRODUCT_ID = "ProductId";
+    protected const string TVP_COL_CART_ITEM_QUANTITY = "ItemQuantity";
+
     // PARAM VARIANTS
     protected const string PARAM_VARIANT_ID = "@VariantId";
     protected const string PARAM_VARIANT_NAME = "@VariantName";

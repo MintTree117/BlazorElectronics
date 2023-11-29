@@ -1,7 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Shared.Admin.Features;
+using BlazorElectronics.Shared.Features;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -24,7 +24,7 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     {
         return await TryQueryAsync( GetViewQuery );
     }
-    public async Task<bool> InsertFeaturedProduct( FeaturedProductEditDto dto )
+    public async Task<bool> InsertFeaturedProduct( FeaturedProductDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_PRODUCT_ID, dto.ProductId );
@@ -39,14 +39,14 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         
         return await TryQueryTransactionAsync( InsertDealQuery, parameters );
     }
-    public async Task<FeaturedProductEditDto?> GetFeaturedProductEdit( int productId )
+    public async Task<FeaturedProductDto?> GetFeaturedProductEdit( int productId )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_PRODUCT_ID, productId );
 
         return await TryQueryAsync( GetProductEditQuery );
     }
-    public async Task<bool> UpdateFeaturedProduct( FeaturedProductEditDto dto )
+    public async Task<bool> UpdateFeaturedProduct( FeaturedProductDto dto )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_PRODUCT_ID, dto.ProductId );
@@ -76,18 +76,18 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         if ( multi is null )
             return null;
         
-        IEnumerable<FeaturedProductEditDto>? products = await multi.ReadAsync<FeaturedProductEditDto>();
-        IEnumerable<FeaturedDealEditDto>? deals = await multi.ReadAsync<FeaturedDealEditDto>();
+        IEnumerable<FeaturedProductDto>? products = await multi.ReadAsync<FeaturedProductDto>();
+        IEnumerable<FeaturedDealDto>? deals = await multi.ReadAsync<FeaturedDealDto>();
 
         return new FeaturesResponse
         {
-            FeaturedProducts = products is not null ? products.ToList() : new List<FeaturedProductEditDto>(),
-            FeaturedDeals = deals is not null ? deals.ToList() : new List<FeaturedDealEditDto>()
+            FeaturedProducts = products is not null ? products.ToList() : new List<FeaturedProductDto>(),
+            FeaturedDeals = deals is not null ? deals.ToList() : new List<FeaturedDealDto>()
         };
     }
-    static async Task<FeaturedProductEditDto?> GetProductEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<FeaturedProductDto?> GetProductEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        return await connection.QuerySingleOrDefaultAsync<FeaturedProductEditDto>( PROCEDURE_GET_PRODUCT_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
+        return await connection.QuerySingleOrDefaultAsync<FeaturedProductDto>( PROCEDURE_GET_PRODUCT_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     static async Task<bool> InsertProductQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
     {

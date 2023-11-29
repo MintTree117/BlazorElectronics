@@ -16,35 +16,105 @@ public abstract class ClientService
         Http = http;
         Storage = storage;
     }
-
-    protected async Task<ApiReply<T>> TryPostRequest<T>( string apiPath, object? data = null )
+    
+    protected async Task<ApiReply<T>> TryGetRequest<T>( string apiPath )
     {
         try
         {
-            HttpResponseMessage httpResponse = await Http.PostAsJsonAsync( apiPath, data );
-            
+            HttpResponseMessage httpResponse = await Http.GetAsync( apiPath );
+
             if ( httpResponse.IsSuccessStatusCode )
             {
-                var apiReply = await httpResponse.Content.ReadFromJsonAsync<ApiReply<T>>();
-                return apiReply ?? new ApiReply<T>( default, false, "No content returned from API." );
+                var getReply = await httpResponse.Content.ReadFromJsonAsync<T>();
+
+                return getReply is not null
+                    ? new ApiReply<T>( getReply )
+                    : new ApiReply<T>( ServiceErrorType.NotFound, "No data returned from request" );
             }
-            else if ( httpResponse.StatusCode is System.Net.HttpStatusCode.BadRequest )
+
+            string errorContent = await httpResponse.Content.ReadAsStringAsync();
+
+            switch ( httpResponse.StatusCode )
             {
-                string errorContent = await httpResponse.Content.ReadAsStringAsync();
-                Logger.LogError( $"TryPostRequest: Bad request: {errorContent}" );
-                return new ApiReply<T>( default, false, errorContent );
+                case System.Net.HttpStatusCode.BadRequest:
+                    Logger.LogError( $"TryGetRequest: Bad request: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.ValidationError, errorContent );
+
+                case System.Net.HttpStatusCode.NotFound:
+                    Logger.LogError( $"TryGetRequest: Not found: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.NotFound, errorContent );
+
+                case System.Net.HttpStatusCode.Unauthorized:
+                    Logger.LogError( $"TryGetRequest: Unauthorized: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.Unauthorized, errorContent );
+
+                case System.Net.HttpStatusCode.Conflict:
+                    Logger.LogError( $"TryGetRequest: Conflict: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.Conflict, errorContent );
+
+                case System.Net.HttpStatusCode.InternalServerError:
+                    Logger.LogError( $"TryGetRequest: Server error: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.ServerError, errorContent );
+
+                default:
+                    Logger.LogError( $"TryGetRequest: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
             }
-            else
+        }
+        catch ( Exception e )
+        {
+            Logger.LogError( e, "TryGetRequest: Exception occurred while sending API request." );
+            return new ApiReply<T>( ServiceErrorType.ServerError, e.Message );
+        }
+    }
+    protected async Task<ApiReply<T>> TryPostRequest<T>(string apiPath, object? data = null)
+    {
+        try
+        {
+            HttpResponseMessage httpResponse = await Http.PostAsJsonAsync(apiPath, data);
+
+            if ( httpResponse.IsSuccessStatusCode )
             {
-                string errorContent = await httpResponse.Content.ReadAsStringAsync();
-                Logger.LogError( $"TryPostRequest: Error: {httpResponse.StatusCode}, Content: {errorContent}" );
-                return new ApiReply<T>( default, false, $"Error: {httpResponse.StatusCode}" );
+                var postReply = await httpResponse.Content.ReadFromJsonAsync<T>();
+
+                return postReply is not null
+                    ? new ApiReply<T>( postReply )
+                    : new ApiReply<T>( ServiceErrorType.NotFound, "No data returned from request" );
+            }
+            
+            string errorContent = await httpResponse.Content.ReadAsStringAsync();
+
+            switch ( httpResponse.StatusCode )
+            {
+                case System.Net.HttpStatusCode.BadRequest:
+                    Logger.LogError( $"TryPostRequest: Bad request: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.ValidationError, errorContent );
+
+                case System.Net.HttpStatusCode.NotFound:
+                    Logger.LogError( $"TryPostRequest: Not found: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.NotFound, errorContent );
+
+                case System.Net.HttpStatusCode.Unauthorized:
+                    Logger.LogError( $"TryPostRequest: Unauthorized: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.Unauthorized, errorContent );
+
+                case System.Net.HttpStatusCode.Conflict:
+                    Logger.LogError( $"TryPostRequest: Conflict: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.Conflict, errorContent );
+
+                case System.Net.HttpStatusCode.InternalServerError:
+                    Logger.LogError( $"TryPostRequest: Server error: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.ServerError, errorContent );
+
+                default:
+                    Logger.LogError( $"TryPostRequest: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
+                    return new ApiReply<T>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
             }
         }
         catch ( Exception e )
         {
             Logger.LogError( e, "TryPostRequest: Exception occurred while sending API request." );
-            return new ApiReply<T>( default, false, e.Message );
+            return new ApiReply<T>( ServiceErrorType.ServerError, e.Message );
         }
     }
 }

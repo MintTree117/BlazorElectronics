@@ -1,6 +1,6 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Repositories.Features;
-using BlazorElectronics.Shared.Admin.Features;
+using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Services.Features;
 
@@ -54,7 +54,7 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ApiReply<FeaturesResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductEditDto dto )
+    public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductDto dto )
     {
         try
         {
@@ -86,23 +86,23 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ApiReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( int productId )
+    public async Task<ApiReply<FeaturedProductDto?>> GetFeaturedProductEdit( int productId )
     {
         try
         {
-            FeaturedProductEditDto? result = await _repository.GetFeaturedProductEdit( productId );
+            FeaturedProductDto? result = await _repository.GetFeaturedProductEdit( productId );
 
             return result is not null
-                ? new ApiReply<FeaturedProductEditDto?>( result )
-                : new ApiReply<FeaturedProductEditDto?>( ServiceErrorType.NotFound );
+                ? new ApiReply<FeaturedProductDto?>( result )
+                : new ApiReply<FeaturedProductDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<FeaturedProductEditDto?>( ServiceErrorType.ServerError );
+            return new ApiReply<FeaturedProductDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductEditDto dto )
+    public async Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto )
     {
         try
         {

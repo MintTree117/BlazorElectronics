@@ -1,6 +1,7 @@
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Services.Products;
 

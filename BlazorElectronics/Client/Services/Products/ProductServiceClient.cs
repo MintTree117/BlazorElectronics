@@ -5,6 +5,7 @@ using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Client.Services.Products;
 

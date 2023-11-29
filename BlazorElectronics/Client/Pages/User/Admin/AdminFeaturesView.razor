@@ -1,6 +1,6 @@
 @page "/admin/features/view"
 @using BlazorElectronics.Shared.Enums
-@using BlazorElectronics.Shared.Admin.Features
+@using BlazorElectronics.Shared.Features
 @inherits AdminView
 
 <div class="container-sm">
@@ -59,7 +59,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ( FeaturedDealEditDto d in _features.FeaturedDeals )
+                @foreach ( FeaturedDealDto d in _features.FeaturedDeals )
                 {
                     <tr class="admin-view-row">
                         <td>@d.ProductId</td>
@@ -90,7 +90,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ( FeaturedProductEditDto p in _features.FeaturedProducts )
+                @foreach ( FeaturedProductDto p in _features.FeaturedProducts )
                 {
                     <tr class="admin-view-row">
                         <td>@p.ProductId</td>

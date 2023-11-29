@@ -1,5 +1,3 @@
-using BlazorElectronics.Server.Models.Cart;
-using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Shared.Cart;
 
@@ -14,223 +12,117 @@ public class CartService : ApiService, ICartService
     {
         _cartRepository = cartRepository;
     }
-    
-    public async Task<ApiReply<CartResponse?>> PostCartItems( int userId, List<CartItemIdsDto> cartItemsDtos )
+
+    public async Task<ApiReply<CartResponse?>> UpdateCart( int userId, CartRequest request )
     {
-        List<CartItem> models = MapItemIdsToModels( cartItemsDtos, userId );
-        
         try
         {
-            await _cartRepository.AddCartItems( models );
+            IEnumerable<CartProductResponse>? models = await _cartRepository.UpdateCart( userId, request );
+            CartResponse? response = MapCartResponse( models );
+
+            return response is not null
+                ? new ApiReply<CartResponse?>( response )
+                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
         }
-        
-        IEnumerable<CartItem>? allItems;
-        
+    }
+    public async Task<ApiReply<CartResponse?>> GetCart( int userId )
+    {
         try
         {
-            allItems = await _cartRepository.GetCartItems( userId );
+            IEnumerable<CartProductResponse>? models = await _cartRepository.GetCart( userId );
+            CartResponse? response = MapCartResponse( models );
+
+            return response is not null
+                ? new ApiReply<CartResponse?>( response )
+                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
         }
-        
-        GetProductIdsFromModels( allItems!, out List<int> productIds, out List<int> variantIds );
-        IEnumerable<CartProductModel>? cartProducts;
-        
+    }
+    public async Task<ApiReply<CartResponse?>> AddToCart( int userId, CartItemDto item )
+    {
         try
         {
-            cartProducts = await _cartRepository.GetCartProducts( productIds, variantIds );
+            IEnumerable<CartProductResponse>? models = await _cartRepository.InsertItem( userId, item );
+            CartResponse? response = MapCartResponse( models );
+
+            return response is not null
+                ? new ApiReply<CartResponse?>( response )
+                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
         }
-
-        CartResponse cartResponse = await MapProductsToCart( cartProducts!, cartItemsDtos );
-        return new ApiReply<CartResponse?>( cartResponse );
     }
-    public async Task<ApiReply<bool>> AddToCart( int userId, CartItemIdsDto cartItem )
+    public async Task<ApiReply<CartResponse?>> UpdateQuantity( int userId, CartItemDto item )
     {
-        CartItem modelItem = MapItemIdsToModel( cartItem, userId );
-
         try
         {
-            await _cartRepository.AddCartItem( modelItem );
+            IEnumerable<CartProductResponse>? models = await _cartRepository.UpdateQuantity( userId, item );
+            CartResponse? response = MapCartResponse( models );
+
+            return response is not null
+                ? new ApiReply<CartResponse?>( response )
+                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<bool>( ServiceErrorType.ServerError, e.Message );
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
         }
-
-        return new ApiReply<bool>( true );
     }
-    public async Task<ApiReply<bool>> UpdateQuantity( int userId, CartItemIdsDto cartItem )
+    public async Task<ApiReply<CartResponse?>> RemoveFromCart( int userId, int productId )
     {
-        CartItem modelItem = MapItemIdsToModel( cartItem, userId );
-
         try
         {
-            await _cartRepository.UpdateCartItemQuantity( modelItem );
+            IEnumerable<CartProductResponse>? models = await _cartRepository.DeleteFromCart( userId, productId );
+            CartResponse? response = MapCartResponse( models );
+
+            return response is not null
+                ? new ApiReply<CartResponse?>( response )
+                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<bool>( ServiceErrorType.ServerError, e.Message );
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
         }
-
-        return new ApiReply<bool>( true );
     }
-    public async Task<ApiReply<bool>> RemoveFromCart( int userId, CartItemIdsDto cartItem )
+    public async Task<ApiReply<bool>> ClearCart( int userId )
     {
-        CartItem modelItem = MapItemIdsToModel( cartItem, userId );
-
         try
         {
-            await _cartRepository.RemoveCartItem( modelItem );
+            bool result = await _cartRepository.DeleteCart( userId );
+            
+            return result
+                ? new ApiReply<bool>( true )
+                : new ApiReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<bool>( ServiceErrorType.ServerError, e.Message );
-        }
-
-        return new ApiReply<bool>( true );
-    }
-    public async Task<ApiReply<int>> CountCartItems( int userId )
-    {
-        int? count = null;
-
-        try
-        {
-            count = await _cartRepository.CountCartItems( userId );
-            if ( count is null or <= 0 )
-                return new ApiReply<int>( ServiceErrorType.NotFound, $"No cart items found!" );
-        }
-        catch ( ServiceException e )
-        {
-            return new ApiReply<int>( ServiceErrorType.ServerError, e.Message );
-        }
-
-        return new ApiReply<int>( count.Value );
-    }
-    public async Task<ApiReply<CartResponse?>> GetCartProducts( int userId )
-    {
-        IEnumerable<CartItem>? cartItems = null;
-
-        try
-        {
-            await _cartRepository.GetCartItems( userId );
-        }
-        catch ( ServiceException e )
-        {
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
-        }
-        
-        List<CartItem> itemsList = cartItems!.ToList();
-        GetProductIdsFromModels( itemsList, out List<int> productIds, out List<int> variantIds );
-
-        IEnumerable<CartProductModel>? cartProducts = null;
-
-        try
-        {
-            await _cartRepository.GetCartProducts( productIds, variantIds );
-        }
-        catch ( ServiceException e )
-        {
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
-        }
-
-        CartResponse cartResponse = await MapProductsToCart( cartProducts!, itemsList.ToList() );
-        return new ApiReply<CartResponse?>( cartResponse );
-    }
-    
-    static void GetProductIdsFromModels( IEnumerable<CartItem> models, out List<int> productIds, out List<int> variantIds )
-    {
-        productIds = new List<int>();
-        variantIds = new List<int>();
-
-        foreach ( CartItem item in models )
-        {
-            productIds.Add( item.ProductId );
-            variantIds.Add( item.VariantId );
+            Logger.LogError( e.Message, e );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    static List<CartItem> MapItemIdsToModels( List<CartItemIdsDto> cartItems, int userId )
-    {
-        var models = new List<CartItem>();
 
-        foreach ( CartItemIdsDto dto in cartItems )
-            models.Add( MapItemIdsToModel( dto, userId ) );
-
-        return models;
-    }
-    static CartItem MapItemIdsToModel( CartItemIdsDto dto, int userId )
+    static CartResponse? MapCartResponse( IEnumerable<CartProductResponse>? models )
     {
-        return new CartItem {
-            UserId = userId,
-            ProductId = dto.ProductId,
-            VariantId = dto.VariantId,
-            Quantity = dto.Quantity
+        if ( models is null )
+            return null;
+
+        return new CartResponse
+        {
+            Items = models.ToList()
         };
-    }
-    static async Task<CartResponse> MapProductsToCart( IEnumerable<CartProductModel> products, List<CartItemIdsDto> dtos )
-    {
-        var cartDto = new CartResponse();
-
-        await Task.Run( () =>
-        {
-            foreach ( CartProductModel p in products )
-            {
-                /*if ( p.ProductVariants.Count <= 0 )
-                    continue;
-
-                ProductVariantModel variantModelData = p.ProductVariants[ 0 ];
-
-                cartDto.Items.Add( new CartProductResponse {
-                    ProductId = p.ProductId,
-                    ProductTitle = p.ProductTitle,
-                    ProductThumbnail = p.ProductThumbnail,
-                    VariantId = variantModelData.VariantId,
-                    VariantName = variantModelData.VariantName,
-                    MainPrice = variantModelData.VariantPriceMain,
-                    SalePrice = variantModelData.VariantPriceSale,
-                    Quantity = dtos.Find( x => x.ProductId == p.ProductId && x.VariantId == variantModelData.VariantId )!.Quantity
-                } );*/
-            }
-        } );
-
-        return cartDto;
-    }
-    static async Task<CartResponse> MapProductsToCart( IEnumerable<CartProductModel> products, List<CartItem> items )
-    {
-        var cartDto = new CartResponse();
-
-        await Task.Run( () =>
-        {
-            foreach ( CartProductModel p in products )
-            {
-                /*if ( p.ProductVariants.Count <= 0 )
-                    continue;
-
-                ProductVariantModel variantModelData = p.ProductVariants[ 0 ];
-
-                cartDto.Items.Add( new CartProductResponse {
-                    ProductId = p.ProductId,
-                    ProductTitle = p.ProductTitle,
-                    ProductThumbnail = p.ProductThumbnail,
-                    VariantId = variantModelData.VariantId,
-                    VariantName = variantModelData.VariantName,
-                    MainPrice = variantModelData.VariantPriceMain,
-                    SalePrice = variantModelData.VariantPriceSale,
-                    Quantity = items.Find( x => x.ProductId == p.ProductId && x.VariantId == variantModelData.VariantId )!.Quantity
-                } );*/
-            }
-        } );
-
-        return cartDto;
     }
 }

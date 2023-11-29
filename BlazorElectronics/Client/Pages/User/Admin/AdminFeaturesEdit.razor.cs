@@ -2,8 +2,8 @@ using System.Collections.Specialized;
 using System.Web;
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Features;
 using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.Features;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -15,7 +15,7 @@ public partial class AdminFeaturesEdit : AdminView
     bool _newFeature;
     FeatureType _featureType;
     int _dealProductId;
-    FeaturedProductEditDto _productDto = new();
+    FeaturedProductDto _productDto = new();
     
     protected override async Task OnInitializedAsync()
     {
@@ -42,7 +42,7 @@ public partial class AdminFeaturesEdit : AdminView
             return;
         }
 
-        ApiReply<FeaturedProductEditDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IntDto( featureId ) );
+        ApiReply<FeaturedProductDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IntDto( featureId ) );
 
         if ( !reply.Success || reply.Data is null )
         {

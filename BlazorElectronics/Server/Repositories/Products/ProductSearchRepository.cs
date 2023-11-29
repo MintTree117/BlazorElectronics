@@ -7,6 +7,7 @@ using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 
@@ -84,31 +85,17 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $"SELECT *, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
             AppendCategoryJoin( builder, categoryMap );
-
-            if ( request.SpecFilters is not null )
-            {
-                AppendSpecJoin( builder, TABLE_PRODUCT_SPECS_INT_FILTERS, request.SpecFilters.IntFilters is not null );
-                AppendSpecJoin( builder, TABLE_PRODUCT_SPECS_STRING, request.SpecFilters.StringFilters is not null );
-                AppendSpecJoin( builder, TABLE_PRODUCT_SPECS_BOOL, request.SpecFilters.BoolFilters is not null );
-                AppendSpecJoin( builder, TABLE_PRODUCT_SPECS_MULTI, request.SpecFilters.MultiIncludes is not null );
-            }
+            AppendSpecLookupJoin( builder, request.LookupIncludes is not null || request.LookupExcludes is not null );
             
             builder.Append( $" WHERE 1=1" );
             
             AppendCategoryCondition( builder, dynamicParams, categoryMap );
             AppendSearchTextCondition( builder, dynamicParams, request.SearchText );
-            AppendHasSaleCondition( builder, request.MustHaveSale );
-            AppendRatingConditions( builder, dynamicParams, request.MinRating, request.MaxRating );
+            AppendHasSaleCondition( builder, request.HasSale );
+            AppendRatingConditions( builder, dynamicParams, request.MinRating );
             AppendPriceConditions( builder, dynamicParams, request.MinPrice, request.MaxPrice );
-
-            if ( request.SpecFilters is not null )
-            {
-                AppendSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_INT_FILTERS, COL_FILTER_INT_ID, request.SpecFilters.IntFilters );
-                AppendSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_STRING, COL_SPEC_VALUE_ID, request.SpecFilters.StringFilters );
-                AppendBoolSpecConditions( builder, dynamicParams, request.SpecFilters.BoolFilters );
-                AppendSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_STRING, COL_SPEC_VALUE_ID, request.SpecFilters.MultiIncludes );
-                AppendSpecConditions( builder, dynamicParams, TABLE_PRODUCT_SPECS_STRING, COL_SPEC_VALUE_ID, request.SpecFilters.MultiExcludes );
-            }
+            AppendLookupConditions( builder, dynamicParams, request.LookupIncludes, false );
+            AppendLookupConditions( builder, dynamicParams, request.LookupExcludes, true );
 
             builder.Append( " )" );
             builder.Append( $" SELECT *, TotalCount" );
@@ -137,13 +124,13 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         builder.Append( $" INNER JOIN {TABLE_PRODUCT_CATEGORIES}" );
         builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_CATEGORIES}.{COL_PRODUCT_ID}" );   
     }
-    static void AppendSpecJoin( StringBuilder builder, string tableName, bool filtersExist )
+    static void AppendSpecLookupJoin( StringBuilder builder, bool filtersExist )
     {
         if ( !filtersExist )
             return;
         
-        builder.Append( $" INNER JOIN {tableName}" );
-        builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {tableName}.{COL_PRODUCT_ID}" );
+        builder.Append( $" INNER JOIN {TABLE_PRODUCT_SPEC_LOOKUPS}" );
+        builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_SPEC_LOOKUPS}.{COL_PRODUCT_ID}" );
     }
 
     // APPEND CONDITIONS
@@ -167,85 +154,82 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         builder.Append( $" OR {TABLE_PRODUCT_DESCRIPTIONS}.{COL_PRODUCT_DESCR_BODY} LIKE {PARAM_SEARCH_TEXT} )" );
         dynamicParams.Add( PARAM_SEARCH_TEXT, searchText );
     }
-    static void AppendHasSaleCondition( StringBuilder builder, bool mustHaveSale )
+    static void AppendVendorCondition( StringBuilder builder, DynamicParameters dynamicParams, List<int>? vendors )
     {
-        if ( !mustHaveSale )
+        if ( vendors is null )
+            return;
+
+        var inParams = new List<string>();
+        for ( int i = 0; i < vendors.Count; i++ )
+        {
+            string paramName = $"{PARAM_VENDOR_ID}{i}";
+            inParams.Add( paramName );
+            dynamicParams.Add( paramName, vendors[ i ] );
+        }
+        
+        string valuesClause = string.Join( ", ", inParams.Select( p => "@" + p ) );
+        string finalQuery = $"AND {TABLE_PRODUCTS}.{COL_VENDOR_ID} IN ({valuesClause})";
+
+        builder.Append( finalQuery );
+    }
+    static void AppendHasSaleCondition( StringBuilder builder, bool? mustHaveSale )
+    {
+        if ( !mustHaveSale.HasValue || !mustHaveSale.Value )
             return;
         
-        builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_HAS_SALE} = 1" );
+        builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} IS NOT NULL" );
     }
-    static void AppendRatingConditions( StringBuilder builder, DynamicParameters dynamicParams, int? minRating, int? maxRating )
+    static void AppendRatingConditions( StringBuilder builder, DynamicParameters dynamicParams, int? minRating )
     {
-        if ( minRating.HasValue )
-        {
-            builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_RATING} >= {PARAM_MIN_RATING}" );
-            dynamicParams.Add( PARAM_MIN_RATING, minRating.Value );
-        }
-        if ( maxRating.HasValue )
-        {
-            builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_RATING} <= {PARAM_MAX_RATING}" );
-            dynamicParams.Add( PARAM_MAX_RATING, maxRating.Value );
-        }
+        if ( !minRating.HasValue ) 
+            return;
+        
+        builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_RATING} >= {PARAM_MIN_RATING}" );
+        dynamicParams.Add( PARAM_MIN_RATING, minRating.Value );
     }
     static void AppendPriceConditions( StringBuilder builder, DynamicParameters dynamicParams, int? minPrice, int? maxPrice )
     {
+        const string priceColumn = $"COALESCE({TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE}, {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE})";
+
         if ( minPrice.HasValue )
         {
-            builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_LOWEST_PRICE} >= {PARAM_MIN_PRICE}" );
-            dynamicParams.Add( PARAM_MIN_RATING, minPrice.Value );
+            builder.Append( $" AND {priceColumn} >= {PARAM_MIN_PRICE}" );
+            dynamicParams.Add( PARAM_MIN_PRICE, minPrice.Value );
         }
         if ( maxPrice.HasValue )
         {
-            builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_HIGHEST_PRICE} <= {PARAM_MAX_PRICE}" );
-            dynamicParams.Add( PARAM_MAX_RATING, maxPrice.Value );
+            builder.Append( $" AND {priceColumn} <= {PARAM_MAX_PRICE}" );
+            dynamicParams.Add( PARAM_MAX_PRICE, maxPrice.Value );
         }
     }
-    
-    static void AppendSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, string tableName, string valueIdName, Dictionary<short, List<short>>? request )
+    static void AppendLookupConditions( StringBuilder builder, DynamicParameters dynamicParams, Dictionary<int, List<int>>? lookups, bool exclude )
     {
-        if ( request is null )
+        if ( lookups is null )
             return;
-        
-        foreach ( short specId in request.Keys )
+
+        string condition = exclude
+            ? " NOT IN "
+            : " IN ";
+
+        foreach ( (int specId, List<int>? valueIds) in lookups )
         {
-            List<short> valueIds = request[ specId ];
-            var clauses = new List<string>();
-            
+            // Create parameter names for IN clause
+            var inParams = new List<string>();
             for ( int i = 0; i < valueIds.Count; i++ )
             {
-                string specIdParamName = $"{PARAM_SPEC_ID}{tableName}{i}";
-                string valueIdParamName = $"{PARAM_SPEC_VALUE_ID}{tableName}{i}";
-
-                string clause = $"( {tableName}.{COL_SPEC_ID} = {specIdParamName}";
-                clause += $" AND {tableName}.{valueIdName} = {valueIdParamName} )";
-
-                clauses.Add( clause );
-                
-                dynamicParams.Add( specIdParamName, specId );
-                dynamicParams.Add( valueIdParamName, valueIds[ i ] );
+                string paramName = $"{PARAM_SPEC_VALUE_ID}{TABLE_PRODUCT_SPEC_LOOKUPS}{i}";
+                inParams.Add( paramName );
+                dynamicParams.Add( paramName, valueIds[ i ] );
             }
 
-            string joinedClauses = string.Join( " OR ", clauses );
-            string finalQuery = $" AND ( {joinedClauses} )";
-            
-            builder.Append( finalQuery );
-        }
-    }
-    static void AppendBoolSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, Dictionary<short, bool>? request )
-    {
-        if ( request is null )
-            return;
+            string valuesClause = string.Join( ", ", inParams.Select( p => "@" + p ) );
 
-        foreach ( short specId in request.Keys )
-        {
-            string idParamName = $"{PARAM_BOOL}{TABLE_PRODUCT_SPECS_BOOL}{specId}";
-            string valueParamName = $"{PARAM_SPEC_VALUE}{TABLE_PRODUCT_SPECS_BOOL}{specId}";
-            
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_BOOL}.{COL_SPEC_ID} = {idParamName}" );
-            builder.Append( $" {TABLE_PRODUCT_SPECS_BOOL}.{COL_SPEC_VALUE} = {valueParamName} )" );
-                
-            dynamicParams.Add( idParamName, specId);
-            dynamicParams.Add( valueParamName, request[ specId ] );
+            // Append the condition with IN clause
+            string finalQuery = $" AND ({TABLE_PRODUCT_SPEC_LOOKUPS}.{COL_SPEC_ID} = @{PARAM_SPEC_ID}{TABLE_PRODUCT_SPEC_LOOKUPS})";
+            finalQuery += $" AND {TABLE_PRODUCT_SPEC_LOOKUPS}.{COL_SPEC_VALUE_ID} {condition} ({valuesClause})";
+
+            builder.Append( finalQuery );
+            dynamicParams.Add( $"{PARAM_SPEC_ID}{TABLE_PRODUCT_SPEC_LOOKUPS}", specId );
         }
     }
 

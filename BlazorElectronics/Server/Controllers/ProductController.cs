@@ -1,10 +1,10 @@
-using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Repositories.SpecLookups;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Products.Search;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;

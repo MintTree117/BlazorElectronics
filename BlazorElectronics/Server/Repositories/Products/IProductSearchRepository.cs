@@ -2,6 +2,7 @@ using BlazorElectronics.Server.Models.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Repositories.Products;
 

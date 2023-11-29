@@ -16,7 +16,7 @@ public class CategoryController : _Controller
         _categoryService = categoryService;
     }
     
-    [HttpGet("categories")]
+    [HttpGet("get-categories")]
     public async Task<ActionResult<CategoriesResponse>> GetCategories()
     {
         ApiReply<CategoriesResponse?> reply = await _categoryService.GetCategoriesResponse();
