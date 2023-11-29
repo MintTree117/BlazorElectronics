@@ -1,6 +1,5 @@
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.SpecLookups;
 using BlazorElectronics.Shared.SpecLookups;
 using Microsoft.AspNetCore.Components;
 

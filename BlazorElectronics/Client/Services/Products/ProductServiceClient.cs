@@ -126,7 +126,7 @@ public class ProductServiceClient : ClientService, IProductServiceClient
                 return new ApiReply<ProductSuggestionsResponse?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new ApiReply<ProductSuggestionsResponse?>( null, false, response.Message ??= "Failed to retrieve Search Suggestions; message is null!" )
+                ? new ApiReply<ProductSuggestionsResponse?>( null, false, response.Message )
                 : response;
         }
         catch ( Exception e )
@@ -168,7 +168,7 @@ public class ProductServiceClient : ClientService, IProductServiceClient
                 return new ApiReply<ProductDetailsResponse?>( null, false, "Service response is null!" );
 
             return !response.Success
-                ? new ApiReply<ProductDetailsResponse?>( null, false, response.Message ??= "Failed to retrieve Product Details; message is null!" )
+                ? new ApiReply<ProductDetailsResponse?>( null, false, response.Message )
                 : response;
         }
         catch ( Exception e )

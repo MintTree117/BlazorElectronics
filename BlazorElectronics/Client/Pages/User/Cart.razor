@@ -35,7 +35,7 @@ else
                 @if ( item.HasSale() )
                 {
                     <h6 class="text-muted">
-                        $@(item.MainPrice * item.Quantity)
+                        $@(item.Price * item.Quantity)
                     </h6>
                     <h4 class="price">
                         $@(item.SalePrice * item.Quantity)
@@ -44,7 +44,7 @@ else
                 else
                 {
                     <h4 class="price">
-                        $@(item.MainPrice * item.Quantity)
+                        $@(item.Price * item.Quantity)
                     </h4>
                 }
             </div>
@@ -78,7 +78,7 @@ else
         ApiReply<CartResponse?> response = await CartService.GetCart();
 
         if ( !response.Success )
-            _serverMessage = response.Message ??= "Failed to get cart! No response message!";
+            _serverMessage = response.Message;
 
         _cart = response.Data;
 

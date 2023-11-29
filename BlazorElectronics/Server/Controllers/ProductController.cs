@@ -30,7 +30,7 @@ public class ProductController : ControllerBase
         ApiReply<bool> validateReply = await ValidateSearchSuggestionRequest( request );
 
         if ( !validateReply.Data )
-            return BadRequest( new ApiReply<ProductSuggestionsResponse>( validateReply.Message ) );
+            return BadRequest( new ApiReply<ProductSuggestionsResponse>( ServiceErrorType.NotFound, validateReply.Message ) );
         
         return Ok( await _productService.GetProductSuggestions( request ) );
     }
@@ -55,7 +55,7 @@ public class ProductController : ControllerBase
         ApiReply<CategoriesResponse?> categoriesReply = await _categoryService.GetCategoriesResponse();
 
         if ( !categoriesReply.Success || categoriesReply.Data is null )
-            return Ok( new ApiReply<ProductDetailsResponse?>( categoriesReply.Message ) );
+            return Ok( new ApiReply<ProductDetailsResponse?>( ServiceErrorType.NotFound, categoriesReply.Message ) );
         
         return Ok( await _productService.GetProductDetails( productId, categoriesReply.Data ) );
     }
@@ -72,7 +72,7 @@ public class ProductController : ControllerBase
     async Task<ApiReply<bool>> ValidateSearchSuggestionRequest( ProductSuggestionRequest request )
     {
         if ( string.IsNullOrEmpty( request.SearchText ) )
-            return new ApiReply<bool>( "SearchText is empty!" );
+            return new ApiReply<bool>( ServiceErrorType.NotFound, "SearchText is empty!" );
 
         if ( request.SearchText.Length > 64 )
             request.SearchText.Remove( 63 );
@@ -81,17 +81,17 @@ public class ProductController : ControllerBase
 
         return categoryReply.Success
             ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( categoryReply.Message );
+            : new ApiReply<bool>( categoryReply.ErrorType, categoryReply.Message );
     }
     async Task<ApiReply<CategoryIdMap?>> ValidateCategoryUrls( string? primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
         if ( string.IsNullOrEmpty( primaryUrl ) )
-            return new ApiReply<CategoryIdMap?>( "Invalid CategoryUrl!" );
+            return new ApiReply<CategoryIdMap?>( ServiceErrorType.ValidationError, "Invalid CategoryUrl!" );
 
         ApiReply<CategoryIdMap?> categoryReply = await _categoryService.GetCategoryIdMapFromUrl( primaryUrl, secondaryUrl, tertiaryUrl );
 
         return categoryReply.Success
             ? new ApiReply<CategoryIdMap?>( categoryReply.Data )
-            : new ApiReply<CategoryIdMap?>( categoryReply.Message );
+            : new ApiReply<CategoryIdMap?>( categoryReply.ErrorType, categoryReply.Message );
     }
 }

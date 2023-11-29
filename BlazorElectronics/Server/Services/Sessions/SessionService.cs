@@ -33,16 +33,16 @@ public class SessionService : ApiService, ISessionService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<SessionDto?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<SessionDto?>( ServiceErrorType.ServerError );
         }
         
         return insertedSession is not null 
             ? new ApiReply<SessionDto?>( new SessionDto( insertedSession.SessionId, token ) ) 
-            : new ApiReply<SessionDto?>( NO_DATA_FOUND_MESSAGE );
+            : new ApiReply<SessionDto?>( ServiceErrorType.NotFound );
     }
     public async Task<ApiReply<bool>> DeleteSession( int sessionId )
     {
-        bool success = false;
+        bool success;
 
         try
         {
@@ -51,12 +51,12 @@ public class SessionService : ApiService, ISessionService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
         }
 
         return success
             ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
+            : new ApiReply<bool>( ServiceErrorType.NotFound );
 
     }
     public async Task<ApiReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
@@ -70,21 +70,21 @@ public class SessionService : ApiService, ISessionService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<int>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<int>( ServiceErrorType.ServerError );
         }
 
         if ( session is null )
-            return new ApiReply<int>( NO_DATA_FOUND_MESSAGE );
+            return new ApiReply<int>( ServiceErrorType.NotFound );
 
         if ( !session.IsValid( MAX_SESSION_HOURS ) )
         {
             await DeleteSession( session.SessionId );
-            return new ApiReply<int>( SESSION_EXPIRED_MESSAGE );   
+            return new ApiReply<int>( ServiceErrorType.ValidationError, SESSION_EXPIRED_MESSAGE );   
         }
 
         return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
             ? new ApiReply<int>( session.UserId )
-            : new ApiReply<int>( INVALID_SESSION_TOKEN_MESSAGE );
+            : new ApiReply<int>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
     }
 
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )

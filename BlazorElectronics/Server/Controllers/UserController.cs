@@ -25,27 +25,27 @@ public class UserController : _Controller
         var dto = new UserDeviceInfoDto( address?.ToString() );
         return dto;
     }
-    protected async Task<HttpAuthorization> ValidateAndAuthorizeUser( UserRequest? request )
+    protected async Task<ApiReply<int>> ValidateAndAuthorizeUser( UserRequest? request )
     {
         if ( !ValidateUserHttp( request ) )
-            return new HttpAuthorization( 0, BadRequest( BAD_REQUEST_MESSAGE ) );
+            return new ApiReply<int>( ServiceErrorType.ValidationError );
 
-        ApiReply<int> authorize = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
+        ApiReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
 
-        return authorize.Success
-            ? new HttpAuthorization( authorize.Data )
-            : new HttpAuthorization( 0, Unauthorized( authorize.Message ) );
+        return authorizeReply.Success
+            ? new ApiReply<int>( authorizeReply.Data )
+            : new ApiReply<int>( ServiceErrorType.Unauthorized );
     }
-    protected async Task<HttpAuthorization> ValidateAndAuthorizeUser<T>( UserDataRequest<T>? request ) where T : class
+    protected async Task<ApiReply<int>> ValidateAndAuthorizeUser<T>( UserDataRequest<T>? request ) where T : class
     {
         if ( !ValidateUserHttp( request ) )
-            return new HttpAuthorization( 0, BadRequest( BAD_REQUEST_MESSAGE ) );
+            return new ApiReply<int>( ServiceErrorType.ValidationError );
 
-        ApiReply<int> authorize = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
+        ApiReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
 
-        return authorize.Success
-            ? new HttpAuthorization( authorize.Data )
-            : new HttpAuthorization( 0, Unauthorized( authorize.Message ) );
+        return authorizeReply.Success
+            ? new ApiReply<int>( authorizeReply.Data )
+            : new ApiReply<int>( ServiceErrorType.Unauthorized );
     }
     
     async Task<ApiReply<int>> AuthorizeSessionRequest( int sessionId, string sessionToken )

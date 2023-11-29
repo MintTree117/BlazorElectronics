@@ -6,19 +6,20 @@ namespace BlazorElectronics.Server.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class CategoryController : ControllerBase
+public class CategoryController : _Controller
 {
     readonly ICategoryService _categoryService;
 
-    public CategoryController( ICategoryService categoryService )
+    public CategoryController( ILogger<_Controller> logger, ICategoryService categoryService )
+        : base( logger )
     {
         _categoryService = categoryService;
     }
     
     [HttpGet("categories")]
-    public async Task<ActionResult<ApiReply<CategoriesResponse>>> GetCategories()
+    public async Task<ActionResult<CategoriesResponse>> GetCategories()
     {
-        ApiReply<CategoriesResponse?> response = await _categoryService.GetCategoriesResponse();
-        return Ok( response );
+        ApiReply<CategoriesResponse?> reply = await _categoryService.GetCategoriesResponse();
+        return GetReturnFromApi( reply );
     }
 }

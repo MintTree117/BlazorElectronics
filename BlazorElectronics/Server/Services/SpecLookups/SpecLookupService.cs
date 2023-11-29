@@ -24,58 +24,193 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         if ( CacheValid() )
             return new ApiReply<SpecLookupsResponse?>( _cachedSpecData!.Object );
 
-        SpecLookupsModel? model = await _repository.Get();
+        SpecLookupsModel? model;
+
+        try
+        {
+            model = await _repository.Get();
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<SpecLookupsResponse?>( ServiceErrorType.ServerError );
+        }
 
         if ( model is null )
-            return new ApiReply<SpecLookupsResponse?>( NO_DATA_FOUND_MESSAGE );
+            return new ApiReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
 
-        _cachedSpecData = await MapGetResult( model );
+        SpecLookupsResponse? response = MapResponse( model );
 
-        return new ApiReply<SpecLookupsResponse?>( _cachedSpecData!.Object );
+        if ( response is null )
+            return new ApiReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
+
+        _cachedSpecData = new CachedObject<SpecLookupsResponse>( response );
+        
+        return new ApiReply<SpecLookupsResponse?>( response );
     }
-    static async Task<CachedObject<SpecLookupsResponse>?> MapGetResult( SpecLookupsModel model )
+    public async Task<ApiReply<SpecLookupViewResponse?>> GetView()
+    {
+        IEnumerable<SpecLookupModel>? models;
+
+        try
+        {
+            models = await _repository.GetView();
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<SpecLookupViewResponse?>( ServiceErrorType.ServerError );
+        }
+
+        SpecLookupViewResponse? dto = MapView( models );
+
+        return dto is not null
+            ? new ApiReply<SpecLookupViewResponse?>( dto )
+            : new ApiReply<SpecLookupViewResponse?>( ServiceErrorType.NotFound );
+    }
+    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( int specId )
+    {
+        SpecLookupEditModel? model;
+
+        try
+        {
+            model = await _repository.GetEdit( specId );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<SpecLookupEditDto?>( ServiceErrorType.ServerError );
+        }
+
+        SpecLookupEditDto? dto = MapEdit( model );
+
+        return dto is not null
+            ? new ApiReply<SpecLookupEditDto?>( dto )
+            : new ApiReply<SpecLookupEditDto?>( ServiceErrorType.NotFound );
+    }
+    public async Task<ApiReply<int>> Add( SpecLookupEditDto dto )
+    {
+        try
+        {
+            int result = await _repository.Insert( dto );
+
+            return result > 0
+                ? new ApiReply<int>( result )
+                : new ApiReply<int>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<int>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ApiReply<bool>> Update( SpecLookupEditDto dto )
+    {
+        try
+        {
+            bool result = await _repository.Update( dto );
+
+            return result
+                ? new ApiReply<bool>( result )
+                : new ApiReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ApiReply<bool>> Remove( int specId )
+    {
+        try
+        {
+            bool result = await _repository.Delete( specId );
+
+            return result
+                ? new ApiReply<bool>( result )
+                : new ApiReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    
+    static SpecLookupsResponse? MapResponse( SpecLookupsModel model )
     {
         if ( model.GlobalSpecs is null || model.SpecCategories is null || model.SpecLookups is null || model.SpecValues is null )
             return null;
 
-        return await Task.Run( () =>
+        List<int> globalIds = model.GlobalSpecs.ToList();
+
+        var idsByCategory = new Dictionary<PrimaryCategory, List<int>>
         {
-            List<int> globalIds = model.GlobalSpecs.ToList();
+            { PrimaryCategory.BOOKS, new List<int>() },
+            { PrimaryCategory.SOFTWARE, new List<int>() },
+            { PrimaryCategory.VIDEOGAMES, new List<int>() },
+            { PrimaryCategory.MOVIESTV, new List<int>() },
+            { PrimaryCategory.COURSES, new List<int>() }
+        };
+        foreach ( SpecLookupCategoryModel sc in model.SpecCategories )
+        {
+            idsByCategory[ ( PrimaryCategory ) sc.PrimaryCategory ].Add( sc.SpecId );
+        }
 
-            var idsByCategory = new Dictionary<PrimaryCategory, List<int>>
+        var responsesById = new Dictionary<int, SpecLookupDto>();
+
+        foreach ( SpecLookupModel m in model.SpecLookups )
+        {
+            List<string> specValues = model.SpecValues
+                .Where( spec => spec.SpecId == m.SpecId )
+                .OrderBy( spec => spec.SpecValueId )
+                .Select( spec => spec.SpecValue )
+                .ToList();
+
+            responsesById.Add( m.SpecId, new SpecLookupDto
             {
-                { PrimaryCategory.BOOKS, new List<int>() },
-                { PrimaryCategory.SOFTWARE, new List<int>() },
-                { PrimaryCategory.VIDEOGAMES, new List<int>() },
-                { PrimaryCategory.MOVIESTV, new List<int>() },
-                { PrimaryCategory.COURSES, new List<int>() }
-            };
-            foreach ( SpecLookupCategoryModel sc in model.SpecCategories )
-            {
-                idsByCategory[ ( PrimaryCategory ) sc.PrimaryCategory ].Add( sc.SpecId );
-            }
+                SpecId = m.SpecId,
+                SpecName = m.SpecName,
+                Values = specValues
+            } );
+        }
 
-            var responsesById = new Dictionary<int, SpecLookupDto>();
+        return new SpecLookupsResponse( globalIds, idsByCategory, responsesById );
+    }
+    static SpecLookupViewResponse? MapView( IEnumerable<SpecLookupModel>? models )
+    {
+        if ( models is null )
+            return null;
 
-            foreach ( SpecLookupModel m in model.SpecLookups )
-            {
-                List<string> specValues = model.SpecValues
-                    .Where( spec => spec.SpecId == m.SpecId )
-                    .OrderBy( spec => spec.SpecValueId )
-                    .Select( spec => spec.SpecValue )
-                    .ToList();
+        List<SpecLookupViewDto> dtos = models
+            .Select( m => new SpecLookupViewDto { SpecId = m.SpecId, SpecName = m.SpecName } )
+            .ToList();
 
-                responsesById.Add( m.SpecId, new SpecLookupDto
-                {
-                    SpecId = m.SpecId,
-                    SpecName = m.SpecName,
-                    Values = specValues
-                } );
-            }
+        return new SpecLookupViewResponse
+        {
+            Lookups = dtos
+        };
+    }
+    static SpecLookupEditDto? MapEdit( SpecLookupEditModel? model )
+    {
+        if ( model?.Spec is null )
+            return null;
 
-            var response = new SpecLookupsResponse( globalIds, idsByCategory, responsesById );
-            return new CachedObject<SpecLookupsResponse>( response );
-        } );
+        string categories = model.Categories is not null
+            ? ConvertPrimaryCategoriesToString( model.Categories.Select( c => c.PrimaryCategory ) )
+            : string.Empty;
+
+        string values = model.Values is not null
+            ? ConvertSpecValuesToString( model.Values )
+            : string.Empty;
+
+        return new SpecLookupEditDto
+        {
+            SpecId = model.Spec.SpecId,
+            SpecName = model.Spec.SpecName,
+            PrimaryCategoriesAsString = categories,
+            ValuesByIdAsString = values
+        };
     }
     bool CacheValid()
     {

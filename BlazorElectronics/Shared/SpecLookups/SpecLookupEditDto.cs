@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared.Admin.SpecLookups;
+namespace BlazorElectronics.Shared.SpecLookups;
 
 public sealed class SpecLookupEditDto
 {

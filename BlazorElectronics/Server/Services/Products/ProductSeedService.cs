@@ -39,7 +39,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
         }
     }
     

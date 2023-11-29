@@ -7,7 +7,7 @@ public enum DtoDefaultMessage
     SUCCESS
 }
 
-public sealed class ApiReply<T>
+public record ApiReply<T>
 {
     const string MESSAGE_RESPONSE_ERROR = "Failed to produce a proper response message!";
     const string MESSAGE_RESPONSE_NULL = "Service response is null!";
@@ -18,23 +18,12 @@ public sealed class ApiReply<T>
     {
         
     }
-    public ApiReply( string? message )
+    public ApiReply( ServiceErrorType errorType, string? message = null )
     {
         Data = default;
         Success = false;
+        ErrorType = errorType;
         Message = message ?? GetDefaultMessage( DtoDefaultMessage.FAILURE );
-    }
-    public ApiReply( ApiReply<T> response )
-    {
-        Data = response.Data;
-        
-        Success = response.Success;
-        if ( Data is null )
-            Success = false;
-        
-        Message = response.Message;
-        if ( string.IsNullOrEmpty( Message ) )
-            Message = Success ? GetDefaultMessage( DtoDefaultMessage.SUCCESS ) : GetDefaultMessage( DtoDefaultMessage.FAILURE );
     }
     public ApiReply( T data )
     {
@@ -42,28 +31,11 @@ public sealed class ApiReply<T>
         Success = true;
         Message = string.Empty;
     }
-    public ApiReply( T? data, bool success, string message )
-    {
-        Data = data;
-        Success = success;
-        Message = message;
-    }
-    public ApiReply( T? data, bool success, DtoDefaultMessage defaultMessage )
-    {
-        Data = data;
-        Success = success;
-        Message = GetDefaultMessage( defaultMessage );
-    }
-    public ApiReply( T? data, bool success, string? recievedMessage, DtoDefaultMessage defaultMessage )
-    {
-        Data = data;
-        Success = success;
-        Message = recievedMessage ?? GetDefaultMessage( defaultMessage );
-    }
 
-    public bool Success { get; set; }
-    public string? Message { get; set; }
-    public T? Data { get; set; }
+    public bool Success { get; init; }
+    public string? Message { get; init; }
+    public T? Data { get; init; }
+    public ServiceErrorType ErrorType { get; init; } = ServiceErrorType.None;
 
     static string GetDefaultMessage( DtoDefaultMessage defaultMessage )
     {

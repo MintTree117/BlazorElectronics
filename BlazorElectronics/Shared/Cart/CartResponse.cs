@@ -6,15 +6,13 @@ public sealed class CartResponse
 
     public decimal GetTotalPrice()
     {
-        return Items.Sum( item => item.GetRealPrice() * item.Quantity );
+        return Items.Sum( item => item.Price * item.Quantity );
     }
-
     public bool GetSameItem( CartProductResponse itemToCompare, out CartProductResponse? item )
     {
-        item = Items.Find( x => x.ProductId == itemToCompare.ProductId && x.VariantId == itemToCompare.VariantId );
+        item = Items.Find( x => x.ProductId == itemToCompare.ProductId );
         return item != null;
     }
-
     public void AddOrUpdateQuantity( CartProductResponse item )
     {
         if ( GetSameItem( item, out CartProductResponse? sameItem ) )

@@ -26,11 +26,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
     { 
         return await TryQueryAsync( GetQuery );
     }
-    public Task<VendorsViewDto?> GetView()
-    {
-        return TryQueryAsync( GetViewQuery );
-    }
-    public Task<VendorEditDto?> GetEdit( int vendorId )
+    public Task<VendorEditModel?> GetEdit( int vendorId )
     {
         var parameters = new DynamicParameters();
         parameters.Add( PARAM_VENDOR_ID, vendorId );
@@ -65,7 +61,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
             return null;
 
         IEnumerable<VendorModel>? vendors = await multi.ReadAsync<VendorModel>();
-        List<VendorCategoryModel> categories = ( await multi.ReadAsync<VendorCategoryModel>() ).ToList();
+        IEnumerable<VendorCategoryModel>? categories = await multi.ReadAsync<VendorCategoryModel>();
 
         return new VendorsModel
         {
@@ -73,66 +69,17 @@ public class VendorRepository : DapperRepository, IVendorRepository
             Categories = categories
         };
     }
-    static async Task<VendorsViewDto?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_VIEW, dynamicParams, commandType: CommandType.StoredProcedure );
-
-        if ( multi is null )
-            return null;
-
-        IEnumerable<VendorModel>? vendors = await multi.ReadAsync<VendorModel>();
-        List<VendorCategoryModel>? categories = ( await multi.ReadAsync<VendorCategoryModel>() ).ToList();
-
-        if ( vendors is null || categories is null )
-            return null;
-
-        var vendorsEdit = new List<VendorEditDto>();
-
-        foreach ( VendorModel vendor in vendors )
-        {
-            List<int> categoryIds = categories
-                .Where( c => c.VendorId == vendor.VendorId )
-                .Select( c => c.PrimaryCategoryId )
-                .ToList();
-            
-            vendorsEdit.Add( new VendorEditDto
-            {
-                VendorId = vendor.VendorId,
-                VendorName = vendor.VendorName,
-                VendorUrl = vendor.VendorUrl,
-                PrimaryCategories = ConvertPrimaryCategoriesToString( categoryIds )
-            } );
-        }
-
-        return new VendorsViewDto
-        {
-            Vendors = vendorsEdit
-        };
-    }
-    static async Task<VendorEditDto?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<VendorEditModel?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
 
         if ( multi is null )
             return null;
-
-        var vendor = await multi.ReadSingleOrDefaultAsync<VendorModel>();
-        List<VendorCategoryModel>? categories = ( await multi.ReadAsync<VendorCategoryModel>() ).ToList();
-
-        if ( vendor is null || categories is null )
-            return null;
         
-        List<int> categoryIds = categories
-                .Where( c => c.VendorId == vendor.VendorId )
-                .Select( c => c.PrimaryCategoryId )
-                .ToList();
-
-        return new VendorEditDto
+        return new VendorEditModel
         {
-            VendorId = vendor.VendorId,
-            VendorName = vendor.VendorName,
-            VendorUrl = vendor.VendorUrl,
-            PrimaryCategories = ConvertPrimaryCategoriesToString( categoryIds )
+            Vendor = await multi.ReadSingleOrDefaultAsync<VendorModel>(),
+            Categories = await multi.ReadAsync<VendorCategoryModel>()
         };
     }
     static async Task<int> InsertQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )

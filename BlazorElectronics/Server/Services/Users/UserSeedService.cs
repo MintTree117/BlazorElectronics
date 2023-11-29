@@ -20,9 +20,9 @@ public sealed class UserSeedService : ApiService, IUserSeedService
         foreach ( UserRegisterRequest seed in seeds )
         {
             ApiReply<UserLoginDto?> seedReply = await _userAccountService.Register( seed.Username, seed.Username, seed.Password, seed.Phone );
-
+            
             if ( !seedReply.Success )
-                return new ApiReply<bool>( seedReply.Message );
+                return new ApiReply<bool>( ServiceErrorType.ServerError, seedReply.Message );
         }
 
         return new ApiReply<bool>( true );

@@ -1,7 +1,7 @@
-using BlazorElectronics.Server.Repositories.SpecLookups;
 using BlazorElectronics.Server.Services.Sessions;
+using BlazorElectronics.Server.Services.SpecLookups;
 using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Shared.Admin.SpecLookups;
+using BlazorElectronics.Shared.SpecLookups;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,122 +11,67 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 [ApiController]
 public sealed class AdminSpecLookupController : _AdminController
 {
-    readonly ISpecLookupRepository _repository;
+    readonly ISpecLookupService _lookupService;
 
-    public AdminSpecLookupController( ILogger<AdminSpecLookupController> logger, IUserAccountService userAccountService, ISessionService sessionService, ISpecLookupRepository repository )
+    public AdminSpecLookupController( ILogger<AdminSpecLookupController> logger, IUserAccountService userAccountService, ISessionService sessionService, ISpecLookupService lookupService )
         : base( logger, userAccountService, sessionService )
     {
-        _repository = repository;
+        _lookupService = lookupService;
     }
     
     [HttpPost( "get-spec-lookup-view" )]
-    public async Task<ActionResult<ApiReply<List<SpecLookupViewDto>>>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<SpecLookupViewResponse?>> GetView( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            List<SpecLookupViewDto>? result = await _repository.GetView();
-
-            return result is not null
-                ? Ok( new ApiReply<List<SpecLookupViewDto>>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<SpecLookupViewResponse?> reply = await _lookupService.GetView();
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "get-spec-lookup-edit" )]
-    public async Task<ActionResult<ApiReply<SpecLookupEditDto>>> GetEdit( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<SpecLookupEditDto?>> GetEdit( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
-        
-        try
-        {
-            SpecLookupEditDto? result = await _repository.GetEdit( request!.Payload!.Value );
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-            return result is not null
-                ? Ok( new ApiReply<SpecLookupEditDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<SpecLookupEditDto?> reply = await _lookupService.GetEdit( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "add-spec-lookup" )]
-    public async Task<ActionResult<ApiReply<int>>> Add( [FromBody] UserDataRequest<SpecLookupEditDto>? request )
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<SpecLookupEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            int result = await _repository.Insert( request!.Payload! );
-
-            return result > 0
-                ? Ok( new ApiReply<int>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<int> reply = await _lookupService.Add( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "update-spec-lookup" )]
-    public async Task<ActionResult<ApiReply<bool>>> Update( [FromBody] UserDataRequest<SpecLookupEditDto>? request )
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecLookupEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.Update( request!.Payload! );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _lookupService.Update( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "remove-spec-lookup" )]
-    public async Task<ActionResult<ApiReply<bool>>> Remove( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.Delete( request!.Payload!.Value );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _lookupService.Remove( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
 }

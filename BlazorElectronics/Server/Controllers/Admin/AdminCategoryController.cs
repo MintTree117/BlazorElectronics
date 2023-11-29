@@ -1,4 +1,4 @@
-using BlazorElectronics.Server.Repositories.Categories;
+using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Admin.Categories;
@@ -11,122 +11,67 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 [ApiController]
 public sealed class AdminCategoryController : _AdminController
 {
-    readonly ICategoryRepository _repository;
+    readonly ICategoryService _service;
     
-    public AdminCategoryController( ILogger<AdminCategoryController> logger, IUserAccountService userAccountService, ISessionService sessionService, ICategoryRepository repository )
+    public AdminCategoryController( ILogger<AdminCategoryController> logger, IUserAccountService userAccountService, ISessionService sessionService, ICategoryService service )
         : base( logger, userAccountService, sessionService )
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpPost( "get-categories-view" )]
-    public async Task<ActionResult<ApiReply<CategoriesViewDto?>>> GetCategoriesView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<CategoriesViewDto?>> GetCategoriesView( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
-
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
         
-        try
-        {
-            CategoriesViewDto? result = await _repository.GetView();
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-            return result is not null
-                ? Ok( new ApiReply<CategoriesViewDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<CategoriesViewDto?> reply = await _service.GetCategoriesView();
+        return GetReturnFromApi( reply );
     }
     [HttpPost("get-category-edit")]
-    public async Task<ActionResult<ApiReply<CategoryEditDto?>>> GetCategoryForEdit( [FromBody] UserDataRequest<CategoryGetEditDto>? request )
+    public async Task<ActionResult<CategoryEditDto?>> GetCategoryForEdit( [FromBody] UserDataRequest<CategoryGetEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            CategoryEditDto? result = await _repository.GetEdit( request!.Payload! );
-
-            return result is not null
-                ? Ok( new ApiReply<CategoryEditDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<CategoryEditDto?> reply = await _service.GetCategoryEdit(  request!.Payload!);
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "add-category" )]
-    public async Task<ActionResult<ApiReply<CategoryEditDto?>>> AddCategory( [FromBody] UserDataRequest<CategoryAddDto>? request )
+    public async Task<ActionResult<CategoryEditDto?>> AddCategory( [FromBody] UserDataRequest<CategoryAddDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            CategoryEditDto? result = await _repository.Insert( request!.Payload! );
-
-            return result is not null
-                ? Ok( new ApiReply<CategoryEditDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<CategoryEditDto?> reply = await _service.AddCategory( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "update-category" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateCategory( [FromBody] UserDataRequest<CategoryEditDto>? request )
+    public async Task<ActionResult<bool>> UpdateCategory( [FromBody] UserDataRequest<CategoryEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.Update( request!.Payload! );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _service.UpdateCategory( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "remove-category" )]
-    public async Task<ActionResult<ApiReply<bool>>> RemoveCategory( [FromBody] UserDataRequest<CategoryRemoveDto>? request )
+    public async Task<ActionResult<bool>> RemoveCategory( [FromBody] UserDataRequest<CategoryRemoveDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.Delete( request!.Payload! );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _service.RemoveCategory( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
 }

@@ -43,8 +43,8 @@ public partial class AdminVariantsEdit : AdminView
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= "Failed to get variant!" );
-            SetViewMessage( false, reply.Message ??= "Failed to get variant!" );
+            Logger.LogError( reply.Message );
+            SetViewMessage( false, reply.Message );
             StartPageRedirection();
             return;
         }

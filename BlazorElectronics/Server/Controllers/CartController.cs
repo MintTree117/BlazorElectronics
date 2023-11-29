@@ -19,45 +19,51 @@ public class CartController : UserController
     }
 
     [HttpPost( "post" )]
-    public async Task<ActionResult<ApiReply<CartResponse?>>> UpdateCartItems( [FromBody] UserDataRequest<CartResponse>? request )
+    public async Task<ActionResult<CartResponse?>> UpdateCart( [FromBody] UserDataRequest<CartRequest>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
-
-        return authorized.HttpError ?? Ok( await _cartService.PostCartItems( authorized.UserId, null ) );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
     }
     [HttpPost( "insert" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddToCart( [FromBody] UserDataRequest<CartItemIdsDto>? request )
+    public async Task<ActionResult<bool>> AddToCart( [FromBody] UserDataRequest<CartItemDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        return authorized.HttpError ?? Ok( await _cartService.AddToCart( authorized.UserId, request!.Payload! ) );
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
     }
     [HttpPost( "update-quantity" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateQuantity( [FromBody] UserDataRequest<CartItemIdsDto>? request )
+    public async Task<ActionResult<bool>> UpdateQuantity( [FromBody] UserDataRequest<CartItemDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        return authorized.HttpError ?? Ok( await _cartService.UpdateQuantity( authorized.UserId, request!.Payload! ) );
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
     }
     [HttpPost( "remove" )]
-    public async Task<ActionResult<ApiReply<bool>>> RemoveItemFromCart( [FromBody] UserDataRequest<CartItemIdsDto>? request )
+    public async Task<ActionResult<bool>> RemoveItemFromCart( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        return authorized.HttpError ?? Ok( await _cartService.RemoveFromCart( authorized.UserId, request!.Payload! ) );
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
     }
     [HttpGet( "count" )]
-    public async Task<ActionResult<ApiReply<int>>> GetCartItemsCount( [FromBody] UserRequest? request )
+    public async Task<ActionResult<int>> GetCartItemsCount( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        return authorized.HttpError ?? Ok( await _cartService.CountCartItems( authorized.UserId ) );
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
     }
     [HttpGet( "products")]
-    public async Task<ActionResult<ApiReply<CartResponse?>>> GetCartProducts( [FromBody] UserRequest? request )
+    public async Task<ActionResult<CartResponse?>> GetCartProducts( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        return authorized.HttpError ?? Ok( await _cartService.GetCartProducts( authorized.UserId ) );
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
     }
 }

@@ -2,6 +2,7 @@ using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Server.Repositories.Categories;
+using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 
@@ -26,34 +27,114 @@ public class CategoryService : ApiService, ICategoryService
 
         return getReply.Success && _cachedData is not null
             ? new ApiReply<CategoriesResponse?>( _cachedData.Object.Response )
-            : new ApiReply<CategoriesResponse?>( getReply.Message );
+            : new ApiReply<CategoriesResponse?>( getReply.ErrorType, getReply.Message );
     }
     public async Task<ApiReply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
         ApiReply<bool> getReply = await TryGetData();
 
         if ( !getReply.Success || _cachedData is null )
-            return new ApiReply<CategoryIdMap?>( getReply.Message );
+            return new ApiReply<CategoryIdMap?>( getReply.ErrorType, getReply.Message );
 
         List<string> urlList = GetCategoryUrlList( primaryUrl, secondaryUrl, tertiaryUrl );
         CategoryIdMap? idMap = _cachedData.Object.Urls.GetCategoryIdMapFromUrl( urlList );
 
         return idMap is not null
             ? new ApiReply<CategoryIdMap?>( idMap )
-            : new ApiReply<CategoryIdMap?>( INVALID_CATEGORY_MESSAGE );
+            : new ApiReply<CategoryIdMap?>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
     public async Task<ApiReply<bool>> ValidateCategoryIdMap( CategoryIdMap idMap )
     {
         ApiReply<bool> getReply = await TryGetData();
         
         if ( !getReply.Success || _cachedData is null )
-            return new ApiReply<bool>( getReply.Message );
+            return new ApiReply<bool>( getReply.ErrorType, getReply.Message );
 
         return ValidateCategoryIdMap( idMap, _cachedData.Object.Ids )
             ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( "Invalid Category!" );
+            : new ApiReply<bool>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
-    
+    public async Task<ApiReply<CategoriesViewDto?>> GetCategoriesView()
+    {
+        try
+        {
+            CategoriesViewDto? result = await _repository.GetView();
+
+            return result is not null
+                ? new ApiReply<CategoriesViewDto?>( result )
+                : new ApiReply<CategoriesViewDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CategoriesViewDto?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ApiReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto dto )
+    {
+        try
+        {
+            CategoryEditDto? result = await _repository.GetEdit( dto );
+
+            return result is not null
+                ? new ApiReply<CategoryEditDto?>( result )
+                : new ApiReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ApiReply<CategoryEditDto?>> AddCategory( CategoryAddDto dto )
+    {
+        try
+        {
+            CategoryEditDto? result = await _repository.Insert( dto );
+
+            return result is not null
+                ? new ApiReply<CategoryEditDto?>( result )
+                : new ApiReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ApiReply<bool>> UpdateCategory( CategoryEditDto dto )
+    {
+        try
+        {
+            bool result = await _repository.Update( dto );
+
+            return result
+                ? new ApiReply<bool>( result )
+                : new ApiReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ApiReply<bool>> RemoveCategory( CategoryRemoveDto dto )
+    {
+        try
+        {
+            bool result = await _repository.Delete( dto );
+
+            return result
+                ? new ApiReply<bool>( result )
+                : new ApiReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+
     async Task<ApiReply<bool>> TryGetData()
     {
         if ( _cachedData is not null && _cachedData.IsValid( CACHE_LIFE ) )
@@ -64,18 +145,18 @@ public class CategoryService : ApiService, ICategoryService
         try
         {
             repositoryResponse = await _repository.Get();
-
-            if ( repositoryResponse is null )
-                return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( INTERNAL_SERVER_ERROR_MESSAGE);
+            return new ApiReply<bool>( ServiceErrorType.ServerError );
         }
 
+        if ( repositoryResponse is null )
+            return new ApiReply<bool>( ServiceErrorType.NotFound );
+        
         if ( repositoryResponse.Primary is null || repositoryResponse.Secondary is null || repositoryResponse.Tertiary is null )
-            return new ApiReply<bool>( NO_DATA_FOUND_MESSAGE );
+            return new ApiReply<bool>( ServiceErrorType.NotFound );
 
         await CreateCacheFromModel( repositoryResponse );
         return new ApiReply<bool>( true );

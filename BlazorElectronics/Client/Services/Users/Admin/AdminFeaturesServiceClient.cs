@@ -18,9 +18,9 @@ public class AdminFeaturesServiceClient : AdminServiceClient, IAdminFeaturesServ
     public AdminFeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ApiReply<FeaturesViewDto?>> GetFeaturesView()
+    public async Task<ApiReply<FeaturesResponse?>> GetFeaturesView()
     {
-        return await TryUserRequest<FeaturesViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<FeaturesResponse?>( API_ROUTE_GET_VIEW );
     }
     public async Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( IntDto dto )
     {

@@ -53,17 +53,16 @@ public class ProductService : ApiService, IProductService
         try
         {
             models = await _productSearchRepository.GetProductSearch( categoryIdMap, request );
-
-            if ( models is null )
-                return new ApiReply<ProductSearchResponse?>( NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<ProductSearchResponse?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<ProductSearchResponse?>( ServiceErrorType.ServerError );
         }
 
-        return new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) );
+        return models is not null 
+            ? new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) ) 
+            : new ApiReply<ProductSearchResponse?>( ServiceErrorType.NotFound );
     }
     public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse )
     {
@@ -76,17 +75,17 @@ public class ProductService : ApiService, IProductService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<ProductDetailsResponse?>( INTERNAL_SERVER_ERROR_MESSAGE );
+            return new ApiReply<ProductDetailsResponse?>( ServiceErrorType.ServerError );
         }
 
         if ( model is null )
-            return new ApiReply<ProductDetailsResponse?>( NO_DATA_FOUND_MESSAGE );
+            return new ApiReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
 
         ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, categoriesResponse );
 
         return dto is not null
             ? new ApiReply<ProductDetailsResponse?>( dto )
-            : new ApiReply<ProductDetailsResponse?>( NO_DATA_FOUND_MESSAGE );
+            : new ApiReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
     }
 
     static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest? request )

@@ -5,7 +5,7 @@ namespace BlazorElectronics.Client.Services.Users.Admin;
 
 public interface IAdminFeaturesServiceClient
 {
-    Task<ApiReply<FeaturesViewDto?>> GetFeaturesView();
+    Task<ApiReply<FeaturesResponse?>> GetFeaturesView();
     Task<ApiReply<FeaturedProductEditDto?>> GetFeaturedProductEdit( IntDto dto );
     Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductEditDto dto );
     Task<ApiReply<bool>> AddFeaturedDeal( IntDto dto );

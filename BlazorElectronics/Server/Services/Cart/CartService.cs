@@ -5,11 +5,12 @@ using BlazorElectronics.Shared.Cart;
 
 namespace BlazorElectronics.Server.Services.Cart;
 
-public class CartService : ICartService
+public class CartService : ApiService, ICartService
 {
     readonly ICartRepository _cartRepository;
 
-    public CartService( ICartRepository cartRepository )
+    public CartService( ILogger<ApiService> logger, ICartRepository cartRepository )
+        : base( logger )
     {
         _cartRepository = cartRepository;
     }
@@ -24,7 +25,8 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( e.Message );
+            Logger.LogError( e.Message, e );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
         }
         
         IEnumerable<CartItem>? allItems;
@@ -35,7 +37,7 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( e.Message );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
         }
         
         GetProductIdsFromModels( allItems!, out List<int> productIds, out List<int> variantIds );
@@ -47,11 +49,11 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( e.Message );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
         }
 
         CartResponse cartResponse = await MapProductsToCart( cartProducts!, cartItemsDtos );
-        return new ApiReply<CartResponse?>( cartResponse, true, "Successfully inserted Cart Items to database, and retrieved Cart Products from database." );
+        return new ApiReply<CartResponse?>( cartResponse );
     }
     public async Task<ApiReply<bool>> AddToCart( int userId, CartItemIdsDto cartItem )
     {
@@ -63,10 +65,10 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<bool>( e.Message );
+            return new ApiReply<bool>( ServiceErrorType.ServerError, e.Message );
         }
 
-        return new ApiReply<bool>( true, true, "Successfully inserted Cart Item into database." );
+        return new ApiReply<bool>( true );
     }
     public async Task<ApiReply<bool>> UpdateQuantity( int userId, CartItemIdsDto cartItem )
     {
@@ -78,10 +80,10 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<bool>( e.Message );
+            return new ApiReply<bool>( ServiceErrorType.ServerError, e.Message );
         }
 
-        return new ApiReply<bool>( true, true, "Successfully updated Cart Item Quantity in database." );
+        return new ApiReply<bool>( true );
     }
     public async Task<ApiReply<bool>> RemoveFromCart( int userId, CartItemIdsDto cartItem )
     {
@@ -93,10 +95,10 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<bool>( e.Message );
+            return new ApiReply<bool>( ServiceErrorType.ServerError, e.Message );
         }
 
-        return new ApiReply<bool>( true, true, "Successfully removed Cart Item from database." );
+        return new ApiReply<bool>( true );
     }
     public async Task<ApiReply<int>> CountCartItems( int userId )
     {
@@ -106,14 +108,14 @@ public class CartService : ICartService
         {
             count = await _cartRepository.CountCartItems( userId );
             if ( count is null or <= 0 )
-                return new ApiReply<int>( $"No cart items found!" );
+                return new ApiReply<int>( ServiceErrorType.NotFound, $"No cart items found!" );
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<int>( e.Message );
+            return new ApiReply<int>( ServiceErrorType.ServerError, e.Message );
         }
 
-        return new ApiReply<int>( count.Value, true, $"Found cart items for user {userId}" );
+        return new ApiReply<int>( count.Value );
     }
     public async Task<ApiReply<CartResponse?>> GetCartProducts( int userId )
     {
@@ -125,7 +127,7 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( e.Message );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
         }
         
         List<CartItem> itemsList = cartItems!.ToList();
@@ -139,11 +141,11 @@ public class CartService : ICartService
         }
         catch ( ServiceException e )
         {
-            return new ApiReply<CartResponse?>( e.Message );
+            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError, e.Message );
         }
 
         CartResponse cartResponse = await MapProductsToCart( cartProducts!, itemsList.ToList() );
-        return new ApiReply<CartResponse?>( cartResponse, true, "Successfully retrieved Cart Products from database." );
+        return new ApiReply<CartResponse?>( cartResponse );
     }
     
     static void GetProductIdsFromModels( IEnumerable<CartItem> models, out List<int> productIds, out List<int> variantIds )

@@ -14,4 +14,22 @@ public class _Controller : ControllerBase
     {
         Logger = logger;
     }
+
+    protected ActionResult GetReturnFromApi<T>( ApiReply<T> reply )
+    {
+        if ( reply.Success )
+        {
+            return Ok( reply.Data );
+        }
+
+        return reply.ErrorType switch
+        {
+            ServiceErrorType.ValidationError => BadRequest( reply.Message ),
+            ServiceErrorType.NotFound => NotFound( reply.Message ),
+            ServiceErrorType.Unauthorized => Unauthorized( reply.Message ),
+            ServiceErrorType.Conflict => Conflict( reply.Message ),
+            ServiceErrorType.ServerError => StatusCode( 500, reply.Message ),
+            _ => Ok( reply.Data )
+        };
+    }
 }

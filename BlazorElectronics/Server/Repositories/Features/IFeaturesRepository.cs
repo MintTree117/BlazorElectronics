@@ -4,7 +4,7 @@ namespace BlazorElectronics.Server.Repositories.Features;
 
 public interface IFeaturesRepository
 {
-    Task<FeaturesViewDto?> GetView();
+    Task<FeaturesResponse?> GetView();
     Task<bool> InsertFeaturedProduct( FeaturedProductEditDto dto );
     Task<bool> InsertFeaturedDeal( int productId );
     Task<FeaturedProductEditDto?> GetFeaturedProductEdit( int productId );

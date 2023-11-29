@@ -12,7 +12,7 @@ public partial class AdminFeaturesView : AdminView
 
     [Inject] IAdminFeaturesServiceClient AdminFeaturesService { get; init; } = default!;
 
-    FeaturesViewDto _features = new();
+    FeaturesResponse _features = new();
     FeatureType _activeFeature = FeatureType.PRODUCT;
 
     protected override async Task OnInitializedAsync()
@@ -99,7 +99,7 @@ public partial class AdminFeaturesView : AdminView
     {
         PageIsLoaded = false;
 
-        ApiReply<FeaturesViewDto?> reply = await AdminFeaturesService.GetFeaturesView();
+        ApiReply<FeaturesResponse?> reply = await AdminFeaturesService.GetFeaturesView();
 
         PageIsLoaded = true;
 

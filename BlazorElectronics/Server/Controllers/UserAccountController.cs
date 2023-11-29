@@ -14,74 +14,71 @@ public class UserAccountController : UserController
     public UserAccountController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
 
     [HttpPost( "register" )]
-    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Register( [FromBody] UserRegisterRequest? request )
+    public async Task<ActionResult<UserSessionResponse>> Register( [FromBody] UserRegisterRequest? request )
     {
         if ( !ValidateRegisterRequest( request ) )
             return BadRequest( BAD_REQUEST_MESSAGE );
-        
-        return await GetLogin(
-            await UserAccountService.Register( request!.Username, request.Email, request.Password, request.Phone ), GetRequestDeviceInfo() );
+
+        ApiReply<UserLoginDto?> reply = await UserAccountService.Register( request!.Username, request.Email, request.Password, request.Phone );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "login" )]
-    public async Task<ActionResult<ApiReply<UserSessionResponse>>> Login( [FromBody] UserLoginRequest? request )
+    public async Task<ActionResult<UserSessionResponse>> Login( [FromBody] UserLoginRequest? request )
     {
         if ( !ValidateLoginRequest( request ) )
             return BadRequest( BAD_REQUEST_MESSAGE );
-        
-        return await GetLogin( 
-            await UserAccountService.Login( request!.EmailOrUsername, request.Password ), GetRequestDeviceInfo() );
+
+        ApiReply<UserLoginDto?> loginReply = await UserAccountService.Login( request!.EmailOrUsername, request.Password );
+
+        if ( !loginReply.Success )
+            return GetReturnFromApi( loginReply );
+
+        ApiReply<SessionDto?> sessionReply = await SessionService.CreateSession( loginReply.Data!.UserId, GetRequestDeviceInfo() );
+
+        if ( !sessionReply.Success )
+            return GetReturnFromApi( sessionReply );
+
+        var session = new UserSessionResponse
+        {
+            Email = loginReply.Data.Email,
+            Username = loginReply.Data.Username,
+            SessionId = sessionReply.Data!.Id,
+            SessionToken = sessionReply.Data.Token,
+            IsAdmin = loginReply.Data.IsAdmin
+        };
+
+        return Ok( session );
     }
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeSession( [FromBody] UserRequest request )
+    public async Task<ActionResult<bool>> AuthorizeSession( [FromBody] UserRequest request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
-        return authorized.HttpError ?? Ok( new ApiReply<bool>( true ) );
+        ApiReply<int> authorizeReply = await ValidateAndAuthorizeUser( request );
+        return GetReturnFromApi( authorizeReply );
     }
     [HttpPost( "change-password" )]
-    public async Task<ActionResult<ApiReply<bool>>> ChangePassword( [FromBody] UserDataRequest<PasswordChangeRequest>? request )
+    public async Task<ActionResult<bool>> ChangePassword( [FromBody] UserDataRequest<PasswordChangeRequest>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
 
         if ( !ValidateChangePasswordRequest( request!.Payload ) )
             return BadRequest( "Invalid password request!" );
 
-        return await UserAccountService.ChangePassword( authorized.UserId, request.Payload!.Password );
+        ApiReply<bool> passwordReply = await UserAccountService.ChangePassword( userReply.Data, request.Payload!.Password );
+        return GetReturnFromApi( passwordReply );
     }
     [HttpPost( "logout" )]
-    public async Task<ActionResult<ApiReply<bool>>> Logout( [FromBody] UserRequest? request )
+    public async Task<ActionResult<bool>> Logout( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeUser( request );
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !userReply.Success )
+            return GetReturnFromApi( userReply );
         
-        return await SessionService.DeleteSession( request!.SessionId );
-    }
-    
-    async Task<ApiReply<UserSessionResponse>> GetLogin( ApiReply<UserLoginDto?> loginReply, UserDeviceInfoDto? deviceInfo )
-    {
-        if ( !loginReply.Success || loginReply.Data is null )
-            return new ApiReply<UserSessionResponse>( loginReply.Message );
-        
-        UserLoginDto login = loginReply.Data;
-        ApiReply<SessionDto?> sessionReply = await SessionService.CreateSession( loginReply.Data.UserId, deviceInfo );
-
-        if ( !sessionReply.Success || sessionReply.Data is null )
-            return new ApiReply<UserSessionResponse>( sessionReply.Message );
-        
-        var response = new UserSessionResponse
-        {
-            Email = login.Email,
-            Username = login.Username,
-            SessionId = sessionReply.Data.Id,
-            SessionToken = sessionReply.Data.Token,
-            IsAdmin = login.IsAdmin
-        };
-        
-        return new ApiReply<UserSessionResponse>( response );
+        ApiReply<bool> deleteReply = await SessionService.DeleteSession( request!.SessionId );
+        return GetReturnFromApi( deleteReply );
     }
 
     static bool ValidateRegisterRequest( UserRegisterRequest? request )

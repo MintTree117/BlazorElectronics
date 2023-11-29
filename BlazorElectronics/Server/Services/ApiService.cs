@@ -1,3 +1,5 @@
+using BlazorElectronics.Server.Models.SpecLookups;
+
 namespace BlazorElectronics.Server.Services;
 
 public abstract class ApiService
@@ -11,17 +13,18 @@ public abstract class ApiService
     {
         Logger = logger;
     }
-    
-    protected static async Task<ApiReply<T>> ExecuteIoCall<T>( Func<Task<T>> func )
+
+    protected static string ConvertPrimaryCategoriesToString( IEnumerable<int> categories )
     {
-        try
-        {
-            T result = await func();
-            return new ApiReply<T>( result, true, "Operation successful" );
-        }
-        catch ( ServiceException ex )
-        {
-            return new ApiReply<T>( $"Operation failed: {ex.Message}" );
-        }
+        return string.Join( ",", categories );
+    }
+    protected static string ConvertSpecValuesToString( IEnumerable<SpecLookupValueModel> values )
+    {
+        List<string> specValues = values
+            .OrderBy( spec => spec.SpecValueId )
+            .Select( spec => spec.SpecValue )
+            .ToList();
+
+        return string.Join( ",", specValues );
     }
 }

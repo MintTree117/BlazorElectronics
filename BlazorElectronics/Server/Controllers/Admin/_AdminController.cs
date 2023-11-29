@@ -12,22 +12,20 @@ public class _AdminController : UserController
     public _AdminController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService )
         : base( logger, userAccountService, sessionService ) { }
 
-    [HttpPost( "authorize" )]
-    public async Task<ActionResult<ApiReply<bool>>> AuthorizeAdmin( [FromBody] UserRequest? request )
+    [HttpPost( "authorize-admin" )]
+    public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequest? request )
     {
-        HttpAuthorization result = await ValidateAndAuthorizeAdmin( request );
-        return result.HttpError ?? Ok( new ApiReply<bool>( true ) );
+        ApiReply<int> reply = await ValidateAndAuthorizeAdmin( request );
+        return GetReturnFromApi( reply );
     }
     
-    protected async Task<HttpAuthorization> ValidateAndAuthorizeAdmin( UserRequest? request )
-    {
-        HttpAuthorization result = await ValidateAndAuthorizeUser( request );
+    protected async Task<ApiReply<int>> ValidateAndAuthorizeAdmin( UserRequest? request )
+    { 
+        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
-        if ( result.HttpError is not null )
-            return result;
-
-        return ( await UserAccountService.VerifyAdminId( result.UserId ) ).Success
-            ? new HttpAuthorization( result.UserId )
-            : new HttpAuthorization( -1, Unauthorized() );
+        if ( !userReply.Success )
+            return userReply;
+        
+        return await UserAccountService.VerifyAdminId( userReply.Data );
     }
 }

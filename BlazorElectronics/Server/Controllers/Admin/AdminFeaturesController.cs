@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Repositories.Features;
+using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.Admin.Features;
@@ -11,166 +12,89 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 [ApiController]
 public sealed class AdminFeaturesController : _AdminController
 {
-    readonly IFeaturesRepository _repository;
+    readonly IFeaturesService _featuresService;
     
-    public AdminFeaturesController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IFeaturesRepository repository )
+    public AdminFeaturesController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IFeaturesService featuresService )
         : base( logger, userAccountService, sessionService )
     {
-        _repository = repository;
+        _featuresService = featuresService;
     }
     
     [HttpPost( "get-features-view" )]
-    public async Task<ActionResult<ApiReply<FeaturesViewDto>>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<FeaturesResponse?>> GetView( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            FeaturesViewDto? result = await _repository.GetView();
-
-            return result is not null
-                ? Ok( new ApiReply<FeaturesViewDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<FeaturesResponse?> reply = await _featuresService.GetView();
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "get-featured-product-edit" )]
-    public async Task<ActionResult<ApiReply<FeaturedProductEditDto>>> GetProductEdit( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<FeaturedProductEditDto?>> GetProductEdit( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            FeaturedProductEditDto? result = await _repository.GetFeaturedProductEdit( request!.Payload!.Value );
-
-            return result is not null
-                ? Ok( new ApiReply<FeaturedProductEditDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<FeaturedProductEditDto?> reply = await _featuresService.GetFeaturedProductEdit( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "add-featured-product" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddProduct( [FromBody] UserDataRequest<FeaturedProductEditDto>? request )
+    public async Task<ActionResult<bool>> AddProduct( [FromBody] UserDataRequest<FeaturedProductEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.InsertFeaturedProduct( request!.Payload! );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _featuresService.AddFeaturedProduct( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "add-featured-deal" )]
-    public async Task<ActionResult<ApiReply<bool>>> AddDeal( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<bool>> AddDeal( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.InsertFeaturedDeal( request!.Payload!.Value );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _featuresService.AddFeaturedDeal( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "update-featured-product" )]
-    public async Task<ActionResult<ApiReply<bool>>> UpdateProduct( [FromBody] UserDataRequest<FeaturedProductEditDto>? request )
+    public async Task<ActionResult<bool>> UpdateProduct( [FromBody] UserDataRequest<FeaturedProductEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.UpdateFeaturedProduct( request!.Payload! );
-            
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _featuresService.UpdateFeaturedProduct( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "remove-featured-product" )]
-    public async Task<ActionResult<ApiReply<bool>>> RemoveProduct( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<bool>> RemoveProduct( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.DeleteFeaturedProduct( request!.Payload!.Value );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _featuresService.RemoveFeaturedProduct( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "remove-featured-deal" )]
-    public async Task<ActionResult<ApiReply<bool>>> RemoveDeal( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<bool>> RemoveDeal( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
-        
-        try
-        {
-            bool result = await _repository.DeleteFeaturedDeal( request!.Payload!.Value );
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _featuresService.RemoveFeaturedDeal( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
 }

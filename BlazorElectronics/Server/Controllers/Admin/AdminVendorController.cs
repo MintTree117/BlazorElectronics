@@ -1,6 +1,6 @@
-using BlazorElectronics.Server.Repositories.Vendors;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
+using BlazorElectronics.Server.Services.Vendors;
 using BlazorElectronics.Shared.Admin.Vendors;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -11,122 +11,67 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 [ApiController]
 public sealed class AdminVendorController : _AdminController
 {
-    readonly IVendorRepository _repository;
+    readonly IVendorService _vendorService;
 
-    public AdminVendorController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IVendorRepository repository )
+    public AdminVendorController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IVendorService vendorService )
         : base( logger, userAccountService, sessionService )
     {
-        _repository = repository;
+        _vendorService = vendorService;
     }
     
-    [HttpPost( "get-vendors-view" )]
-    public async Task<ActionResult<ApiReply<VendorsViewDto>>> GetView( [FromBody] UserRequest? request )
+    [HttpPost( "get-vendor-view" )]
+    public async Task<ActionResult<VendorsViewDto?>> GetView( [FromBody] UserRequest? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
-
-        try
-        {
-            VendorsViewDto? result = await _repository.GetView();
-
-            return result is not null
-                ? Ok( new ApiReply<VendorsViewDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<VendorsViewDto?> reply = await _vendorService.GetView();
+        return GetReturnFromApi( reply );
     }
-    [HttpPost( "get-vendor-edit" )]
-    public async Task<ActionResult<ApiReply<VendorEditDto>>> GetEdit( [FromBody] UserDataRequest<IntDto>? request )
+    [HttpPost("get-vendor-edit")]
+    public async Task<ActionResult<VendorEditDto?>> GetEdit( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            VendorEditDto? result = await _repository.GetEdit( request!.Payload!.Value );
-
-            return result is not null
-                ? Ok( new ApiReply<VendorEditDto>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<VendorEditDto?> reply = await _vendorService.GetEdit( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "add-vendor" )]
-    public async Task<ActionResult<ApiReply<int>>> Add( [FromBody] UserDataRequest<VendorEditDto>? request )
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<VendorEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            int result = await _repository.Insert( request!.Payload! );
-
-            return result > 0
-                ? Ok( new ApiReply<int>( result ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<int> reply = await _vendorService.Add( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "update-vendor" )]
-    public async Task<ActionResult<ApiReply<bool>>> Update( [FromBody] UserDataRequest<VendorEditDto>? request )
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<VendorEditDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.Update( request!.Payload! );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _vendorService.Update( request!.Payload! );
+        return GetReturnFromApi( reply );
     }
     [HttpPost( "remove-vendor" )]
-    public async Task<ActionResult<ApiReply<bool>>> Remove( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto>? request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
-        try
-        {
-            bool result = await _repository.Delete( request!.Payload!.Value );
-
-            return result
-                ? Ok( new ApiReply<bool>( true ) )
-                : NotFound( NOT_FOUND_MESSAGE );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
-        }
+        ApiReply<bool> reply = await _vendorService.Remove( request!.Payload!.Value );
+        return GetReturnFromApi( reply );
     }
 }

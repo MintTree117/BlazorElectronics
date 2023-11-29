@@ -27,7 +27,6 @@ builder.Services.AddSingleton<DapperContext>();
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
-builder.Services.AddSingleton<IFeaturesCache, FeaturesCache>();
 builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();

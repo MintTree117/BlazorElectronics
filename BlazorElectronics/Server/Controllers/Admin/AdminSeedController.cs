@@ -47,10 +47,10 @@ public class AdminSeedController : _AdminController
     [HttpPost( "seed-products" )]
     public async Task<ActionResult<ApiReply<bool>>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
         ApiReply<CategoriesResponse?> categories = await _categoryService.GetCategoriesResponse();
         ApiReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups();
@@ -70,10 +70,10 @@ public class AdminSeedController : _AdminController
     [HttpPost( "seed-users" )]
     public async Task<ActionResult<ApiReply<bool>>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
     {
-        HttpAuthorization authorized = await ValidateAndAuthorizeAdmin( request );
+        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
-        if ( authorized.HttpError is not null )
-            return authorized.HttpError;
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
 
         ApiReply<bool> seedReply = await _userSeedService.SeedUsers( request!.Payload!.Value );
 

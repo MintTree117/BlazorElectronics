@@ -20,7 +20,7 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     public FeaturesRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
-    public async Task<FeaturesViewDto?> GetView()
+    public async Task<FeaturesResponse?> GetView()
     {
         return await TryQueryAsync( GetViewQuery );
     }
@@ -69,7 +69,7 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         return await TryQueryTransactionAsync( DeleteDealQuery, parameters );
     }
     
-    static async Task<FeaturesViewDto?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<FeaturesResponse?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_VIEW, dynamicParams, commandType: CommandType.StoredProcedure );
 
@@ -79,7 +79,7 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         IEnumerable<FeaturedProductEditDto>? products = await multi.ReadAsync<FeaturedProductEditDto>();
         IEnumerable<FeaturedDealEditDto>? deals = await multi.ReadAsync<FeaturedDealEditDto>();
 
-        return new FeaturesViewDto
+        return new FeaturesResponse
         {
             FeaturedProducts = products is not null ? products.ToList() : new List<FeaturedProductEditDto>(),
             FeaturedDeals = deals is not null ? deals.ToList() : new List<FeaturedDealEditDto>()
