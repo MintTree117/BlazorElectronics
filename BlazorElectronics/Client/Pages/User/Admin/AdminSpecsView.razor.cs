@@ -37,7 +37,7 @@ public sealed partial class AdminSpecsView : AdminView
     }
     async Task RemoveSpec( int specId )
     {
-        ApiReply<bool> reply = await AdminSpecsService.Remove( new IntDto( specId ) );
+        ServiceReply<bool> reply = await AdminSpecsService.Remove( new IntDto( specId ) );
 
         if ( !reply.Success )
         {
@@ -53,14 +53,14 @@ public sealed partial class AdminSpecsView : AdminView
     {
         PageIsLoaded = false;
         
-        ApiReply<List<SpecLookupViewDto>?> reply = await AdminSpecsService.GetView();
+        ServiceReply<List<SpecLookupViewDto>?> reply = await AdminSpecsService.GetView();
 
         PageIsLoaded = true;
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= ERROR_GET_SPECS_VIEW );
-            SetViewMessage( false, reply.Message ??= ERROR_GET_SPECS_VIEW );
+            Logger.LogError( reply.Message ?? ERROR_GET_SPECS_VIEW );
+            SetViewMessage( false, reply.Message ?? ERROR_GET_SPECS_VIEW );
             return;
         }
 

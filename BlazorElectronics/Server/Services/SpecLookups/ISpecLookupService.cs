@@ -4,10 +4,10 @@ namespace BlazorElectronics.Server.Services.SpecLookups;
 
 public interface ISpecLookupService
 {
-    Task<ApiReply<SpecLookupsResponse?>> GetLookups();
-    Task<ApiReply<SpecLookupViewResponse?>> GetView();
-    Task<ApiReply<SpecLookupEditDto?>> GetEdit( int specId );
-    Task<ApiReply<int>> Add( SpecLookupEditDto dto );
-    Task<ApiReply<bool>> Update( SpecLookupEditDto dto );
-    Task<ApiReply<bool>> Remove( int specId );
+    Task<ServiceReply<SpecLookupsResponse?>> GetLookups();
+    Task<ServiceReply<SpecLookupViewResponse?>> GetView();
+    Task<ServiceReply<SpecLookupEditDto?>> GetEdit( int specId );
+    Task<ServiceReply<int>> Add( SpecLookupEditDto dto );
+    Task<ServiceReply<bool>> Update( SpecLookupEditDto dto );
+    Task<ServiceReply<bool>> Remove( int specId );
 }

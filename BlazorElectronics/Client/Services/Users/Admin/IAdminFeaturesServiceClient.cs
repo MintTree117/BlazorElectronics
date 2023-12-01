@@ -5,11 +5,11 @@ namespace BlazorElectronics.Client.Services.Users.Admin;
 
 public interface IAdminFeaturesServiceClient
 {
-    Task<ApiReply<FeaturesResponse?>> GetFeaturesView();
-    Task<ApiReply<FeaturedProductDto?>> GetFeaturedProductEdit( IntDto dto );
-    Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductDto dto );
-    Task<ApiReply<bool>> AddFeaturedDeal( IntDto dto );
-    Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto );
-    Task<ApiReply<bool>> RemoveFeaturedProduct( IntDto dto );
-    Task<ApiReply<bool>> RemoveFeaturedDeal( IntDto dto );
+    Task<ServiceReply<FeaturesResponse?>> GetFeaturesView();
+    Task<ServiceReply<FeaturedProductDto?>> GetFeaturedProductEdit( IntDto dto );
+    Task<ServiceReply<bool>> AddFeaturedProduct( FeaturedProductDto dto );
+    Task<ServiceReply<bool>> AddFeaturedDeal( IntDto dto );
+    Task<ServiceReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto );
+    Task<ServiceReply<bool>> RemoveFeaturedProduct( IntDto dto );
+    Task<ServiceReply<bool>> RemoveFeaturedDeal( IntDto dto );
 }

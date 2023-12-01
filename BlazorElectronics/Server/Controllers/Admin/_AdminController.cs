@@ -15,13 +15,13 @@ public class _AdminController : UserController
     [HttpPost( "authorize-admin" )]
     public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequest? request )
     {
-        ApiReply<int> reply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> reply = await ValidateAndAuthorizeAdmin( request );
         return GetReturnFromApi( reply );
     }
     
-    protected async Task<ApiReply<int>> ValidateAndAuthorizeAdmin( UserRequest? request )
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeAdmin( UserRequest? request )
     { 
-        ApiReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
 
         if ( !userReply.Success )
             return userReply;

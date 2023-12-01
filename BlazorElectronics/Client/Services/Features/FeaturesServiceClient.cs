@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Features;
@@ -7,43 +6,39 @@ namespace BlazorElectronics.Client.Services.Features;
 
 public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
 {
+    const string API_PATH = "api/features/get";
+    FeaturesResponse? _features;
+    
     public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
-
-    public async Task<ApiReply<FeaturedProductsResponse?>?> GetFeaturedProducts()
+    
+    public async Task<ServiceReply<List<FeaturedProductDto>?>> GetFeaturedProducts()
     {
-        try
-        {
-            var response = await Http.GetFromJsonAsync<ApiReply<FeaturedProductsResponse?>>( "api/Features/products" );
+        ServiceReply<bool> reply = await GetFeatures();
 
-            if ( response == null )
-                return new ApiReply<FeaturedProductsResponse?>( null, false, "Service response is null!" );
-            
-            return !response.Success 
-                ? new ApiReply<FeaturedProductsResponse?>( null, false, response.Message ??= "Failed to retrieve Featured Products; message is null!" ) 
-                : response;
-        }
-        catch ( Exception e )
-        {
-            return new ApiReply<FeaturedProductsResponse?>( null, false, e.Message );
-        }
+        return reply.Success && _features is not null
+            ? new ServiceReply<List<FeaturedProductDto>?>( _features.FeaturedProducts )
+            : new ServiceReply<List<FeaturedProductDto>?>( reply.ErrorType, reply.Message );
     }
-    public async Task<ApiReply<FeaturedDealsResponse?>?> GetFeaturedDeals()
+    public async Task<ServiceReply<List<FeaturedDealDto>?>> GetFeaturedDeals()
     {
-        try
-        {
-            var response = await Http.GetFromJsonAsync<ApiReply<FeaturedDealsResponse?>>( "api/Features/deals" );
+        ServiceReply<bool> reply = await GetFeatures();
 
-            if ( response == null )
-                return new ApiReply<FeaturedDealsResponse?>( null, false, "Service response is null!" );
-            
-            return !response.Success 
-                ? new ApiReply<FeaturedDealsResponse?>( null, false, response.Message ??= "Failed to retrieve Featured Deals; message is null!" ) 
-                : response;
-        }
-        catch ( Exception e )
-        {
-            return new ApiReply<FeaturedDealsResponse?>( null, false, e.Message );
-        }
+        return reply.Success && _features is not null
+            ? new ServiceReply<List<FeaturedDealDto>?>( _features.FeaturedDeals )
+            : new ServiceReply<List<FeaturedDealDto>?>( reply.ErrorType, reply.Message );
+    }
+
+    async Task<ServiceReply<bool>> GetFeatures()
+    {
+        if ( _features is not null )
+            return new ServiceReply<bool>( true );
+
+        ServiceReply<FeaturesResponse?> reply = await TryGetRequest<FeaturesResponse?>( API_PATH );
+        _features = reply.Data;
+
+        return _features is not null
+            ? new ServiceReply<bool>( true )
+            : new ServiceReply<bool>( reply.ErrorType, reply.Message );
     }
 }

@@ -16,23 +16,23 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     public AdminSpecsServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ApiReply<List<SpecLookupViewDto>?>> GetView()
+    public async Task<ServiceReply<List<SpecLookupViewDto>?>> GetView()
     {
         return await TryUserRequest<List<SpecLookupViewDto>?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( IntDto data )
+    public async Task<ServiceReply<SpecLookupEditDto?>> GetEdit( IntDto data )
     {
         return await TryUserRequest<IntDto,SpecLookupEditDto?>( API_ROUTE_GET_EDIT, data );
     }
-    public async Task<ApiReply<int>> Add( SpecLookupEditDto data )
+    public async Task<ServiceReply<int>> Add( SpecLookupEditDto data )
     {
         return await TryUserRequest<SpecLookupEditDto,int>( API_ROUTE_ADD, data );
     }
-    public async Task<ApiReply<bool>> Update( SpecLookupEditDto data )
+    public async Task<ServiceReply<bool>> Update( SpecLookupEditDto data )
     {
         return await TryUserRequest<SpecLookupEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> Remove( IntDto data )
+    public async Task<ServiceReply<bool>> Remove( IntDto data )
     {
         return await TryUserRequest<IntDto,bool>( API_ROUTE_REMOVE, data );
     }

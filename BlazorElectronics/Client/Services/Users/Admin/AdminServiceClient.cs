@@ -11,7 +11,7 @@ public class AdminServiceClient : UserServiceClient, IAdminServiceClient
     public AdminServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public async Task<ApiReply<bool>> AuthorizeAdmin()
+    public async Task<ServiceReply<bool>> AuthorizeAdmin()
     {
         return await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
     }

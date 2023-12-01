@@ -18,7 +18,7 @@ public abstract class AdminView : UserView
 
     async Task AuthorizeAdmin()
     {
-        ApiReply<bool> response = await AdminService.AuthorizeAdmin();
+        ServiceReply<bool> response = await AdminService.AuthorizeAdmin();
         PageIsAuthorized = response.Data;
 
         if ( !PageIsAuthorized )

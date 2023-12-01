@@ -42,12 +42,12 @@ public partial class AdminFeaturesEdit : AdminView
             return;
         }
 
-        ApiReply<FeaturedProductDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IntDto( featureId ) );
+        ServiceReply<FeaturedProductDto?> reply = await AdminFeaturesServiceClient.GetFeaturedProductEdit( new IntDto( featureId ) );
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= "Failed to get feature!" );
-            SetViewMessage( false, reply.Message ??= "Failed to get feature!" );
+            Logger.LogError( reply.Message ?? "Failed to get feature!" );
+            SetViewMessage( false, reply.Message ?? "Failed to get feature!" );
             StartPageRedirection();
             return;
         }
@@ -87,7 +87,7 @@ public partial class AdminFeaturesEdit : AdminView
     }
     async Task SubmitNew()
     {
-        ApiReply<bool> reply = _featureType == FeatureType.DEAL
+        ServiceReply<bool> reply = _featureType == FeatureType.DEAL
             ? await AdminFeaturesServiceClient.AddFeaturedDeal( new IntDto( _dealProductId ) )
             : await AdminFeaturesServiceClient.AddFeaturedProduct( _productDto );
         
@@ -111,7 +111,7 @@ public partial class AdminFeaturesEdit : AdminView
             return;
         }
         
-        ApiReply<bool> reply = await AdminFeaturesServiceClient.UpdateFeaturedProduct( _productDto );
+        ServiceReply<bool> reply = await AdminFeaturesServiceClient.UpdateFeaturedProduct( _productDto );
 
         if ( !reply.Success )
         {

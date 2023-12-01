@@ -5,9 +5,9 @@ namespace BlazorElectronics.Client.Services.Users.Admin;
 
 public interface IAdminSpecsServiceClient
 {
-    Task<ApiReply<List<SpecLookupViewDto>?>> GetView();
-    Task<ApiReply<SpecLookupEditDto?>> GetEdit( IntDto dto );
-    Task<ApiReply<int>> Add( SpecLookupEditDto dto );
-    Task<ApiReply<bool>> Update( SpecLookupEditDto data );
-    Task<ApiReply<bool>> Remove( IntDto dto );
+    Task<ServiceReply<List<SpecLookupViewDto>?>> GetView();
+    Task<ServiceReply<SpecLookupEditDto?>> GetEdit( IntDto dto );
+    Task<ServiceReply<int>> Add( SpecLookupEditDto dto );
+    Task<ServiceReply<bool>> Update( SpecLookupEditDto data );
+    Task<ServiceReply<bool>> Remove( IntDto dto );
 }

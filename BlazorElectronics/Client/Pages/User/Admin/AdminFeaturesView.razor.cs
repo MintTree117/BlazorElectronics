@@ -78,7 +78,7 @@ public partial class AdminFeaturesView : AdminView
     {
         var idDto = new IntDto( featureId );
 
-        ApiReply<bool> result = featureType switch
+        ServiceReply<bool> result = featureType switch
         {
             FeatureType.PRODUCT => await AdminFeaturesService.RemoveFeaturedProduct( idDto ),
             FeatureType.DEAL => await AdminFeaturesService.RemoveFeaturedDeal( idDto ),
@@ -99,14 +99,14 @@ public partial class AdminFeaturesView : AdminView
     {
         PageIsLoaded = false;
 
-        ApiReply<FeaturesResponse?> reply = await AdminFeaturesService.GetFeaturesView();
+        ServiceReply<FeaturesResponse?> reply = await AdminFeaturesService.GetFeaturesView();
 
         PageIsLoaded = true;
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= ERROR_GET_FEATURES_VIEW );
-            SetViewMessage( false, reply.Message ??= ERROR_GET_FEATURES_VIEW );
+            Logger.LogError( reply.Message ?? ERROR_GET_FEATURES_VIEW );
+            SetViewMessage( false, reply.Message ?? ERROR_GET_FEATURES_VIEW );
             return;
         }
 

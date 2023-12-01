@@ -2,7 +2,7 @@ using System.Collections.Specialized;
 using System.Web;
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Vendors;
+using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -39,12 +39,12 @@ public partial class AdminVendorsEdit : AdminView
             return;
         }
 
-        ApiReply<VendorEditDto?> reply = await AdminVendorServiceClient.GetEdit( new IntDto( variantId ) );
+        ServiceReply<VendorEditDto?> reply = await AdminVendorServiceClient.GetEdit( new IntDto( variantId ) );
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= "Failed to get vendor!" );
-            SetViewMessage( false, reply.Message ??= "Failed to get vendor!" );
+            Logger.LogError( reply.Message ?? "Failed to get vendor!" );
+            SetViewMessage( false, reply.Message ?? "Failed to get vendor!" );
             StartPageRedirection();
             return;
         }
@@ -81,7 +81,7 @@ public partial class AdminVendorsEdit : AdminView
     }
     async Task SubmitNew()
     {
-        ApiReply<int> reply = await AdminVendorServiceClient.Add( _dto );
+        ServiceReply<int> reply = await AdminVendorServiceClient.Add( _dto );
 
         if ( !reply.Success )
         {
@@ -97,7 +97,7 @@ public partial class AdminVendorsEdit : AdminView
     }
     async Task SubmitEdit()
     {
-        ApiReply<bool> reply = await AdminVendorServiceClient.Update( _dto );
+        ServiceReply<bool> reply = await AdminVendorServiceClient.Update( _dto );
 
         if ( !reply.Success )
         {

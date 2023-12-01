@@ -1,6 +1,6 @@
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Vendors;
+using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
@@ -37,7 +37,7 @@ public partial class AdminVendorsView : AdminView
     }
     async Task RemoveVendor( int vendorId )
     {
-        ApiReply<bool> reply = await AdminVendorServiceClient.Remove( new IntDto( vendorId ) );
+        ServiceReply<bool> reply = await AdminVendorServiceClient.Remove( new IntDto( vendorId ) );
 
         if ( !reply.Success )
         {
@@ -53,14 +53,14 @@ public partial class AdminVendorsView : AdminView
     {
         PageIsLoaded = false;
 
-        ApiReply<VendorsViewDto?> reply = await AdminVendorServiceClient.GetView();
+        ServiceReply<VendorsViewDto?> reply = await AdminVendorServiceClient.GetView();
 
         PageIsLoaded = true;
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= ERROR_GET_VENDORS_VIEW );
-            SetViewMessage( false, reply.Message ??= ERROR_GET_VENDORS_VIEW );
+            Logger.LogError( reply.Message ?? ERROR_GET_VENDORS_VIEW );
+            SetViewMessage( false, reply.Message ?? ERROR_GET_VENDORS_VIEW );
             return;
         }
 

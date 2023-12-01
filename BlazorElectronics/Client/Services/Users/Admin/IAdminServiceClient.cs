@@ -4,5 +4,5 @@ namespace BlazorElectronics.Client.Services.Users.Admin;
 
 public interface IAdminServiceClient
 {
-    Task<ApiReply<bool>> AuthorizeAdmin();
+    Task<ServiceReply<bool>> AuthorizeAdmin();
 }

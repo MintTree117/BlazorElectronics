@@ -25,30 +25,30 @@ public class UserController : _Controller
         var dto = new UserDeviceInfoDto( address?.ToString() );
         return dto;
     }
-    protected async Task<ApiReply<int>> ValidateAndAuthorizeUser( UserRequest? request )
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUser( UserRequest? request )
     {
         if ( !ValidateUserHttp( request ) )
-            return new ApiReply<int>( ServiceErrorType.ValidationError );
+            return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        ApiReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
+        ServiceReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
 
         return authorizeReply.Success
-            ? new ApiReply<int>( authorizeReply.Data )
-            : new ApiReply<int>( ServiceErrorType.Unauthorized );
+            ? new ServiceReply<int>( authorizeReply.Data )
+            : new ServiceReply<int>( ServiceErrorType.Unauthorized );
     }
-    protected async Task<ApiReply<int>> ValidateAndAuthorizeUser<T>( UserDataRequest<T>? request ) where T : class
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUser<T>( UserDataRequest<T>? request ) where T : class
     {
         if ( !ValidateUserHttp( request ) )
-            return new ApiReply<int>( ServiceErrorType.ValidationError );
+            return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        ApiReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
+        ServiceReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
 
         return authorizeReply.Success
-            ? new ApiReply<int>( authorizeReply.Data )
-            : new ApiReply<int>( ServiceErrorType.Unauthorized );
+            ? new ServiceReply<int>( authorizeReply.Data )
+            : new ServiceReply<int>( ServiceErrorType.Unauthorized );
     }
     
-    async Task<ApiReply<int>> AuthorizeSessionRequest( int sessionId, string sessionToken )
+    async Task<ServiceReply<int>> AuthorizeSessionRequest( int sessionId, string sessionToken )
     {
         return await SessionService.AuthorizeSession( sessionId, sessionToken, GetRequestDeviceInfo() );
     }

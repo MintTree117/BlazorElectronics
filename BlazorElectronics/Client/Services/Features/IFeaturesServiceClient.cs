@@ -5,6 +5,6 @@ namespace BlazorElectronics.Client.Services.Features;
 
 public interface IFeaturesServiceClient
 {
-    Task<ApiReply<FeaturedProductsResponse?>?> GetFeaturedProducts();
-    Task<ApiReply<FeaturedDealsResponse?>?> GetFeaturedDeals();
+    Task<ServiceReply<List<FeaturedProductDto>?>> GetFeaturedProducts();
+    Task<ServiceReply<List<FeaturedDealDto>?>> GetFeaturedDeals();
 }

@@ -2,7 +2,6 @@ using System.Collections.Specialized;
 using System.Web;
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using Microsoft.AspNetCore.Components;
@@ -43,12 +42,12 @@ public sealed partial class AdminCategoriesEdit : AdminView
         }
 
         var request = new CategoryGetEditDto( type, id );
-        ApiReply<CategoryEditDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
+        ServiceReply<CategoryEditDto?> reply = await AdminCategoryService.GetCategoryEdit( request );
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= "Failed to get category!" );
-            SetViewMessage( false, reply.Message ??= "Failed to get category!" );
+            Logger.LogError( reply.Message ?? "Failed to get category!" );
+            SetViewMessage( false, reply.Message ?? "Failed to get category!" );
             StartPageRedirection();
             return;
         }
@@ -90,7 +89,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
     async Task SubmitNew()
     {
         var request = new CategoryAddDto( _dto );
-        ApiReply<CategoryEditDto?> reply = await AdminCategoryService.AddCategory( request );
+        ServiceReply<CategoryEditDto?> reply = await AdminCategoryService.AddCategory( request );
         
         if ( !reply.Success || reply.Data is null )
         {
@@ -106,7 +105,7 @@ public sealed partial class AdminCategoriesEdit : AdminView
     }
     async Task SubmitEdit()
     {
-        ApiReply<bool> reply = await AdminCategoryService.UpdateCategory( _dto );
+        ServiceReply<bool> reply = await AdminCategoryService.UpdateCategory( _dto );
 
         if ( !reply.Success )
         {

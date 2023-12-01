@@ -20,7 +20,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         _repository = repository;
     }
     
-    public async Task<ApiReply<bool>> SeedProducts( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse specLookups, VendorsResponse vendors, List<int> users )
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse specLookups, VendorsResponse vendors, List<int> users )
     {
         ProductSeedModels seeds = await Task.Run( () => new ProductSeedModels
         {
@@ -34,12 +34,12 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         try
         {
             bool result = false; // await _repository.SeedProducts( seeds );
-            return new ApiReply<bool>( result );
+            return new ServiceReply<bool>( result );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
     

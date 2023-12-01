@@ -16,6 +16,11 @@ public abstract class DapperRepository
     protected const string TABLE_PRODUCT_IMAGES = "Product_Images";
     protected const string TABLE_PRODUCT_REVIEWS = "Product_Reviews";
     protected const string TABLE_PRODUCT_SPEC_LOOKUPS = "Product_Specs_Lookup";
+    protected const string TABLE_PRODUCT_SPECS_BOOK = "Product_Specs_Book";
+    protected const string TABLE_PRODUCT_SPECS_SOFTWARE = "Product_Specs_Software";
+    protected const string TABLE_PRODUCT_SPECS_GAMES = "Product_Specs_Games";
+    protected const string TABLE_PRODUCT_SPECS_MOVIESTV = "Product_Specs_MoviesTV";
+    protected const string TABLE_PRODUCT_SPECS_COURSES = "Product_Specs_Courses";
 
     // TABLES PRODUCT SPECS MAIN
     protected enum ProductSpecMainTableNameEnum
@@ -51,57 +56,31 @@ public abstract class DapperRepository
     protected const string COL_PRODUCT_PRICE = "Price";
     protected const string COL_PRODUCT_SALE_PRICE = "SalePrice";
     protected const string COL_PRODUCT_LAST_UPDATED = "LastUpdated";
-    protected const string COL_PRODUCT_FILE_SIZE = "FileSize";
+    protected const string COL_PRODUCT_FILESIZE = "FileSize";
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
-    
+
+    protected const string COL_PRODUCT_BOOK_PAGES = "Pages";
+    protected const string COL_PRODUCT_BOOK_HAS_AUDIO = "HasAudio";
+    protected const string COL_PRODUCT_BOOK_AUDIO_LENGTH = "AudioLength";
+
+    protected const string COL_PRODUCT_GAME_HAS_MULTIPLAYER = "HasMultiplayer";
+    protected const string COL_PRODUCT_GAME_HAS_OFFLINE = "HasOffline";
+    protected const string COL_PRODUCT_GAME_HAS_CONTROLLER = "HasController";
+    protected const string COL_PRODUCT_GAME_HAS_PURCHASES = "HasPurchases";
+
+    protected const string COL_PRODUCT_VIDEO_RUNTIME = "Runtime";
+    protected const string COL_PRODUCT_VIDEO_EPISODES = "Episodes";
+
+    protected const string COL_PRODUCT_COURSE_DURATION = "Duration";
+
     // COLUMNS VENDORS
     protected const string COL_VENDOR_ID = "VendorId";
     
     // COLUMNS SPECS
     protected const string COL_SPEC_ID = "SpecId";
-    protected const string COL_FILTER_INT_ID = "FilterValueId";
     protected const string COL_SPEC_VALUE_ID = "SpecValueId";
     protected const string COL_SPEC_VALUE = "SpecValue";
-    protected const string COL_FILTER_VALUE = "FilterValue";
 
-    // COLUMNS PRODUCT VARIANTS
-    protected const string COL_VARIANT_ID = "VariantId";
-    protected const string COL_VARIANT_SUB_ID = "VariantSubId";
-    protected const string COL_VARIANT_NAME = "Name";
-    protected const string COL_VARIANT_PRICE_ORIGINAL = "OriginalPrice";
-    protected const string COL_VARIANT_PRICE_SALE = "SalePrice";
-    
-    // COLUMNS BOOKS
-    protected const string COL_BOOKS_PUBLISHER_ID = "PublisherId";
-    protected const string COL_BOOKS_AUTHOR_ID = "AuthorId";
-    protected const string COL_BOOKS_PAGES = "Pages";
-    protected const string COL_BOOKS_ACCESSIBILITY = "HasAccessibility";
-    protected const string COL_BOOKS_HAS_AUDIO = "HasAudio";
-    protected const string COL_BOOKS_AUDIO_LENGTH = "AudioLength";
-    
-    // COLUMNS SOFTWARE
-    protected const string COL_SOFTWARE_DEVELOPER_ID = "PublisherId";
-    
-    // COLUMNS GAMES
-    protected const string COL_GAMES_GAME_DEVELOPER_ID = "GameDeveloperId";
-    protected const string COL_GAMES_ESRB_RATING = "EsrbRating";
-    protected const string COL_GAMES_HAS_MULTIPLAYER = "HasMultiplayer";
-    protected const string COL_GAMES_HAS_IN_GAME_PURCHASES = "HasInGamePurchases";
-    protected const string COL_GAMES_HAS_CONTROLLER_SUPPORT = "HasControllerSupport";
-    
-    // COLUMNS MOVIES_TV
-    protected const string COL_MOVIESTV_IS_TV = "IsTvShow";
-    protected const string COL_MOVIESTV_IS_MOVIE = "IsMovie";
-    protected const string COL_MOVIESTV_RUNTIME = "Runtime";
-    protected const string COL_MOVIESTV_EPISODES = "Episodes";
-    
-    // COLUMNS COURSES
-    protected const string COL_COURSES_LECTURES = "NumLectures";
-    protected const string COL_COURSES_EFFORT = "Effor";
-    protected const string COL_COURSES_DURATION = "Duration";
-    protected const string COL_COURSES_ACCREDATION = "Accredation";
-    protected const string COL_COURSES_CERTIFICATE = "Certificate";
-    
     // COLUMNS USERS
     protected const string COL_USER_NAME = "Username";
     protected const string COL_USER_EMAIL = "Email";

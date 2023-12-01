@@ -15,7 +15,7 @@ public class _Controller : ControllerBase
         Logger = logger;
     }
 
-    protected ActionResult GetReturnFromApi<T>( ApiReply<T> reply )
+    protected ActionResult GetReturnFromApi<T>( ServiceReply<T> reply )
     {
         if ( reply.Success )
         {

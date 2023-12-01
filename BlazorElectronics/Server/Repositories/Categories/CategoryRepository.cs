@@ -2,7 +2,7 @@ using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Categories;
-using BlazorElectronics.Shared.Admin.Categories;
+using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using Dapper;
 using Microsoft.Data.SqlClient;

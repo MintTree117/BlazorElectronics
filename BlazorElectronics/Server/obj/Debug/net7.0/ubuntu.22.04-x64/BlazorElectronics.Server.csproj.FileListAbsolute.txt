@@ -1,0 +1,8 @@
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.GeneratedMSBuildEditorConfig.editorconfig
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.AssemblyInfoInputs.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.AssemblyInfo.cs
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.CoreCompileInputs.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.MvcApplicationPartsAssemblyInfo.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.RazorAssemblyInfo.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.RazorAssemblyInfo.cs

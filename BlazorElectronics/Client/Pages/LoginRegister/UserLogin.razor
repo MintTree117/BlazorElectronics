@@ -1,83 +1,26 @@
 @page "/login"
+@inherits PageView
 
-@using System.Web
-@using System.Collections.Specialized
-@using BlazorElectronics.Shared
-@using BlazorElectronics.Client.Services.Users
-@using BlazorElectronics.Client.Services.Users.Cart
-@using BlazorElectronics.Shared.Users
-
-@inject IUserServiceClient UserService
-@inject ICartServiceClient CartService
-@inject NavigationManager NavManager
-
-@implements IDisposable
-
-<PageTitle>Login</PageTitle>
-
-<h3>UserLogin</h3>
-
-<EditForm Model="_loginRequest" OnValidSubmit="@( async ()=> await HandleLogin() )">
-    <DataAnnotationsValidator/>
-    <div class="mb-3">
-        <label for="email">Email</label>
-        <InputText class="form-control" id="email" @bind-Value="_loginRequest.EmailOrUsername"/>
-        <ValidationMessage For="@(()=> _loginRequest.EmailOrUsername)"/>
-    </div>
-    <div class="mb-3">
-        <label for="password">Password</label>
-        <InputText class="form-control" id="password" @bind-Value="_loginRequest.Password" type="password"/>
-        <ValidationMessage For="@(()=> _loginRequest.Password)"/>
-    </div>
-    <button class="btn btn-primary" type="submit">Login</button>
-</EditForm>
-<div class="text-danger">
-    <span>@_errorMessage</span>
+<div class="container-sm">
+    <PageTitle>Login</PageTitle>
+    <h3>UserLogin</h3>
+    
+    <EditForm Model="_loginRequest" OnValidSubmit="@( async ()=> await HandleLogin() )">
+        <DataAnnotationsValidator/>
+        <div class="mb-3">
+            <label for="email">Email</label>
+            <InputText class="form-control" id="email" @bind-Value="_loginRequest.EmailOrUsername"/>
+            <ValidationMessage For="@(()=> _loginRequest.EmailOrUsername)"/>
+        </div>
+        <div class="mb-3">
+            <label for="password">Password</label>
+            <InputText class="form-control" id="password" @bind-Value="_loginRequest.Password" type="password"/>
+            <ValidationMessage For="@(()=> _loginRequest.Password)"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Login</button>
+    </EditForm>
+    @if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
+    {
+        <span class="@ViewMessageClass">@ViewMessage</span>
+    }
 </div>
-
-@code 
-{
-    readonly UserLoginRequest _loginRequest = new();
-    
-    string _errorMessage = string.Empty;
-    string _returnUrl = string.Empty;
-
-    protected override void OnInitialized()
-    {
-        UserService.SessionStorageError += OnSessionStorageError;
-        
-        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
-        NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
-        string? returnUrl = queryString.Get( "returnUrl" );
-
-        _returnUrl = !string.IsNullOrWhiteSpace( returnUrl )
-            ? returnUrl
-            : "/profile";
-    }
-    
-    async Task HandleLogin()
-    {
-        _errorMessage = string.Empty;
-        
-        ApiReply<UserSessionResponse?> loginReply = await UserService.Login( _loginRequest );
-
-        if ( !loginReply.Success || loginReply.Data is null )
-        {
-            _errorMessage = loginReply.Message ?? "Null login response!";
-            return;
-        }
-        
-        //await CartService.PostCartToServer( true );
-        NavManager.NavigateTo( _returnUrl );
-    }
-
-    void OnSessionStorageError( string error )
-    {
-        _errorMessage = error;
-        StateHasChanged();
-    }
-    public void Dispose()
-    {
-        UserService.SessionStorageError -= OnSessionStorageError;
-    }
-}

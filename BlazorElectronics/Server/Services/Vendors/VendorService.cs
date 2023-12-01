@@ -1,7 +1,6 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.Vendors;
 using BlazorElectronics.Server.Repositories.Vendors;
-using BlazorElectronics.Shared.Admin.Vendors;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 
@@ -20,10 +19,10 @@ public sealed class VendorService : ApiService, IVendorService
         _repository = repository;
     }
     
-    public async Task<ApiReply<VendorsResponse?>> GetVendors()
+    public async Task<ServiceReply<VendorsResponse?>> GetVendors()
     {
         if ( _cachedVendors is not null && _cachedVendors.IsValid( MAX_VENDOR_LIFE ) )
-            return new ApiReply<VendorsResponse?>( _cachedVendors.Object );
+            return new ServiceReply<VendorsResponse?>( _cachedVendors.Object );
 
         VendorsModel? model;
 
@@ -34,18 +33,18 @@ public sealed class VendorService : ApiService, IVendorService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<VendorsResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<VendorsResponse?>( ServiceErrorType.ServerError );
         }
 
         VendorsResponse? response = MapResponse( model );
 
         if ( response is null )
-            return new ApiReply<VendorsResponse?>( ServiceErrorType.NotFound );
+            return new ServiceReply<VendorsResponse?>( ServiceErrorType.NotFound );
 
         _cachedVendors = new CachedObject<VendorsResponse>( response );
-        return new ApiReply<VendorsResponse?>( response );
+        return new ServiceReply<VendorsResponse?>( response );
     }
-    public async Task<ApiReply<VendorsViewDto?>> GetView()
+    public async Task<ServiceReply<VendorsViewDto?>> GetView()
     {
         VendorsModel? model;
 
@@ -56,16 +55,16 @@ public sealed class VendorService : ApiService, IVendorService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<VendorsViewDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<VendorsViewDto?>( ServiceErrorType.ServerError );
         }
 
         VendorsViewDto? view = MapView( model );
 
         return view is not null
-            ? new ApiReply<VendorsViewDto?>( view )
-            : new ApiReply<VendorsViewDto?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<VendorsViewDto?>( view )
+            : new ServiceReply<VendorsViewDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<VendorEditDto?>> GetEdit( int vendorId )
+    public async Task<ServiceReply<VendorEditDto?>> GetEdit( int vendorId )
     {
         VendorEditModel? model;
 
@@ -76,61 +75,61 @@ public sealed class VendorService : ApiService, IVendorService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<VendorEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<VendorEditDto?>( ServiceErrorType.ServerError );
         }
 
         VendorEditDto? dto = MapEdit( model );
 
         return dto is not null
-            ? new ApiReply<VendorEditDto?>( dto )
-            : new ApiReply<VendorEditDto?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<VendorEditDto?>( dto )
+            : new ServiceReply<VendorEditDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<int>> Add( VendorEditDto dto )
+    public async Task<ServiceReply<int>> Add( VendorEditDto dto )
     {
         try
         {
             int result = await _repository.Insert( dto );
 
             return result > 0
-                ? new ApiReply<int>( result )
-                : new ApiReply<int>( ServiceErrorType.NotFound );
+                ? new ServiceReply<int>( result )
+                : new ServiceReply<int>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> Update( VendorEditDto dto )
+    public async Task<ServiceReply<bool>> Update( VendorEditDto dto )
     {
         try
         {
             bool result = await _repository.Update( dto );
 
             return result
-                ? new ApiReply<bool>( result )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> Remove( int vendorId )
+    public async Task<ServiceReply<bool>> Remove( int vendorId )
     {
         try
         {
             bool result = await _repository.Delete( vendorId );
 
             return result
-                ? new ApiReply<bool>( result )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
 

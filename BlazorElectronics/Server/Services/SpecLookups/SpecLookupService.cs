@@ -19,10 +19,10 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         _repository = repository;
     }
     
-    public async Task<ApiReply<SpecLookupsResponse?>> GetLookups()
+    public async Task<ServiceReply<SpecLookupsResponse?>> GetLookups()
     {
         if ( CacheValid() )
-            return new ApiReply<SpecLookupsResponse?>( _cachedSpecData!.Object );
+            return new ServiceReply<SpecLookupsResponse?>( _cachedSpecData!.Object );
 
         SpecLookupsModel? model;
 
@@ -33,22 +33,22 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<SpecLookupsResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<SpecLookupsResponse?>( ServiceErrorType.ServerError );
         }
 
         if ( model is null )
-            return new ApiReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
+            return new ServiceReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
 
         SpecLookupsResponse? response = MapResponse( model );
 
         if ( response is null )
-            return new ApiReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
+            return new ServiceReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
 
         _cachedSpecData = new CachedObject<SpecLookupsResponse>( response );
         
-        return new ApiReply<SpecLookupsResponse?>( response );
+        return new ServiceReply<SpecLookupsResponse?>( response );
     }
-    public async Task<ApiReply<SpecLookupViewResponse?>> GetView()
+    public async Task<ServiceReply<SpecLookupViewResponse?>> GetView()
     {
         IEnumerable<SpecLookupModel>? models;
 
@@ -59,16 +59,16 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<SpecLookupViewResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<SpecLookupViewResponse?>( ServiceErrorType.ServerError );
         }
 
         SpecLookupViewResponse? dto = MapView( models );
 
         return dto is not null
-            ? new ApiReply<SpecLookupViewResponse?>( dto )
-            : new ApiReply<SpecLookupViewResponse?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<SpecLookupViewResponse?>( dto )
+            : new ServiceReply<SpecLookupViewResponse?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<SpecLookupEditDto?>> GetEdit( int specId )
+    public async Task<ServiceReply<SpecLookupEditDto?>> GetEdit( int specId )
     {
         SpecLookupEditModel? model;
 
@@ -79,61 +79,61 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<SpecLookupEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<SpecLookupEditDto?>( ServiceErrorType.ServerError );
         }
 
         SpecLookupEditDto? dto = MapEdit( model );
 
         return dto is not null
-            ? new ApiReply<SpecLookupEditDto?>( dto )
-            : new ApiReply<SpecLookupEditDto?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<SpecLookupEditDto?>( dto )
+            : new ServiceReply<SpecLookupEditDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<int>> Add( SpecLookupEditDto dto )
+    public async Task<ServiceReply<int>> Add( SpecLookupEditDto dto )
     {
         try
         {
             int result = await _repository.Insert( dto );
 
             return result > 0
-                ? new ApiReply<int>( result )
-                : new ApiReply<int>( ServiceErrorType.NotFound );
+                ? new ServiceReply<int>( result )
+                : new ServiceReply<int>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> Update( SpecLookupEditDto dto )
+    public async Task<ServiceReply<bool>> Update( SpecLookupEditDto dto )
     {
         try
         {
             bool result = await _repository.Update( dto );
 
             return result
-                ? new ApiReply<bool>( result )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> Remove( int specId )
+    public async Task<ServiceReply<bool>> Remove( int specId )
     {
         try
         {
             bool result = await _repository.Delete( specId );
 
             return result
-                ? new ApiReply<bool>( result )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
     

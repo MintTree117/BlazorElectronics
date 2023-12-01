@@ -26,11 +26,11 @@ public class ProductService : ApiService, IProductService
         _productDetailsRepository = productDetailsRepository;
     }
 
-    public Task<ApiReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
+    public Task<ServiceReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
     {
         throw new NotImplementedException();
     }
-    public async Task<ApiReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request )
+    public async Task<ServiceReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
         return null;
         /*Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryType, request.CategoryIdMap.CategoryId );
@@ -45,7 +45,7 @@ public class ProductService : ApiService, IProductService
             Message = "Found matching results."
         };*/
     }
-    public async Task<ApiReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request )
+    public async Task<ServiceReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request )
     {
         request = await ValidateProductSearchRequest( request );
         
@@ -58,14 +58,14 @@ public class ProductService : ApiService, IProductService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<ProductSearchResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<ProductSearchResponse?>( ServiceErrorType.ServerError );
         }
 
         return models is not null 
-            ? new ApiReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) ) 
-            : new ApiReply<ProductSearchResponse?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) ) 
+            : new ServiceReply<ProductSearchResponse?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse )
+    public async Task<ServiceReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse )
     {
         ProductDetailsModel? model;
 
@@ -76,17 +76,17 @@ public class ProductService : ApiService, IProductService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<ProductDetailsResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<ProductDetailsResponse?>( ServiceErrorType.ServerError );
         }
 
         if ( model is null )
-            return new ApiReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
+            return new ServiceReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
 
         ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, categoriesResponse );
 
         return dto is not null
-            ? new ApiReply<ProductDetailsResponse?>( dto )
-            : new ApiReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<ProductDetailsResponse?>( dto )
+            : new ServiceReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
     }
 
     static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest? request )
@@ -102,21 +102,9 @@ public class ProductService : ApiService, IProductService
             request.MinPrice = request.MinPrice is null ? null : Math.Max( request.MinPrice.Value, 0 );
             request.MaxPrice = request.MaxPrice is null ? null : Math.Max( request.MaxPrice.Value, 0 );
             request.MinRating = request.MinRating is null ? null : Math.Max( request.MinRating.Value, 0 );
-            request.MaxRating = request.MaxRating is null ? null : Math.Max( request.MaxRating.Value, 0 );
-
+            
             if ( request.SearchText?.Length > MAX_SEARCH_TEXT_LENGTH )
                 request.SearchText.Remove( MAX_SEARCH_TEXT_LENGTH - 1 );
-
-            ProductSearchRequestSpecFilters? specFilters = request.SpecFilters;
-
-            if ( specFilters is null )
-                return request;
-
-            TrimExcessFilterLists( specFilters.IntFilters );
-            TrimExcessFilterLists( specFilters.StringFilters );
-            TrimExcessFilterLists( specFilters.MultiIncludes );
-            TrimExcessFilterLists( specFilters.MultiExcludes );
-            TrimExcessBoolFilters( specFilters.BoolFilters );
 
             return request;
 

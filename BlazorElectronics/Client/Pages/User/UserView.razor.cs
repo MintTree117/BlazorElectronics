@@ -18,7 +18,7 @@ public abstract class UserView : PageView
     }
     protected async Task AuthorizeUser()
     {
-        ApiReply<UserSessionResponse?> response = await UserService.AuthorizeUser();
+        ServiceReply<UserSessionResponse?> response = await UserService.AuthorizeUser();
         PageIsAuthorized = response.Data is not null;
         
         if ( !PageIsAuthorized )

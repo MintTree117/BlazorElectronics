@@ -19,7 +19,7 @@ public class FeaturesController : _Controller
     [HttpGet( "get-features" )]
     public async Task<ActionResult<FeaturesResponse>> GetFeaturedProducts()
     {
-        ApiReply<FeaturesResponse?> featureReply = await _featuresService.GetFeatures();
+        ServiceReply<FeaturesResponse?> featureReply = await _featuresService.GetFeatures();
         return GetReturnFromApi( featureReply );
     }
 }

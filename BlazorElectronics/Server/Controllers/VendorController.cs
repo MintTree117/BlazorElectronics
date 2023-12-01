@@ -19,7 +19,7 @@ public class VendorController : _Controller
     [HttpGet]
     public async Task<ActionResult<VendorsResponse>> GetVendors()
     {
-        ApiReply<VendorsResponse?> reply = await _vendorService.GetVendors();
+        ServiceReply<VendorsResponse?> reply = await _vendorService.GetVendors();
         return GetReturnFromApi( reply );
     }
 }

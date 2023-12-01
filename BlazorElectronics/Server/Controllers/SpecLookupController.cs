@@ -16,7 +16,7 @@ public class SpecLookupController : ControllerBase
     }
 
     [HttpGet( "get-spec-lookups" )]
-    public async Task<ActionResult<ApiReply<SpecLookupsResponse>>> GetSpecLookups()
+    public async Task<ActionResult<ServiceReply<SpecLookupsResponse>>> GetSpecLookups()
     {
         return Ok( await _repository.Get() );
     }

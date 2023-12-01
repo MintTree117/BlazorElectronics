@@ -40,12 +40,12 @@ public sealed partial class AdminSpecsEdit : AdminView
             return;
         }
         
-        ApiReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( new IntDto( specId ) );
+        ServiceReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( new IntDto( specId ) );
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= "Failed to get spec lookup!" );
-            SetViewMessage( false, reply.Message ??= "Failed to get spec lookup!" );
+            Logger.LogError( reply.Message ?? "Failed to get spec lookup!" );
+            SetViewMessage( false, reply.Message ?? "Failed to get spec lookup!" );
             StartPageRedirection();
             return;
         }
@@ -82,11 +82,11 @@ public sealed partial class AdminSpecsEdit : AdminView
     }
     async Task SubmitNew()
     {
-        ApiReply<int> reply = await AdminSpecService.Add( _dto );
+        ServiceReply<int> reply = await AdminSpecService.Add( _dto );
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ??= "Failed to insert spec, no response message!" );
+            SetActionMessage( false, reply.Message ?? "Failed to insert spec, no response message!" );
             return;
         }
 
@@ -98,11 +98,11 @@ public sealed partial class AdminSpecsEdit : AdminView
     }
     async Task SubmitUpdate()
     {
-        ApiReply<bool> reply = await AdminSpecService.Update( _dto );
+        ServiceReply<bool> reply = await AdminSpecService.Update( _dto );
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ??= "Failed to update spec, no response message!" );
+            SetActionMessage( false, reply.Message ?? "Failed to update spec, no response message!" );
             return;
         }
         

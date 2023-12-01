@@ -1,6 +1,5 @@
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
@@ -17,23 +16,23 @@ public sealed class AdminCategoryServiceClient : AdminServiceClient, IAdminCateg
     public AdminCategoryServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public async Task<ApiReply<CategoriesViewDto?>> GetCategoriesView()
+    public async Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView()
     {
         return await TryUserRequest<CategoriesViewDto?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data )
+    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data )
     {
         return await TryUserRequest<CategoryGetEditDto,CategoryEditDto?>( API_ROUTE_GET_EDIT, data );
     }
-    public async Task<ApiReply<CategoryEditDto?>> AddCategory( CategoryAddDto data )
+    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryAddDto data )
     {
         return await TryUserRequest<CategoryAddDto,CategoryEditDto?>( API_ROUTE_ADD, data );
     }
-    public async Task<ApiReply<bool>> UpdateCategory( CategoryEditDto data )
+    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto data )
     {
         return await TryUserRequest<CategoryEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ApiReply<bool>> RemoveCategory( CategoryRemoveDto data )
+    public async Task<ServiceReply<bool>> RemoveCategory( CategoryRemoveDto data )
     {
         return await TryUserRequest<CategoryRemoveDto,bool>( API_ROUTE_REMOVE, data );
     }

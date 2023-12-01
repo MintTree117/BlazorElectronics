@@ -18,23 +18,23 @@ public class UserAccountService : ApiService, IUserAccountService
         _userRepository = userRepository;
     }
 
-    public async Task<ApiReply<List<int>?>> GetIds()
+    public async Task<ServiceReply<List<int>?>> GetIds()
     {
         try
         {
             List<int>? reply = await _userRepository.GetAllIds();
 
             return reply is not null
-                ? new ApiReply<List<int>?>( reply )
-                : new ApiReply<List<int>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<int>?>( reply )
+                : new ServiceReply<List<int>?>( ServiceErrorType.NotFound );
         }
         catch ( Exception e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<List<int>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<int>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<UserLoginDto?>> Login( string emailOrUsername, string password )
+    public async Task<ServiceReply<UserLoginDto?>> Login( string emailOrUsername, string password )
     {
         User? user;
 
@@ -45,29 +45,29 @@ public class UserAccountService : ApiService, IUserAccountService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<UserLoginDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
 
         if ( user is null )
-            return new ApiReply<UserLoginDto?>( ServiceErrorType.NotFound, "User Not Found!" );
+            return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, "User Not Found!" );
 
         return VerifyPasswordHash( password, user.PasswordHash, user.PasswordSalt )
-            ? new ApiReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Username, user.Email, user.IsAdmin ) )
-            : new ApiReply<UserLoginDto?>( ServiceErrorType.ValidationError, BAD_PASSWORD_MESSAGE );
+            ? new ServiceReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Username, user.Email, user.IsAdmin ) )
+            : new ServiceReply<UserLoginDto?>( ServiceErrorType.ValidationError, BAD_PASSWORD_MESSAGE );
     }
-    public async Task<ApiReply<UserLoginDto?>> Register( string username, string email, string password, string? phone )
+    public async Task<ServiceReply<UserLoginDto?>> Register( string username, string email, string password, string? phone )
     {
         try
         {
             UserExists? userExists = await _userRepository.GetUserExists( username, email );
 
             if ( userExists is not null )
-                return new ApiReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
+                return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<UserLoginDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
 
         CreatePasswordHash( password, out byte[] hash, out byte[] salt );
@@ -80,14 +80,14 @@ public class UserAccountService : ApiService, IUserAccountService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<UserLoginDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
 
         return insertedUser is not null
-            ? new ApiReply<UserLoginDto?>( new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) )
-            : new ApiReply<UserLoginDto?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<UserLoginDto?>( new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) )
+            : new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<int>> VerifyAdminId( int adminId )
+    public async Task<ServiceReply<int>> VerifyAdminId( int adminId )
     {
         User? admin;
 
@@ -98,17 +98,17 @@ public class UserAccountService : ApiService, IUserAccountService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
 
         if ( admin is null )
-            return new ApiReply<int>( ServiceErrorType.NotFound );
+            return new ServiceReply<int>( ServiceErrorType.NotFound );
 
         return admin.IsAdmin 
-            ? new ApiReply<int>( admin.UserId ) 
-            : new ApiReply<int>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
+            ? new ServiceReply<int>( admin.UserId ) 
+            : new ServiceReply<int>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
     }
-    public async Task<ApiReply<int>> ValidateUserId( string email )
+    public async Task<ServiceReply<int>> ValidateUserId( string email )
     {
         User? user;
 
@@ -119,14 +119,14 @@ public class UserAccountService : ApiService, IUserAccountService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
 
         return user is not null 
-            ? new ApiReply<int>( user.UserId ) 
-            : new ApiReply<int>( ServiceErrorType.NotFound );
+            ? new ServiceReply<int>( user.UserId ) 
+            : new ServiceReply<int>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<bool>> ChangePassword( int userId, string newPassword )
+    public async Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword )
     {
         User? user;
 
@@ -137,11 +137,11 @@ public class UserAccountService : ApiService, IUserAccountService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
 
         if ( user is null )
-            return new ApiReply<bool>( ServiceErrorType.NotFound );
+            return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
         CreatePasswordHash( newPassword, out byte[] hash, out byte[] salt );
 
@@ -152,13 +152,13 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             bool success = await _userRepository.UpdatePassword( userId, hash, salt );
             return success
-                ? new ApiReply<bool>( true )
-                : new ApiReply<bool>( ServiceErrorType.ValidationError );
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.ValidationError );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
 

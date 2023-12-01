@@ -2,7 +2,6 @@ using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Server.Repositories.Categories;
-using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 
@@ -21,124 +20,124 @@ public class CategoryService : ApiService, ICategoryService
         _repository = repository;
     }
     
-    public async Task<ApiReply<CategoriesResponse?>> GetCategoriesResponse()
+    public async Task<ServiceReply<CategoriesResponse?>> GetCategoriesResponse()
     {
-        ApiReply<bool> getReply = await TryGetData();
+        ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedData is not null
-            ? new ApiReply<CategoriesResponse?>( _cachedData.Object.Response )
-            : new ApiReply<CategoriesResponse?>( getReply.ErrorType, getReply.Message );
+            ? new ServiceReply<CategoriesResponse?>( _cachedData.Object.Response )
+            : new ServiceReply<CategoriesResponse?>( getReply.ErrorType, getReply.Message );
     }
-    public async Task<ApiReply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    public async Task<ServiceReply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
     {
-        ApiReply<bool> getReply = await TryGetData();
+        ServiceReply<bool> getReply = await TryGetData();
 
         if ( !getReply.Success || _cachedData is null )
-            return new ApiReply<CategoryIdMap?>( getReply.ErrorType, getReply.Message );
+            return new ServiceReply<CategoryIdMap?>( getReply.ErrorType, getReply.Message );
 
         List<string> urlList = GetCategoryUrlList( primaryUrl, secondaryUrl, tertiaryUrl );
         CategoryIdMap? idMap = _cachedData.Object.Urls.GetCategoryIdMapFromUrl( urlList );
 
         return idMap is not null
-            ? new ApiReply<CategoryIdMap?>( idMap )
-            : new ApiReply<CategoryIdMap?>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
+            ? new ServiceReply<CategoryIdMap?>( idMap )
+            : new ServiceReply<CategoryIdMap?>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
-    public async Task<ApiReply<bool>> ValidateCategoryIdMap( CategoryIdMap idMap )
+    public async Task<ServiceReply<bool>> ValidateCategoryIdMap( CategoryIdMap idMap )
     {
-        ApiReply<bool> getReply = await TryGetData();
+        ServiceReply<bool> getReply = await TryGetData();
         
         if ( !getReply.Success || _cachedData is null )
-            return new ApiReply<bool>( getReply.ErrorType, getReply.Message );
+            return new ServiceReply<bool>( getReply.ErrorType, getReply.Message );
 
         return ValidateCategoryIdMap( idMap, _cachedData.Object.Ids )
-            ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
+            ? new ServiceReply<bool>( true )
+            : new ServiceReply<bool>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
-    public async Task<ApiReply<CategoriesViewDto?>> GetCategoriesView()
+    public async Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView()
     {
         try
         {
             CategoriesViewDto? result = await _repository.GetView();
 
             return result is not null
-                ? new ApiReply<CategoriesViewDto?>( result )
-                : new ApiReply<CategoriesViewDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CategoriesViewDto?>( result )
+                : new ServiceReply<CategoriesViewDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CategoriesViewDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CategoriesViewDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto dto )
+    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto dto )
     {
         try
         {
             CategoryEditDto? result = await _repository.GetEdit( dto );
 
             return result is not null
-                ? new ApiReply<CategoryEditDto?>( result )
-                : new ApiReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CategoryEditDto?>( result )
+                : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<CategoryEditDto?>> AddCategory( CategoryAddDto dto )
+    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryAddDto dto )
     {
         try
         {
             CategoryEditDto? result = await _repository.Insert( dto );
 
             return result is not null
-                ? new ApiReply<CategoryEditDto?>( result )
-                : new ApiReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CategoryEditDto?>( result )
+                : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> UpdateCategory( CategoryEditDto dto )
+    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto )
     {
         try
         {
             bool result = await _repository.Update( dto );
 
             return result
-                ? new ApiReply<bool>( result )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> RemoveCategory( CategoryRemoveDto dto )
+    public async Task<ServiceReply<bool>> RemoveCategory( CategoryRemoveDto dto )
     {
         try
         {
             bool result = await _repository.Delete( dto );
 
             return result
-                ? new ApiReply<bool>( result )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
 
-    async Task<ApiReply<bool>> TryGetData()
+    async Task<ServiceReply<bool>> TryGetData()
     {
         if ( _cachedData is not null && _cachedData.IsValid( CACHE_LIFE ) )
-            return new ApiReply<bool>( true );
+            return new ServiceReply<bool>( true );
 
         CategoriesModel? repositoryResponse;
 
@@ -149,17 +148,17 @@ public class CategoryService : ApiService, ICategoryService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
 
         if ( repositoryResponse is null )
-            return new ApiReply<bool>( ServiceErrorType.NotFound );
+            return new ServiceReply<bool>( ServiceErrorType.NotFound );
         
         if ( repositoryResponse.Primary is null || repositoryResponse.Secondary is null || repositoryResponse.Tertiary is null )
-            return new ApiReply<bool>( ServiceErrorType.NotFound );
+            return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
         await CreateCacheFromModel( repositoryResponse );
-        return new ApiReply<bool>( true );
+        return new ServiceReply<bool>( true );
     }
     
     async Task CreateCacheFromModel( CategoriesModel model )

@@ -19,7 +19,7 @@ public class CategoryController : _Controller
     [HttpGet("get-categories")]
     public async Task<ActionResult<CategoriesResponse>> GetCategories()
     {
-        ApiReply<CategoriesResponse?> reply = await _categoryService.GetCategoriesResponse();
+        ServiceReply<CategoriesResponse?> reply = await _categoryService.GetCategoriesResponse();
         return GetReturnFromApi( reply );
     }
 }

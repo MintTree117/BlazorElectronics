@@ -2,7 +2,6 @@ using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Vendors;
-using BlazorElectronics.Shared.Admin.Vendors;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 using Dapper;

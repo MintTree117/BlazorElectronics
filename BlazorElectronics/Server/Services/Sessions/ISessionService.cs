@@ -5,7 +5,7 @@ namespace BlazorElectronics.Server.Services.Sessions;
 
 public interface ISessionService
 {
-    Task<ApiReply<SessionDto?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo );
-    Task<ApiReply<bool>> DeleteSession( int sessionId );
-    Task<ApiReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo );
+    Task<ServiceReply<SessionDto?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo );
+    Task<ServiceReply<bool>> DeleteSession( int sessionId );
+    Task<ServiceReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo );
 }

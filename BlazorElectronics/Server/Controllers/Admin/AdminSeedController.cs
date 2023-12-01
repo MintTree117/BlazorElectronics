@@ -45,22 +45,22 @@ public class AdminSeedController : _AdminController
     }
 
     [HttpPost( "seed-products" )]
-    public async Task<ActionResult<ApiReply<bool>>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<ServiceReply<bool>>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
     {
-        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ApiReply<CategoriesResponse?> categories = await _categoryService.GetCategoriesResponse();
-        ApiReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups();
-        ApiReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
-        ApiReply<List<int>?> users = await UserAccountService.GetIds();
+        ServiceReply<CategoriesResponse?> categories = await _categoryService.GetCategoriesResponse();
+        ServiceReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups();
+        ServiceReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
+        ServiceReply<List<int>?> users = await UserAccountService.GetIds();
 
         if ( !categories.Success || !lookups.Success || !vendors.Success || !users.Success )
             return NotFound( NOT_FOUND_MESSAGE );
 
-        ApiReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data, lookups.Data, vendors.Data, users.Data );
+        ServiceReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data, lookups.Data, vendors.Data, users.Data );
 
         return seedResult.Success
             ? Ok( seedResult )
@@ -68,17 +68,17 @@ public class AdminSeedController : _AdminController
     }
 
     [HttpPost( "seed-users" )]
-    public async Task<ActionResult<ApiReply<bool>>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<ServiceReply<bool>>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
     {
-        ApiReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ApiReply<bool> seedReply = await _userSeedService.SeedUsers( request!.Payload!.Value );
+        ServiceReply<bool> seedReply = await _userSeedService.SeedUsers( request!.Payload!.Value );
 
         return seedReply.Success
-            ? Ok( new ApiReply<bool>( true ) )
+            ? Ok( new ServiceReply<bool>( true ) )
             : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
     }
 }

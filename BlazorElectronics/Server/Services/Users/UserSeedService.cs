@@ -13,19 +13,19 @@ public sealed class UserSeedService : ApiService, IUserSeedService
         _userAccountService = userAccountService;
     }
     
-    public async Task<ApiReply<bool>> SeedUsers( int amount )
+    public async Task<ServiceReply<bool>> SeedUsers( int amount )
     {
         List<UserRegisterRequest> seeds = await GetUserSeeds( amount );
 
         foreach ( UserRegisterRequest seed in seeds )
         {
-            ApiReply<UserLoginDto?> seedReply = await _userAccountService.Register( seed.Username, seed.Username, seed.Password, seed.Phone );
+            ServiceReply<UserLoginDto?> seedReply = await _userAccountService.Register( seed.Username, seed.Username, seed.Password, seed.Phone );
             
             if ( !seedReply.Success )
-                return new ApiReply<bool>( ServiceErrorType.ServerError, seedReply.Message );
+                return new ServiceReply<bool>( ServiceErrorType.ServerError, seedReply.Message );
         }
 
-        return new ApiReply<bool>( true );
+        return new ServiceReply<bool>( true );
     }
     static async Task<List<UserRegisterRequest>> GetUserSeeds( int amount )
     {

@@ -17,7 +17,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _cartCount = await CartService.GetCartItemsCount();
+        //_cartCount = await CartService.GetCartItemsCount();
         StateHasChanged();
     }
     protected override void OnInitialized()

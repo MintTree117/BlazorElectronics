@@ -1,6 +1,6 @@
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Categories;
+using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using Microsoft.AspNetCore.Components;
 
@@ -99,7 +99,7 @@ public sealed partial class AdminCategoriesView : AdminView
     async Task RemoveCategory( int categoryId, CategoryType categoryType )
     {
         var dto = new CategoryRemoveDto( categoryId, categoryType );
-        ApiReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
+        ServiceReply<bool> result = await AdminCategoryService.RemoveCategory( dto );
 
         if ( !result.Success )
         {
@@ -115,14 +115,14 @@ public sealed partial class AdminCategoriesView : AdminView
     {
         PageIsLoaded = false;
         
-        ApiReply<CategoriesViewDto?> reply = await AdminCategoryService.GetCategoriesView();
+        ServiceReply<CategoriesViewDto?> reply = await AdminCategoryService.GetCategoriesView();
 
         PageIsLoaded = true;
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
-            SetViewMessage( false, reply.Message ??= ERROR_GET_CATEGORIES_VIEW );
+            Logger.LogError( reply.Message ?? ERROR_GET_CATEGORIES_VIEW );
+            SetViewMessage( false, reply.Message ?? ERROR_GET_CATEGORIES_VIEW );
             return;
         }
         

@@ -23,7 +23,7 @@ public partial class UserProfile : UserView
 
     async Task ChangePassword()
     {
-        ApiReply<bool> result = await UserService.ChangePassword( _changeRequest );
-        ViewMessage = result.Message ??= DEFAULT_FAIL_PASSWORD_CHANGE;
+        ServiceReply<bool> result = await UserService.ChangePassword( _changeRequest );
+        ViewMessage = result.Message ?? DEFAULT_FAIL_PASSWORD_CHANGE;
     }
 }

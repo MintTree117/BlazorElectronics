@@ -6,12 +6,11 @@ namespace BlazorElectronics.Client.Services.Users.Cart;
 public interface ICartServiceClient
 {
     event Action<int> OnChange;
-    event Action<string?> PostErrorEvent;
 
-    Task PostCartToServer( bool emptyLocalCart );
-    Task<ApiReply<CartResponse?>> GetCart();
-    Task AddToCart( CartProductResponse item );
-    Task UpdateItemQuantity( CartProductResponse item );
-    Task RemoveFromCart( CartProductResponse item );
-    Task<int> GetCartItemsCount();
+    Task<ServiceReply<CartResponse?>> GetCart();
+    Task<ServiceReply<CartResponse?>> UpdateCart();
+    Task<ServiceReply<CartResponse?>> AddToCart( CartItemDto item );
+    Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItemDto item );
+    Task<ServiceReply<CartResponse?>> RemoveFromCart( int productId );
+    Task<ServiceReply<bool>> ClearCart();
 }

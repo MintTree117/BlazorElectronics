@@ -1,13 +1,13 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Vendors;
+using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 
 public interface IAdminVendorServiceClient
 {
-    Task<ApiReply<VendorsViewDto?>> GetView();
-    Task<ApiReply<VendorEditDto?>> GetEdit( IntDto dto );
-    Task<ApiReply<int>> Add( VendorEditDto dto );
-    Task<ApiReply<bool>> Update( VendorEditDto dto );
-    Task<ApiReply<bool>> Remove( IntDto dto );
+    Task<ServiceReply<VendorsViewDto?>> GetView();
+    Task<ServiceReply<VendorEditDto?>> GetEdit( IntDto dto );
+    Task<ServiceReply<int>> Add( VendorEditDto dto );
+    Task<ServiceReply<bool>> Update( VendorEditDto dto );
+    Task<ServiceReply<bool>> Remove( IntDto dto );
 }

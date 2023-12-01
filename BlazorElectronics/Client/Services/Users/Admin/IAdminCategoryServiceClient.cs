@@ -1,14 +1,13 @@
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Admin.Categories;
 using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 
 public interface IAdminCategoryServiceClient
 {
-    Task<ApiReply<CategoriesViewDto?>> GetCategoriesView();
-    Task<ApiReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data );
-    Task<ApiReply<CategoryEditDto?>> AddCategory( CategoryAddDto data );
-    Task<ApiReply<bool>> UpdateCategory( CategoryEditDto dto );
-    Task<ApiReply<bool>> RemoveCategory( CategoryRemoveDto dto );
+    Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView();
+    Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data );
+    Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryAddDto data );
+    Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto );
+    Task<ServiceReply<bool>> RemoveCategory( CategoryRemoveDto dto );
 }

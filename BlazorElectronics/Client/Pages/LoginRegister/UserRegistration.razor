@@ -1,64 +1,39 @@
 @page "/registration"
-@using BlazorElectronics.Client.Services.Users
-@using BlazorElectronics.Shared
-@using BlazorElectronics.Shared.Users
+@inherits PageView
 
-@inject IUserServiceClient UserService
-@inject NavigationManager NavManager
-
-<PageTitle>Register</PageTitle>
-
-<h3>UserRegistration</h3>
-
-<EditForm Model="_user" OnValidSubmit="@( async ()=> await HandleRegistration() )">
-    <DataAnnotationsValidator/>
-    <div class="mb-3">
-        <label for="username">Username</label>
-        <InputText class="form-control" id="username" @bind-Value="_user.Username"/>
-        <ValidationMessage For="@(()=> _user.Username)"/>
-    </div>
-    <div class="mb-3">
-        <label for="email">Email</label>
-        <InputText class="form-control" id="email" @bind-Value="_user.Email"/>
-        <ValidationMessage For="@(()=> _user.Email)"/>
-    </div>
-    <div class="mb-3">
-        <label for="password">Password</label>
-        <InputText class="form-control" id="password" @bind-Value="_user.Password" type="password"/>
-        <ValidationMessage For="@(()=> _user.Password)"/>
-    </div>
-    <div class="mb-3">
-        <label for="confirm-password">Confirm Password</label>
-        <InputText class="form-control" id="confirm-password" @bind-Value="_user.ConfirmPassword" type="password"/>
-        <ValidationMessage For="@(()=> _user.ConfirmPassword)"/>
-    </div>
-    <button class="btn btn-primary" type="submit">Register</button>
-    <div class="@_messageCssClass">
-        <span>@_serverMessage</span>
-    </div>
-</EditForm>
-
-@code 
-{
-    readonly UserRegisterRequest _user = new();
-    string _serverMessage = string.Empty;
-    string _messageCssClass = "text-danger";
+<div class="container-sm">
+    <PageTitle>Register</PageTitle>
+    <h3>UserRegistration</h3>
     
-    async Task HandleRegistration()
+    @if ( !_registered )
     {
-        ApiReply<UserSessionResponse?> reply = await UserService.Register( _user );
-
-        if ( !reply.Success || reply.Data is null )
-        {
-            _serverMessage = reply.Message ?? "Null reply!";
-            return;
-        }
-
-        _messageCssClass = "text-success";
-        _serverMessage = $"Successfully registered user {_user.Username}";
-        StateHasChanged();
-
-        await Task.Delay( 4000 );
-        NavManager.NavigateTo( "profile" );
+        <EditForm Model="_user" OnValidSubmit="@(async () => await HandleRegistration() )">
+            <DataAnnotationsValidator/>
+            <div class="mb-3">
+                <label for="username">Username</label>
+                <InputText class="form-control" id="username" @bind-Value="_user.Username"/>
+                <ValidationMessage For="@(() => _user.Username)"/>
+            </div>
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <InputText class="form-control" id="email" @bind-Value="_user.Email"/>
+                <ValidationMessage For="@(() => _user.Email)"/>
+            </div>
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <InputText class="form-control" id="password" @bind-Value="_user.Password" type="password"/>
+                <ValidationMessage For="@(() => _user.Password)"/>
+            </div>
+            <div class="mb-3">
+                <label for="confirm-password">Confirm Password</label>
+                <InputText class="form-control" id="confirm-password" @bind-Value="_user.ConfirmPassword" type="password"/>
+                <ValidationMessage For="@(() => _user.ConfirmPassword)"/>
+            </div>
+            <button class="btn btn-primary" type="submit">Register</button>
+        </EditForm>
     }
-}
+    else
+    {
+        <span>You have successfully registered your account. Please check your email for a verification link.</span>
+    }
+</div>

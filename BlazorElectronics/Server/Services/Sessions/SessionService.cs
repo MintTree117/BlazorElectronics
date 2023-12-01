@@ -20,7 +20,7 @@ public class SessionService : ApiService, ISessionService
         _sessionRepository = sessionRepository;
     }
 
-    public async Task<ApiReply<SessionDto?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo )
+    public async Task<ServiceReply<SessionDto?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo )
     {
         CreateSessionToken( out string token, out byte[] hash, out byte[] salt );
 
@@ -33,14 +33,14 @@ public class SessionService : ApiService, ISessionService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<SessionDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<SessionDto?>( ServiceErrorType.ServerError );
         }
         
         return insertedSession is not null 
-            ? new ApiReply<SessionDto?>( new SessionDto( insertedSession.SessionId, token ) ) 
-            : new ApiReply<SessionDto?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<SessionDto?>( new SessionDto( insertedSession.SessionId, token ) ) 
+            : new ServiceReply<SessionDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ApiReply<bool>> DeleteSession( int sessionId )
+    public async Task<ServiceReply<bool>> DeleteSession( int sessionId )
     {
         bool success;
 
@@ -51,15 +51,15 @@ public class SessionService : ApiService, ISessionService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
 
         return success
-            ? new ApiReply<bool>( true )
-            : new ApiReply<bool>( ServiceErrorType.NotFound );
+            ? new ServiceReply<bool>( true )
+            : new ServiceReply<bool>( ServiceErrorType.NotFound );
 
     }
-    public async Task<ApiReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
+    public async Task<ServiceReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
     {
         UserSession? session;
 
@@ -70,21 +70,21 @@ public class SessionService : ApiService, ISessionService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
 
         if ( session is null )
-            return new ApiReply<int>( ServiceErrorType.NotFound );
+            return new ServiceReply<int>( ServiceErrorType.NotFound );
 
         if ( !session.IsValid( MAX_SESSION_HOURS ) )
         {
             await DeleteSession( session.SessionId );
-            return new ApiReply<int>( ServiceErrorType.ValidationError, SESSION_EXPIRED_MESSAGE );   
+            return new ServiceReply<int>( ServiceErrorType.ValidationError, SESSION_EXPIRED_MESSAGE );   
         }
 
         return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
-            ? new ApiReply<int>( session.UserId )
-            : new ApiReply<int>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
+            ? new ServiceReply<int>( session.UserId )
+            : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
     }
 
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )

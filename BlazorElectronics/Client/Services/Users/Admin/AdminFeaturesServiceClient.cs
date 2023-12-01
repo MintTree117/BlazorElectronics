@@ -18,31 +18,31 @@ public class AdminFeaturesServiceClient : AdminServiceClient, IAdminFeaturesServ
     public AdminFeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ApiReply<FeaturesResponse?>> GetFeaturesView()
+    public async Task<ServiceReply<FeaturesResponse?>> GetFeaturesView()
     {
         return await TryUserRequest<FeaturesResponse?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ApiReply<FeaturedProductDto?>> GetFeaturedProductEdit( IntDto dto )
+    public async Task<ServiceReply<FeaturedProductDto?>> GetFeaturedProductEdit( IntDto dto )
     {
         return await TryUserRequest<IntDto, FeaturedProductDto?>( API_ROUTE_GET_PRODUCT_EDIT, dto );
     }
-    public async Task<ApiReply<bool>> AddFeaturedProduct( FeaturedProductDto dto )
+    public async Task<ServiceReply<bool>> AddFeaturedProduct( FeaturedProductDto dto )
     {
         return await TryUserRequest<FeaturedProductDto, bool>( API_ROUTE_ADD_PRODUCT, dto );
     }
-    public async Task<ApiReply<bool>> AddFeaturedDeal( IntDto dto )
+    public async Task<ServiceReply<bool>> AddFeaturedDeal( IntDto dto )
     {
         return await TryUserRequest<IntDto, bool>( API_ROUTE_ADD_DEAL, dto );
     }
-    public async Task<ApiReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto )
+    public async Task<ServiceReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto )
     {
         return await TryUserRequest<FeaturedProductDto, bool>( API_ROUTE_UPDATE_PRODUCT, dto );
     }
-    public async Task<ApiReply<bool>> RemoveFeaturedProduct( IntDto dto )
+    public async Task<ServiceReply<bool>> RemoveFeaturedProduct( IntDto dto )
     {
         return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE_PRODUCT, dto );
     }
-    public async Task<ApiReply<bool>> RemoveFeaturedDeal( IntDto dto )
+    public async Task<ServiceReply<bool>> RemoveFeaturedDeal( IntDto dto )
     {
         return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE_DEAL, dto );
     }

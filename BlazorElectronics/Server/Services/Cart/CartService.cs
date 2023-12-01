@@ -13,7 +13,7 @@ public class CartService : ApiService, ICartService
         _cartRepository = cartRepository;
     }
 
-    public async Task<ApiReply<CartResponse?>> UpdateCart( int userId, CartRequest request )
+    public async Task<ServiceReply<CartResponse?>> UpdateCart( int userId, CartRequest request )
     {
         try
         {
@@ -21,16 +21,16 @@ public class CartService : ApiService, ICartService
             CartResponse? response = MapCartResponse( models );
 
             return response is not null
-                ? new ApiReply<CartResponse?>( response )
-                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CartResponse?>( response )
+                : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<CartResponse?>> GetCart( int userId )
+    public async Task<ServiceReply<CartResponse?>> GetCart( int userId )
     {
         try
         {
@@ -38,16 +38,16 @@ public class CartService : ApiService, ICartService
             CartResponse? response = MapCartResponse( models );
 
             return response is not null
-                ? new ApiReply<CartResponse?>( response )
-                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CartResponse?>( response )
+                : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<CartResponse?>> AddToCart( int userId, CartItemDto item )
+    public async Task<ServiceReply<CartResponse?>> AddToCart( int userId, CartItemDto item )
     {
         try
         {
@@ -55,16 +55,16 @@ public class CartService : ApiService, ICartService
             CartResponse? response = MapCartResponse( models );
 
             return response is not null
-                ? new ApiReply<CartResponse?>( response )
-                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CartResponse?>( response )
+                : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<CartResponse?>> UpdateQuantity( int userId, CartItemDto item )
+    public async Task<ServiceReply<CartResponse?>> UpdateQuantity( int userId, CartItemDto item )
     {
         try
         {
@@ -72,16 +72,16 @@ public class CartService : ApiService, ICartService
             CartResponse? response = MapCartResponse( models );
 
             return response is not null
-                ? new ApiReply<CartResponse?>( response )
-                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CartResponse?>( response )
+                : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<CartResponse?>> RemoveFromCart( int userId, int productId )
+    public async Task<ServiceReply<CartResponse?>> RemoveFromCart( int userId, int productId )
     {
         try
         {
@@ -89,29 +89,29 @@ public class CartService : ApiService, ICartService
             CartResponse? response = MapCartResponse( models );
 
             return response is not null
-                ? new ApiReply<CartResponse?>( response )
-                : new ApiReply<CartResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CartResponse?>( response )
+                : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<CartResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ApiReply<bool>> ClearCart( int userId )
+    public async Task<ServiceReply<bool>> ClearCart( int userId )
     {
         try
         {
             bool result = await _cartRepository.DeleteCart( userId );
             
             return result
-                ? new ApiReply<bool>( true )
-                : new ApiReply<bool>( ServiceErrorType.NotFound );
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ApiReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
 
