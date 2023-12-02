@@ -8,12 +8,12 @@ public sealed class CategoryRemoveDto
     {
         
     }
-    public CategoryRemoveDto( int categoryId, CategoryType categoryType )
+    public CategoryRemoveDto( int categoryId, CategoryTier categoryTier )
     {
         CategoryId = categoryId;
-        CategoryType = categoryType;
+        CategoryTier = categoryTier;
     }
     
-    public CategoryType CategoryType { get; init; }
+    public CategoryTier CategoryTier { get; init; }
     public int CategoryId { get; init; }
 }

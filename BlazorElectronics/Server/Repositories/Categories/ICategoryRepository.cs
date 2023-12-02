@@ -5,10 +5,9 @@ namespace BlazorElectronics.Server.Repositories.Categories;
 
 public interface ICategoryRepository
 {
-    Task<CategoriesModel?> Get();
-    Task<CategoriesViewDto?> GetView();
-    Task<CategoryEditDto?> GetEdit( CategoryGetEditDto request );
-    Task<CategoryEditDto?> Insert( CategoryAddDto dto );
+    Task<IEnumerable<CategoryModel>?> Get();
+    Task<CategoryModel?> GetEdit( int categoryId );
+    Task<CategoryModel?> Insert( CategoryEditDto dto );
     Task<bool> Update( CategoryEditDto dto );
-    Task<bool> Delete( CategoryRemoveDto dto );
+    Task<bool> Delete( int categoryId );
 }

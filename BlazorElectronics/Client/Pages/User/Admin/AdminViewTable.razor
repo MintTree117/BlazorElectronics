@@ -1,0 +1,86 @@
+@typeparam TItem where TItem : BlazorElectronics.Shared.AdminItemViewDto
+
+<div class="container-sm">
+    @if ( PageIsRedirecting )
+    {
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>@ViewMessage</p>
+            <p>Redirecting in @PageRedirectCountdown...</p>
+        </div>
+    }
+    else if ( !PageIsReady() )
+    {
+        <span>@ViewMessage</span>
+    }
+    else
+    {
+        <h3>View</h3>
+
+        if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
+        {
+            <div class="@ViewMessageClass">
+                <span>@ViewMessage</span>
+            </div>
+        }
+
+        if ( !string.IsNullOrWhiteSpace( ActionMessage ) )
+        {
+            <div class="@ActionMessageClass">
+                <span>@ActionMessage</span>
+            </div>
+        }
+        
+        <table class="table table-hover">
+            <thead class="thead-light">
+            <tr>
+                @foreach ( THeadDisplayMeta meta in THeadMeta )
+                {
+                    <th class="sortable-header" @onclick="meta.SortByDelegate">@meta.DisplayName</th>
+                }
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach ( TItem item in Items )
+            {
+                <tr class="admin-view-row">
+                    @foreach ( string property in TPropertyNames )
+                    {
+                        <td>
+                            @RenderPropertyColumn( item, property )
+                        </td>
+                    }
+                    <td class="text-nowrap">
+                        <button class="btn btn-primary" @onclick="() => EditItem( item.Id )">
+                            <i class="oi oi-pencil"></i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="async () => await RemoveItem( item.Id )">
+                            <i class="oi oi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code 
+{
+    [Parameter] public int PageRedirectCountdown { get; set; }
+    [Parameter] public bool PageIsRedirecting { get; set; }
+    [Parameter] public string ViewMessage { get; set; }
+    [Parameter] public string ViewMessageClass { get; set; }
+    [Parameter] public string ActionMessage { get; set; }
+    [Parameter] public string ActionMessageClass { get; set; }
+    
+    [Parameter] public List<TItem> Items { get; set; }
+    [Parameter] public List<THeadDisplayMeta> THeadMeta { get; set; }
+    [Parameter] public List<string> TPropertyNames { get; set; }
+
+    [Parameter]public Func<bool> PageIsReady { get; set; }
+    [Parameter] public Func<TItem, string, object> RenderPropertyColumn { get; set; }
+    [Parameter] public Action<int> EditItem { get; set; }
+    [Parameter] public Func<int, Task> RemoveItem { get; set; }
+}

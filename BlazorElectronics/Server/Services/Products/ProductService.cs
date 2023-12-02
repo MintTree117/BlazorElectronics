@@ -45,7 +45,7 @@ public class ProductService : ApiService, IProductService
             Message = "Found matching results."
         };*/
     }
-    public async Task<ServiceReply<ProductSearchResponse?>> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest? request )
+    public async Task<ServiceReply<ProductSearchResponse?>> GetProductSearch( int? categoryId, ProductSearchRequest? request )
     {
         request = await ValidateProductSearchRequest( request );
         
@@ -53,7 +53,7 @@ public class ProductService : ApiService, IProductService
 
         try
         {
-            models = await _productSearchRepository.GetProductSearch( categoryIdMap, request );
+            models = await _productSearchRepository.GetProductSearch( categoryId, request );
         }
         catch ( ServiceException e )
         {
@@ -175,8 +175,8 @@ public class ProductService : ApiService, IProductService
 
             var primaryCategory = new ProductCategoryResponse
             {
-                Name = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Name,
-                Url = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Url
+                //Name = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Name,
+                //Url = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Url
             };
 
             //List<ProductCategoryResponse>? parsedSecondaryCategories = ParseProductDetailsCategories( detailsModel.SecondaryCategories, categoriesDto.SecondaryIds, categoriesDto.SecondaryResponses );

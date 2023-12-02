@@ -57,8 +57,8 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<UserSessionResponse?> authorizeReply = await UserService.AuthorizeUser();
-        HandleAuthorizationChange( authorizeReply.Data );
+        //ServiceReply<UserSessionResponse?> authorizeReply = await UserService.AuthorizeUser();
+        //HandleAuthorizationChange( authorizeReply.Data );
     }
     public void Dispose()
     {

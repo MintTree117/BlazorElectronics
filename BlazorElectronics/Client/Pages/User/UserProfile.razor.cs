@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Client.Pages.User;
 
-public partial class UserProfile : UserView
+public partial class UserProfile : UserPage
 {
     const string DEFAULT_FAIL_PASSWORD_CHANGE = "Failed to change password; no response message!";
     

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User;
 
-public abstract class UserView : PageView
+public abstract class UserPage : PageView
 {
     protected const string ERROR_UNAUTHORIZED_USER = "You are not authorized to be here!";
     

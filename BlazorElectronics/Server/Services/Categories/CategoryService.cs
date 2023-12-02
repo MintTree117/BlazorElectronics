@@ -20,7 +20,7 @@ public class CategoryService : ApiService, ICategoryService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<CategoriesResponse?>> GetCategoriesResponse()
+    public async Task<ServiceReply<CategoriesResponse?>> GetCategories()
     {
         ServiceReply<bool> getReply = await TryGetData();
 
@@ -28,39 +28,26 @@ public class CategoryService : ApiService, ICategoryService
             ? new ServiceReply<CategoriesResponse?>( _cachedData.Object.Response )
             : new ServiceReply<CategoriesResponse?>( getReply.ErrorType, getReply.Message );
     }
-    public async Task<ServiceReply<CategoryIdMap?>> GetCategoryIdMapFromUrl( string primaryUrl, string? secondaryUrl = null, string? tertiaryUrl = null )
+    public async Task<ServiceReply<int>> ValidateCategoryUrl( string url )
     {
-        ServiceReply<bool> getReply = await TryGetData();
+        ServiceReply<bool> reply = await TryGetData();
 
-        if ( !getReply.Success || _cachedData is null )
-            return new ServiceReply<CategoryIdMap?>( getReply.ErrorType, getReply.Message );
+        if ( !reply.Success || _cachedData is null )
+            return new ServiceReply<int>( reply.ErrorType, reply.Message );
 
-        List<string> urlList = GetCategoryUrlList( primaryUrl, secondaryUrl, tertiaryUrl );
-        CategoryIdMap? idMap = _cachedData.Object.Urls.GetCategoryIdMapFromUrl( urlList );
-
-        return idMap is not null
-            ? new ServiceReply<CategoryIdMap?>( idMap )
-            : new ServiceReply<CategoryIdMap?>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
-    }
-    public async Task<ServiceReply<bool>> ValidateCategoryIdMap( CategoryIdMap idMap )
-    {
-        ServiceReply<bool> getReply = await TryGetData();
-        
-        if ( !getReply.Success || _cachedData is null )
-            return new ServiceReply<bool>( getReply.ErrorType, getReply.Message );
-
-        return ValidateCategoryIdMap( idMap, _cachedData.Object.Ids )
-            ? new ServiceReply<bool>( true )
-            : new ServiceReply<bool>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
+        return _cachedData.Object.ValidateUrl( url, out int categoryId )
+            ? new ServiceReply<int>( categoryId )
+            : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
     public async Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView()
     {
         try
         {
-            CategoriesViewDto? result = await _repository.GetView();
+            IEnumerable<CategoryModel>? result = await _repository.Get();
+            CategoriesViewDto? dto = await MapView( result );
 
-            return result is not null
-                ? new ServiceReply<CategoriesViewDto?>( result )
+            return dto is not null
+                ? new ServiceReply<CategoriesViewDto?>( dto )
                 : new ServiceReply<CategoriesViewDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
@@ -69,14 +56,15 @@ public class CategoryService : ApiService, ICategoryService
             return new ServiceReply<CategoriesViewDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto dto )
+    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId )
     {
         try
         {
-            CategoryEditDto? result = await _repository.GetEdit( dto );
+            CategoryModel? model = await _repository.GetEdit( categoryId );
+            CategoryEditDto? dto = MapEdit( model );
 
-            return result is not null
-                ? new ServiceReply<CategoryEditDto?>( result )
+            return dto is not null
+                ? new ServiceReply<CategoryEditDto?>( dto )
                 : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
@@ -85,14 +73,15 @@ public class CategoryService : ApiService, ICategoryService
             return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryAddDto dto )
+    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto dto )
     {
         try
         {
-            CategoryEditDto? result = await _repository.Insert( dto );
+            CategoryModel? model = await _repository.Insert( dto );
+            CategoryEditDto? edit = MapEdit( model );
 
-            return result is not null
-                ? new ServiceReply<CategoryEditDto?>( result )
+            return edit is not null
+                ? new ServiceReply<CategoryEditDto?>( edit )
                 : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
@@ -117,11 +106,11 @@ public class CategoryService : ApiService, ICategoryService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> RemoveCategory( CategoryRemoveDto dto )
+    public async Task<ServiceReply<bool>> RemoveCategory( int categoryId )
     {
         try
         {
-            bool result = await _repository.Delete( dto );
+            bool result = await _repository.Delete( categoryId );
 
             return result
                 ? new ServiceReply<bool>( result )
@@ -139,11 +128,11 @@ public class CategoryService : ApiService, ICategoryService
         if ( _cachedData is not null && _cachedData.IsValid( CACHE_LIFE ) )
             return new ServiceReply<bool>( true );
 
-        CategoriesModel? repositoryResponse;
+        IEnumerable<CategoryModel>? models;
 
         try
         {
-            repositoryResponse = await _repository.Get();
+            models = await _repository.Get();
         }
         catch ( ServiceException e )
         {
@@ -151,183 +140,90 @@ public class CategoryService : ApiService, ICategoryService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
 
-        if ( repositoryResponse is null )
-            return new ServiceReply<bool>( ServiceErrorType.NotFound );
-        
-        if ( repositoryResponse.Primary is null || repositoryResponse.Secondary is null || repositoryResponse.Tertiary is null )
+        if ( models is null )
             return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
-        await CreateCacheFromModel( repositoryResponse );
+        await MapModels( models );
         return new ServiceReply<bool>( true );
     }
     
-    async Task CreateCacheFromModel( CategoriesModel model )
+    async Task MapModels( IEnumerable<CategoryModel> models )
     {
-        CategoryIds ids = null;
-        CategoriesResponse response = null;
-        CategoryUrlMap map;
-        
         await Task.Run( () =>
         {
-            var primaryIds = new Dictionary<int, int>();
-            var secondaryIds = new Dictionary<int, int>();
-            var tertiaryIds = new Dictionary<int, int>();
-            
-            var primary = new List<CategoryResponse>();
-            var secondary = new List<CategoryResponse>();
-            var tertiary = new List<CategoryResponse>();
+            List<CategoryModel> list = models.ToList();
 
-            short count = 0;
-            foreach ( CategoryModel p in model.Primary! )
-            {
-                if ( !primaryIds.TryAdd( p.PrimaryCategoryId, count ) )
-                    continue;
-                
-                primary.Add( new CategoryResponse
-                {
-                    Id = p.PrimaryCategoryId,
-                    Name = p.Name,
-                    Url = p.ApiUrl,
-                    ImageUrl = p.ImageUrl,
-                    Children = new List<int>(),
-                });
-                
-                count++;
-            }
-            
-            count = 0;
-            foreach ( CategoryModel s in model.Secondary! )
-            {
-                bool valid =
-                    primaryIds.ContainsKey( s.PrimaryCategoryId ) &&
-                    secondaryIds.TryAdd( s.SecondaryCategoryId, count );
+            CategoriesResponse response = MapResponses( list );
+            Dictionary<string, int> urls = MapUrls( list );
 
-                if ( !valid )
-                    continue;
-
-                secondary.Add( new CategoryResponse
-                {
-                    Id = s.SecondaryCategoryId,
-                    ParentId = s.PrimaryCategoryId,
-                    Name = s.Name,
-                    Url = s.ApiUrl,
-                    ImageUrl = s.ImageUrl,
-                    Children = new List<int>()
-                } );
-                
-                primary[ primaryIds[ s.PrimaryCategoryId ] ].Children.Add( s.SecondaryCategoryId );
-                count++;
-            }
-            count = 0;
-            
-            foreach ( CategoryModel t in model.Tertiary! )
-            {
-                bool valid = 
-                    primaryIds.ContainsKey( t.PrimaryCategoryId ) &&
-                    secondaryIds.ContainsKey( t.SecondaryCategoryId ) &&
-                    tertiaryIds.TryAdd( t.TertiaryCategoryId, count );
-
-                if ( !valid )
-                    continue;
-
-                tertiary.Add( new CategoryResponse
-                {
-                    Id = t.TertiaryCategoryId,
-                    ParentId = t.SecondaryCategoryId,
-                    Name = t.Name,
-                    Url = t.ApiUrl,
-                    ImageUrl = t.ImageUrl
-                });
-                
-                secondary[ secondaryIds[ t.SecondaryCategoryId ] ].Children.Add( t.TertiaryCategoryId );
-                count++;
-            }
-
-            ids = new CategoryIds
-            {
-                PrimarySet = new HashSet<int>( primaryIds.Keys ),
-                SecondarySet = new HashSet<int>( secondaryIds.Keys ),
-                TertiarySet = new HashSet<int>( tertiaryIds.Keys ),
-            };
-
-            response = new CategoriesResponse
-            {
-
-                Primary = primary,
-                Secondary = secondary,
-                Tertiary = tertiary
-            };
+            _cachedData = new CachedObject<CategoryData>( new CategoryData( response, urls ) );
         } );
-
-        map = await CreateUrlMap( response! );
-
-        var data = new CategoryData
-        {
-            Ids = ids!,
-            Response = response!,
-            Urls = map
-        };
-
-        _cachedData = new CachedObject<CategoryData>( data );
     }
-    async Task<CategoryUrlMap> CreateUrlMap( CategoriesResponse dto )
+    static CategoriesResponse MapResponses( List<CategoryModel> models )
     {
+        Dictionary<int, CategoryResponse> responses = new();
+        List<int> primaryIds = new();
+        
+        foreach ( CategoryModel m in models )
+        {
+            CategoryResponse r = MapResponse( m );
+            responses.Add( r.Id, r );
+
+            if ( m.Tier == CategoryTier.PRIMARY )
+                primaryIds.Add( r.Id );
+        }
+
+        foreach ( CategoryResponse r in responses.Values )
+        {
+            if ( responses.TryGetValue( r.ParentId, out CategoryResponse? parent ) )
+                parent.Children.Add( r );
+        }
+
+        return new CategoriesResponse( responses, primaryIds );
+    }
+    static CategoryResponse MapResponse( CategoryModel model )
+    {
+        return new CategoryResponse
+        {
+            Id = model.CategoryId,
+            ParentId = model.ParentCategoryId,
+            Tier = model.Tier,
+            Name = model.Name,
+            Url = model.ApiUrl,
+            ImageUrl = model.ImageUrl
+        };
+    }
+    static Dictionary<string, int> MapUrls( IEnumerable<CategoryModel> models )
+    {
+        return models.ToDictionary( m => m.ApiUrl, m => m.CategoryId );
+    }
+    static async Task<CategoriesViewDto?> MapView( IEnumerable<CategoryModel>? models )
+    {
+        if ( models is null )
+            return null;
+
         return await Task.Run( () =>
         {
-            var primary = new Dictionary<string, int>();
-            var secondary = new Dictionary<string, Dictionary<int, int>>();
-            var tertiary = new Dictionary<string, Dictionary<int, int>>();
-            
-            foreach ( CategoryResponse p in dto.Primary )
-            {
-                primary.TryAdd( p.Url, p.Id );
-            }
+            List<CategoryViewDto> views = models
+                .Select( m => new CategoryViewDto { Id = m.CategoryId, Tier = m.Tier, Name = m.Name } )
+                .ToList();
 
-            foreach ( CategoryResponse s in dto.Secondary )
-            {
-                if ( !secondary.TryGetValue( s.Url, out Dictionary<int, int>? secondaryMap ) )
-                {
-                    secondaryMap = new Dictionary<int, int>();
-                    secondary.TryAdd( s.Url, secondaryMap );
-                }
-                
-                secondaryMap.TryAdd( s.ParentId, s.Id );
-            }
-
-            foreach ( CategoryResponse t in dto.Tertiary )
-            {
-                if ( !tertiary.TryGetValue( t.Url, out Dictionary<int, int>? tertiaryMap ) )
-                {
-                    tertiaryMap = new Dictionary<int, int>();
-                    tertiary.Add( t.Url, tertiaryMap );
-                }
-
-                tertiaryMap.TryAdd( t.ParentId, t.Id );
-            }
-
-            return new CategoryUrlMap( primary, secondary, tertiary );
+            return new CategoriesViewDto( views );
         } );
     }
-    
-    static bool ValidateCategoryIdMap( CategoryIdMap map, CategoryIds ids )
+    static CategoryEditDto? MapEdit( CategoryModel? model )
     {
-        return map.CategoryType switch {
-            CategoryType.PRIMARY => ids.PrimarySet.Contains( map.CategoryId ),
-            CategoryType.SECONDARY => ids.SecondarySet.Contains( map.CategoryId ),
-            CategoryType.TERTIARY => ids.TertiarySet.Contains( map.CategoryId ),
-            _ => false
+        if ( model is null )
+            return null;
+
+        return new CategoryEditDto
+        {
+            CategoryId = model.CategoryId,
+            ParentId = model.ParentCategoryId,
+            Tier = model.Tier,
+            Name = model.Name,
+            ApiUrl = model.ApiUrl,
+            ImageUrl = model.ImageUrl
         };
-    }
-    static List<string> GetCategoryUrlList( string primary, string? secondary = null, string? tertiary = null )
-    {
-        var urlCategories = new List<string> { primary };
-
-        if ( !string.IsNullOrEmpty( secondary ) )
-            urlCategories.Add( secondary );
-
-        if ( !string.IsNullOrEmpty( tertiary ) )
-            urlCategories.Add( tertiary );
-
-        return urlCategories;
     }
 }

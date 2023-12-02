@@ -186,18 +186,19 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     // CATEGORY
     List<int> GetRandomSecondaryCategories( int primaryCategory, CategoriesResponse categoryResponseData )
     {
-        CategoryResponse? response = categoryResponseData.Primary.FirstOrDefault( p => p.Id == primaryCategory );
+        /*CategoryResponse? response = categoryResponseData.Primary.FirstOrDefault( p => p.Id == primaryCategory );
 
         return response is null 
             ? new List<int>() 
-            : PickRandomCategories( response ).ToList();
+            : PickRandomCategories( response ).ToList();*/
+        return new List<int>();
     }
     List<int> GetRandomTertiaryCategories( List<int> secondaryCategories, CategoriesResponse categoryResponseData )
     {
         var tertiaryCategories = new List<int>();
         var secondary = new List<CategoryResponse>();
 
-        foreach ( int secondaryCategory in secondaryCategories )
+        /*foreach ( int secondaryCategory in secondaryCategories )
         {
             CategoryResponse? r = categoryResponseData.Secondary.FirstOrDefault( s => s.Id == secondaryCategory );
 
@@ -214,7 +215,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
                 if ( !tertiaryCategories.Contains( i ) )
                     tertiaryCategories.Add( i );
             }
-        }
+        }*/
         
         return tertiaryCategories;
     }
@@ -237,7 +238,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
                     break;
             }
 
-            picked.Add( response.Children[ i ] );
+            //picked.Add( response.Children[ i ] );
         }
 
         return picked.ToList();

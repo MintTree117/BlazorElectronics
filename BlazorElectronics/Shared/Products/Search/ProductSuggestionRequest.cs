@@ -1,15 +1,11 @@
-using BlazorElectronics.Shared.Categories;
-
 namespace BlazorElectronics.Shared.Products.Search;
 
 public sealed class ProductSuggestionRequest
 {
-    public ProductSuggestionRequest( string searchText, CategoryIdMap? categoryIdMap )
+    public ProductSuggestionRequest( string searchText )
     {
         SearchText = searchText;
-        CategoryIdMap = categoryIdMap;
     }
     
     public string SearchText { get; }
-    public CategoryIdMap? CategoryIdMap { get; }
 }

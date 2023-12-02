@@ -3,11 +3,9 @@ using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 
-public interface IAdminCategoryServiceClient
+public interface IAdminCategoryServiceClient : IAdminViewService<CategoryViewDto>
 {
-    Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView();
-    Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data );
-    Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryAddDto data );
+    Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( IntDto data );
+    Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto data );
     Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto );
-    Task<ServiceReply<bool>> RemoveCategory( CategoryRemoveDto dto );
 }

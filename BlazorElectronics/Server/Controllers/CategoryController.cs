@@ -16,10 +16,10 @@ public class CategoryController : _Controller
         _categoryService = categoryService;
     }
     
-    [HttpGet("get-categories")]
+    [HttpGet("get")]
     public async Task<ActionResult<CategoriesResponse>> GetCategories()
     {
-        ServiceReply<CategoriesResponse?> reply = await _categoryService.GetCategoriesResponse();
+        ServiceReply<CategoriesResponse?> reply = await _categoryService.GetCategories();
         return GetReturnFromApi( reply );
     }
 }

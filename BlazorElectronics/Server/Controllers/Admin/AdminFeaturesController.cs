@@ -1,4 +1,3 @@
-using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
@@ -21,7 +20,7 @@ public sealed class AdminFeaturesController : _AdminController
     }
     
     [HttpPost( "get-features-view" )]
-    public async Task<ActionResult<FeaturesResponse?>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<List<AdminItemViewDto>>> GetView( [FromBody] UserRequest? request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 

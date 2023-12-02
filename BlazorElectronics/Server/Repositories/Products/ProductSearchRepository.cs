@@ -51,12 +51,10 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     public ProductSearchRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
     // PUBLIC API
-    public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText, CategoryType categoryType, short categoryId )
+    public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText )
     {
         var dynamicParams = new DynamicParameters();
         dynamicParams.Add( PARAM_SEARCH_TEXT, searchText );
-        dynamicParams.Add( PARAM_CATEGORY_ID, categoryType );
-        dynamicParams.Add( PARAM_CATEGORY_TYPE, categoryId );
 
         try
         {
@@ -73,17 +71,9 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             throw new ServiceException( e.Message, e );
         }
     }
-    public async Task<string?> GetProductSearchQueryString( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest )
+    public async Task<IEnumerable<ProductSearchModel>?> GetProductSearch( int? categoryId, ProductSearchRequest searchRequest )
     {
-        var productQuery = new StringBuilder();
-        var countQuery = new StringBuilder();
-
-        await BuildProductSearchQuery( categoryIdMap, searchRequest );
-        return productQuery + "-----------------------------------------" + countQuery;
-    }
-    public async Task<IEnumerable<ProductSearchModel>?> GetProductSearch( CategoryIdMap? categoryIdMap, ProductSearchRequest searchRequest )
-    {
-        SearchQueryObject searchQueryObject = await BuildProductSearchQuery( categoryIdMap, searchRequest );
+        SearchQueryObject searchQueryObject = await BuildProductSearchQuery( categoryId, searchRequest );
         return await TryQueryAsync( GetProductSearchQuery, searchQueryObject.DynamicParams, searchQueryObject.SearchQuery );
     }
     
@@ -92,7 +82,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     {
         return await connection.QueryAsync<ProductSearchModel>( sql, dynamicParams );
     }
-    static async Task<SearchQueryObject> BuildProductSearchQuery( CategoryIdMap? categoryMap, ProductSearchRequest request )
+    static async Task<SearchQueryObject> BuildProductSearchQuery( int? categoryId, ProductSearchRequest request )
     {
         var builder = new StringBuilder();
         var dynamicParams = new DynamicParameters();
@@ -102,13 +92,13 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $"WITH Results AS (" );
             builder.Append( $"SELECT *, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
-            AppendCategoryJoin( builder, categoryMap );
+            AppendCategoryJoin( builder, categoryId );
             AppendSpecJoin( builder, request.CategoryFilters );
             AppendSpecLookupJoin( builder, request.LookupIncludes is not null || request.LookupExcludes is not null );
             
             builder.Append( $" WHERE 1=1" );
             
-            AppendCategoryCondition( builder, dynamicParams, categoryMap );
+            AppendCategoryCondition( builder, dynamicParams, categoryId );
             AppendSearchTextCondition( builder, dynamicParams, request.SearchText );
             AppendVendorCondition( builder, dynamicParams, request.Vendors );
             AppendHasSaleCondition( builder, request.HasSale );
@@ -137,9 +127,9 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     }
     
     // APPEND JOINS
-    static void AppendCategoryJoin( StringBuilder builder, CategoryIdMap? categoryMap )
+    static void AppendCategoryJoin( StringBuilder builder, int? categoryId )
     {
-        if ( categoryMap is null )
+        if ( categoryId is null )
             return;
         
         builder.Append( $" INNER JOIN {TABLE_PRODUCT_CATEGORIES}" );
@@ -181,16 +171,15 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     }
 
     // APPEND CONDITIONS
-    static void AppendCategoryCondition( StringBuilder builder, DynamicParameters dynamicParams, CategoryIdMap? categoryMap )
+    static void AppendCategoryCondition( StringBuilder builder, DynamicParameters dynamicParams, int? categoryId )
     {
-        if ( categoryMap is null )
+        if ( categoryId is null )
             return;
         
         builder.Append( $" AND ( {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_TIER_ID} = {PARAM_CATEGORY_TYPE}" );
         builder.Append( $" AND {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_ID} = {PARAM_CATEGORY_ID} )" );
-
-        dynamicParams.Add( PARAM_CATEGORY_TYPE, categoryMap.CategoryType );
-        dynamicParams.Add( PARAM_CATEGORY_ID, categoryMap.CategoryId );
+        
+        dynamicParams.Add( PARAM_CATEGORY_ID, categoryId );
     }
     static void AppendSearchTextCondition( StringBuilder builder, DynamicParameters dynamicParams, string? searchText )
     {

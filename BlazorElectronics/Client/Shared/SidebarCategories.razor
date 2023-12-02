@@ -1,0 +1,24 @@
+@inherits RazorView
+
+<div class="vertical-menu">
+    @if ( currentCategoryIds != null )
+    {
+        <ul class="list-group">
+            @if ( currentParentId.HasValue )
+            {
+                <li class="list-group-item">
+                    <button class="btn btn-link" @onclick="GoBack">Back</button>
+                </li>
+            }
+
+            @foreach ( int categoryId in currentCategoryIds )
+            {
+                <li class="list-group-item">
+                    <button class="btn btn-link" @onclick="@(() => SelectCategory( categoryId ))">
+                        @categoriesResponse.CategoriesById[ categoryId ].Name
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</div>

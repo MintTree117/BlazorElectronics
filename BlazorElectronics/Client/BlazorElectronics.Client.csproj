@@ -22,8 +22,6 @@
     <ItemGroup>
       <AdditionalFiles Include="Pages\Home\FeaturedProducts.razor" />
       <AdditionalFiles Include="Pages\Home\Index.razor" />
-      <AdditionalFiles Include="Pages\User\Admin\AdminCategoriesEdit.razor" />
-      <AdditionalFiles Include="Pages\User\Admin\AdminCategoriesView.razor" />
     </ItemGroup>
 
     <ItemGroup>

@@ -16,9 +16,9 @@ public class AdminVendorServiceClient : AdminServiceClient, IAdminVendorServiceC
     public AdminVendorServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<VendorsViewDto?>> GetView()
+    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetView()
     {
-        return await TryUserRequest<VendorsViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<List<AdminItemViewDto>?>( API_ROUTE_GET_VIEW );
     }
     public async Task<ServiceReply<VendorEditDto?>> GetEdit( IntDto dto )
     {
@@ -32,8 +32,8 @@ public class AdminVendorServiceClient : AdminServiceClient, IAdminVendorServiceC
     {
         return await TryUserRequest<VendorEditDto, bool>( API_ROUTE_UPDATE, dto );
     }
-    public async Task<ServiceReply<bool>> Remove( IntDto dto )
+    public async Task<ServiceReply<bool>> RemoveItem( IntDto itemId )
     {
-        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE, dto );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE, itemId );
     }
 }

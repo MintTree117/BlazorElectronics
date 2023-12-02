@@ -1,9 +1,8 @@
+using BlazorElectronics.Shared.Enums;
+
 namespace BlazorElectronics.Shared.Categories;
 
-public sealed class CategoryViewDto
+public sealed class CategoryViewDto : AdminItemViewDto
 {
-    public int PrimaryCategoryId { get; set; }
-    public int SecondaryCategoryId { get; set; }
-    public int TertiaryCategoryId { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public CategoryTier Tier { get; set; }
 }

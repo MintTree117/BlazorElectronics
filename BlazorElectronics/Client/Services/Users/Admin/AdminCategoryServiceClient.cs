@@ -16,24 +16,24 @@ public sealed class AdminCategoryServiceClient : AdminServiceClient, IAdminCateg
     public AdminCategoryServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public async Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView()
+    public async Task<ServiceReply<List<CategoryViewDto>?>> GetView()
     {
-        return await TryUserRequest<CategoriesViewDto?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<List<CategoryViewDto>?>( API_ROUTE_GET_VIEW );
     }
-    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( CategoryGetEditDto data )
+    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( IntDto data )
     {
-        return await TryUserRequest<CategoryGetEditDto,CategoryEditDto?>( API_ROUTE_GET_EDIT, data );
+        return await TryUserRequest<IntDto,CategoryEditDto?>( API_ROUTE_GET_EDIT, data );
     }
-    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryAddDto data )
+    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto data )
     {
-        return await TryUserRequest<CategoryAddDto,CategoryEditDto?>( API_ROUTE_ADD, data );
+        return await TryUserRequest<CategoryEditDto,CategoryEditDto?>( API_ROUTE_ADD, data );
     }
     public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto data )
     {
         return await TryUserRequest<CategoryEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ServiceReply<bool>> RemoveCategory( CategoryRemoveDto data )
+    public async Task<ServiceReply<bool>> RemoveItem( IntDto itemId )
     {
-        return await TryUserRequest<CategoryRemoveDto,bool>( API_ROUTE_REMOVE, data );
+        return await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE, itemId );
     }
 }

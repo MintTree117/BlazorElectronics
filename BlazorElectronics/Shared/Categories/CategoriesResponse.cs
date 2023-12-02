@@ -6,15 +6,12 @@ public sealed class CategoriesResponse
     {
         
     }
-    
-    public CategoriesResponse( IReadOnlyList<CategoryResponse> primary, IReadOnlyList<CategoryResponse> secondary, IReadOnlyList<CategoryResponse> tertiary )
+    public CategoriesResponse( Dictionary<int, CategoryResponse> categories, List<int> primary )
     {
-        Primary = primary.ToList();
-        Secondary = secondary.ToList();
-        Tertiary = tertiary.ToList();
+        CategoriesById = categories;
+        PrimaryIds = primary;
     }
 
-    public List<CategoryResponse> Primary { get; init; } = new();
-    public List<CategoryResponse> Secondary { get; init; } = new();
-    public List<CategoryResponse> Tertiary { get; init; } = new();
+    public Dictionary<int, CategoryResponse> CategoriesById { get; init; } = new();
+    public List<int> PrimaryIds { get; set; } = new();
 }

@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Shared.Vendors;
 
-public sealed class VendorDto
+public sealed class VendorDto : AdminItemViewDto
 {
     public int VendorId { get; set; }
     public string VendorName { get; set; } = string.Empty;

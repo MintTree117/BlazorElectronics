@@ -1,3 +1,9 @@
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.csproj.AssemblyReference.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.GeneratedMSBuildEditorConfig.editorconfig
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.AssemblyInfoInputs.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.AssemblyInfo.cs
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.csproj.CoreCompileInputs.cache
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.MvcApplicationPartsAssemblyInfo.cache
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/blazor.boot.json
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/blazor.webassembly.js
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Blazored.LocalStorage.dll
@@ -617,12 +623,6 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/icudt_no_CJK.dat
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/BlazorElectronics.Shared.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/BlazorElectronics.Shared.pdb
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.csproj.AssemblyReference.cache
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.GeneratedMSBuildEditorConfig.editorconfig
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.AssemblyInfoInputs.cache
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.AssemblyInfo.cs
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.csproj.CoreCompileInputs.cache
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.MvcApplicationPartsAssemblyInfo.cache
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/JrX1JcP+.gz
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/vuIX71IK.gz
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/H0of7p2f.gz

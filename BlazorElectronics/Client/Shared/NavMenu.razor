@@ -23,7 +23,7 @@
                         All Products
                     </li>
                 </ul>
-                <CategoryList></CategoryList>
+                <SidebarCategories></SidebarCategories>
             </div>
         </div>
     </div>
@@ -49,20 +49,7 @@
     string? NavMenuCssClass => _collapseNavMenu ? "nav-sidebar-hide" : "";
 
     CategoriesResponse? _categories;
-
-    protected override async Task OnInitializedAsync()
-    {
-        ServiceReply<CategoriesResponse?> response = await CategoryService.GetCategories();
-        _loadedCategories = true;
-
-        if ( !response.Success )
-        {
-            _categoryMessage = response.Message!;
-            return;
-        }
-
-        _categories = response.Data;
-    }
+    
     void ToggleNavMenu()
     {
         _collapseNavMenu = !_collapseNavMenu;

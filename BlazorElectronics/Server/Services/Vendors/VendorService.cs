@@ -44,7 +44,7 @@ public sealed class VendorService : ApiService, IVendorService
         _cachedVendors = new CachedObject<VendorsResponse>( response );
         return new ServiceReply<VendorsResponse?>( response );
     }
-    public async Task<ServiceReply<VendorsViewDto?>> GetView()
+    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetView()
     {
         VendorsModel? model;
 
@@ -55,14 +55,14 @@ public sealed class VendorService : ApiService, IVendorService
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<VendorsViewDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
         }
 
-        VendorsViewDto? view = MapView( model );
+        List<AdminItemViewDto>? view = MapView( model );
 
         return view is not null
-            ? new ServiceReply<VendorsViewDto?>( view )
-            : new ServiceReply<VendorsViewDto?>( ServiceErrorType.NotFound );
+            ? new ServiceReply<List<AdminItemViewDto>?>( view )
+            : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
     }
     public async Task<ServiceReply<VendorEditDto?>> GetEdit( int vendorId )
     {
@@ -165,34 +165,11 @@ public sealed class VendorService : ApiService, IVendorService
 
         return response;
     }
-    static VendorsViewDto? MapView( VendorsModel? model )
+    static List<AdminItemViewDto>? MapView( VendorsModel? model )
     {
-        if ( model?.Vendors is null || model.Categories is null )
-            return null;
-        
-        List<VendorCategoryModel> categories = model.Categories.ToList();
-        var vendorsEdit = new List<VendorEditDto>();
-
-        foreach ( VendorModel vendor in model.Vendors )
-        {
-            List<int> categoryIds = categories
-                .Where( c => c.VendorId == vendor.VendorId )
-                .Select( c => c.PrimaryCategoryId )
-                .ToList();
-
-            vendorsEdit.Add( new VendorEditDto
-            {
-                VendorId = vendor.VendorId,
-                VendorName = vendor.VendorName,
-                VendorUrl = vendor.VendorUrl,
-                PrimaryCategories = ConvertPrimaryCategoriesToString( categoryIds )
-            } );
-        }
-
-        return new VendorsViewDto
-        {
-            Vendors = vendorsEdit
-        };
+        return model?.Vendors?
+            .Select( vendor => new AdminItemViewDto { Id = vendor.VendorId, Name = vendor.VendorName } )
+            .ToList();
     }
     static VendorEditDto? MapEdit( VendorEditModel? model )
     {

@@ -6,7 +6,7 @@ namespace BlazorElectronics.Client.Services.Categories;
 
 public class CategoryServiceClient : ClientService, ICategoryServiceClient
 {
-    const string API_PATH = "api/categories/get";
+    const string API_PATH = "api/category/get";
     CategoriesResponse? _categories;
 
     public CategoryServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )

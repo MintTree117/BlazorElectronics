@@ -15,10 +15,10 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     
     public AdminSpecsServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
-    
-    public async Task<ServiceReply<List<SpecLookupViewDto>?>> GetView()
+
+    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetView()
     {
-        return await TryUserRequest<List<SpecLookupViewDto>?>( API_ROUTE_GET_VIEW );
+        return await TryUserRequest<List<AdminItemViewDto>?>( API_ROUTE_GET_VIEW );
     }
     public async Task<ServiceReply<SpecLookupEditDto?>> GetEdit( IntDto data )
     {
@@ -32,7 +32,7 @@ public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsSer
     {
         return await TryUserRequest<SpecLookupEditDto,bool>( API_ROUTE_UPDATE, data );
     }
-    public async Task<ServiceReply<bool>> Remove( IntDto data )
+    public async Task<ServiceReply<bool>> RemoveItem( IntDto data )
     {
         return await TryUserRequest<IntDto,bool>( API_ROUTE_REMOVE, data );
     }

@@ -1,0 +1,18 @@
+@page "/admin/specs/view"
+@using BlazorElectronics.Shared
+@inherits AdminView<AdminItemViewDto>
+
+<AdminViewTable TItem="AdminItemViewDto"
+                Items="@Items"
+                THeadMeta="@THeadMeta"
+                TPropertyNames="@TPropertyNames"
+                EditItem="@EditItem"
+                RemoveItem="@RemoveItem"
+                RenderPropertyColumn="@RenderPropertyColumn"
+                PageIsReady="@PageIsReady"
+                PageIsRedirecting="@PageIsRedirecting"
+                PageRedirectCountdown="@PageRedirectCountdown"
+                ViewMessage="@ViewMessage"
+                ViewMessageClass="@ViewMessageClass"
+                ActionMessage="@ActionMessage"
+                ActionMessageClass="@ActionMessageClass" />
