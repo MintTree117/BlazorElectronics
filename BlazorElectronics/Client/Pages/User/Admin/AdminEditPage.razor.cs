@@ -1,19 +1,18 @@
 using System.Collections.Specialized;
 using System.Web;
 using BlazorElectronics.Client.Services.Users.Admin;
-using BlazorElectronics.Client.Services.Users.Admin.SpecLookups;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.SpecLookups;
-using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.User.Admin.SpecLookups;
+namespace BlazorElectronics.Client.Pages.User.Admin;
 
-public sealed partial class AdminSpecsEdit : AdminPage
+public class AdminEditPage<T> : AdminPage
 {
-    [Inject] IAdminSpecsServiceClient AdminSpecService { get; set; } = default!;
+    const string ERROR_GET = "Failed to get item for edit!";
     
-    SpecLookupEditDto _dto = new();
-    bool _newSpec;
+    IAdminEditService<T> EditService;
+
+    T _dto;
+    bool _newItem;
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,18 +34,18 @@ public sealed partial class AdminSpecsEdit : AdminPage
             return;
         }
 
-        if ( _newSpec )
+        if ( _newItem )
         {
             PageIsLoaded = true;
             return;
         }
-        
-        ServiceReply<SpecLookupEditDto?> reply = await AdminSpecService.GetEdit( new IntDto( specId ) );
+
+        ServiceReply<T?> reply = await EditService.GetEdit( new IntDto( specId ) );
 
         if ( !reply.Success || reply.Data is null )
         {
-            Logger.LogError( reply.Message ?? "Failed to get spec lookup!" );
-            SetViewMessage( false, reply.Message ?? "Failed to get spec lookup!" );
+            Logger.LogError( reply.Message ?? ERROR_GET );
+            SetViewMessage( false, reply.Message ?? ERROR_GET );
             StartPageRedirection();
             return;
         }
@@ -55,58 +54,59 @@ public sealed partial class AdminSpecsEdit : AdminPage
         _dto = reply.Data;
         StateHasChanged();
     }
-    bool TryParseUrlParameters( out int specId )
+
+    bool TryParseUrlParameters( out int itemId )
     {
-        specId = -1;
+        itemId = -1;
 
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
 
-        string? newSpecString = queryString.Get( "newSpec" );
-        string? specIdString = queryString.Get( "specId" );
+        string? newSpecString = queryString.Get( "newItem" );
+        string? specIdString = queryString.Get( "itemId" );
 
         bool parsed = !string.IsNullOrWhiteSpace( newSpecString ) &&
-                      bool.TryParse( newSpecString, out _newSpec );
+                      bool.TryParse( newSpecString, out _newItem );
 
-        if ( _newSpec )
+        if ( _newItem )
             return parsed;
-        
-        return !string.IsNullOrWhiteSpace( specIdString ) && int.TryParse( specIdString, out specId );
+
+        return !string.IsNullOrWhiteSpace( specIdString ) && int.TryParse( specIdString, out itemId );
     }
 
     async Task Submit()
     {
-        if ( _newSpec )
+        if ( _newItem )
             await SubmitNew();
         else
             await SubmitUpdate();
     }
     async Task SubmitNew()
     {
-        ServiceReply<int> reply = await AdminSpecService.Add( _dto );
+        ServiceReply<T?> reply = await EditService.Add( _dto );
 
-        if ( !reply.Success )
+        if ( !reply.Success || reply.Data is null )
         {
             SetActionMessage( false, reply.Message ?? "Failed to insert spec, no response message!" );
             return;
         }
 
-        _dto.SpecId = reply.Data;
-        _newSpec = false;
-        
+        _dto = reply.Data;
+        _newItem = false;
+
         SetActionMessage( true, "Successfully added spec." );
         StateHasChanged();
     }
     async Task SubmitUpdate()
     {
-        ServiceReply<bool> reply = await AdminSpecService.Update( _dto );
+        ServiceReply<bool> reply = await EditService.Update( _dto );
 
         if ( !reply.Success )
         {
             SetActionMessage( false, reply.Message ?? "Failed to update spec, no response message!" );
             return;
         }
-        
+
         SetActionMessage( true, "Successfully updated spec." );
         StateHasChanged();
     }

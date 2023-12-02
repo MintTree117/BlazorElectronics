@@ -1,7 +1,7 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Vendors;
 
-namespace BlazorElectronics.Client.Services.Users.Admin;
+namespace BlazorElectronics.Client.Services.Users.Admin.Vendors;
 
 public interface IAdminVendorServiceClient : IAdminViewService<AdminItemViewDto>
 {

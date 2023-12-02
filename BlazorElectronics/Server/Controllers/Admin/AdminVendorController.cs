@@ -42,14 +42,14 @@ public sealed class AdminVendorController : _AdminController
         return GetReturnFromApi( reply );
     }
     [HttpPost( "add-vendor" )]
-    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<VendorEditDto> request )
+    public async Task<ActionResult<VendorEditDto?>> Add( [FromBody] UserDataRequest<VendorEditDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<int> reply = await _vendorService.Add( request.Payload );
+        ServiceReply<VendorEditDto?> reply = await _vendorService.Add( request.Payload );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "update-vendor" )]

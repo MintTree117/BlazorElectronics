@@ -81,21 +81,25 @@ public sealed class VendorService : ApiService, IVendorService
             ? new ServiceReply<VendorEditDto?>( dto )
             : new ServiceReply<VendorEditDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ServiceReply<int>> Add( VendorEditDto dto )
+    public async Task<ServiceReply<VendorEditDto?>> Add( VendorEditDto dto )
     {
+        VendorEditModel? model;
+
         try
         {
-            int result = await _repository.Insert( dto );
-
-            return result > 0
-                ? new ServiceReply<int>( result )
-                : new ServiceReply<int>( ServiceErrorType.NotFound );
+            model = await _repository.Insert( dto );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<VendorEditDto?>( ServiceErrorType.ServerError );
         }
+
+        VendorEditDto? edit = MapEdit( model );
+
+        return edit is not null
+            ? new ServiceReply<VendorEditDto?>( edit )
+            : new ServiceReply<VendorEditDto?>( ServiceErrorType.NotFound );
     }
     public async Task<ServiceReply<bool>> Update( VendorEditDto dto )
     {

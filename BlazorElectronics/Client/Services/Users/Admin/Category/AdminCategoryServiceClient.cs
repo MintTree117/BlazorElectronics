@@ -2,7 +2,7 @@ using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Categories;
 
-namespace BlazorElectronics.Client.Services.Users.Admin;
+namespace BlazorElectronics.Client.Services.Users.Admin.Category;
 
 public sealed class AdminCategoryServiceClient : AdminServiceClient, IAdminCategoryServiceClient
 {

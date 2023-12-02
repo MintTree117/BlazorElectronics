@@ -2,7 +2,7 @@ using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.SpecLookups;
 
-namespace BlazorElectronics.Client.Services.Users.Admin;
+namespace BlazorElectronics.Client.Services.Users.Admin.SpecLookups;
 
 public sealed class AdminSpecsServiceClient : AdminServiceClient, IAdminSpecsServiceClient
 {

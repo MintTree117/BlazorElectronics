@@ -1,5 +1,6 @@
-@page "/admin/features/view"
+@page "/admin/featured-deals/view"
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Client.Pages.User.Admin
 @inherits AdminViewPage<AdminItemViewDto>
 
 <AdminViewTable TItem="AdminItemViewDto"
@@ -15,4 +16,4 @@
                 ViewMessage="@ViewMessage"
                 ViewMessageClass="@ViewMessageClass"
                 ActionMessage="@ActionMessage"
-                ActionMessageClass="@ActionMessageClass" />
+                ActionMessageClass="@ActionMessageClass"/>

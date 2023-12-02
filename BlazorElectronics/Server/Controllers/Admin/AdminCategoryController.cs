@@ -42,14 +42,14 @@ public sealed class AdminCategoryController : _AdminController
         return GetReturnFromApi( reply );
     }
     [HttpPost( "add-category" )]
-    public async Task<ActionResult<int>> AddCategory( [FromBody] UserDataRequest<CategoryEditDto> request )
+    public async Task<ActionResult<CategoryEditDto?>> AddCategory( [FromBody] UserDataRequest<CategoryEditDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<int> reply = await _service.AddCategory( request.Payload );
+        ServiceReply<CategoryEditDto?> reply = await _service.AddCategory( request.Payload );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "update-category" )]

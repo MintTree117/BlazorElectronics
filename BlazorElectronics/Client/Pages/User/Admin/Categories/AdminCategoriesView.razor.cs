@@ -1,10 +1,11 @@
 using BlazorElectronics.Client.Services.Users.Admin;
+using BlazorElectronics.Client.Services.Users.Admin.Category;
 using BlazorElectronics.Shared.Categories;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin.Categories;
 
-public sealed partial class AdminCategoriesView : AdminView<CategoryViewDto>
+public sealed partial class AdminCategoriesViewPage : AdminViewPage<CategoryViewDto>
 {
     [Inject] IAdminCategoryServiceClient AdminCategoryService { get; init; } = default!;
 

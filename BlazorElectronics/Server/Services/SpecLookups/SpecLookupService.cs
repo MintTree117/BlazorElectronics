@@ -88,21 +88,25 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
             ? new ServiceReply<SpecLookupEditDto?>( dto )
             : new ServiceReply<SpecLookupEditDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ServiceReply<int>> Add( SpecLookupEditDto dto )
+    public async Task<ServiceReply<SpecLookupEditDto?>> Add( SpecLookupEditDto dto )
     {
+        SpecLookupEditModel? model;
+
         try
         {
-            int result = await _repository.Insert( dto );
-
-            return result > 0
-                ? new ServiceReply<int>( result )
-                : new ServiceReply<int>( ServiceErrorType.NotFound );
+            model = await _repository.Insert( dto );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<int>( ServiceErrorType.ServerError );
+            return new ServiceReply<SpecLookupEditDto?>( ServiceErrorType.ServerError );
         }
+
+        SpecLookupEditDto? edit = MapEdit( model );
+
+        return edit is not null
+            ? new ServiceReply<SpecLookupEditDto?>( edit )
+            : new ServiceReply<SpecLookupEditDto?>( ServiceErrorType.NotFound );
     }
     public async Task<ServiceReply<bool>> Update( SpecLookupEditDto dto )
     {

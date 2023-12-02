@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using System.Web;
 using BlazorElectronics.Client.Services.Users.Admin;
+using BlazorElectronics.Client.Services.Users.Admin.Vendors;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;

@@ -32,10 +32,10 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         p.Add( PARAM_SPEC_ID, specId );
         return await TryQueryAsync( GetEditQuery, p );
     }
-    public async Task<int> Insert( SpecLookupEditDto dto )
+    public async Task<SpecLookupEditModel?> Insert( SpecLookupEditDto dto )
     {
         DynamicParameters p = GetInsertParams( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<SpecLookupEditModel?>, p, PROCEDURE_INSERT );
     }
     public async Task<bool> Update( SpecLookupEditDto dto )
     {

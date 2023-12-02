@@ -6,6 +6,10 @@ using Blazored.LocalStorage;
 using BlazorElectronics.Client.Services.Features;
 using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Client.Services.Users.Admin;
+using BlazorElectronics.Client.Services.Users.Admin.Category;
+using BlazorElectronics.Client.Services.Users.Admin.Features;
+using BlazorElectronics.Client.Services.Users.Admin.SpecLookups;
+using BlazorElectronics.Client.Services.Users.Admin.Vendors;
 using BlazorElectronics.Client.Services.Users.Cart;
 
 var builder = WebAssemblyHostBuilder.CreateDefault( args );
@@ -21,7 +25,7 @@ builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
 builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCategoryServiceClient, AdminCategoryServiceClient>();
-builder.Services.AddScoped<IAdminFeaturedProductsServiceClient, AdminFeaturedProductsServiceClient>();
+builder.Services.AddScoped<IAdminFeaturesServiceClient, AdminFeaturesServiceClient>();
 builder.Services.AddScoped<IAdminSpecsServiceClient, AdminSpecsServiceClient>();
 builder.Services.AddScoped<IAdminVendorServiceClient, AdminVendorServiceClient>();
 

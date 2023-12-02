@@ -1,12 +1,13 @@
 using BlazorElectronics.Client.Services.Users.Admin;
+using BlazorElectronics.Client.Services.Users.Admin.Features;
 using BlazorElectronics.Shared;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.User.Admin.Features;
 
-public partial class AdminFeaturesView : AdminView<AdminItemViewDto>
+public partial class AdminFeaturesViewPage : AdminViewPage<AdminItemViewDto>
 {
-    [Inject] IAdminFeaturedProductsServiceClient FeaturesService { get; init; } = default!;
+    [Inject] IAdminFeaturesServiceClient FeaturesService { get; init; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

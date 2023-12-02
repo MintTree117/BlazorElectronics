@@ -4,9 +4,9 @@ using BlazorElectronics.Shared;
 
 namespace BlazorElectronics.Client.Pages.User.Admin;
 
-public class AdminView<T> : AdminPage where T : AdminItemViewDto
+public class AdminViewPage<T> : AdminPage where T : AdminItemViewDto
 {
-    protected IAdminViewService<T> ViewService;
+    protected IAdminViewService<T> ViewService = null!;
 
     const string ERROR_GET_VIEW = "Failed to load item view!";
     const string UrlNew = "newItem";

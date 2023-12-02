@@ -27,10 +27,10 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         p.Add( PARAM_CATEGORY_ID, categoryId );
         return await TryQueryAsync( QuerySingleOrDefault<CategoryModel?>, p, PROCEDURE_GET_EDIT );
     }
-    public async Task<int> Insert( CategoryEditDto dto )
+    public async Task<CategoryModel?> Insert( CategoryEditDto dto )
     {
         DynamicParameters p = GetAddParameters( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<CategoryModel?>, p, PROCEDURE_INSERT );
     }
     public async Task<bool> Update( CategoryEditDto dto )
     {
