@@ -7,37 +7,37 @@ namespace BlazorElectronics.Client.Services.Features;
 public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
 {
     const string API_PATH = "api/features/get";
-    FeaturesResponse? _features;
+    FeaturesResponse? _response;
     
     public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<List<FeaturedProductDto>?>> GetFeaturedProducts()
+    public async Task<ServiceReply<List<Feature>?>> GetFeatures()
     {
-        ServiceReply<bool> reply = await GetFeatures();
+        ServiceReply<bool> reply = await GetResponse();
 
-        return reply.Success && _features is not null
-            ? new ServiceReply<List<FeaturedProductDto>?>( _features.FeaturedProducts )
-            : new ServiceReply<List<FeaturedProductDto>?>( reply.ErrorType, reply.Message );
+        return reply.Success && _response is not null
+            ? new ServiceReply<List<Feature>?>( _response.Features )
+            : new ServiceReply<List<Feature>?>( reply.ErrorType, reply.Message );
     }
-    public async Task<ServiceReply<List<FeaturedDealDto>?>> GetFeaturedDeals()
+    public async Task<ServiceReply<List<FeaturedDeal>?>> GetFeaturedDeals()
     {
-        ServiceReply<bool> reply = await GetFeatures();
+        ServiceReply<bool> reply = await GetResponse();
 
-        return reply.Success && _features is not null
-            ? new ServiceReply<List<FeaturedDealDto>?>( _features.FeaturedDeals )
-            : new ServiceReply<List<FeaturedDealDto>?>( reply.ErrorType, reply.Message );
+        return reply.Success && _response is not null
+            ? new ServiceReply<List<FeaturedDeal>?>( _response.Deals )
+            : new ServiceReply<List<FeaturedDeal>?>( reply.ErrorType, reply.Message );
     }
 
-    async Task<ServiceReply<bool>> GetFeatures()
+    async Task<ServiceReply<bool>> GetResponse()
     {
-        if ( _features is not null )
+        if ( _response is not null )
             return new ServiceReply<bool>( true );
 
         ServiceReply<FeaturesResponse?> reply = await TryGetRequest<FeaturesResponse?>( API_PATH );
-        _features = reply.Data;
+        _response = reply.Data;
 
-        return _features is not null
+        return _response is not null
             ? new ServiceReply<bool>( true )
             : new ServiceReply<bool>( reply.ErrorType, reply.Message );
     }

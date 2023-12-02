@@ -22,10 +22,10 @@ public class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            List<int>? reply = await _userRepository.GetAllIds();
+            IEnumerable<int>? reply = await _userRepository.GetAllIds();
 
             return reply is not null
-                ? new ServiceReply<List<int>?>( reply )
+                ? new ServiceReply<List<int>?>( reply.ToList() )
                 : new ServiceReply<List<int>?>( ServiceErrorType.NotFound );
         }
         catch ( Exception e )

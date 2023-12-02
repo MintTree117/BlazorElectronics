@@ -117,6 +117,12 @@ public abstract class DapperRepository
     protected const string TVP_COL_SPEC_VALUE = "SpecValue";
     protected const string TVP_COL_FILTER_VALUE = "FilterValue";
     
+    // PARAM FEATURES
+    protected const string PARAM_FEATURE_ID = "@FeatureId";
+    protected const string PARAM_FEATURE_NAME = "@FeatureName";
+    protected const string PARAM_FEATURE_URL = "@FeatureUrl";
+    protected const string PARAM_FEATURE_IMAGE = "@FeatureImage";
+    
     // PARAM USER
     protected const string PARAM_USER_ID = "@UserId";
     protected const string PARAM_USER_NAME = "@Username";
@@ -255,6 +261,28 @@ public abstract class DapperRepository
         }
     }
 
+    protected static async Task<IEnumerable<T>?> Query<T>( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
+    {
+        return await connection.QueryAsync<T>( sql, dynamicParams, commandType: CommandType.StoredProcedure );
+    }
+    protected static async Task<IEnumerable<T>?> QueryTransaction<T>( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
+    {
+        return await connection.QueryAsync<T>( sql, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+    }
+    protected static async Task<T> QuerySingleOrDefault<T>( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
+    {
+        return await connection.QuerySingleOrDefaultAsync<T>( sql, dynamicParams, commandType: CommandType.StoredProcedure );
+    }
+    protected static async Task<T> QuerySingleOrDefaultTransaction<T>( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
+    {
+        return await connection.QuerySingleOrDefaultAsync<T>( sql, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+    }
+    protected static async Task<bool> Execute( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
+    {
+        int rows = await connection.ExecuteAsync( sql, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
+        return rows > 0;
+    }
+    
     protected static DataTable GetPrimaryCategoriesTable( string categoriesString )
     {
         List<string> categoryStrings = categoriesString

@@ -4,7 +4,7 @@ namespace BlazorElectronics.Server.Repositories.Users;
 
 public interface IUserRepository
 {
-    Task<List<int>?> GetAllIds();
+    Task<IEnumerable<int>?> GetAllIds();
     Task<User?> GetById( int id );
     Task<User?> GetByUsername( string username );
     Task<User?> GetByEmail( string email );

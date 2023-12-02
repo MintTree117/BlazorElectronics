@@ -20,80 +20,91 @@ public sealed class AdminFeaturesController : _AdminController
     }
     
     [HttpPost( "get-features-view" )]
-    public async Task<ActionResult<List<AdminItemViewDto>>> GetView( [FromBody] UserRequest? request )
+    public async Task<ActionResult<List<AdminItemViewDto>>> GetFeauresView( [FromBody] UserRequest request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<FeaturesResponse?> reply = await _featuresService.GetView();
+        ServiceReply<List<AdminItemViewDto>?> reply = await _featuresService.GetFeaturesView();
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "get-featured-product-edit" )]
-    public async Task<ActionResult<FeaturedProductDto?>> GetProductEdit( [FromBody] UserDataRequest<IntDto>? request )
+    [HttpPost( "get-deals-view" )]
+    public async Task<ActionResult<List<AdminItemViewDto>>> GetDealsView( [FromBody] UserRequest request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<FeaturedProductDto?> reply = await _featuresService.GetFeaturedProductEdit( request!.Payload!.Value );
+        ServiceReply<List<AdminItemViewDto>?> reply = await _featuresService.GetDealsView();
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "add-featured-product" )]
-    public async Task<ActionResult<bool>> AddProduct( [FromBody] UserDataRequest<FeaturedProductDto>? request )
+    [HttpPost( "add-feature" )]
+    public async Task<ActionResult<Feature>> AddFeature( [FromBody] UserDataRequest<Feature> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.AddFeaturedProduct( request!.Payload! );
+        ServiceReply<Feature?> reply = await _featuresService.AddFeature( request.Payload );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "add-featured-deal" )]
-    public async Task<ActionResult<bool>> AddDeal( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<FeaturedDeal>> AddDeal( [FromBody] UserDataRequest<FeaturedDeal> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.AddFeaturedDeal( request!.Payload!.Value );
+        ServiceReply<FeaturedDeal?> reply = await _featuresService.AddDeal( request.Payload );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "update-featured-product" )]
-    public async Task<ActionResult<bool>> UpdateProduct( [FromBody] UserDataRequest<FeaturedProductDto>? request )
+    [HttpPost( "update-feature" )]
+    public async Task<ActionResult<bool>> UpdateFeature( [FromBody] UserDataRequest<Feature> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.UpdateFeaturedProduct( request!.Payload! );
+        ServiceReply<bool> reply = await _featuresService.UpdateFeature( request.Payload );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "remove-featured-product" )]
-    public async Task<ActionResult<bool>> RemoveProduct( [FromBody] UserDataRequest<IntDto>? request )
+    [HttpPost( "update-featured-deal" )]
+    public async Task<ActionResult<bool>> UpdateFeature( [FromBody] UserDataRequest<FeaturedDeal> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.RemoveFeaturedProduct( request!.Payload!.Value );
+        ServiceReply<bool> reply = await _featuresService.UpdateDeal( request.Payload );
+        return GetReturnFromApi( reply );
+    }
+    [HttpPost( "remove-feature" )]
+    public async Task<ActionResult<bool>> RemoveFeature( [FromBody] UserDataRequest<IntDto> request )
+    {
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+
+        if ( !adminReply.Success )
+            return GetReturnFromApi( adminReply );
+
+        ServiceReply<bool> reply = await _featuresService.RemoveFeature( request.Payload.Value );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "remove-featured-deal" )]
-    public async Task<ActionResult<bool>> RemoveDeal( [FromBody] UserDataRequest<IntDto>? request )
+    public async Task<ActionResult<bool>> RemoveDeal( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.RemoveFeaturedDeal( request!.Payload!.Value );
+        ServiceReply<bool> reply = await _featuresService.RemoveDeal( request.Payload.Value );
         return GetReturnFromApi( reply );
     }
 }

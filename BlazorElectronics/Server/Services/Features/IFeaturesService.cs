@@ -5,11 +5,14 @@ namespace BlazorElectronics.Server.Services.Features;
 public interface IFeaturesService
 {
     Task<ServiceReply<FeaturesResponse?>> GetFeatures();
-    Task<ServiceReply<FeaturesResponse?>> GetView();
-    Task<ServiceReply<bool>> AddFeaturedProduct( FeaturedProductDto dto );
-    Task<ServiceReply<bool>> AddFeaturedDeal( int productId );
-    Task<ServiceReply<FeaturedProductDto?>> GetFeaturedProductEdit( int productId );
-    Task<ServiceReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto );
-    Task<ServiceReply<bool>> RemoveFeaturedProduct( int productId );
-    Task<ServiceReply<bool>> RemoveFeaturedDeal( int productId );
+    Task<ServiceReply<List<AdminItemViewDto>?>> GetFeaturesView();
+    Task<ServiceReply<List<AdminItemViewDto>?>> GetDealsView();
+    Task<ServiceReply<Feature?>> GetFeature( int featureId );
+    Task<ServiceReply<FeaturedDeal?>> GetDeal( int productId );
+    Task<ServiceReply<Feature?>> AddFeature( Feature dto );
+    Task<ServiceReply<FeaturedDeal?>> AddDeal( FeaturedDeal dto );
+    Task<ServiceReply<bool>> UpdateFeature( Feature dto );
+    Task<ServiceReply<bool>> UpdateDeal( FeaturedDeal dto );
+    Task<ServiceReply<bool>> RemoveFeature( int featureId );
+    Task<ServiceReply<bool>> RemoveDeal( int productId );
 }

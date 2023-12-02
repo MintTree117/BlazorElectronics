@@ -46,23 +46,20 @@ public sealed class VendorService : ApiService, IVendorService
     }
     public async Task<ServiceReply<List<AdminItemViewDto>?>> GetView()
     {
-        VendorsModel? model;
-
         try
         {
-            model = await _repository.Get();
+            IEnumerable<VendorModel>? models = await _repository.GetView();
+            List<AdminItemViewDto>? view = MapView( models );
+
+            return view is not null
+                ? new ServiceReply<List<AdminItemViewDto>?>( view )
+                : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
         }
-
-        List<AdminItemViewDto>? view = MapView( model );
-
-        return view is not null
-            ? new ServiceReply<List<AdminItemViewDto>?>( view )
-            : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
     }
     public async Task<ServiceReply<VendorEditDto?>> GetEdit( int vendorId )
     {
@@ -165,9 +162,9 @@ public sealed class VendorService : ApiService, IVendorService
 
         return response;
     }
-    static List<AdminItemViewDto>? MapView( VendorsModel? model )
+    static List<AdminItemViewDto>? MapView( IEnumerable<VendorModel>? models )
     {
-        return model?.Vendors?
+        return models?
             .Select( vendor => new AdminItemViewDto { Id = vendor.VendorId, Name = vendor.VendorName } )
             .ToList();
     }

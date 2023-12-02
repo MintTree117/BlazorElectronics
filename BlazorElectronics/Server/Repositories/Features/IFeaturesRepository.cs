@@ -1,14 +1,19 @@
+using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Repositories.Features;
 
 public interface IFeaturesRepository
 {
-    Task<FeaturesResponse?> GetView();
-    Task<bool> InsertFeaturedProduct( FeaturedProductDto dto );
-    Task<bool> InsertFeaturedDeal( int productId );
-    Task<FeaturedProductDto?> GetFeaturedProductEdit( int productId );
-    Task<bool> UpdateFeaturedProduct( FeaturedProductDto dto );
-    Task<bool> DeleteFeaturedProduct( int productId );
-    Task<bool> DeleteFeaturedDeal( int productId );
+    Task<FeaturesModel?> Get();
+    Task<IEnumerable<Feature>?> GetFeatures();
+    Task<IEnumerable<FeaturedDeal>?> GetDeals();
+    Task<Feature?> GetFeature( int featureId );
+    Task<FeaturedDeal?> GetDeal( int productId );
+    Task<Feature?> InsertFeature( Feature dto );
+    Task<FeaturedDeal?> InsertDeal( FeaturedDeal dto );
+    Task<bool> UpdateFeature( Feature dto );
+    Task<bool> UpdateDeal( FeaturedDeal dto );
+    Task<bool> DeleteFeature( int featureId );
+    Task<bool> DeleteDeal( int productId );
 }

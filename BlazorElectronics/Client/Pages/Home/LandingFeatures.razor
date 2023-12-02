@@ -18,10 +18,10 @@
                 }
             </div>
             <div class="carousel-inner">
-                @foreach ( FeaturedProductDto p in _featuredProducts )
+                @foreach ( Feature p in _featuredProducts )
                 {
                     <div class="carousel-item fp-carousel-item @(p == _featuredProducts.First() ? "active" : "")">
-                        <img class="d-block w-100 fp-carousel-item-img" src="@p.ImageUrl" alt="@p.ProductId"/>
+                        <img class="d-block w-100 fp-carousel-item-img" src="@p.FeatureImage" alt="@p.FeatureName"/>
                     </div>
                 }
             </div>

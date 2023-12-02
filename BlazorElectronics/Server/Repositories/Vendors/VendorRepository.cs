@@ -25,31 +25,31 @@ public class VendorRepository : DapperRepository, IVendorRepository
     { 
         return await TryQueryAsync( GetQuery );
     }
-    public Task<VendorEditModel?> GetEdit( int vendorId )
+    public async Task<IEnumerable<VendorModel>?> GetView()
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_VENDOR_ID, vendorId );
-
-        return TryQueryAsync( GetEditQuery, parameters );
+        return await TryQueryAsync( Query<VendorModel>, null, PROCEDURE_GET_VIEW );
     }
-    public Task<int> Insert( VendorEditDto dto )
+    public async Task<VendorEditModel?> GetEdit( int vendorId )
     {
-        DynamicParameters parameters = GetInsertParameters( dto );
-
-        return TryQueryTransactionAsync( InsertQuery, parameters );
+        DynamicParameters p = new();
+        p.Add( PARAM_VENDOR_ID, vendorId );
+        return await TryQueryAsync( GetEditQuery, p );
     }
-    public Task<bool> Update( VendorEditDto dto )
+    public async Task<int> Insert( VendorEditDto dto )
     {
-        DynamicParameters parameters = GetUpdateParameters( dto );
-
-        return TryQueryTransactionAsync( UpdateQuery, parameters );
+        DynamicParameters p = GetInsertParameters( dto );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public Task<bool> Delete( int vendorId )
+    public async Task<bool> Update( VendorEditDto dto )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_VENDOR_ID, vendorId );
-
-        return TryQueryTransactionAsync( RemoveQuery, parameters );
+        DynamicParameters p = GetUpdateParameters( dto );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
+    }
+    public async Task<bool> Delete( int vendorId )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_VENDOR_ID, vendorId );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
 
     static async Task<VendorsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
@@ -59,13 +59,10 @@ public class VendorRepository : DapperRepository, IVendorRepository
         if ( multi is null )
             return null;
 
-        IEnumerable<VendorModel>? vendors = await multi.ReadAsync<VendorModel>();
-        IEnumerable<VendorCategoryModel>? categories = await multi.ReadAsync<VendorCategoryModel>();
-
         return new VendorsModel
         {
-            Vendors = vendors,
-            Categories = categories
+            Vendors = await multi.ReadAsync<VendorModel>(),
+            Categories = await multi.ReadAsync<VendorCategoryModel>()
         };
     }
     static async Task<VendorEditModel?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
@@ -80,20 +77,6 @@ public class VendorRepository : DapperRepository, IVendorRepository
             Vendor = await multi.ReadSingleOrDefaultAsync<VendorModel>(),
             Categories = await multi.ReadAsync<VendorCategoryModel>()
         };
-    }
-    static async Task<int> InsertQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        return await connection.ExecuteScalarAsync<int>( PROCEDURE_INSERT, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-    }
-    static async Task<bool> UpdateQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_UPDATE, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
-    }
-    static async Task<bool> RemoveQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_DELETE, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
     }
     
     static DynamicParameters GetInsertParameters( VendorEditDto dto )

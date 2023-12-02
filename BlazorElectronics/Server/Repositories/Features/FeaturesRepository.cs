@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
+using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Shared.Features;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -9,109 +10,115 @@ namespace BlazorElectronics.Server.Repositories.Features;
 
 public class FeaturesRepository : DapperRepository, IFeaturesRepository
 {
-    const string PROCEDURE_GET_VIEW = "Get_FeaturesView";
-    const string PROCEDURE_GET_PRODUCT_EDIT = "Get_FeaturedProductEdit";
-    const string PROCEDURE_INSERT_PRODUCT = "Insert_FeaturedProduct";
+    const string PROCEDURE_GET = "Get_Features";
+    const string PROCEDURE_GET_FEATURES = "Get_FeaturesView";
+    const string PROCEDURE_GET_DEALS = "Get_FeaturedDealsView";
+    const string PROCEDURE_GET_FEATURE = "Get_Feature";
+    const string PROCEDURE_GET_DEAL = "Get_FeaturedDeal";
+    const string PROCEDURE_INSERT_FEATURE = "Insert_Feature";
     const string PROCEDURE_INSERT_DEAL = "Insert_FeaturedDeal";
-    const string PROCEDURE_UPDATE_PRODUCT = "Update_FeaturedProduct";
-    const string PROCEDURE_DELETE_PRODUCT = "Delete_FeaturedProduct";
+    const string PROCEDURE_UPDATE_FEATURE = "Update_Feature";
+    const string PROCEDURE_UPDATE_DEAL = "Update_FeaturedDeal";
+    const string PROCEDURE_DELETE_FEATURE = "Delete_Feature";
     const string PROCEDURE_DELETE_DEAL = "Delete_FeaturedDeal";
-    
+
     public FeaturesRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
-    
-    public async Task<FeaturesResponse?> GetView()
-    {
-        return await TryQueryAsync( GetViewQuery );
-    }
-    public async Task<bool> InsertFeaturedProduct( FeaturedProductDto dto )
-    {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, dto.ProductId );
-        parameters.Add( PARAM_FEATURE_IMAGE_URL, dto.ImageUrl );
 
-        return await TryQueryTransactionAsync( InsertProductQuery, parameters );
-    }
-    public async Task<bool> InsertFeaturedDeal( int productId )
+    public async Task<FeaturesModel?> Get()
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, productId );
-        
-        return await TryQueryTransactionAsync( InsertDealQuery, parameters );
+        return await TryQueryAsync( GetQuery );
     }
-    public async Task<FeaturedProductDto?> GetFeaturedProductEdit( int productId )
+    public async Task<IEnumerable<Feature>?> GetFeatures()
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, productId );
+        return await TryQueryAsync( Query<Feature>, null, PROCEDURE_GET_FEATURES );
+    }
+    public async Task<IEnumerable<FeaturedDeal>?> GetDeals()
+    {
+        return await TryQueryAsync( Query<FeaturedDeal>, null, PROCEDURE_GET_DEALS );
+    }
+    public async Task<Feature?> GetFeature( int featureId )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_FEATURE_ID, featureId );
 
-        return await TryQueryAsync( GetProductEditQuery );
+        return await TryQueryAsync( QuerySingleOrDefault<Feature?>, p, PROCEDURE_GET_FEATURE );
     }
-    public async Task<bool> UpdateFeaturedProduct( FeaturedProductDto dto )
+    public async Task<FeaturedDeal?> GetDeal( int productId )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, dto.ProductId );
-        parameters.Add( PARAM_FEATURE_IMAGE_URL, dto.ImageUrl );
+        DynamicParameters p = new();
+        p.Add( PARAM_PRODUCT_ID, productId );
 
-        return await TryQueryTransactionAsync( UpdateProductQuery, parameters );
+        return await TryQueryAsync( QuerySingleOrDefault<FeaturedDeal?>, p, PROCEDURE_GET_DEAL );
     }
-    public async Task<bool> DeleteFeaturedProduct( int productId )
+    public async Task<Feature?> InsertFeature( Feature dto )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, productId );
+        DynamicParameters p = GetFeatureInsertParams( dto );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<Feature?>, p, PROCEDURE_INSERT_FEATURE );
+    }
+    public async Task<FeaturedDeal?> InsertDeal( FeaturedDeal dto )
+    {
+        DynamicParameters p = GetDealParams( dto );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<FeaturedDeal?>, p, PROCEDURE_INSERT_DEAL );
+    }
+    public async Task<bool> UpdateFeature( Feature dto )
+    {
+        DynamicParameters p = GetFeatureUpdateParams( dto );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_FEATURE );
+    }
+    public async Task<bool> UpdateDeal( FeaturedDeal dto )
+    {
+        DynamicParameters p = GetDealParams( dto );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_DEAL );
+    }
+    public async Task<bool> DeleteFeature( int featureId )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_FEATURE_ID, featureId );
 
-        return await TryQueryTransactionAsync( DeleteProductQuery, parameters );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_FEATURE );
     }
-    public async Task<bool> DeleteFeaturedDeal( int productId )
+    public async Task<bool> DeleteDeal( int productId )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add( PARAM_PRODUCT_ID, productId );
+        DynamicParameters p = new();
+        p.Add( PARAM_PRODUCT_ID, productId );
 
-        return await TryQueryTransactionAsync( DeleteDealQuery, parameters );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_DEAL );
     }
-    
-    static async Task<FeaturesResponse?> GetViewQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+
+    static async Task<FeaturesModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
-        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_VIEW, dynamicParams, commandType: CommandType.StoredProcedure );
+        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, dynamicParams, commandType: CommandType.StoredProcedure );
 
         if ( multi is null )
             return null;
-        
-        IEnumerable<FeaturedProductDto>? products = await multi.ReadAsync<FeaturedProductDto>();
-        IEnumerable<FeaturedDealDto>? deals = await multi.ReadAsync<FeaturedDealDto>();
 
-        return new FeaturesResponse
+        return new FeaturesModel
         {
-            FeaturedProducts = products is not null ? products.ToList() : new List<FeaturedProductDto>(),
-            FeaturedDeals = deals is not null ? deals.ToList() : new List<FeaturedDealDto>()
+            Features = await multi.ReadAsync<Feature>(),
+            Deals = await multi.ReadAsync<FeaturedDeal>()
         };
     }
-    static async Task<FeaturedProductDto?> GetProductEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+
+    static DynamicParameters GetFeatureInsertParams( Feature dto )
     {
-        return await connection.QuerySingleOrDefaultAsync<FeaturedProductDto>( PROCEDURE_GET_PRODUCT_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
+        DynamicParameters p = new();
+        p.Add( PARAM_FEATURE_NAME, dto.FeatureName );
+        p.Add( PARAM_FEATURE_URL, dto.FeatureUrl );
+        p.Add( PARAM_FEATURE_IMAGE, dto.FeatureImage );
+        return p;
     }
-    static async Task<bool> InsertProductQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
+    static DynamicParameters GetFeatureUpdateParams( Feature dto )
     {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_INSERT_PRODUCT, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
+        DynamicParameters p = GetFeatureInsertParams( dto );
+        p.Add( PARAM_FEATURE_ID, dto.FeatureId );
+        return p;
     }
-    static async Task<bool> InsertDealQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
+    static DynamicParameters GetDealParams( FeaturedDeal dto )
     {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_INSERT_DEAL, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
-    }
-    static async Task<bool> UpdateProductQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_UPDATE_PRODUCT, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
-    }
-    static async Task<bool> DeleteProductQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_DELETE_PRODUCT, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
-    }
-    static async Task<bool> DeleteDealQuery( SqlConnection connection, DbTransaction transaction, string? dynamicSql, DynamicParameters? dynamicParams )
-    {
-        int rowsAffected = await connection.ExecuteAsync( PROCEDURE_DELETE_DEAL, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
-        return rowsAffected > 0;
+        DynamicParameters p = new();
+        p.Add( PARAM_PRODUCT_ID, dto.ProductId );
+        p.Add( PARAM_FEATURE_IMAGE, dto.ThumbnailUrl );
+        return p;
     }
 }

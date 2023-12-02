@@ -1,7 +1,17 @@
 namespace BlazorElectronics.Shared.Features;
 
-public class FeaturesResponse
+public sealed class FeaturesResponse
 {
-    public List<FeaturedProductDto> FeaturedProducts { get; set; } = new();
-    public List<FeaturedDealDto> FeaturedDeals { get; set; } = new();
+    public FeaturesResponse()
+    {
+        
+    }
+    public FeaturesResponse( List<Feature> features, List<FeaturedDeal> deals )
+    {
+        Features = features;
+        Deals = deals;
+    }
+    
+    public List<Feature> Features { get; set; } = new();
+    public List<FeaturedDeal> Deals { get; set; } = new();
 }

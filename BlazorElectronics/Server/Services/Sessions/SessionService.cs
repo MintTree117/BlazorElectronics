@@ -28,7 +28,7 @@ public class SessionService : ApiService, ISessionService
         
         try
         {
-            insertedSession = await _sessionRepository.AddSession( userId, hash, salt, deviceInfo );
+            insertedSession = await _sessionRepository.InsertSession( userId, hash, salt, deviceInfo );
         }
         catch ( ServiceException e )
         {
@@ -46,7 +46,7 @@ public class SessionService : ApiService, ISessionService
 
         try
         {
-            success = await _sessionRepository.RemoveSession( sessionId );
+            success = await _sessionRepository.DeleteSession( sessionId );
         }
         catch ( ServiceException e )
         {

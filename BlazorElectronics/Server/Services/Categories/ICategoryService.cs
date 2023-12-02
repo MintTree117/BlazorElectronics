@@ -11,7 +11,7 @@ public interface ICategoryService
     // ADMIN
     Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView();
     Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId );
-    Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto dto );
+    Task<ServiceReply<int>> AddCategory( CategoryEditDto dto );
     Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto );
     Task<ServiceReply<bool>> RemoveCategory( int categoryId );
 }

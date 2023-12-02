@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Dtos;
+using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Shared.Features;
 
@@ -23,14 +24,20 @@ public class FeaturesService : ApiService, IFeaturesService
         
         try
         {
-            FeaturesResponse? result = await _repository.GetView();
+            FeaturesModel? model = await _repository.Get();
 
-            if ( result is null )
+            if ( model is null )
                 return new ServiceReply<FeaturesResponse?>( ServiceErrorType.NotFound );
 
-            _cachedFeatures = new CachedObject<FeaturesResponse>( result );
+            FeaturesResponse r = new()
+            {
+                Features = model.Features is not null ? model.Features.ToList() : new List<Feature>(),
+                Deals = model.Deals is not null ? model.Deals.ToList() : new List<FeaturedDeal>()
+            };
 
-            return new ServiceReply<FeaturesResponse?>( result );
+            _cachedFeatures = new CachedObject<FeaturesResponse>( r );
+
+            return new ServiceReply<FeaturesResponse?>( r );
         }
         catch ( ServiceException e )
         {
@@ -38,79 +45,113 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ServiceReply<FeaturesResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<FeaturesResponse?>> GetView()
+    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetFeaturesView()
     {
         try
         {
-            FeaturesResponse? result = await _repository.GetView();
+            IEnumerable<Feature>? models = await _repository.GetFeatures();
+            List<AdminItemViewDto>? dto = MapFeaturesView( models );
+
+            return dto is not null
+                ? new ServiceReply<List<AdminItemViewDto>?>( dto )
+                : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetDealsView()
+    {
+        try
+        {
+            IEnumerable<FeaturedDeal>? models = await _repository.GetDeals();
+            List<AdminItemViewDto>? dto = MapDealsView( models );
+
+            return dto is not null
+                ? new ServiceReply<List<AdminItemViewDto>?>( dto )
+                : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<Feature?>> GetFeature( int featureId )
+    {
+        try
+        {
+            Feature? dto = await _repository.GetFeature( featureId );
+
+            return dto is not null
+                ? new ServiceReply<Feature?>( dto )
+                : new ServiceReply<Feature?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<Feature?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<FeaturedDeal?>> GetDeal( int productId )
+    {
+        try
+        {
+            FeaturedDeal? dto = await _repository.GetDeal( productId );
+
+            return dto is not null
+                ? new ServiceReply<FeaturedDeal?>( dto )
+                : new ServiceReply<FeaturedDeal?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<FeaturedDeal?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<Feature?>> AddFeature( Feature dto )
+    {
+        try
+        {
+            Feature? result = await _repository.InsertFeature( dto );
 
             return result is not null
-                ? new ServiceReply<FeaturesResponse?>( result )
-                : new ServiceReply<FeaturesResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<Feature?>( result )
+                : new ServiceReply<Feature?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeaturesResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<Feature?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> AddFeaturedProduct( FeaturedProductDto dto )
+    public async Task<ServiceReply<FeaturedDeal?>> AddDeal( FeaturedDeal dto )
     {
         try
         {
-            bool result = await _repository.InsertFeaturedProduct( dto );
-
-            return result
-                ? new ServiceReply<bool>( result )
-                : new ServiceReply<bool>( ServiceErrorType.NotFound );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
-        }
-    }
-    public async Task<ServiceReply<bool>> AddFeaturedDeal( int productId )
-    {
-        try
-        {
-            bool result = await _repository.InsertFeaturedDeal( productId );
-
-            return result
-                ? new ServiceReply<bool>( result )
-                : new ServiceReply<bool>( ServiceErrorType.NotFound );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
-        }
-    }
-    public async Task<ServiceReply<FeaturedProductDto?>> GetFeaturedProductEdit( int productId )
-    {
-        try
-        {
-            FeaturedProductDto? result = await _repository.GetFeaturedProductEdit( productId );
+            FeaturedDeal? result = await _repository.InsertDeal( dto );
 
             return result is not null
-                ? new ServiceReply<FeaturedProductDto?>( result )
-                : new ServiceReply<FeaturedProductDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<FeaturedDeal?>( result )
+                : new ServiceReply<FeaturedDeal?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeaturedProductDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<FeaturedDeal?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateFeaturedProduct( FeaturedProductDto dto )
+    public async Task<ServiceReply<bool>> UpdateFeature( Feature dto )
     {
         try
         {
-            bool result = await _repository.UpdateFeaturedProduct( dto );
+            bool result = await _repository.UpdateFeature( dto );
 
             return result
                 ? new ServiceReply<bool>( result )
-                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+                : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
@@ -118,15 +159,15 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> RemoveFeaturedProduct( int productId )
+    public async Task<ServiceReply<bool>> UpdateDeal( FeaturedDeal dto )
     {
         try
         {
-            bool result = await _repository.DeleteFeaturedProduct( productId );
+            bool result = await _repository.UpdateDeal( dto );
 
             return result
                 ? new ServiceReply<bool>( result )
-                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+                : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
@@ -134,20 +175,49 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> RemoveFeaturedDeal( int productId )
+    public async Task<ServiceReply<bool>> RemoveFeature( int featureId )
     {
         try
         {
-            bool result = await _repository.DeleteFeaturedDeal( productId );
+            bool result = await _repository.DeleteFeature( featureId );
 
             return result
                 ? new ServiceReply<bool>( result )
-                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+                : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
+    }
+    public async Task<ServiceReply<bool>> RemoveDeal( int productId )
+    {
+        try
+        {
+            bool result = await _repository.DeleteDeal( productId );
+
+            return result
+                ? new ServiceReply<bool>( result )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+
+    static List<AdminItemViewDto>? MapFeaturesView( IEnumerable<Feature>? models )
+    {
+        return models?
+            .Select( m => new AdminItemViewDto { Id = m.FeatureId, Name = m.FeatureName } )
+            .ToList();
+    }
+    static List<AdminItemViewDto>? MapDealsView( IEnumerable<FeaturedDeal>? models )
+    {
+        return models?
+            .Select( m => new AdminItemViewDto { Id = m.ProductId, Name = m.ProductName } )
+            .ToList();
     }
 }

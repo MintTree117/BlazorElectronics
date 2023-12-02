@@ -26,16 +26,4 @@ public class AdminFeaturedProductsServiceClient : AdminServiceClient, IAdminFeat
     {
         throw new NotImplementedException();
     }
-    public async Task<ServiceReply<FeaturedProductDto?>> GetEdit( IntDto dto )
-    {
-        throw new NotImplementedException();
-    }
-    public async Task<ServiceReply<int>> Add( FeaturedProductDto dto )
-    {
-        throw new NotImplementedException();
-    }
-    public async Task<ServiceReply<bool>> Update( FeaturedProductDto dto )
-    {
-        throw new NotImplementedException();
-    }
 }

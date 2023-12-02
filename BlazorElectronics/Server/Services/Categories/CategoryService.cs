@@ -73,21 +73,20 @@ public class CategoryService : ApiService, ICategoryService
             return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto dto )
+    public async Task<ServiceReply<int>> AddCategory( CategoryEditDto dto )
     {
         try
         {
-            CategoryModel? model = await _repository.Insert( dto );
-            CategoryEditDto? edit = MapEdit( model );
+            int result = await _repository.Insert( dto );
 
-            return edit is not null
-                ? new ServiceReply<CategoryEditDto?>( edit )
-                : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+            return result > 0
+                ? new ServiceReply<int>( result )
+                : new ServiceReply<int>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto )

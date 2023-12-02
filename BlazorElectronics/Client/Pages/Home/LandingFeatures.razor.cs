@@ -6,17 +6,17 @@ using Microsoft.JSInterop;
 
 namespace BlazorElectronics.Client.Pages.Home;
 
-public partial class FeaturedProducts : RazorView
+public partial class LandingFeatures : RazorView
 {
     [Inject] IFeaturesServiceClient FeaturesService { get; init; } = default!;
     [Inject] IJSRuntime JsRuntime { get; init; } = default!;
     
     bool _isCarouselInitialized = false;
-    List<FeaturedProductDto>? _featuredProducts;
+    List<Feature>? _featuredProducts;
 
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<List<FeaturedProductDto>?> reply = await FeaturesService.GetFeaturedProducts();
+        ServiceReply<List<Feature>?> reply = await FeaturesService.GetFeatures();
 
         if ( reply.Success )
             _featuredProducts = reply.Data;
