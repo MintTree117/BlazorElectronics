@@ -1,9 +1,10 @@
 @page "/admin/crud/vendors"
 @using BlazorElectronics.Shared;
+@using BlazorElectronics.Shared.Enums
 @using BlazorElectronics.Shared.Vendors;
-@inherits CrudPage<AdminItemViewDto, VendorEditDto>
+@inherits CrudPage<CrudView, VendorEdit>
 
-<div class="container-sm">
+<div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
 
     @if ( PageIsReady() )
@@ -20,7 +21,7 @@
                 </button>
                 <h3>@PageTitle</h3>
             </div>
-
+            
             <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
                 <div class="mb-3">
                     <label for="Name" class="form-label">Vendor Name</label>
@@ -31,8 +32,13 @@
                     <InputText @bind-Value="ItemEdit.VendorName" class="form-control" id="Url"></InputText>
                 </div>
                 <div class="mb-3">
-                    <label for="Categories" class="form-label">Categories: comma separated</label>
-                    <InputTextArea @bind-Value="ItemEdit.PrimaryCategories" class="form-control" id="Categories"></InputTextArea>
+                    <label for="Categories" class="form-label">Spec Name</label>
+                    <InputSelect multiple="@true" @bind-Value="ItemEdit.PrimaryCategories" class="form-control" id="Categories">
+                        @foreach ( PrimaryCategory option in Enum.GetValues<PrimaryCategory>() )
+                        {
+                            <option value="@option">@option</option>
+                        }
+                    </InputSelect>
                 </div>
                 <div class="mb-3 form-check">
                     <InputCheckbox @bind-Value="ItemEdit.IsGlobal" class="form-check-input" id="Global"></InputCheckbox>
@@ -42,6 +48,8 @@
                     <i class="oi oi-cloud-upload"></i>
                 </button>
             </EditForm>
+
+            <ActionMessage Page="@this"></ActionMessage>
         }
     }
 </div>

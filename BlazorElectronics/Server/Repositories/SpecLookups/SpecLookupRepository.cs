@@ -32,12 +32,12 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         p.Add( PARAM_SPEC_ID, specId );
         return await TryQueryAsync( GetEditQuery, p );
     }
-    public async Task<SpecLookupEditModel?> Insert( SpecLookupEditDto dto )
+    public async Task<int> Insert( SpecLookupEdit dto )
     {
         DynamicParameters p = GetInsertParams( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<SpecLookupEditModel?>, p, PROCEDURE_INSERT );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( SpecLookupEditDto dto )
+    public async Task<bool> Update( SpecLookupEdit dto )
     {
         DynamicParameters p = GetUpdateParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
@@ -74,17 +74,16 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         return new SpecLookupEditModel
         {
             Spec = await result.ReadSingleOrDefaultAsync<SpecLookupModel>(),
-            IsGlobal = ( await result.ReadFirstOrDefaultAsync<int>() ) > 0,
             Categories = await result.ReadAsync<SpecLookupCategoryModel>(),
             Values = await result.ReadAsync<SpecLookupValueModel>()
         };
     }
     
-    static DynamicParameters GetInsertParams( SpecLookupEditDto dto )
+    static DynamicParameters GetInsertParams( SpecLookupEdit dto )
     {
         var parameters = new DynamicParameters();
 
-        DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategoriesAsString );
+        DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategories );
         
         parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
@@ -95,7 +94,7 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         
         return parameters;
     }
-    static DynamicParameters GetUpdateParams( SpecLookupEditDto dto )
+    static DynamicParameters GetUpdateParams( SpecLookupEdit dto )
     {
         DynamicParameters parameters = GetInsertParams( dto );
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );

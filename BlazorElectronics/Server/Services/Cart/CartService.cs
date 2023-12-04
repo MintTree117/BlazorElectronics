@@ -1,3 +1,4 @@
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Shared.Cart;
 
@@ -24,7 +25,7 @@ public class CartService : ApiService, ICartService
                 ? new ServiceReply<CartResponse?>( response )
                 : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
@@ -41,7 +42,7 @@ public class CartService : ApiService, ICartService
                 ? new ServiceReply<CartResponse?>( response )
                 : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
@@ -58,7 +59,7 @@ public class CartService : ApiService, ICartService
                 ? new ServiceReply<CartResponse?>( response )
                 : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
@@ -75,7 +76,7 @@ public class CartService : ApiService, ICartService
                 ? new ServiceReply<CartResponse?>( response )
                 : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
@@ -92,7 +93,7 @@ public class CartService : ApiService, ICartService
                 ? new ServiceReply<CartResponse?>( response )
                 : new ServiceReply<CartResponse?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
@@ -108,7 +109,7 @@ public class CartService : ApiService, ICartService
                 ? new ServiceReply<bool>( true )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );

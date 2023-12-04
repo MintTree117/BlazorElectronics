@@ -1,5 +1,5 @@
-@typeparam TItem where TItem : BlazorElectronics.Shared.AdminItemViewDto
-@typeparam TEdit where TEdit : new()
+@typeparam TItem where TItem : BlazorElectronics.Shared.CrudView
+@typeparam TEdit where TEdit : BlazorElectronics.Shared.ICrudEdit, new()
 
 <div class="form-header">
     <h3>@Page.PageTitle</h3>

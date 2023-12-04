@@ -47,11 +47,11 @@
     flex-direction: row;
 }
 
-.oi {
+.top-nav .oi {
     width: 2rem;
-    font-size: 1.1rem;
+    /*font-size: 1.1rem;
     vertical-align: text-top;
-    top: -2px;
+    top: -2px;*/
 }
 
 .nav-sidebar {

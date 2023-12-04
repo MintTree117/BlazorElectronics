@@ -36,36 +36,36 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     {
         return await TryQueryAsync( Query<FeaturedDeal>, null, PROCEDURE_GET_DEALS );
     }
-    public async Task<Feature?> GetFeature( int featureId )
+    public async Task<FeatureEdit?> GetFeature( int featureId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_FEATURE_ID, featureId );
 
-        return await TryQueryAsync( QuerySingleOrDefault<Feature?>, p, PROCEDURE_GET_FEATURE );
+        return await TryQueryAsync( QuerySingleOrDefault<FeatureEdit?>, p, PROCEDURE_GET_FEATURE );
     }
-    public async Task<FeaturedDeal?> GetDeal( int productId )
+    public async Task<FeaturedDealEdit?> GetDeal( int productId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, productId );
 
-        return await TryQueryAsync( QuerySingleOrDefault<FeaturedDeal?>, p, PROCEDURE_GET_DEAL );
+        return await TryQueryAsync( QuerySingleOrDefault<FeaturedDealEdit?>, p, PROCEDURE_GET_DEAL );
     }
-    public async Task<Feature?> InsertFeature( Feature dto )
+    public async Task<int> InsertFeature( FeatureEdit dto )
     {
         DynamicParameters p = GetFeatureInsertParams( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<Feature?>, p, PROCEDURE_INSERT_FEATURE );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT_FEATURE );
     }
-    public async Task<FeaturedDeal?> InsertDeal( FeaturedDeal dto )
+    public async Task<int> InsertDeal( FeaturedDealEdit dto )
     {
         DynamicParameters p = GetDealParams( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<FeaturedDeal?>, p, PROCEDURE_INSERT_DEAL );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT_DEAL );
     }
-    public async Task<bool> UpdateFeature( Feature dto )
+    public async Task<bool> UpdateFeature( FeatureEdit dto )
     {
         DynamicParameters p = GetFeatureUpdateParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_FEATURE );
     }
-    public async Task<bool> UpdateDeal( FeaturedDeal dto )
+    public async Task<bool> UpdateDeal( FeaturedDealEdit dto )
     {
         DynamicParameters p = GetDealParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_DEAL );

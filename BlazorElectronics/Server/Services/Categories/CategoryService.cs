@@ -1,6 +1,7 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Models.Categories;
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
@@ -39,58 +40,57 @@ public class CategoryService : ApiService, ICategoryService
             ? new ServiceReply<int>( categoryId )
             : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
-    public async Task<ServiceReply<List<CategoryViewDto>?>> GetCategoriesView()
+    public async Task<ServiceReply<List<CategoryView>?>> GetCategoriesView()
     {
         try
         {
             IEnumerable<CategoryModel>? result = await _repository.Get();
-            List<CategoryViewDto>? dto = await MapView( result );
+            List<CategoryView>? dto = await MapView( result );
 
             return dto is not null
-                ? new ServiceReply<List<CategoryViewDto>?>( dto )
-                : new ServiceReply<List<CategoryViewDto>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CategoryView>?>( dto )
+                : new ServiceReply<List<CategoryView>?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<CategoryViewDto>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CategoryView>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId )
+    public async Task<ServiceReply<CategoryEdit?>> GetCategoryEdit( int categoryId )
     {
         try
         {
             CategoryModel? model = await _repository.GetEdit( categoryId );
-            CategoryEditDto? dto = MapEdit( model );
+            CategoryEdit? dto = MapEdit( model );
 
             return dto is not null
-                ? new ServiceReply<CategoryEditDto?>( dto )
-                : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CategoryEdit?>( dto )
+                : new ServiceReply<CategoryEdit?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CategoryEdit?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto dto )
+    public async Task<ServiceReply<int>> AddCategory( CategoryEdit dto )
     {
         try
         {
-            CategoryModel? model = await _repository.Insert( dto );
-            CategoryEditDto? edit = MapEdit( model );
+            int id = await _repository.Insert( dto );
 
-            return edit is not null
-                ? new ServiceReply<CategoryEditDto?>( edit )
-                : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
+            return id > 0
+                ? new ServiceReply<int>( id )
+                : new ServiceReply<int>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto )
+    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEdit dto )
     {
         try
         {
@@ -100,7 +100,7 @@ public class CategoryService : ApiService, ICategoryService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -116,7 +116,7 @@ public class CategoryService : ApiService, ICategoryService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -134,7 +134,7 @@ public class CategoryService : ApiService, ICategoryService
         {
             models = await _repository.Get();
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -169,7 +169,7 @@ public class CategoryService : ApiService, ICategoryService
             CategoryResponse r = MapResponse( m );
             responses.Add( r.Id, r );
 
-            if ( m.Tier == CategoryTier.PRIMARY )
+            if ( m.Tier == CategoryTier.Primary )
                 primaryIds.Add( r.Id );
         }
 
@@ -197,7 +197,7 @@ public class CategoryService : ApiService, ICategoryService
     {
         return models.ToDictionary( m => m.ApiUrl, m => m.CategoryId );
     }
-    static async Task<List<CategoryViewDto>?> MapView( IEnumerable<CategoryModel>? models )
+    static async Task<List<CategoryView>?> MapView( IEnumerable<CategoryModel>? models )
     {
         if ( models is null )
             return null;
@@ -205,16 +205,16 @@ public class CategoryService : ApiService, ICategoryService
         return await Task.Run( () =>
         {
             return models
-                .Select( m => new CategoryViewDto { Id = m.CategoryId, Tier = m.Tier, Name = m.Name } )
+                .Select( m => new CategoryView { Id = m.CategoryId, Tier = m.Tier, Name = m.Name } )
                 .ToList();
         } );
     }
-    static CategoryEditDto? MapEdit( CategoryModel? model )
+    static CategoryEdit? MapEdit( CategoryModel? model )
     {
         if ( model is null )
             return null;
 
-        return new CategoryEditDto
+        return new CategoryEdit
         {
             CategoryId = model.CategoryId,
             ParentId = model.ParentCategoryId,

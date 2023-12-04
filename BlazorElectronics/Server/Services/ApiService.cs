@@ -13,11 +13,7 @@ public abstract class ApiService
     {
         Logger = logger;
     }
-
-    protected static string ConvertPrimaryCategoriesToString( IEnumerable<int> categories )
-    {
-        return string.Join( ",", categories );
-    }
+    
     protected static string ConvertSpecValuesToString( IEnumerable<SpecLookupValueModel> values )
     {
         List<string> specValues = values

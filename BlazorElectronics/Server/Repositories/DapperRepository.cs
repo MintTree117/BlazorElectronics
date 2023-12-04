@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
+using BlazorElectronics.Shared.Enums;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -245,21 +246,8 @@ public abstract class DapperRepository
         return rows > 0;
     }
     
-    protected static DataTable GetPrimaryCategoriesTable( string categoriesString )
+    protected static DataTable GetPrimaryCategoriesTable( List<PrimaryCategory> categories )
     {
-        List<string> categoryStrings = categoriesString
-            .Split( ',' )
-            .Select( s => s.Trim() ) // Trims whitespace from each item.
-            .ToList();
-
-        var categories = new List<int>();
-
-        foreach ( string c in categoryStrings )
-        {
-            if ( int.TryParse( c, out int category ) )
-                categories.Add( category );
-        }
-
         var table = new DataTable();
         table.Columns.Add( COL_CATEGORY_ID, typeof( int ) );
 

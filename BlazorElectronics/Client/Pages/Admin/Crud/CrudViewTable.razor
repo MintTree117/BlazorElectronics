@@ -1,12 +1,14 @@
-@typeparam TItem where TItem : BlazorElectronics.Shared.AdminItemViewDto
-@typeparam TEdit where TEdit : new()
+@typeparam TItem where TItem : BlazorElectronics.Shared.CrudView
+@typeparam TEdit where TEdit : BlazorElectronics.Shared.ICrudEdit, new()
 
 <div class="form-header">
     <h3>@Page.PageTitle</h3>
-    <button class="btn btn-primary mb-3" type="button" @onclick="@Page.CreateItem">
-        <span class="oi oi-plus"></span> Create New
+    <button type="button" onclick="@Page.CreateItem" class="btn btn-primary btn-lg btn-icon">
+        <i class="oi oi-plus"></i>Create New
     </button>
 </div>
+
+<ActionMessage Page="@Page"></ActionMessage>
 
 <table class="table table-hover crud-table">
     <thead class="thead-light">
@@ -24,7 +26,7 @@
         <tr class="crud-tr">
             @foreach ( string property in Page.GetColumnProperties() )
             {
-                <td>
+                <td class="align-middle">
                     @Page.RenderPropertyColumn( item, property )
                 </td>
             }

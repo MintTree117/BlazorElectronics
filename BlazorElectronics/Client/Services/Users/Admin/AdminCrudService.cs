@@ -3,7 +3,7 @@ using BlazorElectronics.Shared;
 
 namespace BlazorElectronics.Client.Services.Users.Admin;
 
-public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCrudService<Tview,Tedit> where Tview : AdminItemViewDto where Tedit : class
+public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCrudService<Tview,Tedit> where Tview : CrudView where Tedit : class
 {
     public AdminCrudService( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
@@ -16,9 +16,9 @@ public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCr
     {
         return await TryUserRequest<IntDto,Tedit?>( path, itemId );
     }
-    public async Task<ServiceReply<Tedit?>> Add( string path, Tedit dto )
+    public async Task<ServiceReply<int>> Add( string path, Tedit dto )
     {
-        return await TryUserRequest<Tedit, Tedit?>( path, dto );
+        return await TryUserRequest<Tedit, int>( path, dto );
     }
     public async Task<ServiceReply<bool>> Update( string path, Tedit dto )
     {

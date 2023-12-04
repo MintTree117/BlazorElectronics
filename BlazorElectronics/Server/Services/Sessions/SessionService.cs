@@ -3,6 +3,7 @@ using System.Text;
 using BlazorElectronics.Server.Dtos.Sessions;
 using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Models.Users;
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Sessions;
 
 namespace BlazorElectronics.Server.Services.Sessions;
@@ -30,7 +31,7 @@ public class SessionService : ApiService, ISessionService
         {
             insertedSession = await _sessionRepository.InsertSession( userId, hash, salt, deviceInfo );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<SessionDto?>( ServiceErrorType.ServerError );
@@ -48,7 +49,7 @@ public class SessionService : ApiService, ISessionService
         {
             success = await _sessionRepository.DeleteSession( sessionId );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -67,7 +68,7 @@ public class SessionService : ApiService, ISessionService
         {
             session = await _sessionRepository.GetSession( sessionId );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -94,7 +95,7 @@ public class SessionService : ApiService, ISessionService
         {
             session = await _sessionRepository.GetSession( sessionId );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<int>( ServiceErrorType.ServerError );

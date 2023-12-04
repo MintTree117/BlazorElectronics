@@ -19,41 +19,41 @@ public sealed class AdminSpecLookupController : _AdminController
         _lookupService = lookupService;
     }
     
-    [HttpPost( "get-spec-lookup-view" )]
-    public async Task<ActionResult<SpecLookupViewResponse?>> GetView( [FromBody] UserRequest request )
+    [HttpPost( "get-view" )]
+    public async Task<ActionResult<List<CrudView>?>> GetView( [FromBody] UserRequest request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<SpecLookupViewResponse?> reply = await _lookupService.GetView();
+        ServiceReply<List<CrudView>?> reply = await _lookupService.GetView();
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "get-spec-lookup-edit" )]
-    public async Task<ActionResult<SpecLookupEditDto?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
+    [HttpPost( "get-edit" )]
+    public async Task<ActionResult<SpecLookupEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<SpecLookupEditDto?> reply = await _lookupService.GetEdit( request.Payload.Value );
+        ServiceReply<SpecLookupEdit?> reply = await _lookupService.GetEdit( request.Payload.Value );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "add-spec-lookup" )]
-    public async Task<ActionResult<SpecLookupEditDto?>> Add( [FromBody] UserDataRequest<SpecLookupEditDto> request )
+    [HttpPost( "add" )]
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<SpecLookupEdit> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<SpecLookupEditDto?> reply = await _lookupService.Add( request.Payload );
+        ServiceReply<int> reply = await _lookupService.Add( request.Payload );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "update-spec-lookup" )]
-    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecLookupEditDto> request )
+    [HttpPost( "update" )]
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecLookupEdit> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
@@ -63,7 +63,7 @@ public sealed class AdminSpecLookupController : _AdminController
         ServiceReply<bool> reply = await _lookupService.Update( request.Payload );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "remove-spec-lookup" )]
+    [HttpPost( "remove" )]
     public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );

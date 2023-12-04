@@ -1,9 +1,10 @@
 using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.User.Admin.Crud;
+namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudCategories : CrudPage<CategoryViewDto, CategoryEditDto>
+public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit>
 {
     protected override async Task OnInitializedAsync()
     {
@@ -23,14 +24,20 @@ public sealed partial class CrudCategories : CrudPage<CategoryViewDto, CategoryE
         base.GenerateTableMeta();
         THeadMeta.Add( "Category Tier", SortByTier );
     }
-
+    protected override string GetEditTitle()
+    {
+        return $"Edit {ItemEdit.Tier} {ItemTitle}";
+    }
+    
     void HandleTierChange( ChangeEventArgs e )
     {
         StateHasChanged();
     }
-    List<CategoryViewDto> GetEditParents()
+    List<CategoryView> GetEditParents()
     {
-        return ItemsView.Where( item => item.Tier == ItemEdit.Tier ).ToList();
+        return Enum.TryParse( ( ( int ) ItemEdit.Tier - 1 ).ToString(), out CategoryTier parentTier )
+            ? ItemsView.Where( item => item.Tier == parentTier ).ToList()
+            : new List<CategoryView>();
     }
     void SortByTier()
     {

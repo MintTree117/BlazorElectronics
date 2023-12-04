@@ -13,7 +13,9 @@ using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
+using BlazorElectronics.Server.Services.SpecLookups;
 using BlazorElectronics.Server.Services.Users;
+using BlazorElectronics.Server.Services.Vendors;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -26,8 +28,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<DapperContext>();
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddScoped<IFeaturesService, FeaturesService>();
+builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
@@ -43,11 +47,10 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IVendorService, VendorService>();
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
-builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
 
 WebApplication app = builder.Build();
 

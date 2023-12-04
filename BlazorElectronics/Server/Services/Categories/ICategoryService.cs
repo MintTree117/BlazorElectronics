@@ -9,9 +9,9 @@ public interface ICategoryService
     Task<ServiceReply<int>> ValidateCategoryUrl( string url );
 
     // ADMIN
-    Task<ServiceReply<List<CategoryViewDto>?>> GetCategoriesView();
-    Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId );
-    Task<ServiceReply<CategoryEditDto?>> AddCategory( CategoryEditDto dto );
-    Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto );
+    Task<ServiceReply<List<CategoryView>?>> GetCategoriesView();
+    Task<ServiceReply<CategoryEdit?>> GetCategoryEdit( int categoryId );
+    Task<ServiceReply<int>> AddCategory( CategoryEdit dto );
+    Task<ServiceReply<bool>> UpdateCategory( CategoryEdit dto );
     Task<ServiceReply<bool>> RemoveCategory( int categoryId );
 }

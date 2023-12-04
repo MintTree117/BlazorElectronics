@@ -1,9 +1,10 @@
-@page "/admin/crud/specs"
+@page "/admin/crud/spec-lookups"
 @using BlazorElectronics.Shared;
 @using BlazorElectronics.Shared.SpecLookups;
-@inherits CrudPage<AdminItemViewDto, SpecLookupEditDto>
+@using BlazorElectronics.Client.Models
+@inherits CrudPage<CrudView, SpecLookupEdit>
 
-<div class="container-sm">
+<div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
 
     @if ( PageIsReady() )
@@ -14,21 +15,22 @@
         }
         else
         {
-            <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-primary" type="button" @onclick="@GoBack">
-                    <span class="oi oi-plus"></span> Back
-                </button>
-                <h3>@PageTitle</h3>
-            </div>
-
+            <CrudEditTitle Page="@this"></CrudEditTitle>
+            
             <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
                 <div class="mb-3">
                     <label for="Name" class="form-label">Spec Name</label>
                     <InputText @bind-Value="ItemEdit.SpecName" class="form-control" id="Name"></InputText>
                 </div>
                 <div class="mb-3">
-                    <label for="Categories" class="form-label">Categories: comma separated</label>
-                    <InputText @bind-Value="ItemEdit.PrimaryCategoriesAsString" class="form-control" id="Categories"></InputText>
+                    <h4>Category Selection</h4>
+                    @foreach ( CategorySelectionOption option in CategoryOptions.Options )
+                    {
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Category"/>
+                            <label class="form-check-label" for="@option.Category">@option.Category</label>
+                        </div>
+                    }
                 </div>
                 <div class="mb-3">
                     <label for="Values" class="form-label">Values: comma separated, sorted</label>
@@ -38,10 +40,14 @@
                     <InputCheckbox @bind-Value="ItemEdit.IsGlobal" class="form-check-input" id="Global"></InputCheckbox>
                     <label class="form-check-label" for="Global">Is Global</label>
                 </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="oi oi-cloud-upload"></i>
-                </button>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="oi oi-cloud-upload"></i> Submit
+                    </button>
+                </div>
             </EditForm>
+
+            <ActionMessage Page="@this"></ActionMessage>
         }
     }
 </div>

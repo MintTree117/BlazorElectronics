@@ -26,12 +26,12 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         p.Add( PARAM_CATEGORY_ID, categoryId );
         return await TryQueryAsync( QuerySingleOrDefault<CategoryModel?>, p, PROCEDURE_GET_EDIT );
     }
-    public async Task<CategoryModel?> Insert( CategoryEditDto dto )
+    public async Task<int> Insert( CategoryEdit dto )
     {
         DynamicParameters p = GetInsertParameters( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<CategoryModel?>, p, PROCEDURE_INSERT );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( CategoryEditDto dto )
+    public async Task<bool> Update( CategoryEdit dto )
     {
         DynamicParameters p = GetUpdateParameters( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
@@ -43,7 +43,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
     
-    static DynamicParameters GetInsertParameters( CategoryEditDto dto )
+    static DynamicParameters GetInsertParameters( CategoryEdit dto )
     {
         DynamicParameters p = new();
         p.Add( PARAM_CATEGORY_PARENT_ID, dto.ParentId );
@@ -54,7 +54,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
 
         return p;
     }
-    static DynamicParameters GetUpdateParameters( CategoryEditDto dto )
+    static DynamicParameters GetUpdateParameters( CategoryEdit dto )
     {
         DynamicParameters p = GetInsertParameters( dto );
         p.Add( PARAM_CATEGORY_ID, dto.CategoryId );

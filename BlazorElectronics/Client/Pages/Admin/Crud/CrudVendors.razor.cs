@@ -1,9 +1,9 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Vendors;
 
-namespace BlazorElectronics.Client.Pages.User.Admin.Crud;
+namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudVendors : CrudPage<AdminItemViewDto, VendorEditDto>
+public sealed partial class CrudVendors : CrudPage<CrudView, VendorEdit>
 {
     protected override async Task OnInitializedAsync()
     {
@@ -14,7 +14,7 @@ public sealed partial class CrudVendors : CrudPage<AdminItemViewDto, VendorEditD
         if ( !PageIsAuthorized )
             return;
 
-        ApiPath = "api/AdminVendors";
+        ApiPath = "api/AdminVendor";
         await LoadView();
     }
 }

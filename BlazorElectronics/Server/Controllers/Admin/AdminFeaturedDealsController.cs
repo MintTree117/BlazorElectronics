@@ -9,58 +9,58 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public sealed class AdminFeaturesController : _AdminController
+public sealed class AdminFeaturedDealsController : _AdminController
 {
     readonly IFeaturesService _featuresService;
     
-    public AdminFeaturesController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IFeaturesService featuresService )
+    public AdminFeaturedDealsController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IFeaturesService featuresService )
         : base( logger, userAccountService, sessionService )
     {
         _featuresService = featuresService;
     }
-    
+
     [HttpPost( "get-view" )]
-    public async Task<ActionResult<List<CrudView>?>> GetView( [FromBody] UserRequest request )
+    public async Task<ActionResult<List<CrudView>>> GetView( [FromBody] UserRequest request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<List<CrudView>?> reply = await _featuresService.GetFeaturesView();
+        ServiceReply<List<CrudView>?> reply = await _featuresService.GetDealsView();
         return GetReturnFromApi( reply );
     }
     [HttpPost( "get-edit" )]
-    public async Task<ActionResult<FeatureEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<FeaturedDealEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<FeatureEdit?> reply = await _featuresService.GetFeatureEdit( request.Payload.Value );
+        ServiceReply<FeaturedDealEdit?> reply = await _featuresService.GetDealEdit( request.Payload.Value );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "add" )]
-    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<FeatureEdit> request )
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<FeaturedDealEdit> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<int> reply = await _featuresService.AddFeature( request.Payload );
+        ServiceReply<int> reply = await _featuresService.AddDeal( request.Payload );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<FeatureEdit> request )
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<FeaturedDealEdit> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.UpdateFeature( request.Payload );
+        ServiceReply<bool> reply = await _featuresService.UpdateDeal( request.Payload );
         return GetReturnFromApi( reply );
     }
     [HttpPost( "remove" )]
@@ -71,7 +71,7 @@ public sealed class AdminFeaturesController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.RemoveFeature( request.Payload.Value );
+        ServiceReply<bool> reply = await _featuresService.RemoveDeal( request.Payload.Value );
         return GetReturnFromApi( reply );
     }
 }

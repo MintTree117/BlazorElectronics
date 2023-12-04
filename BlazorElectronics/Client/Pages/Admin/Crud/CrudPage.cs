@@ -3,9 +3,9 @@ using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.User.Admin.Crud;
+namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public class CrudPage<Tview, Tedit> : AdminPage where Tview : AdminItemViewDto where Tedit : new()
+public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Tedit : ICrudEdit, new()
 {
     [Inject] protected IAdminCrudService<Tview, Tedit> CrudService { get; init; } = default!;
 
@@ -23,7 +23,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : AdminItemViewDto w
     
     protected Tedit ItemEdit = default!;
     protected bool IsEditing;
-    bool NewItem;
+    protected bool NewItem;
 
     public IReadOnlyList<Tview> GetView()
     {
@@ -111,7 +111,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : AdminItemViewDto w
         IsEditing = true;
         NewItem = true;
     }
-    public async Task EditItem( int itemId )
+    public virtual async Task EditItem( int itemId )
     {
         PageIsLoaded = false;
         
@@ -128,8 +128,8 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : AdminItemViewDto w
         
         PageIsLoaded = true;
         IsEditing = true;
-        
-        PageTitle = $"Edit {ItemTitle}";
+
+        PageTitle = GetEditTitle();
         
         StateHasChanged();
     }
@@ -159,6 +159,10 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : AdminItemViewDto w
     }
     
     // EDIT
+    protected virtual string GetEditTitle()
+    {
+        return $"Edit {ItemTitle}";
+    }
     public void GoBack()
     {
         PageTitle = $"{ItemTitle} View";
@@ -166,26 +170,28 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : AdminItemViewDto w
         NewItem = false;
         StateHasChanged();
     }
-    protected async Task Submit()
+    protected virtual async Task Submit()
     {
         if ( NewItem )
             await SubmitNew();
         else
             await SubmitUpdate();
+
+        await LoadView();
     }
     async Task SubmitNew()
     {
-        ServiceReply<Tedit?> reply = await CrudService.Add( $"{ApiPath}/add", ItemEdit );
+        ServiceReply<int> reply = await CrudService.Add( $"{ApiPath}/add", ItemEdit );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success )
         {
             SetActionMessage( false, reply.Message ?? "Failed to insert spec, no response message!" );
             return;
         }
-
-        ItemEdit = reply.Data;
+        
+        ItemEdit.SetId( reply.Data );
         NewItem = false;
-
+        
         SetActionMessage( true, "Successfully added spec." );
         StateHasChanged();
     }

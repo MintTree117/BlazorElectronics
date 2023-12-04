@@ -1,5 +1,6 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.Features;
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Shared.Features;
 
@@ -39,111 +40,111 @@ public class FeaturesService : ApiService, IFeaturesService
 
             return new ServiceReply<FeaturesResponse?>( r );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<FeaturesResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetFeaturesView()
+    public async Task<ServiceReply<List<CrudView>?>> GetFeaturesView()
     {
         try
         {
             IEnumerable<Feature>? models = await _repository.GetFeatures();
-            List<AdminItemViewDto>? dto = MapFeaturesView( models );
+            List<CrudView>? dto = MapFeaturesView( models );
 
             return dto is not null
-                ? new ServiceReply<List<AdminItemViewDto>?>( dto )
-                : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CrudView>?>( dto )
+                : new ServiceReply<List<CrudView>?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetDealsView()
+    public async Task<ServiceReply<List<CrudView>?>> GetDealsView()
     {
         try
         {
             IEnumerable<FeaturedDeal>? models = await _repository.GetDeals();
-            List<AdminItemViewDto>? dto = MapDealsView( models );
+            List<CrudView>? dto = MapDealsView( models );
 
             return dto is not null
-                ? new ServiceReply<List<AdminItemViewDto>?>( dto )
-                : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CrudView>?>( dto )
+                : new ServiceReply<List<CrudView>?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<Feature?>> GetFeature( int featureId )
+    public async Task<ServiceReply<FeatureEdit?>> GetFeatureEdit( int featureId )
     {
         try
         {
-            Feature? dto = await _repository.GetFeature( featureId );
+            FeatureEdit? dto = await _repository.GetFeature( featureId );
 
             return dto is not null
-                ? new ServiceReply<Feature?>( dto )
-                : new ServiceReply<Feature?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+                ? new ServiceReply<FeatureEdit?>( dto )
+                : new ServiceReply<FeatureEdit?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<Feature?>( ServiceErrorType.ServerError );
+            return new ServiceReply<FeatureEdit?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<FeaturedDeal?>> GetDeal( int productId )
+    public async Task<ServiceReply<FeaturedDealEdit?>> GetDealEdit( int productId )
     {
         try
         {
-            FeaturedDeal? dto = await _repository.GetDeal( productId );
+            FeaturedDealEdit? dto = await _repository.GetDeal( productId );
 
             return dto is not null
-                ? new ServiceReply<FeaturedDeal?>( dto )
-                : new ServiceReply<FeaturedDeal?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+                ? new ServiceReply<FeaturedDealEdit?>( dto )
+                : new ServiceReply<FeaturedDealEdit?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeaturedDeal?>( ServiceErrorType.ServerError );
+            return new ServiceReply<FeaturedDealEdit?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<Feature?>> AddFeature( Feature dto )
+    public async Task<ServiceReply<int>> AddFeature( FeatureEdit dto )
     {
         try
         {
-            Feature? result = await _repository.InsertFeature( dto );
+            int id = await _repository.InsertFeature( dto );
 
-            return result is not null
-                ? new ServiceReply<Feature?>( result )
-                : new ServiceReply<Feature?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+            return id > 0
+                ? new ServiceReply<int>( id )
+                : new ServiceReply<int>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<Feature?>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<FeaturedDeal?>> AddDeal( FeaturedDeal dto )
+    public async Task<ServiceReply<int>> AddDeal( FeaturedDealEdit dto )
     {
         try
         {
-            FeaturedDeal? result = await _repository.InsertDeal( dto );
+            int id = await _repository.InsertDeal( dto );
 
-            return result is not null
-                ? new ServiceReply<FeaturedDeal?>( result )
-                : new ServiceReply<FeaturedDeal?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+            return id > 0
+                ? new ServiceReply<int>( id )
+                : new ServiceReply<int>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeaturedDeal?>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateFeature( Feature dto )
+    public async Task<ServiceReply<bool>> UpdateFeature( FeatureEdit dto )
     {
         try
         {
@@ -153,13 +154,13 @@ public class FeaturesService : ApiService, IFeaturesService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateDeal( FeaturedDeal dto )
+    public async Task<ServiceReply<bool>> UpdateDeal( FeaturedDealEdit dto )
     {
         try
         {
@@ -169,7 +170,7 @@ public class FeaturesService : ApiService, IFeaturesService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -185,7 +186,7 @@ public class FeaturesService : ApiService, IFeaturesService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -201,23 +202,23 @@ public class FeaturesService : ApiService, IFeaturesService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
 
-    static List<AdminItemViewDto>? MapFeaturesView( IEnumerable<Feature>? models )
+    static List<CrudView>? MapFeaturesView( IEnumerable<Feature>? models )
     {
         return models?
-            .Select( m => new AdminItemViewDto { Id = m.FeatureId, Name = m.Name } )
+            .Select( m => new CrudView { Id = m.FeatureId, Name = m.Name } )
             .ToList();
     }
-    static List<AdminItemViewDto>? MapDealsView( IEnumerable<FeaturedDeal>? models )
+    static List<CrudView>? MapDealsView( IEnumerable<FeaturedDeal>? models )
     {
         return models?
-            .Select( m => new AdminItemViewDto { Id = m.ProductId, Name = m.ProductName } )
+            .Select( m => new CrudView { Id = m.ProductId, Name = m.ProductName } )
             .ToList();
     }
 }

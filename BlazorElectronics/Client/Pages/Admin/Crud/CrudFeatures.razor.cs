@@ -1,20 +1,20 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Features;
 
-namespace BlazorElectronics.Client.Pages.User.Admin.Crud;
+namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudFeaturedDeals : CrudPage<AdminItemViewDto, FeaturedDeal>
+public sealed partial class CrudFeatures : CrudPage<CrudView, FeatureEdit>
 {
     protected override async Task OnInitializedAsync()
     {
-        ItemTitle = "Featured Deal";
-
+        ItemTitle = "Feature";
+        
         await base.OnInitializedAsync();
 
         if ( !PageIsAuthorized )
             return;
 
-        ApiPath = "api/AdminFeaturedDeal";
+        ApiPath = "api/AdminFeatures";
         await LoadView();
     }
 }

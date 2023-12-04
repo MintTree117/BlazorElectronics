@@ -1,9 +1,9 @@
 @page "/admin/crud/features"
 @using BlazorElectronics.Shared;
 @using BlazorElectronics.Shared.Features;
-@inherits CrudPage<AdminItemViewDto, Feature>
+@inherits CrudPage<CrudView, FeatureEdit>
 
-<div class="container-sm">
+<div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
     
     @if ( PageIsReady() )
@@ -38,6 +38,8 @@
                     <i class="oi oi-cloud-upload"></i>
                 </button>
             </EditForm>
+
+            <ActionMessage Page="@this"></ActionMessage>
         }
     }
 </div>

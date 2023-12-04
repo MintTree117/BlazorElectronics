@@ -2,7 +2,7 @@ namespace BlazorElectronics.Shared.Enums;
 
 public enum CategoryTier
 {
-    PRIMARY = 1,
-    SECONDARY = 2,
-    TERTIARY = 3
+    Primary = 1,
+    Secondary = 2,
+    Tertiary = 3
 }

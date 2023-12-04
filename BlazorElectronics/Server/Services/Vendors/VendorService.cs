@@ -1,5 +1,6 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.Vendors;
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Vendors;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
@@ -24,84 +25,73 @@ public sealed class VendorService : ApiService, IVendorService
         if ( _cachedVendors is not null && _cachedVendors.IsValid( MAX_VENDOR_LIFE ) )
             return new ServiceReply<VendorsResponse?>( _cachedVendors.Object );
 
-        VendorsModel? model;
-
         try
         {
-            model = await _repository.Get();
+            VendorsModel? model = await _repository.Get();
+            VendorsResponse? response = MapResponse( model );
+            _cachedVendors = response is not null ? new CachedObject<VendorsResponse>( response ) : null;
+            
+            return response is not null 
+                ? new ServiceReply<VendorsResponse?>( response ) 
+                : new ServiceReply<VendorsResponse?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<VendorsResponse?>( ServiceErrorType.ServerError );
         }
-
-        VendorsResponse? response = MapResponse( model );
-
-        if ( response is null )
-            return new ServiceReply<VendorsResponse?>( ServiceErrorType.NotFound );
-
-        _cachedVendors = new CachedObject<VendorsResponse>( response );
-        return new ServiceReply<VendorsResponse?>( response );
     }
-    public async Task<ServiceReply<List<AdminItemViewDto>?>> GetView()
+    public async Task<ServiceReply<List<CrudView>?>> GetView()
     {
         try
         {
             IEnumerable<VendorModel>? models = await _repository.GetView();
-            List<AdminItemViewDto>? view = MapView( models );
+            List<CrudView>? view = MapView( models );
 
             return view is not null
-                ? new ServiceReply<List<AdminItemViewDto>?>( view )
-                : new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CrudView>?>( view )
+                : new ServiceReply<List<CrudView>?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<AdminItemViewDto>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<VendorEditDto?>> GetEdit( int vendorId )
+    public async Task<ServiceReply<VendorEdit?>> GetEdit( int vendorId )
     {
-        VendorEditModel? model;
-
         try
         {
-            model = await _repository.GetEdit( vendorId );
+            VendorEditModel? model = await _repository.GetEdit( vendorId );
+            VendorEdit? dto = MapEdit( model );
+
+            return dto is not null
+                ? new ServiceReply<VendorEdit?>( dto )
+                : new ServiceReply<VendorEdit?>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<VendorEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<VendorEdit?>( ServiceErrorType.ServerError );
         }
-
-        VendorEditDto? dto = MapEdit( model );
-
-        return dto is not null
-            ? new ServiceReply<VendorEditDto?>( dto )
-            : new ServiceReply<VendorEditDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ServiceReply<VendorEditDto?>> Add( VendorEditDto dto )
+    public async Task<ServiceReply<int>> Add( VendorEdit dto )
     {
-        VendorEditModel? model;
-
         try
         {
-            model = await _repository.Insert( dto );
+            int id = await _repository.Insert( dto );
+            
+            return id > 0
+                ? new ServiceReply<int>( id )
+                : new ServiceReply<int>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<VendorEditDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
-
-        VendorEditDto? edit = MapEdit( model );
-
-        return edit is not null
-            ? new ServiceReply<VendorEditDto?>( edit )
-            : new ServiceReply<VendorEditDto?>( ServiceErrorType.NotFound );
     }
-    public async Task<ServiceReply<bool>> Update( VendorEditDto dto )
+    public async Task<ServiceReply<bool>> Update( VendorEdit dto )
     {
         try
         {
@@ -111,7 +101,7 @@ public sealed class VendorService : ApiService, IVendorService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -127,7 +117,7 @@ public sealed class VendorService : ApiService, IVendorService
                 ? new ServiceReply<bool>( result )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -143,7 +133,7 @@ public sealed class VendorService : ApiService, IVendorService
 
         foreach ( VendorModel v in model.Vendors )
         {
-            response.VendorsById.TryAdd( v.VendorId, new VendorDto
+            response.VendorsById.TryAdd( v.VendorId, new Vendor
             {
                 VendorId = v.VendorId,
                 VendorName = v.VendorName,
@@ -161,32 +151,32 @@ public sealed class VendorService : ApiService, IVendorService
                 response.VendorIdsByCategory.Add( pc, ids );
             }
 
-            ids.Add( c.PrimaryCategoryId );
+            ids.Add( c.VendorId );
         }
 
         return response;
     }
-    static List<AdminItemViewDto>? MapView( IEnumerable<VendorModel>? models )
+    static List<CrudView>? MapView( IEnumerable<VendorModel>? models )
     {
         return models?
-            .Select( vendor => new AdminItemViewDto { Id = vendor.VendorId, Name = vendor.VendorName } )
+            .Select( vendor => new CrudView { Id = vendor.VendorId, Name = vendor.VendorName } )
             .ToList();
     }
-    static VendorEditDto? MapEdit( VendorEditModel? model )
+    static VendorEdit? MapEdit( VendorEditModel? model )
     {
         if ( model?.Vendor is null )
             return null;
         
-        List<int>? categoryIds = model.Categories?
-            .Select( c => c.PrimaryCategoryId )
-            .ToList();
+        List<PrimaryCategory> categories = model.Categories is not null
+            ? model.Categories.Select( c => c.PrimaryCategoryId ).ToList()
+            : new List<PrimaryCategory>();
 
-        return new VendorEditDto
+        return new VendorEdit
         {
             VendorId = model.Vendor.VendorId,
             VendorName = model.Vendor.VendorName,
             VendorUrl = model.Vendor.VendorUrl,
-            PrimaryCategories = ConvertPrimaryCategoriesToString( categoryIds ?? new List<int>() )
+            PrimaryCategories = categories
         };
     }
 }

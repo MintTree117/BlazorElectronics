@@ -20,6 +20,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudCategories.razor" />
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudEditTitle.razor" />
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudFeaturedDeals.razor" />
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudFeatures.razor" />
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudSpecs.razor" />
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudVendors.razor" />
+      <AdditionalFiles Include="Pages\Admin\Crud\CrudViewTable.razor" />
       <AdditionalFiles Include="Pages\Home\Index.razor" />
     </ItemGroup>
 
@@ -32,6 +39,13 @@
       <_ContentIncludedByDefault Remove="Pages\ProductDetails\ProductDetails.razor" />
       <_ContentIncludedByDefault Remove="Pages\ProductSearch\ProductList.razor" />
       <_ContentIncludedByDefault Remove="Pages\ProductSearch\ProductSearch.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudCategories.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudEditTitle.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudFeaturedDeals.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudFeatures.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudSpecs.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudVendors.razor" />
+      <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudViewTable.razor" />
     </ItemGroup>
 
 </Project>

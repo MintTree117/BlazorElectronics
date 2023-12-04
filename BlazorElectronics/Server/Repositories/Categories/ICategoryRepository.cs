@@ -7,7 +7,7 @@ public interface ICategoryRepository
 {
     Task<IEnumerable<CategoryModel>?> Get();
     Task<CategoryModel?> GetEdit( int categoryId );
-    Task<CategoryModel?> Insert( CategoryEditDto dto );
-    Task<bool> Update( CategoryEditDto dto );
+    Task<int> Insert( CategoryEdit dto );
+    Task<bool> Update( CategoryEdit dto );
     Task<bool> Delete( int categoryId );
 }

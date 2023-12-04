@@ -35,12 +35,12 @@ public class VendorRepository : DapperRepository, IVendorRepository
         p.Add( PARAM_VENDOR_ID, vendorId );
         return await TryQueryAsync( GetEditQuery, p );
     }
-    public async Task<VendorEditModel?> Insert( VendorEditDto dto )
+    public async Task<int> Insert( VendorEdit dto )
     {
         DynamicParameters p = GetInsertParameters( dto );
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<VendorEditModel?>, p, PROCEDURE_INSERT );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( VendorEditDto dto )
+    public async Task<bool> Update( VendorEdit dto )
     {
         DynamicParameters p = GetUpdateParameters( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
@@ -79,7 +79,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
         };
     }
     
-    static DynamicParameters GetInsertParameters( VendorEditDto dto )
+    static DynamicParameters GetInsertParameters( VendorEdit dto )
     {
         var parameters = new DynamicParameters();
 
@@ -91,7 +91,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
         
         return parameters;
     }
-    static DynamicParameters GetUpdateParameters( VendorEditDto dto )
+    static DynamicParameters GetUpdateParameters( VendorEdit dto )
     {
         DynamicParameters parameters = GetInsertParameters( dto );
         parameters.Add( PARAM_VENDOR_ID, dto.VendorId );

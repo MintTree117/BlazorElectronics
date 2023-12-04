@@ -1,8 +1,9 @@
+using BlazorElectronics.Client.Pages.User;
 using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Shared;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.User.Admin;
+namespace BlazorElectronics.Client.Pages.Admin;
 
 public abstract class AdminPage : UserPage
 {

@@ -1,3 +1,13 @@
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon .oi {
+    margin-right: 5px;
+}
+
 .form-wrapper {
     border: 1px solid #dee2e6; /* Subtle border color */
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, .075); /* Subtle shadow */
@@ -5,10 +15,6 @@
     padding: 20px;
     border-radius: 5px;
     margin-bottom: 20px;
-}
-
-.form-control {
-    padding: 15px;
 }
 
 .form-header {
@@ -29,6 +35,10 @@
 .back-button:hover {
     color: #0056b3; /* Darken color on hover */
     text-decoration: underline;
+}
+
+.form-wrapper .form-control {
+    padding: 15px;
 }
 
 .crud-table thead th:last-child {

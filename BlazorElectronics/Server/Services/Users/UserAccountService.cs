@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Models.Users;
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Users;
 
 namespace BlazorElectronics.Server.Services.Users;
@@ -28,7 +29,7 @@ public class UserAccountService : ApiService, IUserAccountService
                 ? new ServiceReply<List<int>?>( reply.ToList() )
                 : new ServiceReply<List<int>?>( ServiceErrorType.NotFound );
         }
-        catch ( Exception e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<List<int>?>( ServiceErrorType.ServerError );
@@ -42,7 +43,7 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
@@ -64,7 +65,7 @@ public class UserAccountService : ApiService, IUserAccountService
             if ( userExists is not null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
@@ -77,7 +78,7 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
@@ -95,7 +96,7 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             admin = await _userRepository.GetById( adminId );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -116,7 +117,7 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             admin = await _userRepository.GetById( adminId );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<int>( ServiceErrorType.ServerError );
@@ -137,7 +138,7 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             user = await _userRepository.GetByEmail( email );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<int>( ServiceErrorType.ServerError );
@@ -155,7 +156,7 @@ public class UserAccountService : ApiService, IUserAccountService
         {
             user = await _userRepository.GetById( userId );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
@@ -176,7 +177,7 @@ public class UserAccountService : ApiService, IUserAccountService
                 ? new ServiceReply<bool>( true )
                 : new ServiceReply<bool>( ServiceErrorType.ValidationError );
         }
-        catch ( ServiceException e )
+        catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );

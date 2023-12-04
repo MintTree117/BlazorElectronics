@@ -1,9 +1,9 @@
 @page "/admin/crud/featured-deals"
 @using BlazorElectronics.Shared;
 @using BlazorElectronics.Shared.Features;
-@inherits CrudPage<AdminItemViewDto, FeaturedDeal>
+@inherits CrudPage<CrudView, FeaturedDealEdit>
 
-<div class="container-sm">
+<div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
 
     @if ( PageIsReady() )
@@ -39,6 +39,8 @@
                     <i class="oi oi-cloud-upload"></i>
                 </button>
             </EditForm>
+
+            <ActionMessage Page="@this"></ActionMessage>
         }
     }
 </div>
