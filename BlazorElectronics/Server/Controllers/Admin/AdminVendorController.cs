@@ -22,7 +22,7 @@ public sealed class AdminVendorController : _AdminController
     [HttpPost( "get-vendor-view" )]
     public async Task<ActionResult<List<AdminItemViewDto>?>> GetView( [FromBody] UserRequest request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
         
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -33,7 +33,7 @@ public sealed class AdminVendorController : _AdminController
     [HttpPost("get-vendor-edit")]
     public async Task<ActionResult<VendorEditDto?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -44,7 +44,7 @@ public sealed class AdminVendorController : _AdminController
     [HttpPost( "add-vendor" )]
     public async Task<ActionResult<VendorEditDto?>> Add( [FromBody] UserDataRequest<VendorEditDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -55,7 +55,7 @@ public sealed class AdminVendorController : _AdminController
     [HttpPost( "update-vendor" )]
     public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<VendorEditDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -66,7 +66,7 @@ public sealed class AdminVendorController : _AdminController
     [HttpPost( "remove-vendor" )]
     public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );

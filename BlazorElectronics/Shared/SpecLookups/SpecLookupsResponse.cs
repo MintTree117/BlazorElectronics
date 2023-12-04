@@ -4,10 +4,6 @@ namespace BlazorElectronics.Shared.SpecLookups;
 
 public sealed class SpecLookupsResponse
 {
-    public SpecLookupsResponse()
-    {
-        
-    }
     public SpecLookupsResponse( List<int> globalIds, Dictionary<PrimaryCategory, List<int>> categories, Dictionary<int, SpecLookupDto> responses )
     {
         GlobalSpecIds = globalIds;

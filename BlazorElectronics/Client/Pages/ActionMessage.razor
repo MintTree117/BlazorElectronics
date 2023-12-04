@@ -1,0 +1,11 @@
+@if ( !string.IsNullOrWhiteSpace( Page.ActionMessage ) )
+{
+    <div class="action-message @Page.ActionMessageClass">
+        <span>@Page.ActionMessage</span>
+    </div>
+}
+
+@code 
+{
+    [Parameter] public PageView Page { get; set; } = null!;  
+}

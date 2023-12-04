@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Users;
 
@@ -9,7 +10,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     public UserServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public event Action<UserSessionResponse?>? SessionChanged;
+    public event Action<SessionMeta?>? SessionChanged;
 
     const string API_ROUTE = "api/UserAccount";
     const string API_ROUTE_REGISTER = API_ROUTE + "/register";
@@ -21,31 +22,27 @@ public class UserServiceClient : ClientService, IUserServiceClient
     
     UserSessionResponse? _userSession;
     
-    public async Task<ServiceReply<UserSessionResponse?>> Register( UserRegisterRequest request )
+    public async Task<ServiceReply<bool>> Register( UserRegisterRequest request )
     {
         ServiceReply<UserSessionResponse?> registerReply = await TryGetSessionResponse( API_ROUTE_REGISTER, request );
-
-        if ( !registerReply.Success || registerReply.Data is null )
-            SessionChanged?.Invoke( _userSession );
-        
-        return registerReply;
+        return new ServiceReply<bool>( false );
     }
     public async Task<ServiceReply<UserSessionResponse?>> Login( UserLoginRequest request )
     {
         ServiceReply<UserSessionResponse?> loginReply = await TryGetSessionResponse( API_ROUTE_LOGIN, request );
 
         if ( loginReply is { Success: true, Data: not null } )
-            SessionChanged?.Invoke( _userSession );
+            SessionChanged?.Invoke( GetSessionMeta( loginReply.Data ) );
 
         return loginReply;
     }
-    public async Task<ServiceReply<UserSessionResponse?>> AuthorizeUser()
+    public async Task<ServiceReply<bool>> AuthorizeUser()
     {
         ServiceReply<bool> serviceReply = await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
 
         return serviceReply.Success
-            ? new ServiceReply<UserSessionResponse?>( _userSession )
-            : new ServiceReply<UserSessionResponse?>( serviceReply.ErrorType, serviceReply.Message );
+            ? new ServiceReply<bool>( true )
+            : new ServiceReply<bool>( serviceReply.ErrorType, serviceReply.Message );
     }
     public async Task<ServiceReply<bool>> Logout()
     {
@@ -58,7 +55,16 @@ public class UserServiceClient : ClientService, IUserServiceClient
     {
         return await TryUserRequest<PasswordChangeRequest, bool>( API_ROUTE_CHANGE_PASSWORD, request );
     }
-    public async Task<ServiceReply<UserSessionResponse?>> TryGetLocalUserSession()
+    public async Task<SessionMeta?> GetSessionMeta()
+    {
+        ServiceReply<UserSessionResponse?> reply = await TryGetLocalUserSession();
+
+        if ( !reply.Success || reply.Data is null )
+            return null;
+
+        return new SessionMeta( reply.Data.IsAdmin ? SessionType.Admin : SessionType.User, reply.Data.Username );
+    }
+    async Task<ServiceReply<UserSessionResponse?>> TryGetLocalUserSession()
     {
         if ( _userSession is not null )
             return new ServiceReply<UserSessionResponse?>( _userSession );
@@ -127,5 +133,10 @@ public class UserServiceClient : ClientService, IUserServiceClient
         {
             Logger.LogError( e.Message + e.InnerException?.Message );
         }
+    }
+
+    static SessionMeta GetSessionMeta( UserSessionResponse session )
+    {
+        return new SessionMeta( session.IsAdmin ? SessionType.Admin : SessionType.User, session.Username );
     }
 }

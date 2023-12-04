@@ -211,7 +211,7 @@ public class FeaturesService : ApiService, IFeaturesService
     static List<AdminItemViewDto>? MapFeaturesView( IEnumerable<Feature>? models )
     {
         return models?
-            .Select( m => new AdminItemViewDto { Id = m.FeatureId, Name = m.FeatureName } )
+            .Select( m => new AdminItemViewDto { Id = m.FeatureId, Name = m.Name } )
             .ToList();
     }
     static List<AdminItemViewDto>? MapDealsView( IEnumerable<FeaturedDeal>? models )

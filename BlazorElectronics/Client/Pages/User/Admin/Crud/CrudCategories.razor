@@ -1,0 +1,63 @@
+@page "/admin/crud/categories"
+@using BlazorElectronics.Shared.Categories
+@using BlazorElectronics.Shared.Enums
+@inherits CrudPage<CategoryViewDto, CategoryEditDto>
+
+<div class="container-sm form-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        if ( !IsEditing )
+        {
+            <CrudViewTable Page="@this"></CrudViewTable>
+        }
+        else
+        {
+            <CrudEditTitle Page="@this"></CrudEditTitle>
+
+            <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
+                <div class="mb-3">
+                    <label for="Tier" class="form-label">Category Tier</label>
+                    <InputSelect @bind-Value="ItemEdit.Tier" @onchange="HandleTierChange" class="form-control" id="Tier">
+                        @foreach ( CategoryTier tier in Enum.GetValues<CategoryTier>() )
+                        {
+                            <option value="@tier">@tier</option>
+                        }
+                    </InputSelect>
+                </div>
+                @if ( ItemEdit.Tier != CategoryTier.PRIMARY )
+                {
+                    
+                    <div class="mb-3">
+                        <label for="Parent" class="form-label">Parent Category</label>
+                        <InputSelect @bind-Value="ItemEdit.ParentId" class="form-control" id="Parent">
+                            @foreach ( CategoryViewDto item in GetEditParents() )
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+                }
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Category Name</label>
+                    <InputText @bind-Value="ItemEdit.Name" class="form-control" id="Name"></InputText>
+                </div>
+                <div class="mb-3">
+                    <label for="ApiUrl" class="form-label">Api Url</label>
+                    <InputText @bind-Value="ItemEdit.ApiUrl" class="form-control" id="ApiUrl"></InputText>
+                </div>
+                <div class="mb-3">
+                    <label for="ImageUrl" class="form-label">Image Url</label>
+                    <InputText @bind-Value="ItemEdit.ImageUrl" class="form-control" id="ImageUrl"></InputText>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="oi oi-cloud-upload"></i> Submit
+                    </button>
+                </div>
+            </EditForm>
+        }
+    }
+</div>

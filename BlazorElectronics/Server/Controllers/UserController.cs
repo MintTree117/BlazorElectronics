@@ -25,33 +25,29 @@ public class UserController : _Controller
         var dto = new UserDeviceInfoDto( address?.ToString() );
         return dto;
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUser( UserRequest? request )
+
+    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeUser( UserRequest? request )
     {
         if ( !ValidateUserHttp( request ) )
-            return new ServiceReply<int>( ServiceErrorType.ValidationError );
+            return new ServiceReply<bool>( ServiceErrorType.ValidationError );
 
-        ServiceReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
-
-        return authorizeReply.Success
-            ? new ServiceReply<int>( authorizeReply.Data )
-            : new ServiceReply<int>( ServiceErrorType.Unauthorized );
+        return await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUser<T>( UserDataRequest<T>? request ) where T : class
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( UserRequest? request )
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        ServiceReply<int> authorizeReply = await AuthorizeSessionRequest( request!.SessionId, request.SessionToken );
+        return await SessionService.AuthorizeSessionId( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+    }
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId<T>( UserDataRequest<T>? request ) where T : class
+    {
+        if ( !ValidateUserHttp( request ) )
+            return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        return authorizeReply.Success
-            ? new ServiceReply<int>( authorizeReply.Data )
-            : new ServiceReply<int>( ServiceErrorType.Unauthorized );
+        return await SessionService.AuthorizeSessionId( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
     
-    async Task<ServiceReply<int>> AuthorizeSessionRequest( int sessionId, string sessionToken )
-    {
-        return await SessionService.AuthorizeSession( sessionId, sessionToken, GetRequestDeviceInfo() );
-    }
     static bool ValidateUserHttp( UserRequest? request )
     {
         return request is not null && 

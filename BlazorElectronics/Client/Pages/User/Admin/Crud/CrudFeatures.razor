@@ -1,0 +1,43 @@
+@page "/admin/crud/features"
+@using BlazorElectronics.Shared;
+@using BlazorElectronics.Shared.Features;
+@inherits CrudPage<AdminItemViewDto, Feature>
+
+<div class="container-sm">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        if ( !IsEditing )
+        {
+            <CrudViewTable Page="@this"></CrudViewTable>
+        }
+        else
+        {
+            <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-primary" type="button" @onclick="@GoBack">
+                    <span class="oi oi-plus"></span> Back
+                </button>
+                <h3>@PageTitle</h3>
+            </div>
+
+            <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Feature Name</label>
+                    <InputText @bind-Value="ItemEdit.Name" class="form-control" id="Name"></InputText>
+                </div>
+                <div class="mb-3">
+                    <label for="ApiUrl" class="form-label">Url: include query parameters</label>
+                    <InputText @bind-Value="ItemEdit.Url" class="form-control" id="ApiUrl"></InputText>
+                </div>
+                <div class="mb-3">
+                    <label for="ImageUrl" class="form-label">Image Url</label>
+                    <InputText @bind-Value="ItemEdit.Image" class="form-control" id="ImageUrl"></InputText>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="oi oi-cloud-upload"></i>
+                </button>
+            </EditForm>
+        }
+    }
+</div>

@@ -21,7 +21,7 @@
                 @foreach ( Feature p in _featuredProducts )
                 {
                     <div class="carousel-item fp-carousel-item @(p == _featuredProducts.First() ? "active" : "")">
-                        <img class="d-block w-100 fp-carousel-item-img" src="@p.FeatureImage" alt="@p.FeatureName"/>
+                        <img class="d-block w-100 fp-carousel-item-img" src="@p.Image" alt="@p.Name"/>
                     </div>
                 }
             </div>
@@ -34,7 +34,7 @@
                 <span class="visually-hidden">Next</span>
             </button>
             <div class="category-list-container">
-                <CategoryListOld></CategoryListOld>
+                
             </div>
             <div class="featured-products-fade">
             </div>

@@ -2,9 +2,10 @@
 @inherits PageView
 
 <div class="container-sm">
-    <PageTitle>Register</PageTitle>
-    <h3>UserRegistration</h3>
+    <PageLoader Page="@this"></PageLoader>
     
+    <h3>User Registration</h3>
+
     @if ( !_registered )
     {
         <EditForm Model="_user" OnValidSubmit="@(async () => await HandleRegistration() )">
@@ -32,8 +33,6 @@
             <button class="btn btn-primary" type="submit">Register</button>
         </EditForm>
     }
-    else
-    {
-        <span>You have successfully registered your account. Please check your email for a verification link.</span>
-    }
+    
+    <ActionMessage Page="@this"></ActionMessage>
 </div>

@@ -47,7 +47,7 @@ public class AdminSeedController : _AdminController
     [HttpPost( "seed-products" )]
     public async Task<ActionResult<ServiceReply<bool>>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -60,7 +60,7 @@ public class AdminSeedController : _AdminController
         if ( !categories.Success || !lookups.Success || !vendors.Success || !users.Success )
             return NotFound( NOT_FOUND_MESSAGE );
 
-        ServiceReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data, lookups.Data, vendors.Data, users.Data );
+        ServiceReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data!, lookups.Data!, vendors.Data!, users.Data! );
 
         return seedResult.Success
             ? Ok( seedResult )
@@ -70,7 +70,7 @@ public class AdminSeedController : _AdminController
     [HttpPost( "seed-users" )]
     public async Task<ActionResult<ServiceReply<bool>>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );

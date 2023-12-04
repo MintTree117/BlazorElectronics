@@ -1,36 +1,27 @@
 @page "/profile"
-
 @inherits UserPage
 
-<h3>User Profile</h3>
+<div class="container-sm">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <h3>User Profile</h3>
+        <h5>Change Password</h5>
 
-@if ( PageIsRedirecting )
-{
-    <div class="loading-container">
-        <div class="loading-circle"></div>
-        <p>@ViewMessage</p>
-        <p>Redirecting in @PageRedirectCountdown...</p>
-    </div>
-}
-else if ( !PageIsReady() )
-{
-    <span>@ViewMessage</span>
-}
-else
-{
-    <h5>Change Password</h5>
+        <EditForm Model="_changeRequest" OnValidSubmit="@(async () => await ChangePassword() )">
+            <div class="mb-3">
+                <label for="password">New Password</label>
+                <InputText class="form-control" id="password" @bind-Value="_changeRequest.Password" type="password"/>
+                <ValidationMessage For="@(() => _changeRequest.Password)"/>
+            </div>
+            <div class="mb-3">
+                <label for="confirm-password">Confirm New Password</label>
+                <InputText class="form-control" id="confirm-password" @bind-Value="_changeRequest.ConfirmPassword" type="password"/>
+                <ValidationMessage For="@(() => _changeRequest.ConfirmPassword)"/>
+            </div>
+            <button class="btn btn-primary" type="submit">Apply</button>
+        </EditForm>
+    }
+</div>
 
-    <EditForm Model="_changeRequest" OnValidSubmit="@(async () => await ChangePassword() )">
-        <div class="mb-3">
-            <label for="password">New Password</label>
-            <InputText class="form-control" id="password" @bind-Value="_changeRequest.Password" type="password"/>
-            <ValidationMessage For="@(() => _changeRequest.Password)"/>
-        </div>
-        <div class="mb-3">
-            <label for="confirm-password">Confirm New Password</label>
-            <InputText class="form-control" id="confirm-password" @bind-Value="_changeRequest.ConfirmPassword" type="password"/>
-            <ValidationMessage For="@(() => _changeRequest.ConfirmPassword)"/>
-        </div>
-        <button class="btn btn-primary" type="submit">Apply</button>
-    </EditForm>
-}

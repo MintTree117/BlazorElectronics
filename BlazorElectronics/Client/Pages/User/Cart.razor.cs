@@ -8,7 +8,7 @@ namespace BlazorElectronics.Client.Pages.User;
 public partial class Cart : PageView
 {
     [Inject] ICartServiceClient CartService { get; init; } = default!;
-    List<CartProductResponse>? _cart;
+    CartResponse? _cart;
 
     protected override async Task OnInitializedAsync()
     {
@@ -22,6 +22,6 @@ public partial class Cart : PageView
             return;
         }
 
-        _cart = reply.Data.Items;
+        _cart = reply.Data;
     }
 }

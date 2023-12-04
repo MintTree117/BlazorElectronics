@@ -1,0 +1,68 @@
+.form-wrapper {
+    border: 1px solid #dee2e6; /* Subtle border color */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, .075); /* Subtle shadow */
+    background-color: #f8f9fa; /* Light background color */
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.form-control {
+    padding: 15px;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    color: #007bff; /* Bootstrap primary color */
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+.back-button:hover {
+    color: #0056b3; /* Darken color on hover */
+    text-decoration: underline;
+}
+
+.crud-table thead th:last-child {
+    text-align: right;
+}
+
+.crud-sort-th {
+    cursor: pointer;
+    background-color: #f8f9fa; /* Light grey background */
+    text-decoration: underline; /* Underline text to indicate it's clickable */
+}
+
+.crud-sort-th:hover {
+    background-color: #e2e6ea; /* Slightly darker grey on hover */
+}
+
+table.table-hover tbody tr:hover {
+    background-color: #e9ecef; /* Change color on hover */
+}
+
+.crud-tr > td:last-child {
+    text-align: right;
+}
+
+.crud-tr {
+    padding: 10px 5px 10px 5px;
+}
+
+/* Style for odd rows */
+.crud-tr:nth-child(odd) {
+    background-color: #f1f1f1; /* Lighter grey for better contrast */
+}
+
+/* Style for even rows */
+.crud-tr:nth-child(even) {
+    background-color: #d6d8db; /* Slightly darker grey for better contrast */
+}

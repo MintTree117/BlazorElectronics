@@ -32,7 +32,7 @@ public class ProductService : ApiService, IProductService
     }
     public async Task<ServiceReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request )
     {
-        return null;
+        return new ServiceReply<ProductSuggestionsResponse?>( null );
         /*Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryType, request.CategoryIdMap.CategoryId );
         ApiReply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
 

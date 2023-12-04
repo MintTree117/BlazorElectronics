@@ -87,6 +87,27 @@ public class UserAccountService : ApiService, IUserAccountService
             ? new ServiceReply<UserLoginDto?>( new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) )
             : new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound );
     }
+    public async Task<ServiceReply<bool>> VerifyAdmin( int adminId )
+    {
+        User? admin;
+
+        try
+        {
+            admin = await _userRepository.GetById( adminId );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+
+        if ( admin is null )
+            return new ServiceReply<bool>( ServiceErrorType.NotFound );
+
+        return admin.IsAdmin
+            ? new ServiceReply<bool>( true )
+            : new ServiceReply<bool>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
+    }
     public async Task<ServiceReply<int>> VerifyAdminId( int adminId )
     {
         User? admin;

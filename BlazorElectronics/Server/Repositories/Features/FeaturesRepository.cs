@@ -1,5 +1,4 @@
 using System.Data;
-using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Shared.Features;
@@ -103,9 +102,9 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     static DynamicParameters GetFeatureInsertParams( Feature dto )
     {
         DynamicParameters p = new();
-        p.Add( PARAM_FEATURE_NAME, dto.FeatureName );
-        p.Add( PARAM_FEATURE_URL, dto.FeatureUrl );
-        p.Add( PARAM_FEATURE_IMAGE, dto.FeatureImage );
+        p.Add( PARAM_FEATURE_NAME, dto.Name );
+        p.Add( PARAM_FEATURE_URL, dto.Url );
+        p.Add( PARAM_FEATURE_IMAGE, dto.Image );
         return p;
     }
     static DynamicParameters GetFeatureUpdateParams( Feature dto )
@@ -118,7 +117,7 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, dto.ProductId );
-        p.Add( PARAM_FEATURE_IMAGE, dto.ThumbnailUrl );
+        p.Add( PARAM_FEATURE_IMAGE, dto.Image );
         return p;
     }
 }

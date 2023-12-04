@@ -52,13 +52,13 @@ public class UserAccountController : UserController
     [HttpPost( "authorize" )]
     public async Task<ActionResult<bool>> AuthorizeSession( [FromBody] UserRequest request )
     {
-        ServiceReply<int> authorizeReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<bool> authorizeReply = await ValidateAndAuthorizeUser( request );
         return GetReturnFromApi( authorizeReply );
     }
     [HttpPost( "change-password" )]
     public async Task<ActionResult<bool>> ChangePassword( [FromBody] UserDataRequest<PasswordChangeRequest>? request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );
@@ -72,7 +72,7 @@ public class UserAccountController : UserController
     [HttpPost( "logout" )]
     public async Task<ActionResult<bool>> Logout( [FromBody] UserRequest? request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );

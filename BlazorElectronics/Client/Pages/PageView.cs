@@ -6,25 +6,24 @@ namespace BlazorElectronics.Client.Pages;
 public abstract class PageView : RazorView
 {
     protected bool PageIsLoaded = false;
-    protected bool PageIsRedirecting = false;
-
-    protected const string ERROR_INVALID_URL_PARAMS = "Invalid url paramters!";
-    protected const string MESSAGE_SUCCESS_CLASS = "text-success";
-    protected const string MESSAGE_FAILURE_CLASS = "text-danger";
-    protected string ViewMessageClass = MESSAGE_FAILURE_CLASS;
-    protected string ActionMessageClass = MESSAGE_FAILURE_CLASS;
-    protected string ViewMessage = "Loading Data...";
-    protected string ActionMessage = string.Empty;
+    public bool PageIsRedirecting { get; private set; }
+    
+    const string MESSAGE_SUCCESS_CLASS = "text-success";
+    const string MESSAGE_FAILURE_CLASS = "text-danger";
+    public string ViewMessageClass { get; private set; } = MESSAGE_FAILURE_CLASS;
+    public string ActionMessageClass { get; private set; } = MESSAGE_FAILURE_CLASS;
+    public string ViewMessage { get; private set; } = "Loading Data...";
+    public string ActionMessage { get; private set; } = string.Empty;
     
     const int PAGE_REDIRECTION_WAIT_MILLISECONDS = 3000;
     const string PAGE_RETURN_URL_PARAM = "returnUrl";
     const string PAGE_RETURN_URL_DEFAULT = "";
     
     string? ReturnUrl = string.Empty;
-    protected int PageRedirectCountdown = 3;
+    protected int PageRedirectCountdown { get; private set; } = 3;
     System.Timers.Timer? PageRedirectTimer;
-
-    protected virtual bool PageIsReady()
+    
+    public virtual bool PageIsReady()
     {
         return PageIsLoaded;
     }
@@ -34,8 +33,9 @@ public abstract class PageView : RazorView
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
         ReturnUrl = queryString.Get( PAGE_RETURN_URL_PARAM );
     }
-    protected void StartPageRedirection()
+    protected void StartPageRedirection( string message )
     {
+        SetViewMessage( false, message );
         PageIsRedirecting = true;
         PageRedirectTimer = new System.Timers.Timer( PAGE_REDIRECTION_WAIT_MILLISECONDS );
         PageRedirectTimer.Elapsed += CountdownTimerElapsed;

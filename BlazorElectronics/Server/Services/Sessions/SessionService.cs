@@ -59,7 +59,34 @@ public class SessionService : ApiService, ISessionService
             : new ServiceReply<bool>( ServiceErrorType.NotFound );
 
     }
-    public async Task<ServiceReply<int>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
+    public async Task<ServiceReply<bool>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
+    {
+        UserSession? session;
+
+        try
+        {
+            session = await _sessionRepository.GetSession( sessionId );
+        }
+        catch ( ServiceException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+
+        if ( session is null )
+            return new ServiceReply<bool>( ServiceErrorType.NotFound );
+
+        if ( !session.IsValid( MAX_SESSION_HOURS ) )
+        {
+            await DeleteSession( session.SessionId );
+            return new ServiceReply<bool>( ServiceErrorType.ValidationError, SESSION_EXPIRED_MESSAGE );
+        }
+
+        return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
+            ? new ServiceReply<bool>( true )
+            : new ServiceReply<bool>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
+    }
+    public async Task<ServiceReply<int>> AuthorizeSessionId( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
     {
         UserSession? session;
 
@@ -86,7 +113,7 @@ public class SessionService : ApiService, ISessionService
             ? new ServiceReply<int>( session.UserId )
             : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
     }
-
+    
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )
     {
         var hmac = new HMACSHA512();

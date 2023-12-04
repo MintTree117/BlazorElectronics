@@ -1,4 +1,5 @@
 @using Blazored.LocalStorage
+@using BlazorElectronics.Client.Models
 @using BlazorElectronics.Client.Services.Users
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.Users
@@ -27,12 +28,11 @@
             {
                 <hr/>
                 <h6>Admin</h6>
-                <a class="dropdown-item" href="admin/categories/view">Categories</a>
-                <a class="dropdown-item" href="admin/features/view">Features</a>
-                <a class="dropdown-item" href="admin/products/view">Products</a>
-                <a class="dropdown-item" href="admin/specs/view">Specifications</a>
-                <a class="dropdown-item" href="admin/variants/view">Variants</a>
-                <a class="dropdown-item" href="admin/vendors/view">Vendors</a>
+                <a class="dropdown-item" href="admin/crud/categories">Categories</a>
+                <a class="dropdown-item" href="admin/crud/features">Features</a>
+                <a class="dropdown-item" href="admin/crud/products">Products</a>
+                <a class="dropdown-item" href="admin/crud/specs">Specifications</a>
+                <a class="dropdown-item" href="admin/crud/vendors">Vendors</a>
                 <hr/>
             }
         }
@@ -53,16 +53,16 @@
 
     protected override void OnInitialized()
     {
-        UserService.SessionChanged += HandleAuthorizationChange;
+        UserService.SessionChanged += HandleSessionChange;
     }
     protected override async Task OnInitializedAsync()
     {
-        //ServiceReply<UserSessionResponse?> authorizeReply = await UserService.AuthorizeUser();
-        //HandleAuthorizationChange( authorizeReply.Data );
+        SessionMeta? sessionReply = await UserService.GetSessionMeta();
+        HandleSessionChange( sessionReply );
     }
     public void Dispose()
     {
-        UserService.SessionChanged -= HandleAuthorizationChange;
+        UserService.SessionChanged -= HandleSessionChange;
     }
     
     async Task HideUserMenu()
@@ -81,10 +81,10 @@
         _showUserMenu = !_showUserMenu;
         StateHasChanged();
     }
-    void HandleAuthorizationChange( UserSessionResponse? sessionResponse )
+    void HandleSessionChange( SessionMeta? meta  )
     {
-        _isAuthorized = sessionResponse is not null;
-        _isAdmin = sessionResponse is not null && sessionResponse.IsAdmin;
+        _isAuthorized = meta is not null;
+        _isAdmin = meta is not null && meta.Type == SessionType.Admin;
         StateHasChanged();
     }
 }

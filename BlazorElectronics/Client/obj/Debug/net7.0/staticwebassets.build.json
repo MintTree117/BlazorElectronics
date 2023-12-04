@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "GWNQdsnvqmhE7/6I6XLmAudofTbbXYYXRZgL3EtM/lI=",
+  "Hash": "ljNjrdlwn/Mq/+5N/5zssLepD54nfnssKzTVdB+X2tc=",
   "Source": "BlazorElectronics.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -7820,23 +7820,6 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/scopedcss/projectbundle/BlazorElectronics.Client.bundle.scp.css"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/admin.css",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Discovered",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "css/admin.css",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/css/admin.css"
-    },
-    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
@@ -7920,6 +7903,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/categorylist.css"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/forms.css",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "css/forms.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/forms.css"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/home.css",

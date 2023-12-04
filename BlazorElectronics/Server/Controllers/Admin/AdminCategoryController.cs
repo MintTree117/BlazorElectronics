@@ -19,21 +19,21 @@ public sealed class AdminCategoryController : _AdminController
         _service = service;
     }
 
-    [HttpPost( "get-categories-view" )]
+    [HttpPost( "get-view" )]
     public async Task<ActionResult<List<CategoryViewDto>?>> GetCategoriesView( [FromBody] UserRequest request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
         
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
 
-        ServiceReply<CategoriesViewDto?> reply = await _service.GetCategoriesView();
+        ServiceReply<List<CategoryViewDto>?> reply = await _service.GetCategoriesView();
         return GetReturnFromApi( reply );
     }
-    [HttpPost("get-category-edit")]
+    [HttpPost("get-edit")]
     public async Task<ActionResult<CategoryEditDto?>> GetCategoryForEdit( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -41,10 +41,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<CategoryEditDto?> reply = await _service.GetCategoryEdit( request.Payload.Value );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "add-category" )]
+    [HttpPost( "add" )]
     public async Task<ActionResult<CategoryEditDto?>> AddCategory( [FromBody] UserDataRequest<CategoryEditDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -52,10 +52,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<CategoryEditDto?> reply = await _service.AddCategory( request.Payload );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "update-category" )]
+    [HttpPost( "update" )]
     public async Task<ActionResult<bool>> UpdateCategory( [FromBody] UserDataRequest<CategoryEditDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -63,10 +63,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<bool> reply = await _service.UpdateCategory( request.Payload );
         return GetReturnFromApi( reply );
     }
-    [HttpPost( "remove-category" )]
+    [HttpPost( "remove" )]
     public async Task<ActionResult<bool>> RemoveCategory( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );

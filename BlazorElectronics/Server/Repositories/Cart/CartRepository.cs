@@ -39,7 +39,7 @@ public class CartRepository : DapperRepository, ICartRepository
             table.Rows.Add( row );
         }
 
-        p.Add( PARAM_CART_REQUEST, table.AsTableValuedParameter( TVP_CART_ITEMS ) );
+        p.Add( PARAM_CART_ITEMS, table.AsTableValuedParameter( TVP_CART_ITEMS ) );
         
         return await TryQueryTransactionAsync( QueryTransaction<CartProductResponse>, p, PROCEDURE_UPDATE_CART );
     }

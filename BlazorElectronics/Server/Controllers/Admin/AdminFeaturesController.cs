@@ -22,7 +22,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "get-features-view" )]
     public async Task<ActionResult<List<AdminItemViewDto>>> GetFeauresView( [FromBody] UserRequest request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -33,7 +33,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "get-deals-view" )]
     public async Task<ActionResult<List<AdminItemViewDto>>> GetDealsView( [FromBody] UserRequest request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -44,7 +44,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "add-feature" )]
     public async Task<ActionResult<Feature>> AddFeature( [FromBody] UserDataRequest<Feature> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -55,7 +55,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "add-featured-deal" )]
     public async Task<ActionResult<FeaturedDeal>> AddDeal( [FromBody] UserDataRequest<FeaturedDeal> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -66,7 +66,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "update-feature" )]
     public async Task<ActionResult<bool>> UpdateFeature( [FromBody] UserDataRequest<Feature> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -77,7 +77,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "update-featured-deal" )]
     public async Task<ActionResult<bool>> UpdateFeature( [FromBody] UserDataRequest<FeaturedDeal> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -88,7 +88,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "remove-feature" )]
     public async Task<ActionResult<bool>> RemoveFeature( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -99,7 +99,7 @@ public sealed class AdminFeaturesController : _AdminController
     [HttpPost( "remove-featured-deal" )]
     public async Task<ActionResult<bool>> RemoveDeal( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );

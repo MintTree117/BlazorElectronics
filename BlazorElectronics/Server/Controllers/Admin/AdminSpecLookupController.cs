@@ -22,7 +22,7 @@ public sealed class AdminSpecLookupController : _AdminController
     [HttpPost( "get-spec-lookup-view" )]
     public async Task<ActionResult<SpecLookupViewResponse?>> GetView( [FromBody] UserRequest request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -33,7 +33,7 @@ public sealed class AdminSpecLookupController : _AdminController
     [HttpPost( "get-spec-lookup-edit" )]
     public async Task<ActionResult<SpecLookupEditDto?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -44,7 +44,7 @@ public sealed class AdminSpecLookupController : _AdminController
     [HttpPost( "add-spec-lookup" )]
     public async Task<ActionResult<SpecLookupEditDto?>> Add( [FromBody] UserDataRequest<SpecLookupEditDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -55,7 +55,7 @@ public sealed class AdminSpecLookupController : _AdminController
     [HttpPost( "update-spec-lookup" )]
     public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecLookupEditDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );
@@ -66,7 +66,7 @@ public sealed class AdminSpecLookupController : _AdminController
     [HttpPost( "remove-spec-lookup" )]
     public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromApi( adminReply );

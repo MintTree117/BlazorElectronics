@@ -20,7 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Pages\Home\FeaturedProducts.razor" />
       <AdditionalFiles Include="Pages\Home\Index.razor" />
     </ItemGroup>
 

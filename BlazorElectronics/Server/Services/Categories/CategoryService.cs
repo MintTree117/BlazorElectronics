@@ -39,21 +39,21 @@ public class CategoryService : ApiService, ICategoryService
             ? new ServiceReply<int>( categoryId )
             : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
-    public async Task<ServiceReply<CategoriesViewDto?>> GetCategoriesView()
+    public async Task<ServiceReply<List<CategoryViewDto>?>> GetCategoriesView()
     {
         try
         {
             IEnumerable<CategoryModel>? result = await _repository.Get();
-            CategoriesViewDto? dto = await MapView( result );
+            List<CategoryViewDto>? dto = await MapView( result );
 
             return dto is not null
-                ? new ServiceReply<CategoriesViewDto?>( dto )
-                : new ServiceReply<CategoriesViewDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CategoryViewDto>?>( dto )
+                : new ServiceReply<List<CategoryViewDto>?>( ServiceErrorType.NotFound );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CategoriesViewDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CategoryViewDto>?>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId )
@@ -197,18 +197,16 @@ public class CategoryService : ApiService, ICategoryService
     {
         return models.ToDictionary( m => m.ApiUrl, m => m.CategoryId );
     }
-    static async Task<CategoriesViewDto?> MapView( IEnumerable<CategoryModel>? models )
+    static async Task<List<CategoryViewDto>?> MapView( IEnumerable<CategoryModel>? models )
     {
         if ( models is null )
             return null;
 
         return await Task.Run( () =>
         {
-            List<CategoryViewDto> views = models
+            return models
                 .Select( m => new CategoryViewDto { Id = m.CategoryId, Tier = m.Tier, Name = m.Name } )
                 .ToList();
-
-            return new CategoriesViewDto( views );
         } );
     }
     static CategoryEditDto? MapEdit( CategoryModel? model )

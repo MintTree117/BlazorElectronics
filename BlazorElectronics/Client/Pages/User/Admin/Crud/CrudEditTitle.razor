@@ -1,0 +1,14 @@
+@typeparam TItem where TItem : BlazorElectronics.Shared.AdminItemViewDto
+@typeparam TEdit where TEdit : new()
+
+<div class="form-header">
+    <h3>@Page.PageTitle</h3>
+    <button class="btn btn-link back-button" type="button" @onclick="@Page.GoBack">
+        <span class="oi oi-arrow-left"></span> Back
+    </button>
+</div>
+
+@code 
+{
+    [Parameter] public CrudPage<TItem, TEdit> Page { get; set; } = null!;
+}

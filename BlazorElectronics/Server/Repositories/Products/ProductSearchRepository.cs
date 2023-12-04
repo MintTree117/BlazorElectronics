@@ -176,7 +176,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         if ( categoryId is null )
             return;
         
-        builder.Append( $" AND ( {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_TIER_ID} = {PARAM_CATEGORY_TYPE}" );
+        builder.Append( $" AND ( {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_TIER} = {PARAM_CATEGORY_TIER}" );
         builder.Append( $" AND {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_ID} = {PARAM_CATEGORY_ID} )" );
         
         dynamicParams.Add( PARAM_CATEGORY_ID, categoryId );
@@ -187,7 +187,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             return;
         
         builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_TITLE} LIKE {PARAM_SEARCH_TEXT}" );
-        builder.Append( $" OR {TABLE_PRODUCT_DESCRIPTIONS}.{COL_PRODUCT_DESCR_BODY} LIKE {PARAM_SEARCH_TEXT} )" );
+        builder.Append( $" OR {TABLE_PRODUCT_DESCRIPTIONS}.{COL_PRODUCT_DESCR} LIKE {PARAM_SEARCH_TEXT} )" );
         dynamicParams.Add( PARAM_SEARCH_TEXT, searchText );
     }
     static void AppendVendorCondition( StringBuilder builder, DynamicParameters dynamicParams, List<int>? vendors )

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BlazorElectronics.Shared.Users;
 
 public sealed class UserDataRequest<T> : UserRequest where T : class
@@ -9,10 +11,11 @@ public sealed class UserDataRequest<T> : UserRequest where T : class
         Payload = payload;
     }
     
-    public UserDataRequest( int sessionId, string token, T payload )
+    [JsonConstructor]
+    public UserDataRequest( int sessionId, string sessionToken, T payload )
     {
         SessionId = sessionId;
-        SessionToken = token;
+        SessionToken = sessionToken;
         Payload = payload;
     }
 

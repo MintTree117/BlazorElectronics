@@ -2,25 +2,24 @@
 @inherits PageView
 
 <div class="container-sm">
-    <PageTitle>Login</PageTitle>
-    <h3>UserLogin</h3>
+    <PageLoader Page="@this"></PageLoader>
     
-    <EditForm Model="_loginRequest" OnValidSubmit="@( async ()=> await HandleLogin() )">
+    <h3>UserLogin</h3>
+
+    <EditForm Model="_loginRequest" OnValidSubmit="@(async () => await HandleLogin() )">
         <DataAnnotationsValidator/>
         <div class="mb-3">
             <label for="email">Email</label>
             <InputText class="form-control" id="email" @bind-Value="_loginRequest.EmailOrUsername"/>
-            <ValidationMessage For="@(()=> _loginRequest.EmailOrUsername)"/>
+            <ValidationMessage For="@(() => _loginRequest.EmailOrUsername)"/>
         </div>
         <div class="mb-3">
             <label for="password">Password</label>
             <InputText class="form-control" id="password" @bind-Value="_loginRequest.Password" type="password"/>
-            <ValidationMessage For="@(()=> _loginRequest.Password)"/>
+            <ValidationMessage For="@(() => _loginRequest.Password)"/>
         </div>
         <button class="btn btn-primary" type="submit">Login</button>
     </EditForm>
-    @if ( !string.IsNullOrWhiteSpace( ViewMessage ) )
-    {
-        <span class="@ViewMessageClass">@ViewMessage</span>
-    }
+    
+    <ActionMessage Page="@this"></ActionMessage>
 </div>

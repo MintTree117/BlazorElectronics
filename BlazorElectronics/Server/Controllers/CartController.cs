@@ -21,7 +21,7 @@ public class CartController : UserController
     [HttpGet( "products" )]
     public async Task<ActionResult<CartResponse?>> GetCartProducts( [FromBody] UserRequest request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );
@@ -32,7 +32,7 @@ public class CartController : UserController
     [HttpPost( "post" )]
     public async Task<ActionResult<CartResponse?>> UpdateCart( [FromBody] UserDataRequest<CartRequest> request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
         
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );
@@ -43,7 +43,7 @@ public class CartController : UserController
     [HttpPost( "insert" )]
     public async Task<ActionResult<CartResponse?>> AddToCart( [FromBody] UserDataRequest<CartItemDto> request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );
@@ -54,7 +54,7 @@ public class CartController : UserController
     [HttpPost( "update-quantity" )]
     public async Task<ActionResult<CartResponse?>> UpdateQuantity( [FromBody] UserDataRequest<CartItemDto> request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );
@@ -65,7 +65,7 @@ public class CartController : UserController
     [HttpPost( "remove" )]
     public async Task<ActionResult<CartResponse?>> RemoveItemFromCart( [FromBody] UserDataRequest<IntDto> request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );
@@ -76,7 +76,7 @@ public class CartController : UserController
     [HttpPost( "clear" )]
     public async Task<ActionResult<bool>> ClearCart( [FromBody] UserRequest request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
             return GetReturnFromApi( userReply );

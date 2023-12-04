@@ -1,0 +1,17 @@
+@if ( Page.PageIsRedirecting )
+{
+    <div class="loading-container">
+        <div class="loading-circle"></div>
+        <p class="@Page.ViewMessageClass">@Page.ViewMessage</p>
+        <p>Redirecting in @Page....</p>
+    </div>
+}
+else if ( !Page.PageIsReady() )
+{
+    <span class="@Page.ViewMessageClass">@Page.ViewMessage</span>
+}
+
+@code 
+{
+    [Parameter] public PageView Page { get; set; } = null!;
+}

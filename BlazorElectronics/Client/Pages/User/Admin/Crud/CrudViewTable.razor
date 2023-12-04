@@ -1,0 +1,47 @@
+@typeparam TItem where TItem : BlazorElectronics.Shared.AdminItemViewDto
+@typeparam TEdit where TEdit : new()
+
+<div class="form-header">
+    <h3>@Page.PageTitle</h3>
+    <button class="btn btn-primary mb-3" type="button" @onclick="@Page.CreateItem">
+        <span class="oi oi-plus"></span> Create New
+    </button>
+</div>
+
+<table class="table table-hover crud-table">
+    <thead class="thead-light">
+    <tr>
+        @foreach ( KeyValuePair<string, Action> meta in Page.GetTHeadMeta() )
+        {
+            <th class="crud-sort-th" @onclick="meta.Value">@meta.Key</th>
+        }
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach ( TItem item in Page.GetView() )
+    {
+        <tr class="crud-tr">
+            @foreach ( string property in Page.GetColumnProperties() )
+            {
+                <td>
+                    @Page.RenderPropertyColumn( item, property )
+                </td>
+            }
+            <td class="text-nowrap">
+                <button class="btn btn-primary" @onclick="async () => await Page.EditItem( item.Id )">
+                    <i class="oi oi-pencil"></i>
+                </button>
+                <button class="btn btn-primary" @onclick="async () => await Page.RemoveItem( item.Id )">
+                    <i class="oi oi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code 
+{
+    [Parameter] public CrudPage<TItem,TEdit> Page { get; set; } = null!;
+}

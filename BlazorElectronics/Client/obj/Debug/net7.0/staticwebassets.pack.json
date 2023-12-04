@@ -221,10 +221,6 @@
       "PackagePath": "staticwebassets/Images/logo.png"
     },
     {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/admin.css",
-      "PackagePath": "staticwebassets/css/admin.css"
-    },
-    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",
       "PackagePath": "staticwebassets/css/app.css"
     },
@@ -243,6 +239,10 @@
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/categorylist.css",
       "PackagePath": "staticwebassets/css/categorylist.css"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/forms.css",
+      "PackagePath": "staticwebassets/css/forms.css"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/home.css",

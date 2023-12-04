@@ -13,9 +13,9 @@ public partial class UserRegistration : PageView
 
     async Task HandleRegistration()
     {
-        ServiceReply<UserSessionResponse?> reply = await UserService.Register( _user );
+        ServiceReply<bool> reply = await UserService.Register( _user );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success )
         {
             SetActionMessage( false, reply.Message ?? "Failed to register!" );
             return;

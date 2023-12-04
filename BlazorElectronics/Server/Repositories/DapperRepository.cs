@@ -1,7 +1,6 @@
 using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Server.Models.SpecLookups;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -22,55 +21,35 @@ public abstract class DapperRepository
     protected const string TABLE_PRODUCT_SPECS_MOVIESTV = "Product_Specs_MoviesTV";
     protected const string TABLE_PRODUCT_SPECS_COURSES = "Product_Specs_Courses";
 
-    // TABLES PRODUCT SPECS MAIN
-    protected enum ProductSpecMainTableNameEnum
-    {
-        BOOKS, SOFTWARE, GAMES, TVMOVIES, COURSES
-    }
-    const string TABLE_PATTERN_PRODUCT_SPECS_MAIN = "Product_Specs_Main";
-    protected static readonly Dictionary<ProductSpecMainTableNameEnum, string> PRODUCT_SPECS_MAIN_TABLE_NAMES = new()
-    {
-        { ProductSpecMainTableNameEnum.BOOKS, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_Books" },
-        { ProductSpecMainTableNameEnum.SOFTWARE, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_Software" },
-        { ProductSpecMainTableNameEnum.GAMES, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_Games" },
-        { ProductSpecMainTableNameEnum.TVMOVIES, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_TvMovies" },
-        { ProductSpecMainTableNameEnum.COURSES, TABLE_PATTERN_PRODUCT_SPECS_MAIN + "_Courses" },
-    };
-
     // COLUMNS CATEGORIES
-    protected const string COL_CATEGORY_PRIMARY_ID = "PrimaryCategoryId";
-    protected const string COL_CATEGORY_SECONDARY_ID = "SecondaryCategoryId";
-    protected const string COL_CATEGORY_TERTIARY_ID = "TertiaryCategoryId";
     protected const string COL_CATEGORY_ID = "CategoryId";
-    protected const string COL_CATEGORY_TIER_ID = "CategoryTierId";
+    protected const string COL_CATEGORY_TIER = "CategoryTier";
     
     // COLUMNS PRODUCTS
     protected const string COL_PRODUCT_ID = "ProductId";
     protected const string COL_PRODUCT_TITLE = "Title";
     protected const string COL_PRODUCT_RATING = "Rating";
-    protected const string COL_PRODUCT_IMAGE_ID = "ImageId";
-    protected const string COL_PRODUCT_REVIEW_ID = "ReviewId";
     protected const string COL_PRODUCT_THUMBNAIL = "Thumbnail";
-    protected const string COL_PRODUCT_DESCRIPTION_ID_COLUMN = "DescriptionId";
-    protected const string COL_PRODUCT_DESCR_BODY = "DescriptionBody";
+    protected const string COL_PRODUCT_DESCR = "Description";
     protected const string COL_PRODUCT_PRICE = "Price";
     protected const string COL_PRODUCT_SALE_PRICE = "SalePrice";
+    // SHARED SPECS
     protected const string COL_PRODUCT_LAST_UPDATED = "LastUpdated";
     protected const string COL_PRODUCT_FILESIZE = "FileSize";
     protected const string COL_PRODUCT_HAS_SUBTITLES = "HasSubtitles";
-
+    // BOOKS
     protected const string COL_PRODUCT_BOOK_PAGES = "Pages";
     protected const string COL_PRODUCT_BOOK_HAS_AUDIO = "HasAudio";
     protected const string COL_PRODUCT_BOOK_AUDIO_LENGTH = "AudioLength";
-
+    // BOOKS
     protected const string COL_PRODUCT_GAME_HAS_MULTIPLAYER = "HasMultiplayer";
     protected const string COL_PRODUCT_GAME_HAS_OFFLINE = "HasOffline";
     protected const string COL_PRODUCT_GAME_HAS_CONTROLLER = "HasController";
     protected const string COL_PRODUCT_GAME_HAS_PURCHASES = "HasPurchases";
-
+    // VIDEO
     protected const string COL_PRODUCT_VIDEO_RUNTIME = "Runtime";
     protected const string COL_PRODUCT_VIDEO_EPISODES = "Episodes";
-
+    // COURSES
     protected const string COL_PRODUCT_COURSE_DURATION = "Duration";
 
     // COLUMNS VENDORS
@@ -81,24 +60,13 @@ public abstract class DapperRepository
     protected const string COL_SPEC_VALUE_ID = "SpecValueId";
     protected const string COL_SPEC_VALUE = "SpecValue";
 
-    // COLUMNS USERS
-    protected const string COL_USER_NAME = "Username";
-    protected const string COL_USER_EMAIL = "Email";
-    protected const string COL_USER_HASH = "PasswordHash";
-    protected const string COL_USER_SALT = "PasswordSalt";
-    protected const string COL_USER_DATE = "DateCreated";
-
     // PARAM CATEGORY
     protected const string PARAM_CATEGORY_ID = "@CategoryId";
-    protected const string PARAM_CATEGORY_TYPE = "@CategoryTier";
-    protected const string PARAM_CATEGORY_PRIMARY_ID = "@PrimaryCategoryId";
-    protected const string PARAM_CATEGORY_SECONDARY_ID = "@SecondaryCategoryId";
-    protected const string PARAM_CATEGORY_TERTIARY_ID = "@TertiaryCategoryId";
+    protected const string PARAM_CATEGORY_PARENT_ID = "@ParentCategoryId";
+    protected const string PARAM_CATEGORY_TIER = "@CategoryTier";
     protected const string PARAM_CATEGORY_NAME = "@Name";
     protected const string PARAM_CATEGORY_API_URL = "@ApiUrl";
     protected const string PARAM_CATEGORY_IMAGE_URL = "@ImageUrl";
-    protected const string PARAM_CATEGORY_DESCRIPTION = "@Description";
-
     protected const string TVP_PRIMARY_CATEGORIES = "TVP_PrimaryCategoryIds";
     protected const string PARAM_PRIMARY_CATEGORIES = "@PrimaryCategories";
     protected const string PARAM_IS_GLOBAL = "@IsGlobal";
@@ -106,22 +74,16 @@ public abstract class DapperRepository
     // PARAM SPECS
     protected const string PARAM_SPEC_ID = "@SpecId";
     protected const string PARAM_SPEC_NAME = "@SpecName";
-    protected const string PARAM_FILTER_VALUES = "@FilterValues";
     protected const string PARAM_SPEC_VALUES = "@SpecValues";
-    
     protected const string TVP_SPEC_VALUES = "TVP_SpecLookupValues";
-    protected const string TVP_FILTER_VALUES = "TVP_SpecLookupIntFilters";
-    
     protected const string TVP_COL_SPEC_ID = "SpecValueId";
-    protected const string TVP_COL_FILTER_ID = "FilterValueId";
     protected const string TVP_COL_SPEC_VALUE = "SpecValue";
-    protected const string TVP_COL_FILTER_VALUE = "FilterValue";
-    
+
     // PARAM FEATURES
     protected const string PARAM_FEATURE_ID = "@FeatureId";
-    protected const string PARAM_FEATURE_NAME = "@FeatureName";
-    protected const string PARAM_FEATURE_URL = "@FeatureUrl";
-    protected const string PARAM_FEATURE_IMAGE = "@FeatureImage";
+    protected const string PARAM_FEATURE_NAME = "@Name";
+    protected const string PARAM_FEATURE_URL = "@Url";
+    protected const string PARAM_FEATURE_IMAGE = "@Image";
     
     // PARAM USER
     protected const string PARAM_USER_ID = "@UserId";
@@ -147,8 +109,8 @@ public abstract class DapperRepository
     protected const string PARAM_FEATURE_IMAGE_URL = "@FeatureImageUrl";
 
     // PARAM CART
-    protected const string PARAM_CART_REQUEST = "@CartRequest";
-    protected const string PARAM_CART_QUANTITY = "@Quantity";
+    protected const string PARAM_CART_ITEMS = "@CartItems";
+    protected const string PARAM_CART_QUANTITY = "@ItemQuantity";
     protected const string TVP_CART_ITEMS = "TVP_CartItems";
     protected const string TVP_COL_CART_PRODUCT_ID = "ProductId";
     protected const string TVP_COL_CART_ITEM_QUANTITY = "ItemQuantity";
@@ -299,7 +261,7 @@ public abstract class DapperRepository
         }
 
         var table = new DataTable();
-        table.Columns.Add( COL_CATEGORY_PRIMARY_ID, typeof( int ) );
+        table.Columns.Add( COL_CATEGORY_ID, typeof( int ) );
 
         foreach ( int id in categories )
             table.Rows.Add( id );
