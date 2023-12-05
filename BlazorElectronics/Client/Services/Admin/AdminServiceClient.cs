@@ -1,7 +1,8 @@
 using Blazored.LocalStorage;
+using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
 
-namespace BlazorElectronics.Client.Services.Users.Admin;
+namespace BlazorElectronics.Client.Services.Admin;
 
 public class AdminServiceClient : UserServiceClient, IAdminServiceClient
 {

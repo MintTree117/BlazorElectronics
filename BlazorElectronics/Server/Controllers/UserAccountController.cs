@@ -20,7 +20,7 @@ public class UserAccountController : UserController
             return BadRequest( BAD_REQUEST_MESSAGE );
 
         ServiceReply<UserLoginDto?> reply = await UserAccountService.Register( request!.Username, request.Email, request.Password, request.Phone );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "login" )]
     public async Task<ActionResult<UserSessionResponse>> Login( [FromBody] UserLoginRequest? request )
@@ -31,12 +31,12 @@ public class UserAccountController : UserController
         ServiceReply<UserLoginDto?> loginReply = await UserAccountService.Login( request!.EmailOrUsername, request.Password );
 
         if ( !loginReply.Success )
-            return GetReturnFromApi( loginReply );
+            return GetReturnFromReply( loginReply );
 
         ServiceReply<SessionDto?> sessionReply = await SessionService.CreateSession( loginReply.Data!.UserId, GetRequestDeviceInfo() );
 
         if ( !sessionReply.Success )
-            return GetReturnFromApi( sessionReply );
+            return GetReturnFromReply( sessionReply );
 
         var session = new UserSessionResponse
         {
@@ -53,7 +53,7 @@ public class UserAccountController : UserController
     public async Task<ActionResult<bool>> AuthorizeSession( [FromBody] UserRequest request )
     {
         ServiceReply<bool> authorizeReply = await ValidateAndAuthorizeUser( request );
-        return GetReturnFromApi( authorizeReply );
+        return GetReturnFromReply( authorizeReply );
     }
     [HttpPost( "change-password" )]
     public async Task<ActionResult<bool>> ChangePassword( [FromBody] UserDataRequest<PasswordChangeRequest>? request )
@@ -61,13 +61,13 @@ public class UserAccountController : UserController
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
-            return GetReturnFromApi( userReply );
+            return GetReturnFromReply( userReply );
 
         if ( !ValidateChangePasswordRequest( request!.Payload ) )
             return BadRequest( "Invalid password request!" );
 
         ServiceReply<bool> passwordReply = await UserAccountService.ChangePassword( userReply.Data, request.Payload!.Password );
-        return GetReturnFromApi( passwordReply );
+        return GetReturnFromReply( passwordReply );
     }
     [HttpPost( "logout" )]
     public async Task<ActionResult<bool>> Logout( [FromBody] UserRequest? request )
@@ -75,10 +75,10 @@ public class UserAccountController : UserController
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
         if ( !userReply.Success )
-            return GetReturnFromApi( userReply );
+            return GetReturnFromReply( userReply );
         
         ServiceReply<bool> deleteReply = await SessionService.DeleteSession( request!.SessionId );
-        return GetReturnFromApi( deleteReply );
+        return GetReturnFromReply( deleteReply );
     }
 
     static bool ValidateRegisterRequest( UserRegisterRequest? request )

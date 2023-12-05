@@ -72,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWN0aW9uTWVzc2FnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Admin/Seed/SeedPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vU2VlZC9TZWVkUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Home/FeaturedDeals.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS9GZWF0dXJlZERlYWxzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 

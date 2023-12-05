@@ -5,5 +5,5 @@ namespace BlazorElectronics.Server.Models.Vendors;
 public sealed class VendorCategoryModel
 {
     public int VendorId { get; set; }
-    public PrimaryCategory PrimaryCategoryId { get; set; }
+    public int PrimaryCategoryId { get; set; }
 }

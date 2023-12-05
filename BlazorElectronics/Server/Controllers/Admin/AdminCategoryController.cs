@@ -25,10 +25,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
         
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<List<CategoryView>?> reply = await _service.GetCategoriesView();
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost("get-edit")]
     public async Task<ActionResult<CategoryEdit?>> GetCategoryForEdit( [FromBody] UserDataRequest<IntDto> request )
@@ -36,10 +36,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<CategoryEdit?> reply = await _service.GetCategoryEdit( request.Payload.Value );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
     public async Task<ActionResult<int>> AddCategory( [FromBody] UserDataRequest<CategoryEdit> request )
@@ -47,10 +47,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<int> reply = await _service.AddCategory( request.Payload );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
     public async Task<ActionResult<bool>> UpdateCategory( [FromBody] UserDataRequest<CategoryEdit> request )
@@ -58,10 +58,10 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> reply = await _service.UpdateCategory( request.Payload );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "remove" )]
     public async Task<ActionResult<bool>> RemoveCategory( [FromBody] UserDataRequest<IntDto> request )
@@ -69,9 +69,9 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> reply = await _service.RemoveCategory( request.Payload.Value );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
 }

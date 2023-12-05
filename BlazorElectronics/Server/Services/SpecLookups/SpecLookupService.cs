@@ -20,7 +20,7 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<SpecLookupsResponse?>> GetLookups()
+    public async Task<ServiceReply<SpecLookupsResponse?>> GetLookups( List<int> primaryCategories )
     {
         if ( CacheValid() )
             return new ServiceReply<SpecLookupsResponse?>( _cachedSpecData!.Object );
@@ -28,7 +28,7 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         try
         {
             SpecLookupsModel? model = await _repository.Get();
-            SpecLookupsResponse? response = MapResponse( model );
+            SpecLookupsResponse? response = MapResponse( model, primaryCategories );
 
             _cachedSpecData = response is not null ? new CachedObject<SpecLookupsResponse>( response ) : null;
 
@@ -125,24 +125,17 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         }
     }
     
-    static SpecLookupsResponse? MapResponse( SpecLookupsModel? model )
+    static SpecLookupsResponse? MapResponse( SpecLookupsModel? model, List<int> primaryIds )
     {
         if ( model?.GlobalSpecs is null || model.SpecCategories is null || model.SpecLookups is null || model.SpecValues is null )
             return null;
 
         List<int> globalIds = model.GlobalSpecs.ToList();
+        Dictionary<int, List<int>> idsByCategory = primaryIds.ToDictionary( id => id, id => new List<int>() );
 
-        var idsByCategory = new Dictionary<PrimaryCategory, List<int>>
-        {
-            { PrimaryCategory.Book, new List<int>() },
-            { PrimaryCategory.Software, new List<int>() },
-            { PrimaryCategory.VideoGames, new List<int>() },
-            { PrimaryCategory.MoviesTv, new List<int>() },
-            { PrimaryCategory.Courses, new List<int>() }
-        };
         foreach ( SpecLookupCategoryModel sc in model.SpecCategories )
         {
-            idsByCategory[ ( PrimaryCategory ) sc.PrimaryCategoryId ].Add( sc.SpecId );
+            idsByCategory[ sc.PrimaryCategoryId ].Add( sc.SpecId );
         }
 
         var responsesById = new Dictionary<int, SpecLookupDto>();
@@ -179,9 +172,9 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         if ( model?.Spec is null )
             return null;
 
-        List<PrimaryCategory> categories = model.Categories is not null
+        List<int> categories = model.Categories is not null
             ? model.Categories.Select( c => c.PrimaryCategoryId ).ToList()
-            : new List<PrimaryCategory>();
+            : new List<int>();
 
         string values = model.Values is not null
             ? ConvertSpecValuesToString( model.Values )

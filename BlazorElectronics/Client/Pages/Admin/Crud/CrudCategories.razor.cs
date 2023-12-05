@@ -11,7 +11,7 @@ public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit
         ItemTitle = "Category";
         
         await base.OnInitializedAsync();
-
+        
         if ( !PageIsAuthorized )
             return;
         

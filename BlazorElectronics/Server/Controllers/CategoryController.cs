@@ -20,6 +20,6 @@ public class CategoryController : _Controller
     public async Task<ActionResult<CategoriesResponse>> GetCategories()
     {
         ServiceReply<CategoriesResponse?> reply = await _categoryService.GetCategories();
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
 }

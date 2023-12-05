@@ -27,8 +27,8 @@
                     @foreach ( CategorySelectionOption option in CategoryOptions.Options )
                     {
                         <div class="form-check">
-                            <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Category"/>
-                            <label class="form-check-label" for="@option.Category">@option.Category</label>
+                            <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>
+                            <label class="form-check-label" for="@option.Id">@option.Name</label>
                         </div>
                     }
                 </div>
@@ -40,8 +40,9 @@
                     <InputCheckbox @bind-Value="ItemEdit.IsGlobal" class="form-check-input" id="Global"></InputCheckbox>
                     <label class="form-check-label" for="Global">Is Global</label>
                 </div>
+                
                 <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-success btn-lg">
+                    <button type="submit" class="btn btn-success btn-icon">
                         <i class="oi oi-cloud-upload"></i> Submit
                     </button>
                 </div>

@@ -1,5 +1,5 @@
 using BlazorElectronics.Client.Pages.User;
-using BlazorElectronics.Client.Services.Users.Admin;
+using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Shared;
 using Microsoft.AspNetCore.Components;
 

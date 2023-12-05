@@ -35,12 +35,15 @@ builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
+builder.Services.AddScoped<IProductSeedRepository, ProductSeedRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductSeedService, ProductSeedService>();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+builder.Services.AddScoped<IUserSeedService, UserSeedService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<ISessionService, SessionService>();
@@ -51,6 +54,9 @@ builder.Services.AddScoped<IVendorService, VendorService>();
 
 builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
 builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
+
+
+//builder.Services.AddScoped<IProductSeedService, ProductSeedService>();
 
 WebApplication app = builder.Build();
 

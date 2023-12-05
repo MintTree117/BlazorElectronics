@@ -2,7 +2,6 @@ using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.Vendors;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Vendors;
-using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Services.Vendors;
@@ -143,12 +142,10 @@ public sealed class VendorService : ApiService, IVendorService
 
         foreach ( VendorCategoryModel c in model.Categories )
         {
-            var pc = ( PrimaryCategory ) c.PrimaryCategoryId;
-
-            if ( !response.VendorIdsByCategory.TryGetValue( pc, out List<int>? ids ) )
+            if ( !response.VendorIdsByCategory.TryGetValue( c.PrimaryCategoryId, out List<int>? ids ) )
             {
                 ids = new List<int>();
-                response.VendorIdsByCategory.Add( pc, ids );
+                response.VendorIdsByCategory.Add( c.PrimaryCategoryId, ids );
             }
 
             ids.Add( c.VendorId );
@@ -167,9 +164,9 @@ public sealed class VendorService : ApiService, IVendorService
         if ( model?.Vendor is null )
             return null;
         
-        List<PrimaryCategory> categories = model.Categories is not null
+        List<int> categories = model.Categories is not null
             ? model.Categories.Select( c => c.PrimaryCategoryId ).ToList()
-            : new List<PrimaryCategory>();
+            : new List<int>();
 
         return new VendorEdit
         {

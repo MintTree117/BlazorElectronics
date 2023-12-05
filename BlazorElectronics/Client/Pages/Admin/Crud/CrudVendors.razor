@@ -1,7 +1,7 @@
 @page "/admin/crud/vendors"
 @using BlazorElectronics.Shared;
-@using BlazorElectronics.Shared.Enums
 @using BlazorElectronics.Shared.Vendors;
+@using BlazorElectronics.Client.Models
 @inherits CrudPage<CrudView, VendorEdit>
 
 <div class="container-sm form-wrapper">
@@ -15,12 +15,7 @@
         }
         else
         {
-            <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-primary" type="button" @onclick="@GoBack">
-                    <span class="oi oi-plus"></span> Back
-                </button>
-                <h3>@PageTitle</h3>
-            </div>
+            <CrudEditTitle Page="@this"></CrudEditTitle>
             
             <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
                 <div class="mb-3">
@@ -32,21 +27,25 @@
                     <InputText @bind-Value="ItemEdit.VendorName" class="form-control" id="Url"></InputText>
                 </div>
                 <div class="mb-3">
-                    <label for="Categories" class="form-label">Spec Name</label>
-                    <InputSelect multiple="@true" @bind-Value="ItemEdit.PrimaryCategories" class="form-control" id="Categories">
-                        @foreach ( PrimaryCategory option in Enum.GetValues<PrimaryCategory>() )
-                        {
-                            <option value="@option">@option</option>
-                        }
-                    </InputSelect>
+                    <h4>Category Selection</h4>
+                    @foreach ( CategorySelectionOption option in CategoryOptions.Options )
+                    {
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>
+                            <label class="form-check-label" for="@option.Id">@option.Name</label>
+                        </div>
+                    }
                 </div>
                 <div class="mb-3 form-check">
                     <InputCheckbox @bind-Value="ItemEdit.IsGlobal" class="form-check-input" id="Global"></InputCheckbox>
                     <label class="form-check-label" for="Global">Is Global</label>
                 </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="oi oi-cloud-upload"></i>
-                </button>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success btn-icon">
+                        <i class="oi oi-cloud-upload"></i> Submit
+                    </button>
+                </div>
             </EditForm>
 
             <ActionMessage Page="@this"></ActionMessage>

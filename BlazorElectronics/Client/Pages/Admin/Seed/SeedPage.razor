@@ -1,0 +1,41 @@
+@page "/admin/seed"
+@inherits AdminPage
+
+<div class="container-sm form-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <div class="form-header">
+            <h3>Seed Database</h3>
+        </div>
+        
+        <EditForm Model="ProductCount" OnSubmit="( async () => await SeedProducts() )">
+            <div class="mb-3">
+                <label for="Products" class="form-label">Seed Products</label>
+                <InputNumber @bind-Value="ProductCount.Value" class="form-control" id="Products"></InputNumber>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success btn-icon">
+                    <i class="oi oi-cloud-upload"></i> Submit
+                </button>
+            </div>
+        </EditForm>
+
+        <EditForm Model="UserCount" OnSubmit="( async () => await SeedUsers() )">
+            <div class="mb-3">
+                <label for="Users" class="form-label">Seed Users</label>
+                <InputNumber @bind-Value="UserCount.Value" class="form-control" id="Users"></InputNumber>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success btn-icon">
+                    <i class="oi oi-cloud-upload"></i> Submit
+                </button>
+            </div>
+        </EditForm>
+
+        <ActionMessage Page="@this"></ActionMessage>
+    }
+</div>

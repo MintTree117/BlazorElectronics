@@ -168,7 +168,7 @@ public class CategoryService : ApiService, ICategoryService
         {
             CategoryResponse r = MapResponse( m );
             responses.Add( r.Id, r );
-
+            
             if ( m.Tier == CategoryTier.Primary )
                 primaryIds.Add( r.Id );
         }
@@ -195,7 +195,14 @@ public class CategoryService : ApiService, ICategoryService
     }
     static Dictionary<string, int> MapUrls( IEnumerable<CategoryModel> models )
     {
-        return models.ToDictionary( m => m.ApiUrl, m => m.CategoryId );
+        Dictionary<string, int> urls = new();
+
+        foreach ( CategoryModel m in models )
+        {
+            urls.TryAdd( m.ApiUrl, m.CategoryId );
+        }
+
+        return urls;
     }
     static async Task<List<CategoryView>?> MapView( IEnumerable<CategoryModel>? models )
     {

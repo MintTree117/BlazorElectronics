@@ -151,7 +151,7 @@ public abstract class DapperRepository
         {
             try
             {
-                await using SqlConnection? connection = await _dbContext.GetOpenConnection();
+                await using SqlConnection connection = await _dbContext.GetOpenConnection();
                 return await dapperQueryDelegate.Invoke( connection, dynamicSql, dynamicParams );
             }
             catch ( TimeoutException timeout )
@@ -246,14 +246,14 @@ public abstract class DapperRepository
         return rows > 0;
     }
     
-    protected static DataTable GetPrimaryCategoriesTable( List<PrimaryCategory> categories )
+    protected static DataTable GetPrimaryCategoriesTable( List<int> categories )
     {
         var table = new DataTable();
         table.Columns.Add( COL_CATEGORY_ID, typeof( int ) );
-
+        
         foreach ( int id in categories )
             table.Rows.Add( id );
-
+        
         return table;
     }
     protected static DataTable GetStringValuesTable( string valuesString, string idCol, string valueCol )

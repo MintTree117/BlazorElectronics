@@ -25,10 +25,10 @@ public sealed class AdminSpecLookupController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<List<CrudView>?> reply = await _lookupService.GetView();
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "get-edit" )]
     public async Task<ActionResult<SpecLookupEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
@@ -36,10 +36,10 @@ public sealed class AdminSpecLookupController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<SpecLookupEdit?> reply = await _lookupService.GetEdit( request.Payload.Value );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
     public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<SpecLookupEdit> request )
@@ -47,10 +47,10 @@ public sealed class AdminSpecLookupController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<int> reply = await _lookupService.Add( request.Payload );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
     public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecLookupEdit> request )
@@ -58,10 +58,10 @@ public sealed class AdminSpecLookupController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> reply = await _lookupService.Update( request.Payload );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "remove" )]
     public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
@@ -69,9 +69,9 @@ public sealed class AdminSpecLookupController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> reply = await _lookupService.Remove( request.Payload.Value );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
 }

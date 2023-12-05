@@ -1,7 +1,3 @@
-using BlazorElectronics.Server.Dtos.Categories;
-using BlazorElectronics.Server.Repositories.SpecLookups;
-using BlazorElectronics.Server.Repositories.Users;
-using BlazorElectronics.Server.Repositories.Vendors;
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
@@ -44,16 +40,16 @@ public class AdminSeedController : _AdminController
         _lookupService = lookupService;
     }
 
-    [HttpPost( "seed-products" )]
+    [HttpPost( "products" )]
     public async Task<ActionResult<ServiceReply<bool>>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<CategoriesResponse?> categories = await _categoryService.GetCategories();
-        ServiceReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups();
+        ServiceReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups( categories.Data.PrimaryIds );
         ServiceReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
         ServiceReply<List<int>?> users = await UserAccountService.GetIds();
 
@@ -67,18 +63,15 @@ public class AdminSeedController : _AdminController
             : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR + seedResult.Message );
     }
 
-    [HttpPost( "seed-users" )]
+    [HttpPost( "users" )]
     public async Task<ActionResult<ServiceReply<bool>>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> seedReply = await _userSeedService.SeedUsers( request!.Payload!.Value );
-
-        return seedReply.Success
-            ? Ok( new ServiceReply<bool>( true ) )
-            : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR );
+        return GetReturnFromReply( seedReply );
     }
 }

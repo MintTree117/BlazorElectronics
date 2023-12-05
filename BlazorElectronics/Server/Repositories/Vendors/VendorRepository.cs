@@ -1,8 +1,6 @@
 using System.Data;
-using System.Data.Common;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Vendors;
-using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -20,7 +18,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
     
     public VendorRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
-
+    
     public async Task<VendorsModel?> Get()
     { 
         return await TryQueryAsync( GetQuery );
@@ -51,7 +49,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
         p.Add( PARAM_VENDOR_ID, vendorId );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
-
+    
     static async Task<VendorsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_VENDORS, commandType: CommandType.StoredProcedure );
@@ -85,6 +83,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
 
         parameters.Add( PARAM_VENDOR_NAME, dto.VendorName );
         parameters.Add( PARAM_VENDOR_URL, dto.VendorUrl );
+        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
         DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategories );
         parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable.AsTableValuedParameter( TVP_PRIMARY_CATEGORIES ) );

@@ -20,6 +20,6 @@ public class FeaturesController : _Controller
     public async Task<ActionResult<FeaturesResponse>> GetFeaturedProducts()
     {
         ServiceReply<FeaturesResponse?> featureReply = await _featuresService.GetFeatures();
-        return GetReturnFromApi( featureReply );
+        return GetReturnFromReply( featureReply );
     }
 }

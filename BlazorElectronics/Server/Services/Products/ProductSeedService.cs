@@ -48,14 +48,14 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     {
         var model = new T
         {
-            VendorId = PickRandomVendor( ( PrimaryCategory ) category, vendors ),
+            VendorId = PickRandomVendor( category, vendors ),
             Title = ProductSeedData.PRODUCT_TITLES[ category ] + " " + i,
             ThumbnailUrl = ProductSeedData.PRODUCT_IMAGES[ category ],
             Price = GetRandomDecimal( ProductSeedData.MIN_PRICE, ProductSeedData.MAX_PRICE ),
             ReleaseDate = GetRandomDate( ProductSeedData.MIN_RELEASE_DATE, ProductSeedData.MAX_RELEASE_DATE ),
             NumberSold = GetRandomInt( 0, ProductSeedData.MAX_NUM_SOLD ),
             HasDrm = GetRandomBoolean(),
-            Description = GetRandomDescription( ( PrimaryCategory ) category ),
+            Description = GetRandomDescription( category ),
             Languages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.Language, lookups ), 8 ),
             MatureContent = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MatureContent, lookups ), 8 ),
             PrimaryCategoryId = category,
@@ -69,15 +69,15 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return model;
     }
     // DESCRIPTIONS
-    string GetRandomDescription( PrimaryCategory category )
+    string GetRandomDescription( int category )
     {
         return category switch
         {
-            PrimaryCategory.Book => ProductSeedData.BOOK_DESCR[ GetRandomInt( 0, ProductSeedData.BOOK_DESCR.Length - 1 ) ],
-            PrimaryCategory.Software => ProductSeedData.SOFTWARE_DESCR[ GetRandomInt( 0, ProductSeedData.SOFTWARE_DESCR.Length - 1 ) ],
-            PrimaryCategory.VideoGames => ProductSeedData.GAME_DESCR[ GetRandomInt( 0, ProductSeedData.GAME_DESCR.Length - 1 ) ],
-            PrimaryCategory.MoviesTv => ProductSeedData.MOVESTV_DESCR[ GetRandomInt( 0, ProductSeedData.MOVESTV_DESCR.Length - 1 ) ],
-            PrimaryCategory.Courses => ProductSeedData.COURSE_DESCR[ GetRandomInt( 0, ProductSeedData.COURSE_DESCR.Length - 1 ) ],
+            1 => ProductSeedData.BOOK_DESCR[ GetRandomInt( 0, ProductSeedData.BOOK_DESCR.Length - 1 ) ],
+            2 => ProductSeedData.SOFTWARE_DESCR[ GetRandomInt( 0, ProductSeedData.SOFTWARE_DESCR.Length - 1 ) ],
+            3 => ProductSeedData.GAME_DESCR[ GetRandomInt( 0, ProductSeedData.GAME_DESCR.Length - 1 ) ],
+            4 => ProductSeedData.MOVESTV_DESCR[ GetRandomInt( 0, ProductSeedData.MOVESTV_DESCR.Length - 1 ) ],
+            5 => ProductSeedData.COURSE_DESCR[ GetRandomInt( 0, ProductSeedData.COURSE_DESCR.Length - 1 ) ],
             _ => string.Empty
         };
     }
@@ -299,7 +299,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return string.Join( ",", specs.Values );
     }
     // VENDORS
-    int PickRandomVendor( PrimaryCategory category, VendorsResponse vendors )
+    int PickRandomVendor( int category, VendorsResponse vendors )
     {
         List<int> vendorIds = vendors.VendorIdsByCategory[ category ];
         return vendorIds[ GetRandomInt( 0, vendorIds.Count - 1 ) ];

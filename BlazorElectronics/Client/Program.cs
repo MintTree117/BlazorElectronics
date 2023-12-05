@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorElectronics.Client;
 using BlazorElectronics.Client.Services.Categories;
 using Blazored.LocalStorage;
+using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Client.Services.Features;
 using BlazorElectronics.Client.Services.Users;
-using BlazorElectronics.Client.Services.Users.Admin;
 using BlazorElectronics.Client.Services.Users.Cart;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Categories;
@@ -32,6 +32,7 @@ builder.Services.AddScoped<IAdminCrudService<CrudView, FeaturedDealEdit>, AdminC
 builder.Services.AddScoped<IAdminCrudService<CrudView, FeatureEdit>, AdminCrudService<CrudView, FeatureEdit>>();
 builder.Services.AddScoped<IAdminCrudService<CrudView, SpecLookupEdit>, AdminCrudService<CrudView, SpecLookupEdit>>();
 builder.Services.AddScoped<IAdminCrudService<CrudView, VendorEdit>, AdminCrudService<CrudView, VendorEdit>>();
+builder.Services.AddScoped<IAdminSeedService, AdminSeedService>();
 
 
 builder.Logging.SetMinimumLevel( LogLevel.Error ); // Set the minimum level of logging

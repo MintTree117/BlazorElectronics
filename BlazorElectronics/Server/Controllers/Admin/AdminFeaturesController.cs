@@ -25,10 +25,10 @@ public sealed class AdminFeaturesController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<List<CrudView>?> reply = await _featuresService.GetFeaturesView();
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "get-edit" )]
     public async Task<ActionResult<FeatureEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
@@ -36,10 +36,10 @@ public sealed class AdminFeaturesController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<FeatureEdit?> reply = await _featuresService.GetFeatureEdit( request.Payload.Value );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
     public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<FeatureEdit> request )
@@ -47,10 +47,10 @@ public sealed class AdminFeaturesController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<int> reply = await _featuresService.AddFeature( request.Payload );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
     public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<FeatureEdit> request )
@@ -58,10 +58,10 @@ public sealed class AdminFeaturesController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> reply = await _featuresService.UpdateFeature( request.Payload );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
     [HttpPost( "remove" )]
     public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
@@ -69,9 +69,9 @@ public sealed class AdminFeaturesController : _AdminController
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
-            return GetReturnFromApi( adminReply );
+            return GetReturnFromReply( adminReply );
 
         ServiceReply<bool> reply = await _featuresService.RemoveFeature( request.Payload.Value );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
 }

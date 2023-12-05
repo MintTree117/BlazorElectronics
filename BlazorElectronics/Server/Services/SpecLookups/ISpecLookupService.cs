@@ -4,7 +4,7 @@ namespace BlazorElectronics.Server.Services.SpecLookups;
 
 public interface ISpecLookupService
 {
-    Task<ServiceReply<SpecLookupsResponse?>> GetLookups();
+    Task<ServiceReply<SpecLookupsResponse?>> GetLookups( List<int> primaryCategories );
     Task<ServiceReply<List<CrudView>?>> GetView();
     Task<ServiceReply<SpecLookupEdit?>> GetEdit( int specId );
     Task<ServiceReply<int>> Add( SpecLookupEdit dto );

@@ -1,7 +1,7 @@
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 
-namespace BlazorElectronics.Client.Services.Users.Admin;
+namespace BlazorElectronics.Client.Services.Admin;
 
 public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCrudService<Tview,Tedit> where Tview : CrudView where Tedit : class
 {

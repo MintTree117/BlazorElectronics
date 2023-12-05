@@ -20,6 +20,6 @@ public class VendorController : _Controller
     public async Task<ActionResult<VendorsResponse>> GetVendors()
     {
         ServiceReply<VendorsResponse?> reply = await _vendorService.GetVendors();
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
 }

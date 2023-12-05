@@ -16,7 +16,7 @@ public class _AdminController : UserController
     public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequest? request )
     {
         ServiceReply<bool> reply = await ValidateAndAuthorizeAdmin( request );
-        return GetReturnFromApi( reply );
+        return GetReturnFromReply( reply );
     }
 
     protected async Task<ServiceReply<bool>> ValidateAndAuthorizeAdmin( UserRequest? request )

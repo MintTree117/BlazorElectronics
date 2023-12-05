@@ -1,6 +1,6 @@
 using BlazorElectronics.Shared;
 
-namespace BlazorElectronics.Client.Services.Users.Admin;
+namespace BlazorElectronics.Client.Services.Admin;
 
 public interface IAdminServiceClient
 {
