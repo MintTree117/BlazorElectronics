@@ -74,6 +74,22 @@ public class CategoryService : ApiService, ICategoryService
             return new ServiceReply<CategoryEdit?>( ServiceErrorType.ServerError );
         }
     }
+    public async Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEdit> categories )
+    {
+        try
+        {
+            bool result = await _repository.BulkInsert( categories );
+
+            return result
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
     public async Task<ServiceReply<int>> AddCategory( CategoryEdit dto )
     {
         try

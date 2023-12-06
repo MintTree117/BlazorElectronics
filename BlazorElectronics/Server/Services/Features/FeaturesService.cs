@@ -2,6 +2,7 @@ using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Features;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Services.Features;

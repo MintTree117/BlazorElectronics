@@ -1,0 +1,48 @@
+using Blazored.LocalStorage;
+using BlazorElectronics.Client.Models;
+using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.Categories;
+using BlazorElectronics.Shared.Enums;
+
+namespace BlazorElectronics.Client.Services.Admin;
+
+public sealed class AdminCategoryHelper : AdminServiceClient, IAdminCategoryHelper
+{
+    public AdminCategoryHelper( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
+        : base( logger, http, storage ) { }
+
+    public List<CategoryView> Categories { get; set; } = new();
+    public List<CategorySelectionOption> PrimarySelection { get; set; } = new();
+
+    public async Task<ServiceReply<bool>> Init()
+    {
+        ServiceReply<List<CategoryView>?> reply = await TryUserRequest<List<CategoryView>?>( "api/AdminCategory/get-view" );
+
+        if ( !reply.Success || reply.Data is null )
+        {
+            Logger.LogError( reply.ErrorType + reply.Message );
+            return new ServiceReply<bool>( reply.ErrorType, reply.Message );
+        }
+
+        Categories = reply.Data;
+        PrimarySelection = Categories
+            .Where( c => c.Tier == CategoryTier.Primary )
+            .Select( c => new CategorySelectionOption( c.Id, c.Name ) )
+            .ToList();
+
+        return new ServiceReply<bool>( true );
+    }
+    public void SetPrimaryOptions( List<int> modelCategories )
+    {
+        foreach ( CategorySelectionOption option in PrimarySelection )
+        {
+            option.IsSelected = modelCategories.Contains( option.Id );
+        }
+    }
+    public List<int> GetSelectedPrimaryOptions()
+    {
+        return PrimarySelection.Where( c => c.IsSelected )
+            .Select( c => c.Id )
+            .ToList();
+    }
+}

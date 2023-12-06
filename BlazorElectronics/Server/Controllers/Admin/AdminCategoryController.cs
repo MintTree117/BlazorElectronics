@@ -41,6 +41,21 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<CategoryEdit?> reply = await _service.GetCategoryEdit( request.Payload.Value );
         return GetReturnFromReply( reply );
     }
+    [HttpPost( "add-bulk" )]
+    public async Task<ActionResult<bool>> AddCategoriesBulk( [FromBody] UserDataRequest<List<CategoryEdit>> request )
+    {
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        
+        Logger.LogError( "hit" );
+        
+        if ( !adminReply.Success )
+            return GetReturnFromReply( adminReply );
+        
+        Logger.LogError( "validated" );
+        
+        ServiceReply<bool> reply = await _service.AddBulkCategories( request.Payload );
+        return GetReturnFromReply( reply );
+    }
     [HttpPost( "add" )]
     public async Task<ActionResult<int>> AddCategory( [FromBody] UserDataRequest<CategoryEdit> request )
     {

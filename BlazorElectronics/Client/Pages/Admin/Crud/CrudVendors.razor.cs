@@ -1,8 +1,5 @@
-using BlazorElectronics.Client.Models;
 using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
 
@@ -10,9 +7,8 @@ namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
 public sealed partial class CrudVendors : CrudPage<CrudView, VendorEdit>
 {
-    [Inject] IAdminCrudService<CategoryView, CategoryEdit> CategoryService { get; set; } = null!;
-    CategorySelection CategoryOptions = null!;
-    
+    [Inject] public IAdminCategoryHelper CategoryHelper { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
         ItemTitle = "Vendor";
@@ -22,33 +18,27 @@ public sealed partial class CrudVendors : CrudPage<CrudView, VendorEdit>
         if ( !PageIsAuthorized )
             return;
 
-        ServiceReply<List<CategoryView>?> categoryResponse = await CategoryService.GetView( "api/AdminCategory/get-view" );
+        ServiceReply<bool> categoryResponse = await CategoryHelper.Init();
 
-        if ( !categoryResponse.Success || categoryResponse.Data is null )
+        if ( !categoryResponse.Success )
         {
-            Logger.LogError( categoryResponse.ErrorType + categoryResponse.Message );
-            SetActionMessage( false, "Failed to get categories!" );
+            SetActionMessage( false, categoryResponse.Message ?? "Failed to get categories!" );
             return;
         }
 
-        List<CategoryView> categories = categoryResponse.Data.Where( c => c.Tier == CategoryTier.Primary ).ToList();
-        CategoryOptions = new CategorySelection( categories );
-        
-        Logger.LogError( "C" + categories.Count );
-        
         ApiPath = "api/AdminVendor";
         await LoadView();
     }
 
     protected override async Task Submit()
     {
-        ItemEdit.PrimaryCategories = CategoryOptions.GetSelected();
+        ItemEdit.PrimaryCategories = CategoryHelper.GetSelectedPrimaryOptions();
         await base.Submit();
     }
     public override async Task EditItem( int itemId )
     {
         await base.EditItem( itemId );
-        CategoryOptions.Set( ItemEdit.PrimaryCategories );
+        CategoryHelper.SetPrimaryOptions( ItemEdit.PrimaryCategories );
         StateHasChanged();
     }
 }

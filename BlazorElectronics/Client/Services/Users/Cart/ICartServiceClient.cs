@@ -9,8 +9,8 @@ public interface ICartServiceClient
 
     Task<ServiceReply<CartResponse?>> GetCart();
     Task<ServiceReply<CartResponse?>> UpdateCart();
-    Task<ServiceReply<CartResponse?>> AddToCart( CartItemDto item );
-    Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItemDto item );
+    Task<ServiceReply<CartResponse?>> AddToCart( CartItem item );
+    Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItem item );
     Task<ServiceReply<CartResponse?>> RemoveFromCart( int productId );
     Task<ServiceReply<bool>> ClearCart();
 }

@@ -2,16 +2,16 @@ using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Shared;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.Admin.Seed;
+namespace BlazorElectronics.Client.Pages.Admin.TestSeed;
 
-public partial class SeedPage : AdminPage
+public partial class TestSeedPage : AdminPage
 {
     const string FAIL_SEED_MESSAGE = "Failed to seed items!";
     
     [Inject] IAdminSeedService SeedService { get; init; } = default!;
 
-    IntDto ProductCount = new();
-    IntDto UserCount = new();
+    readonly IntDto ProductCount = new();
+    readonly IntDto UserCount = new();
 
     protected override async Task OnInitializedAsync()
     {

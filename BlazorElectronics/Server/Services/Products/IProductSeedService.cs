@@ -6,5 +6,5 @@ namespace BlazorElectronics.Server.Services.Products;
 
 public interface IProductSeedService
 {
-    Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse specLookups, VendorsResponse vendors, List<int> users );
+    Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categories, SpecLookupsResponse lookups, VendorsResponse vendors, List<int> users );
 }

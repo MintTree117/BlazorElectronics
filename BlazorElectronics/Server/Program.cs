@@ -55,9 +55,6 @@ builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
 builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
 
-
-//builder.Services.AddScoped<IProductSeedService, ProductSeedService>();
-
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.

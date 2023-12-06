@@ -4,8 +4,6 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Repositories.Products;
@@ -20,29 +18,6 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     const string PARAM_QUERY_ROWS = "@Rows";
     const string PARAM_SEARCH_TEXT = "@SearchText";
     const string PARAM_SPEC_VALUE_ID = "@filterSpec_";
-
-    const string PARAM_HAS_SUBTITLES = "@HasSubtitles";
-    const string PARAM_MIN_FILESIZE = "@FileSizeMin";
-    const string PARAM_MAX_FILESIZE = "@FileSizeMax";
-    
-    const string PARAM_BOOK_MIN_PAGES = "@BookPagesMin";
-    const string PARAM_BOOK_MAX_PAGES = "@BookPagesMax";
-    const string PARAM_BOOK_HAS_AUDIO = "@BookHasAudio";
-    const string PARAM_BOOK_MIN_AUDIO = "@BookAudioMin";
-    const string PARAM_BOOK_MAX_AUDIO = "@BookAudioMax";
-
-    const string PARAM_GAME_HAS_MULTIPLAYER = "@HasMultiplayer";
-    const string PARAM_GAME_HAS_OFFLINE = "@HasOffline";
-    const string PARAM_GAME_HAS_CONTROLLER = "@HasController";
-    const string PARAM_GAME_HAS_PURCHASES = "@HasPurchases";
-
-    const string PARAM_VIDEO_MIN_RUNTIME = "@RuntimeMin";
-    const string PARAM_VIDEO_MAX_RUNTIME = "@RuntimeMax";
-    const string PARAM_VIDEO_MIN_EPISODES = "@EpisodesMin";
-    const string PARAM_VIDEO_MAX_EPISODES = "@EpisodesMax";
-
-    const string PARAM_COURSE_MIN_DURATION = "@MinDuration";
-    const string PARAM_COURSE_MAX_DURATION = "@MaxDuration";
 
     // STORED PROCEDURES
     const string STORED_PROCEDURE_GET_SEARCH_SUGGESTIONS = "Get_ProductSearchSuggestions";
@@ -93,7 +68,6 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $"SELECT *, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
             AppendCategoryJoin( builder, categoryId );
-            AppendSpecJoin( builder, request.CategoryFilters );
             AppendSpecLookupJoin( builder, request.LookupIncludes is not null || request.LookupExcludes is not null );
             
             builder.Append( $" WHERE 1=1" );
@@ -104,7 +78,6 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             AppendHasSaleCondition( builder, request.HasSale );
             AppendRatingConditions( builder, dynamicParams, request.MinRating );
             AppendPriceConditions( builder, dynamicParams, request.MinPrice, request.MaxPrice );
-            AppendSpecConditions( builder, dynamicParams, request.CategoryFilters );
             AppendLookupConditions( builder, dynamicParams, request.LookupIncludes, false );
             AppendLookupConditions( builder, dynamicParams, request.LookupExcludes, true );
 
@@ -134,32 +107,6 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         
         builder.Append( $" INNER JOIN {TABLE_PRODUCT_CATEGORIES}" );
         builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_CATEGORIES}.{COL_PRODUCT_ID}" );   
-    }
-    static void AppendSpecJoin( StringBuilder builder, object? filters )
-    {
-        if ( filters is null )
-            return;
-
-        switch ( filters )
-        {
-            case SearchFiltersBook:
-                builder.Append( $" LEFT JOIN {TABLE_PRODUCT_SPECS_BOOK} ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_SPECS_BOOK}.{COL_PRODUCT_ID}" );
-                break;
-            case SearchFiltersSoftware:
-                builder.Append( $" LEFT JOIN {TABLE_PRODUCT_SPECS_SOFTWARE} ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_SPECS_SOFTWARE}.{COL_PRODUCT_ID}" );
-                break;
-            case SearchFiltersGames:
-                builder.Append( $" LEFT JOIN {TABLE_PRODUCT_SPECS_GAMES} ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_ID}" );
-                break;
-            case SearchFiltersVideo:
-                builder.Append( $" LEFT JOIN {TABLE_PRODUCT_SPECS_MOVIESTV} ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_SPECS_MOVIESTV}.{COL_PRODUCT_ID}" );
-                break;
-            case SearchFiltersCourses:
-                builder.Append( $" LEFT JOIN {TABLE_PRODUCT_SPECS_COURSES} ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_SPECS_COURSES}.{COL_PRODUCT_ID}" );
-                break;
-            default:
-                return;
-        }
     }
     static void AppendSpecLookupJoin( StringBuilder builder, bool filtersExist )
     {
@@ -268,148 +215,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             dynamicParams.Add( $"{PARAM_SPEC_ID}{TABLE_PRODUCT_SPEC_LOOKUPS}", specId );
         }
     }
-    
-    static void AppendSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, object? filters ) 
-    {
-        switch ( filters )
-        {
-            case SearchFiltersBook book:
-                AppendBookConditions( builder, dynamicParams, book );
-                break;
-            case SearchFiltersSoftware software:
-                AppendSoftwareConditions( builder, dynamicParams, software );
-                break;
-            case SearchFiltersGames games:
-                AppendGameConditions( builder, dynamicParams, games );
-                break;
-            case SearchFiltersVideo video:
-                AppendSoftwareConditions( builder, dynamicParams, video );
-                break;
-            case SearchFiltersCourses course:
-                AppendCourseConditions( builder, dynamicParams, course );
-                break;
-        }
-    }
-    static void AppendBookConditions( StringBuilder builder, DynamicParameters dynamicParams, SearchFiltersBook? book )
-    {
-        if ( book is null )
-            return;
 
-        if ( book.Pages is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_BOOK}.{COL_PRODUCT_BOOK_PAGES} >= {PARAM_BOOK_MIN_PAGES}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_BOOK}.{COL_PRODUCT_BOOK_PAGES} <= {PARAM_BOOK_MAX_PAGES} )" );
-            dynamicParams.Add( PARAM_BOOK_MIN_PAGES, book.Pages.Min );
-            dynamicParams.Add( PARAM_BOOK_MAX_PAGES, book.Pages.Max );
-        }
-
-        if ( book.HasAudio is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_BOOK}.{COL_PRODUCT_BOOK_HAS_AUDIO} = {PARAM_BOOK_HAS_AUDIO}" );
-            dynamicParams.Add( PARAM_BOOK_HAS_AUDIO, true );
-        }
-        
-        if ( book.AudioLength is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_BOOK}.{COL_PRODUCT_BOOK_AUDIO_LENGTH} >= {PARAM_BOOK_MIN_AUDIO}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_BOOK}.{COL_PRODUCT_BOOK_AUDIO_LENGTH} <= {PARAM_BOOK_MAX_AUDIO} )" );
-            dynamicParams.Add( PARAM_BOOK_MIN_AUDIO, book.AudioLength.Min );
-            dynamicParams.Add( PARAM_BOOK_MAX_AUDIO, book.AudioLength.Max );
-        }
-    }
-    static void AppendSoftwareConditions( StringBuilder builder, DynamicParameters dynamicParams, SearchFiltersSoftware? software )
-    {
-        if ( software is null )
-            return;
-
-        if ( software.FileSize is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_SOFTWARE}.{COL_PRODUCT_FILESIZE} >= {PARAM_MIN_FILESIZE}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_SOFTWARE}.{COL_PRODUCT_FILESIZE} <= {PARAM_MAX_FILESIZE} )" );
-            dynamicParams.Add( PARAM_MIN_FILESIZE, software.FileSize.Min );
-            dynamicParams.Add( PARAM_MAX_FILESIZE, software.FileSize.Max );
-        }
-    }
-    static void AppendGameConditions( StringBuilder builder, DynamicParameters dynamicParams, SearchFiltersGames? game )
-    {
-        if ( game is null )
-            return;
-
-
-        if ( game.HasMultiplayer is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_GAME_HAS_MULTIPLAYER} = {PARAM_GAME_HAS_MULTIPLAYER}" );
-            dynamicParams.Add( PARAM_GAME_HAS_MULTIPLAYER, game.HasMultiplayer.Value );
-        }
-        if ( game.HasOffline is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_GAME_HAS_OFFLINE} = {PARAM_GAME_HAS_OFFLINE}" );
-            dynamicParams.Add( PARAM_GAME_HAS_OFFLINE, game.HasOffline.Value );
-        }
-        if ( game.HasController is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_GAME_HAS_CONTROLLER} = {PARAM_GAME_HAS_CONTROLLER}" );
-            dynamicParams.Add( PARAM_GAME_HAS_CONTROLLER, game.HasController.Value );
-        }
-        if ( game.HasPurchases is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_GAME_HAS_PURCHASES} = {PARAM_GAME_HAS_PURCHASES}" );
-            dynamicParams.Add( PARAM_GAME_HAS_PURCHASES, game.HasPurchases.Value );
-        }
-        if ( game.FileSize is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_FILESIZE} >= {PARAM_MIN_FILESIZE}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_GAMES}.{COL_PRODUCT_FILESIZE} <= {PARAM_MAX_FILESIZE} )" );
-            dynamicParams.Add( PARAM_MIN_FILESIZE, game.FileSize.Min );
-            dynamicParams.Add( PARAM_MAX_FILESIZE, game.FileSize.Max );
-        }
-    }
-    static void AppendSoftwareConditions( StringBuilder builder, DynamicParameters dynamicParams, SearchFiltersVideo? video )
-    {
-        if ( video is null )
-            return;
-
-        if ( video.Runtime is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_MOVIESTV}.{COL_PRODUCT_VIDEO_RUNTIME} >= {PARAM_VIDEO_MIN_RUNTIME}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_MOVIESTV}.{COL_PRODUCT_VIDEO_RUNTIME} <= {PARAM_VIDEO_MAX_RUNTIME} )" );
-            dynamicParams.Add( PARAM_VIDEO_MIN_RUNTIME, video.Runtime.Min );
-            dynamicParams.Add( PARAM_VIDEO_MAX_RUNTIME, video.Runtime.Max );
-        }
-        if ( video.Episodes is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_MOVIESTV}.{COL_PRODUCT_VIDEO_EPISODES} >= {PARAM_VIDEO_MIN_EPISODES}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_MOVIESTV}.{COL_PRODUCT_VIDEO_EPISODES} <= {PARAM_VIDEO_MAX_EPISODES} )" );
-            dynamicParams.Add( PARAM_VIDEO_MIN_EPISODES, video.Episodes.Min );
-            dynamicParams.Add( PARAM_VIDEO_MAX_EPISODES, video.Episodes.Max );
-        }
-
-        if ( video.HasSubtitles is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_MOVIESTV}.{COL_PRODUCT_HAS_SUBTITLES} = {PARAM_HAS_SUBTITLES}" );
-            dynamicParams.Add( PARAM_HAS_SUBTITLES, true );
-        }
-    }
-    static void AppendCourseConditions( StringBuilder builder, DynamicParameters dynamicParams, SearchFiltersCourses? course )
-    {
-        if ( course is null )
-            return;
-
-        if ( course.Duration is not null )
-        {
-            builder.Append( $" AND ( {TABLE_PRODUCT_SPECS_COURSES}.{COL_PRODUCT_COURSE_DURATION} >= {PARAM_COURSE_MIN_DURATION}" );
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_COURSES}.{COL_PRODUCT_COURSE_DURATION} <= {PARAM_COURSE_MAX_DURATION} )" );
-            dynamicParams.Add( PARAM_COURSE_MIN_DURATION, course.Duration.Min );
-            dynamicParams.Add( PARAM_COURSE_MAX_DURATION, course.Duration.Max );
-        }
-
-        if ( course.HasSubtitles is not null )
-        {
-            builder.Append( $" AND {TABLE_PRODUCT_SPECS_COURSES}.{COL_PRODUCT_HAS_SUBTITLES} = {PARAM_HAS_SUBTITLES}" );
-            dynamicParams.Add( PARAM_HAS_SUBTITLES, true );
-        }
-    }
-    
     sealed class SearchQueryObject
     {
         public string SearchQuery { get; init; } = string.Empty;

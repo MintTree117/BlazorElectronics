@@ -3,6 +3,7 @@ using BlazorElectronics.Server.Models.Products.Details;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
 using BlazorElectronics.Shared.Products.Search;

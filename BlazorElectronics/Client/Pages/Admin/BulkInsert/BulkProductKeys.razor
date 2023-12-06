@@ -1,0 +1,32 @@
+@page "/admin/bulk/product-keys"
+@inherits AdminPage
+
+<div class="container-sm form-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <div class="form-header">
+            <h3>Bulk Insert Product Keys</h3>
+        </div>
+        
+        <EditForm Model="_seed" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="Id" class="form-label">Product Id</label>
+                <InputNumber @bind-Value="_seed.ProductId" class="form-control" id="Id"></InputNumber>
+            </div>
+            <div class="mb-3">
+                <label for="Keys" class="form-label">Keys: comma separated</label>
+                <InputTextArea @bind-Value="_seed.Keys" class="form-control" id="Keys"></InputTextArea>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success btn-icon">
+                    <i class="oi oi-cloud-upload"></i> Submit
+                </button>
+            </div>
+        </EditForm>
+        
+        <ActionMessage Page="@this"></ActionMessage>
+    }
+</div>

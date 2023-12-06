@@ -1,7 +1,7 @@
 namespace BlazorElectronics.Shared.Cart;
 
-public sealed class CartItemDto
+public sealed class CartItem
 {
-    public int ProductId { get; set; }
+    public int ProductId { get; init; }
     public int Quantity { get; set; }
 }

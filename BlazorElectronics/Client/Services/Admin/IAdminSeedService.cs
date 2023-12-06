@@ -1,5 +1,6 @@
 using BlazorElectronics.Shared;
 
+
 namespace BlazorElectronics.Client.Services.Admin;
 
 public interface IAdminSeedService

@@ -1,0 +1,50 @@
+@page "/admin/bulk/categories"
+@using BlazorElectronics.Shared.Enums
+@using BlazorElectronics.Shared.Categories
+@inherits AdminPage
+
+<div class="container-sm form-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <div class="form-header">
+            <h3>Bulk Insert Categories</h3>
+        </div>
+        
+        <EditForm Model="_seed" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="Tier" class="form-label">Category Tier</label>
+                <InputSelect @bind-Value="_seed.Tier" @onchange="HandleTierChange" class="form-control" id="Tier">
+                    @foreach ( CategoryTier tier in Enum.GetValues<CategoryTier>() )
+                    {
+                        if ( tier == CategoryTier.Primary )
+                            continue;
+                        <option value="@tier">@tier</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="Parent" class="form-label">Parent Category</label>
+                <InputSelect @bind-Value="_seed.ParentCategoryId" class="form-control" id="Parent">
+                    @foreach ( CategoryView item in GetEditParents() )
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label for="Names" class="form-label">Names: separated by comma</label>
+                <InputTextArea @bind-Value="_seed.Names" class="form-control" id="Names"></InputTextArea>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success btn-icon">
+                    <i class="oi oi-cloud-upload"></i> Submit
+                </button>
+            </div>
+        </EditForm>
+
+        <ActionMessage Page="@this"></ActionMessage>
+    }
+</div>

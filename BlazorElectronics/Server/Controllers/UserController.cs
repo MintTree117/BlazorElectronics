@@ -2,6 +2,7 @@ using System.Net;
 using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Users;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 

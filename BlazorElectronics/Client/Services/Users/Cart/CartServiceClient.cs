@@ -21,11 +21,11 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     {
         throw new NotImplementedException();
     }
-    public Task<ServiceReply<CartResponse?>> AddToCart( CartItemDto item )
+    public Task<ServiceReply<CartResponse?>> AddToCart( CartItem item )
     {
         throw new NotImplementedException();
     }
-    public Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItemDto item )
+    public Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItem item )
     {
         throw new NotImplementedException();
     }

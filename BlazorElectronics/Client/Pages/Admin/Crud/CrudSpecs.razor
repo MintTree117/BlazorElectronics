@@ -24,7 +24,7 @@
                 </div>
                 <div class="mb-3">
                     <h4>Category Selection</h4>
-                    @foreach ( CategorySelectionOption option in CategoryOptions.Options )
+                    @foreach ( CategorySelectionOption option in CategoryHelper.PrimarySelection )
                     {
                         <div class="form-check">
                             <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>

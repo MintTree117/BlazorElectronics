@@ -13,5 +13,5 @@ public sealed class CategoriesResponse
     }
 
     public Dictionary<int, CategoryResponse> CategoriesById { get; init; } = new();
-    public List<int> PrimaryIds { get; set; } = new();
+    public List<int> PrimaryIds { get; init; } = new();
 }

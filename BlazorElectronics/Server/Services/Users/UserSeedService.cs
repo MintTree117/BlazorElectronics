@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Dtos.Users;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Server.Services.Users;

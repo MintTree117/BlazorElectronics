@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using BlazorElectronics.Server.Models.Products.Seed;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.Categories;
@@ -20,52 +21,71 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse specLookups, VendorsResponse vendors, List<int> users )
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categories, SpecLookupsResponse lookups, VendorsResponse vendors, List<int> users )
     {
-        ProductSeedModels seeds = await Task.Run( () => new ProductSeedModels
+        List<ProductSeedModel> models = new();
+
+        for ( int primaryCategory = 1; primaryCategory <= 5; primaryCategory++ )
         {
-            Books = GetBookModels( amount, categoriesResponse, specLookups, vendors ),
-            Software = GetSoftwareModels( amount, categoriesResponse, specLookups, vendors ),
-            Games = GetGamesModels( amount, categoriesResponse, specLookups, vendors ),
-            MoviesTv = GetMoviesTvModels( amount, categoriesResponse, specLookups, vendors ),
-            Courses = GetCoursesModels( amount, categoriesResponse, specLookups, vendors )
-        } );
+            for ( int i = 0; i < amount; i++ )
+            {
+                models.Add( GetSeedModel( primaryCategory, i, categories, lookups, vendors ) );
+            }
+        }
 
         try
         {
-            bool result = false; // await _repository.SeedProducts( seeds );
-            return new ServiceReply<bool>( result );
+            bool result = await _repository.SeedProducts( models );
+            return result
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound, "Failed to seed products!" );
         }
         catch ( ServiceException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to seed products!" );
         }
     }
     
     // BASE MODEL
-    T GetBaseModel<T>( int category, int i, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors ) where T : ProductSeedModel, new()
+    ProductSeedModel GetSeedModel( int primaryCategory, int i, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
     {
-        var model = new T
+        ProductSeedModel model = new()
         {
-            VendorId = PickRandomVendor( category, vendors ),
-            Title = ProductSeedData.PRODUCT_TITLES[ category ] + " " + i,
-            ThumbnailUrl = ProductSeedData.PRODUCT_IMAGES[ category ],
+            VendorId = PickRandomVendor( primaryCategory, vendors ),
+            Title = ProductSeedData.PRODUCT_TITLES[ primaryCategory ] + " " + i,
+            ThumbnailUrl = ProductSeedData.PRODUCT_IMAGES[ primaryCategory ],
             Price = GetRandomDecimal( ProductSeedData.MIN_PRICE, ProductSeedData.MAX_PRICE ),
             ReleaseDate = GetRandomDate( ProductSeedData.MIN_RELEASE_DATE, ProductSeedData.MAX_RELEASE_DATE ),
             NumberSold = GetRandomInt( 0, ProductSeedData.MAX_NUM_SOLD ),
             HasDrm = GetRandomBoolean(),
-            Description = GetRandomDescription( category ),
-            Languages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.Language, lookups ), 8 ),
-            MatureContent = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MatureContent, lookups ), 8 ),
-            PrimaryCategoryId = category,
-            SecondaryCategoryIds = GetRandomSecondaryCategories( category, categoriesResponse ),
+            Description = GetRandomDescription( primaryCategory ),
         };
 
         if ( GetRandomBoolean() )
             model.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) model.Price );
+
+        model.Categories.Add( primaryCategory );
+        model.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoriesResponse ) );
         
-        model.TertiaryCategoryIds = GetRandomTertiaryCategories( model.SecondaryCategoryIds, categoriesResponse );
+        GetRandomLookups( lookups.GlobalSpecIds, lookups )
+            .ToList()
+            .ForEach( x => model.SpecLookups[ x.Key ] = x.Value );
+
+        GetRandomLookups( lookups.SpecIdsByCategory[ primaryCategory ], lookups )
+            .ToList()
+            .ForEach( x => model.SpecLookups[ x.Key ] = x.Value );
+
+        model.XmlSpecs = primaryCategory switch
+        {
+            1 => GetBookXml(),
+            2 => GetSoftwareXml(),
+            3 => GetGameXml(),
+            4 => GetMoviesTvXml(),
+            5 => GetCoursesXml(),
+            _ => throw new ArgumentOutOfRangeException( nameof( primaryCategory ), primaryCategory, null )
+        };
+
         return model;
     }
     // DESCRIPTIONS
@@ -81,143 +101,113 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             _ => string.Empty
         };
     }
-    // SPECIFIC MODELS
-    List<BookSeedModel> GetBookModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
+    // XML
+    string GetBookXml()
     {
-        var books = new List<BookSeedModel>();
-
-        for ( int i = 0; i < amount; i++ )
-        {
-            var book = GetBaseModel<BookSeedModel>( amount, i, categoriesResponse, lookups, vendors );
-            book.Author = GetRandomSpec( ProductSeedData.NAMES );
-            book.Publisher = GetRandomSpec( ProductSeedData.PUBLISHERS );
-            book.ISBN = GetRandomSpec( ProductSeedData.ISBNS );
-            book.Pages = GetRandomInt( 0, ProductSeedData.MAX_PAGE_LENGTH );
-            book.HasAudio = GetRandomBoolean();
-            book.EbookFormats = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.EbookFormat, lookups ), 4 );
-            book.Accessibility = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.EbookAccessibility, lookups ), 2 );
-
-            if ( !book.HasAudio ) 
-                continue;
-            
-            book.Narrator = GetRandomSpec( ProductSeedData.NAMES );
-            book.AudioLength = GetRandomInt( 0, ProductSeedData.MAX_AUDIO_LENGTH );
-            book.AudioBookFormats = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.AudioBookFormat, lookups ), 4 );
-        }
+        var author = new XElement( "Author", GetRandomSpec( ProductSeedData.NAMES ) );
+        var publisher = new XElement( "Publisher", GetRandomSpec( ProductSeedData.PUBLISHERS ) );
+        var isbn = new XElement( "ISBN", GetRandomSpec( ProductSeedData.ISBNS ) );
+        var pages = new XElement( "Pages", GetRandomInt( 0, ProductSeedData.MAX_PAGE_LENGTH ).ToString() );
         
-        return books;
-    }
-    List<SoftwareSeedSeedModel> GetSoftwareModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
-    {
-        var softwares = new List<SoftwareSeedSeedModel>();
+        var root = new XElement( "RootElement" );
+        root.Add( author );
+        root.Add( publisher );
+        root.Add( isbn );
+        root.Add( pages );
+
+        if ( !GetRandomBoolean() ) 
+            return root.ToString();
         
-        for ( int i = 0; i < amount; i++ )
-        {
-            var software = GetBaseModel<SoftwareSeedSeedModel>( amount, i, categoriesResponse, lookups, vendors );
-            software.Version = GetRandomSpec( ProductSeedData.SOFTWARE_VERSIONS );
-            software.Developer = GetRandomSpec( ProductSeedData.SOFTWARE_DEVELOPERS );
-            software.Dependencies = GetRandomSpecs( ProductSeedData.SOFTWARE_DEPENDENCIES, 5 );
-            software.TrialLimitations = GetRandomSpecs( ProductSeedData.SOFTWARE_TRIAL_LIMITATIONS, 5 );
-            software.OsRequirements = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.OsRequirement, lookups ), 3 );
-            software.SoftwareLanguages = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.SoftwareLanguage, lookups ), 4 );
-        }
-        
-        return softwares;
+        var narrator = new XElement( "Narrator", GetRandomSpec( ProductSeedData.ISBNS ) );
+        var audioLength = new XElement( "AudioLength", GetRandomInt( 0, ProductSeedData.MAX_AUDIO_LENGTH ).ToString() );
+        root.Add( narrator );
+        root.Add( audioLength );
+
+        return root.ToString();
     }
-    List<GamesSeedModel> GetGamesModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
+    string GetSoftwareXml()
     {
-        var games = new List<GamesSeedModel>();
+        var version = new XElement( "Version", GetRandomSpec( ProductSeedData.SOFTWARE_VERSIONS ) );
+        var developer = new XElement( "Developer", GetRandomSpec( ProductSeedData.SOFTWARE_DEVELOPERS ) );
+        var dependencies = new XElement( "Dependencies", GetRandomSpecs( ProductSeedData.SOFTWARE_DEPENDENCIES, 5 ) );
+        var trialLimitations = new XElement( "TrialLimitations", GetRandomSpec( ProductSeedData.SOFTWARE_TRIAL_LIMITATIONS ) );
 
-        for ( int i = 0; i < amount; i++ )
-        {
-            var game = GetBaseModel<GamesSeedModel>( amount, i, categoriesResponse, lookups, vendors );
-            game.Developer = GetRandomSpec( ProductSeedData.GAME_DEVELOPERS );
-            game.HasMultiplayer = GetRandomBoolean();
-            game.HasOfflineMode = GetRandomBoolean();
-            game.HasInGamePurchases = GetRandomBoolean();
-            game.HasControllerSupport = GetRandomBoolean();
-            game.FileSizeMb = GetRandomInt( ProductSeedData.MIN_FILE_SIZE, ProductSeedData.MAX_FILE_SIZE );
-            game.OsRequirements = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.OsRequirement, lookups ), 3 );
+        var root = new XElement( "RootElement" );
+        root.Add( version );
+        root.Add( developer );
+        root.Add( dependencies );
+        root.Add( trialLimitations );
 
-            if ( game.HasMultiplayer )
-            {
-                game.MultiplayerDetails = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MultiplayerDetail, lookups ), 6 );
-            }
-        }
-
-        return games;
+        return root.ToString();
     }
-    List<MoviesTvSeedModel> GetMoviesTvModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
+    string GetGameXml()
     {
-        var moviesTv = new List<MoviesTvSeedModel>();
+        var developer = new XElement( "Developer", GetRandomSpec( ProductSeedData.GAME_DEVELOPERS ) );
+        var hasMultiplayer = new XElement( "HasMultiplayer", GetRandomBoolean().ToString() );
+        var hasOfflineMode = new XElement( "HasOfflineMode", GetRandomBoolean().ToString() );
+        var hasInGamePurchases = new XElement( "HasInGamePurchases", GetRandomBoolean().ToString() );
+        var hasControllerSupport = new XElement( "HasControllerSupport", GetRandomBoolean().ToString() );
+        var fileSize = new XElement( "FileSizeMb", GetRandomInt( ProductSeedData.MIN_FILE_SIZE, ProductSeedData.MAX_FILE_SIZE ).ToString() );
 
-        for ( int i = 0; i < amount; i++ )
-        {
-            var movieTv = GetBaseModel<MoviesTvSeedModel>( amount, i, categoriesResponse, lookups, vendors );
-            movieTv.Director = GetRandomSpec( ProductSeedData.DIRECTORS );
-            movieTv.Cast = GetRandomSpecs( ProductSeedData.ACTORS, 10 );
-            movieTv.RuntimeMinutes = GetRandomInt( 0, ProductSeedData.MAX_RUNTIME );
-            movieTv.Episodes = GetRandomInt( 0, ProductSeedData.MAX_EPISODES );
-            movieTv.HasSubtitles = GetRandomBoolean();
-            movieTv.VideoFormats = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.VideoFormat, lookups ), 3 );
-            movieTv.Accessibility = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.VideoAccessibility, lookups ), 3 );
-            movieTv.Awards = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.MoviesTvAward, lookups ), 5 );
-        }
+        var root = new XElement( "RootElement" );
+        root.Add( developer );
+        root.Add( hasMultiplayer );
+        root.Add( hasOfflineMode );
+        root.Add( hasInGamePurchases );
+        root.Add( hasControllerSupport );
+        root.Add( fileSize );
 
-        return moviesTv;
+        return root.ToString();
     }
-    List<CourseSeedModel> GetCoursesModels( int amount, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
+    string GetMoviesTvXml()
     {
-        var courses = new List<CourseSeedModel>();
+        var director = new XElement( "Director", GetRandomSpec( ProductSeedData.DIRECTORS ) );
+        var cast = new XElement( "Cast", GetRandomSpecs( ProductSeedData.NAMES, 10) );
+        var runtimeMinutes = new XElement( "RuntimeMinutes", GetRandomInt( 1, ProductSeedData.MAX_RUNTIME ).ToString() );
+        var episodes = new XElement( "Episodes", GetRandomInt( 1, ProductSeedData.MAX_EPISODES ).ToString() );
+        var hasSubtitles = new XElement( "HasSubtitles", GetRandomBoolean().ToString() );
 
-        for ( int i = 0; i < amount; i++ )
-        {
-            var course = GetBaseModel<CourseSeedModel>( amount, i, categoriesResponse, lookups, vendors );
-            course.Instructors = GetRandomSpecs( ProductSeedData.NAMES, 3 );
-            course.Requirements = GetRandomSpecs( ProductSeedData.COURSE_REQUIREMENTS, 5 );
-            course.DurationWeeks = GetRandomInt( 1, ProductSeedData.MAX_COURSE_DURATION );
-            course.HasSubtitles = GetRandomBoolean();
-            course.Certifications = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.CourseCertificate, lookups ), 3 );
-            course.VideoAccessibility = GetRandomSpecLookups( GetLookupMaxIndex( SpecLookupType.VideoAccessibility, lookups ), 3 );
-        }
+        var root = new XElement( "RootElement" );
+        root.Add( director );
+        root.Add( cast );
+        root.Add( runtimeMinutes );
+        root.Add( episodes );
+        root.Add( hasSubtitles );
 
-        return courses;
+        return root.ToString();
+    }
+    string GetCoursesXml()
+    {
+        var instructors = new XElement( "Instructors", GetRandomSpecs( ProductSeedData.NAMES, 3 ) );
+        var requirements = new XElement( "Requirements", GetRandomSpecs( ProductSeedData.COURSE_REQUIREMENTS, 5 ) );
+        var durationWeeks = new XElement( "DurationWeeks", GetRandomInt( 1, ProductSeedData.MAX_COURSE_DURATION ).ToString() );
+        var hasSubtitles = new XElement( "HasSubtitles", GetRandomBoolean().ToString() );
+
+        var root = new XElement( "RootElement" );
+        root.Add( instructors );
+        root.Add( requirements );
+        root.Add( durationWeeks );
+        root.Add( hasSubtitles );
+
+        return root.ToString();
     }
     // CATEGORY
-    List<int> GetRandomSecondaryCategories( int primaryCategory, CategoriesResponse categoryResponseData )
+    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> categories, CategoriesResponse categoriesResponse )
     {
-        /*CategoryResponse? response = categoryResponseData.Primary.FirstOrDefault( p => p.Id == primaryCategory );
+        CategoryResponse response = categoriesResponse.CategoriesById[ currentCategory ];
+        
+        if ( response.Children.Count <= 0 )
+            return categories;
 
-        return response is null 
-            ? new List<int>() 
-            : PickRandomCategories( response ).ToList();*/
-        return new List<int>();
-    }
-    List<int> GetRandomTertiaryCategories( List<int> secondaryCategories, CategoriesResponse categoryResponseData )
-    {
-        var tertiaryCategories = new List<int>();
-        var secondary = new List<CategoryResponse>();
+        List<int> subcategories = PickRandomCategories( response ).ToList();
+        categories.AddRange( subcategories );
 
-        /*foreach ( int secondaryCategory in secondaryCategories )
+        foreach ( int category in subcategories )
         {
-            CategoryResponse? r = categoryResponseData.Secondary.FirstOrDefault( s => s.Id == secondaryCategory );
-
-            if ( r is not null )
-                secondary.Add( r );
+            categories.AddRange( GetRandomCategories( category, categories, categoriesResponse ) );
         }
 
-        foreach ( CategoryResponse r in secondary )
-        {
-            IEnumerable<int> picked = PickRandomCategories( r );
-
-            foreach ( int i in picked )
-            {
-                if ( !tertiaryCategories.Contains( i ) )
-                    tertiaryCategories.Add( i );
-            }
-        }*/
-        
-        return tertiaryCategories;
+        return categories;
     }
     IEnumerable<int> PickRandomCategories( CategoryResponse response )
     {
@@ -238,22 +228,35 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
                     break;
             }
 
-            //picked.Add( response.Children[ i ] );
+            picked.Add( response.Children[ i ].Id );
         }
-
+        
         return picked.ToList();
     }
     // SPEC LOOKUP
-    List<int> GetRandomSpecLookups( int maxIndex, int maxAmount )
+    Dictionary<int, List<int>> GetRandomLookups( List<int> ids, SpecLookupsResponse lookups )
+    {
+        Dictionary<int, List<int>> specs = new();
+
+        foreach ( int i in ids )
+        {
+            SpecLookup response = lookups.ResponsesBySpecId[ i ];
+            List<int> valueIds = PickRandomSpecValueIds( response.Values.Count );
+            specs.Add( i, valueIds );
+        }
+
+        return specs;
+    }
+    List<int> PickRandomSpecValueIds( int listCount )
     {
         var alreadyPicked = new HashSet<int>();
         
-        int amount = GetRandomInt( 0, maxAmount );
+        int amount = GetRandomInt( 0, listCount );
         int count = 0;
         
         while ( alreadyPicked.Count < amount )
         {
-            int i = GetRandomInt( 0, maxIndex );
+            int i = GetRandomInt( 0, listCount - 1 );
 
             if ( alreadyPicked.Contains( i ) )
             {
@@ -267,10 +270,6 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         }
 
         return alreadyPicked.ToList();
-    }
-    int GetLookupMaxIndex( SpecLookupType type, SpecLookupsResponse lookups )
-    {
-        return lookups.ResponsesBySpecId[ ( int ) type ].Values.Count - 1;
     }
     // SPEC
     string GetRandomSpec( IReadOnlyList<string> list )
@@ -318,15 +317,16 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     int GetRandomInt( int min, int max )
     {
-        // Generate a random double number between 0 and 1
-        double randomDouble = _random.NextDouble();
+        // Check if the arguments are valid
+        if ( min >= max )
+        {
+            throw new ArgumentOutOfRangeException( nameof( min ), "minValue must be less than maxValue" );
+        }
 
-        // Adjust the range of the double number
-        double range = ( double ) ( ProductSeedData.MAX_NUM_SOLD );
-        double randomInRange = ( randomDouble * range );
-
-        // Convert to decimal and return
-        return ( int ) randomInRange;
+        // Generate a random double, cast it to float, and adjust the range
+        int range = max - min;
+        int randomInt = ( int ) _random.NextDouble(); // This will be between 0.0 and 1.0
+        return ( randomInt * range ) + min;
     }
     float GetRandomFloat( float minValue, float maxValue )
     {

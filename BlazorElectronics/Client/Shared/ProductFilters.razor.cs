@@ -12,7 +12,7 @@ public partial class ProductFilters : RazorView
     int? MaxPrice { get; set; } = null;
     int? MinRating { get; set; } = null;
 
-    List<SpecLookupDto> _specFilters = new();
+    List<SpecLookup> _specFilters = new();
     Dictionary<(int specId, int specValueId), bool> _selectedFilters = new();
 
     void ApplyFilters()

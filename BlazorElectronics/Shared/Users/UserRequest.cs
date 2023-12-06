@@ -19,6 +19,6 @@ public class UserRequest
         SessionToken = token;
     }
     
-    public int SessionId { get; init; }
-    public string SessionToken { get; init; } = string.Empty;
+    public int SessionId { get; protected init; }
+    public string SessionToken { get; protected init; } = string.Empty;
 }

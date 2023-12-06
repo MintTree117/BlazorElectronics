@@ -31,7 +31,7 @@ public class CartRepository : DapperRepository, ICartRepository
         table.Columns.Add( TVP_COL_CART_PRODUCT_ID, typeof( int ) );
         table.Columns.Add( TVP_COL_CART_ITEM_QUANTITY, typeof( int ) );
 
-        foreach ( CartItemDto item in request.Items )
+        foreach ( CartItem item in request.Items )
         {
             DataRow row = table.NewRow();
             row[ TVP_COL_CART_PRODUCT_ID ] = item.ProductId;
@@ -43,7 +43,7 @@ public class CartRepository : DapperRepository, ICartRepository
         
         return await TryQueryTransactionAsync( QueryTransaction<CartProductResponse>, p, PROCEDURE_UPDATE_CART );
     }
-    public async Task<IEnumerable<CartProductResponse>?> InsertItem( int userId, CartItemDto item )
+    public async Task<IEnumerable<CartProductResponse>?> InsertItem( int userId, CartItem item )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_ID, userId );
@@ -52,7 +52,7 @@ public class CartRepository : DapperRepository, ICartRepository
 
         return await TryQueryTransactionAsync( QueryTransaction<CartProductResponse>, p, PROCEDURE_INSERT_TO_CART );
     }
-    public async Task<IEnumerable<CartProductResponse>?> UpdateQuantity( int userId, CartItemDto item )
+    public async Task<IEnumerable<CartProductResponse>?> UpdateQuantity( int userId, CartItem item )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_ID, userId );

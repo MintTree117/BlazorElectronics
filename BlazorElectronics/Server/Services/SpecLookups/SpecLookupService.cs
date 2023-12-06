@@ -138,7 +138,7 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
             idsByCategory[ sc.PrimaryCategoryId ].Add( sc.SpecId );
         }
 
-        var responsesById = new Dictionary<int, SpecLookupDto>();
+        var responsesById = new Dictionary<int, SpecLookup>();
 
         foreach ( SpecLookupModel m in model.SpecLookups )
         {
@@ -148,7 +148,7 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
                 .Select( spec => spec.SpecValue )
                 .ToList();
 
-            responsesById.Add( m.SpecId, new SpecLookupDto
+            responsesById.Add( m.SpecId, new SpecLookup
             {
                 SpecId = m.SpecId,
                 SpecName = m.SpecName,

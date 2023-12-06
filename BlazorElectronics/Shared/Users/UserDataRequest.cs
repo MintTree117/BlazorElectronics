@@ -19,5 +19,5 @@ public sealed class UserDataRequest<T> : UserRequest where T : class
         Payload = payload;
     }
 
-    public T Payload { get; set; }
+    public T Payload { get; init; }
 }

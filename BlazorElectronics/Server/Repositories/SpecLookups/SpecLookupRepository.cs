@@ -89,7 +89,7 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
         parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable.AsTableValuedParameter( TVP_PRIMARY_CATEGORIES ) );
 
-        DataTable valuesTable = GetStringValuesTable( dto.ValuesByIdAsString, TVP_COL_SPEC_ID, TVP_COL_SPEC_VALUE );
+        DataTable valuesTable = GetStringValuesTable( dto.ValuesByIdAsString, COL_SPEC_VALUE_ID, COL_SPEC_VALUE );
         parameters.Add( PARAM_SPEC_VALUES, valuesTable.AsTableValuedParameter( TVP_SPEC_VALUES ) );
         
         return parameters;

@@ -1,3 +1,4 @@
+using BlazorElectronics.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Controllers;

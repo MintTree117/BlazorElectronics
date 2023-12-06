@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Client.Services;
 

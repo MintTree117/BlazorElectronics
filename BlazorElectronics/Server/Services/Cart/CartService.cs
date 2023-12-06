@@ -1,6 +1,7 @@
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Cart;
 using BlazorElectronics.Shared.Cart;
+using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Services.Cart;
 
@@ -48,7 +49,7 @@ public class CartService : ApiService, ICartService
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CartResponse?>> AddToCart( int userId, CartItemDto item )
+    public async Task<ServiceReply<CartResponse?>> AddToCart( int userId, CartItem item )
     {
         try
         {
@@ -65,7 +66,7 @@ public class CartService : ApiService, ICartService
             return new ServiceReply<CartResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CartResponse?>> UpdateQuantity( int userId, CartItemDto item )
+    public async Task<ServiceReply<CartResponse?>> UpdateQuantity( int userId, CartItem item )
     {
         try
         {

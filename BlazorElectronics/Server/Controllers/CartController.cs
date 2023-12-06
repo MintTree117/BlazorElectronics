@@ -41,7 +41,7 @@ public class CartController : UserController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "insert" )]
-    public async Task<ActionResult<CartResponse?>> AddToCart( [FromBody] UserDataRequest<CartItemDto> request )
+    public async Task<ActionResult<CartResponse?>> AddToCart( [FromBody] UserDataRequest<CartItem> request )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
@@ -52,7 +52,7 @@ public class CartController : UserController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "update-quantity" )]
-    public async Task<ActionResult<CartResponse?>> UpdateQuantity( [FromBody] UserDataRequest<CartItemDto> request )
+    public async Task<ActionResult<CartResponse?>> UpdateQuantity( [FromBody] UserDataRequest<CartItem> request )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 

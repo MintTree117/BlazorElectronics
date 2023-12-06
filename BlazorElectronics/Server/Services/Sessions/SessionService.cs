@@ -5,6 +5,7 @@ using BlazorElectronics.Server.Dtos.Users;
 using BlazorElectronics.Server.Models.Users;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Sessions;
+using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Services.Sessions;
 

@@ -33,6 +33,8 @@ builder.Services.AddScoped<IAdminCrudService<CrudView, FeatureEdit>, AdminCrudSe
 builder.Services.AddScoped<IAdminCrudService<CrudView, SpecLookupEdit>, AdminCrudService<CrudView, SpecLookupEdit>>();
 builder.Services.AddScoped<IAdminCrudService<CrudView, VendorEdit>, AdminCrudService<CrudView, VendorEdit>>();
 builder.Services.AddScoped<IAdminSeedService, AdminSeedService>();
+builder.Services.AddScoped<IAdminCategoryHelper, AdminCategoryHelper>();
+builder.Services.AddScoped<IAdminBulkServiceClient, AdminBulkServiceClient>();
 
 
 builder.Logging.SetMinimumLevel( LogLevel.Error ); // Set the minimum level of logging

@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Client.Services.Users;

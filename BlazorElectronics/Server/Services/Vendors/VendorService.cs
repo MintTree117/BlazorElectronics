@@ -2,6 +2,7 @@ using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.Vendors;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Vendors;
+using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Services.Vendors;

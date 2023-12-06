@@ -2,11 +2,11 @@ namespace BlazorElectronics.Shared.Cart;
 
 public sealed class CartProductResponse
 {
-    public int UserId { get; set; }
-    public int ProductId { get; set; }
-    public string ProductTitle { get; set; } = string.Empty;
-    public string ProductThumbnail { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public decimal? SalePrice { get; set; }
+    public int UserId { get; init; }
+    public int ProductId { get; init; }
+    public string ProductTitle { get; init; } = string.Empty;
+    public string ProductThumbnail { get; init; } = string.Empty;
+    public decimal Price { get; init; }
+    public decimal? SalePrice { get; init; }
     public int Quantity { get; set; } = 1;
 }

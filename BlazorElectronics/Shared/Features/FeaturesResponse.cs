@@ -12,6 +12,6 @@ public sealed class FeaturesResponse
         Deals = deals;
     }
     
-    public List<Feature> Features { get; set; } = new();
-    public List<FeaturedDeal> Deals { get; set; } = new();
+    public List<Feature> Features { get; init; } = new();
+    public List<FeaturedDeal> Deals { get; init; } = new();
 }

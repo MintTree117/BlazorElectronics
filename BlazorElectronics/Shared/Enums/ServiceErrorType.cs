@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared;
+namespace BlazorElectronics.Shared.Enums;
 
 public enum ServiceErrorType
 {

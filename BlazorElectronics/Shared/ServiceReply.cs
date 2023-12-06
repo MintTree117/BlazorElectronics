@@ -1,3 +1,5 @@
+using BlazorElectronics.Shared.Enums;
+
 namespace BlazorElectronics.Shared;
 
 public enum DtoDefaultMessage
