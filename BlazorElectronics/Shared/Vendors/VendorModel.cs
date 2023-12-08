@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Server.Models.Vendors;
+namespace BlazorElectronics.Shared.Vendors;
 
 public sealed class VendorModel
 {

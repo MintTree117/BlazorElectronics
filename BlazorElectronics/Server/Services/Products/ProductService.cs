@@ -1,8 +1,6 @@
 using BlazorElectronics.Server.Models.Products;
-using BlazorElectronics.Server.Models.Products.Details;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.DtosOutbound.Products;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Outbound.Products;
 using BlazorElectronics.Shared.Products;
@@ -13,18 +11,18 @@ namespace BlazorElectronics.Server.Services.Products;
 public class ProductService : ApiService, IProductService
 {
     readonly IProductSearchRepository _productSearchRepository;
-    readonly IProductDetailsRepository _productDetailsRepository;
+    readonly IProductRepository _productRepository;
 
     const int MAX_PRODUCT_LIST_ROWS = 100;
     const int MAX_SEARCH_TEXT_LENGTH = 64;
     const int MAX_FILTER_ID_LENGTH = 8;
 
     public ProductService(
-        ILogger<ApiService> logger, IProductSearchRepository productSearchRepository, IProductDetailsRepository productDetailsRepository )
+        ILogger<ApiService> logger, IProductSearchRepository productSearchRepository, IProductRepository productRepository )
         : base( logger )
     {
         _productSearchRepository = productSearchRepository;
-        _productDetailsRepository = productDetailsRepository;
+        _productRepository = productRepository;
     }
 
     public Task<ServiceReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
@@ -68,26 +66,7 @@ public class ProductService : ApiService, IProductService
     }
     public async Task<ServiceReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse )
     {
-        ProductDetailsModel? model;
-
-        try
-        {
-            model = await _productDetailsRepository.GetProductDetails( productId );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<ProductDetailsResponse?>( ServiceErrorType.ServerError );
-        }
-
-        if ( model is null )
-            return new ServiceReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
-
-        ProductDetailsResponse? dto = await MapProductDetailsToResponse( model, categoriesResponse );
-
-        return dto is not null
-            ? new ServiceReply<ProductDetailsResponse?>( dto )
-            : new ServiceReply<ProductDetailsResponse?>( ServiceErrorType.NotFound );
+        return new ServiceReply<ProductDetailsResponse?>();
     }
 
     static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest? request )
@@ -143,122 +122,5 @@ public class ProductService : ApiService, IProductService
         } );
 
         return dto;
-    }
-    static async Task<ProductDetailsResponse?> MapProductDetailsToResponse( ProductDetailsModel detailsModel, CategoriesResponse categoriesResponse )
-    {
-        return await Task.Run( () =>
-        {
-            if ( detailsModel.Overview is null )
-                return null;
-            
-            ProductOverviewModel overviewModel = detailsModel.Overview;
-
-            var variants = new List<ProductVariantResponse>();
-            var images = new List<ProductImageResponse>();
-
-            foreach ( ProductVariantModel variant in detailsModel.Variants )
-            {
-                variants.Add( new ProductVariantResponse {
-                    Id = variant.VariantId,
-                    Name = variant.VariantName,
-                    Price = variant.VariantPriceMain,
-                    SalePrice = variant.VariantPriceSale,
-                } );
-            }
-
-            foreach ( ProductImageModel image in detailsModel.Images )
-            {
-                images.Add( new ProductImageResponse {
-                    Url = image.ImageUrl,
-                    VariantId = image.VariantId
-                } );
-            }
-
-            var primaryCategory = new ProductCategoryResponse
-            {
-                //Name = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Name,
-                //Url = categoriesResponse.Primary[ detailsModel.PrimaryCategory ].Url
-            };
-
-            //List<ProductCategoryResponse>? parsedSecondaryCategories = ParseProductDetailsCategories( detailsModel.SecondaryCategories, categoriesDto.SecondaryIds, categoriesDto.SecondaryResponses );
-            //List<ProductCategoryResponse>? parsedTertiaryCategories = ParseProductDetailsCategories( detailsModel.TertiaryCategories, categoriesDto.TertiaryIds, categoriesDto.TertiaryResponses );
-
-            return new ProductDetailsResponse
-            {
-                PrimaryCategory = primaryCategory,
-                //SecondaryCategories = parsedSecondaryCategories ?? new List<ProductCategoryResponse>(),
-                //TertiaryCategories = parsedTertiaryCategories ?? new List<ProductCategoryResponse>(),
-                Title = overviewModel.Title,
-                Rating = overviewModel.Rating,
-                ReleaseDate = overviewModel.ReleaseDate,
-                HasDrm = overviewModel.HasDrm,
-                NumberSold = overviewModel.NumberSold,
-                VariantTypeName = "",
-                Description = detailsModel.ProductDescription ?? "No description!",
-                Images = images,
-                Variants = variants
-            };
-        } );
-    }
-
-    static List<ProductCategoryResponse>? ParseProductDetailsCategories( string? modelCategories, IReadOnlyDictionary<short, short> dtoIds, IReadOnlyList<CategoryResponse> dtoResponses )
-    {
-        if ( string.IsNullOrEmpty( modelCategories ) )
-            return null;
-        
-        List<int>? ids = modelCategories?
-            .Split( ',' )
-            .ToList()
-            .Select( int.Parse )
-            .ToList();
-
-        if ( ids is null )
-            return new List<ProductCategoryResponse>();
-
-        var responses = new List<ProductCategoryResponse>();
-
-        foreach ( int id in ids )
-        {
-            if ( !dtoIds.TryGetValue( ( short ) id, out short responseId ) )
-                continue;
-
-            responses.Add( new ProductCategoryResponse
-            {
-                Name = dtoResponses[ responseId ].Name,
-                Url = dtoResponses[ responseId ].Url
-            } );
-        }
-
-        return responses;
-    }
-    static void TrimExcessFilterLists( Dictionary<short, List<short>>? filters )
-    {
-        if ( filters is null )
-            return;
-        
-        List<short> keysToTrim = filters.Keys.Where( k => filters[ k ].Count > MAX_FILTER_ID_LENGTH ).ToList();
-        foreach ( short key in keysToTrim )
-        {
-            filters[ key ] = filters[ key ].Take( MAX_FILTER_ID_LENGTH ).ToList();
-        }
-        
-        List<short> keysToRemove = filters.Keys.Skip( MAX_FILTER_ID_LENGTH ).ToList();
-        foreach ( short key in keysToRemove )
-        {
-            filters.Remove( key );
-        }
-    }
-    static void TrimExcessBoolFilters( Dictionary<short, bool>? filters )
-    {
-        if ( filters is null || filters.Count <= MAX_FILTER_ID_LENGTH )
-            return;
-        
-        List<KeyValuePair<short, bool>> trimmedFilters = filters.Take( MAX_FILTER_ID_LENGTH ).ToList();
-        filters.Clear();
-        
-        foreach ( KeyValuePair<short, bool> pair in trimmedFilters )
-        {
-            filters.Add( pair.Key, pair.Value );
-        }
     }
 }

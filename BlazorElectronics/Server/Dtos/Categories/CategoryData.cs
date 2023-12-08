@@ -28,7 +28,7 @@ public sealed class CategoryData
             if ( !Urls.TryGetValue( u, out int id ) )
                 return false;
 
-            if ( !Response.CategoriesById.TryGetValue( id, out CategoryResponse? r ) )
+            if ( !Response.CategoriesById.TryGetValue( id, out CategoryModel? r ) )
                 return false;
 
             if ( r.Tier != ( CategoryTier ) count )

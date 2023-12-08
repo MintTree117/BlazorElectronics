@@ -1,5 +1,5 @@
 using BlazorElectronics.Server.Services.Sessions;
-using BlazorElectronics.Server.Services.SpecLookups;
+using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Shared.SpecLookups;
 using BlazorElectronics.Shared.Users;
@@ -11,9 +11,9 @@ namespace BlazorElectronics.Server.Controllers.Admin;
 [ApiController]
 public sealed class AdminSpecLookupController : _AdminController
 {
-    readonly ISpecLookupService _lookupService;
+    readonly ISpecsService _lookupService;
 
-    public AdminSpecLookupController( ILogger<AdminSpecLookupController> logger, IUserAccountService userAccountService, ISessionService sessionService, ISpecLookupService lookupService )
+    public AdminSpecLookupController( ILogger<AdminSpecLookupController> logger, IUserAccountService userAccountService, ISessionService sessionService, ISpecsService lookupService )
         : base( logger, userAccountService, sessionService )
     {
         _lookupService = lookupService;
@@ -31,18 +31,18 @@ public sealed class AdminSpecLookupController : _AdminController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "get-edit" )]
-    public async Task<ActionResult<SpecLookupEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<SpecEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<SpecLookupEdit?> reply = await _lookupService.GetEdit( request.Payload.Value );
+        ServiceReply<SpecEdit?> reply = await _lookupService.GetEdit( request.Payload.Value );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
-    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<SpecLookupEdit> request )
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<SpecEdit> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
@@ -53,7 +53,7 @@ public sealed class AdminSpecLookupController : _AdminController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecLookupEdit> request )
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecEdit> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 

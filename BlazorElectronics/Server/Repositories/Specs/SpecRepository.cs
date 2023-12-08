@@ -5,39 +5,39 @@ using BlazorElectronics.Shared.SpecLookups;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace BlazorElectronics.Server.Repositories.SpecLookups;
+namespace BlazorElectronics.Server.Repositories.Specs;
 
-public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
+public class SpecRepository : DapperRepository, ISpecRepository
 {
-    const string PROCEDURE_GET = "Get_SpecLookups";
-    const string PROCEDURE_GET_VIEW = "Get_SpecLookupView";
-    const string PROCEDURE_GET_EDIT = "Get_SpecLookupEdit";
-    const string PROCEDURE_INSERT = "Insert_SpecLookup";
-    const string PROCEDURE_UPDATE = "Update_SpecLookup";
-    const string PROCEDURE_DELETE = "Delete_SpecLookup";
+    const string PROCEDURE_GET = "Get_Specs";
+    const string PROCEDURE_GET_VIEW = "Get_SpecView";
+    const string PROCEDURE_GET_EDIT = "Get_SpecEdit";
+    const string PROCEDURE_INSERT = "Insert_Spec";
+    const string PROCEDURE_UPDATE = "Update_Spec";
+    const string PROCEDURE_DELETE = "Delete_Spec";
 
-    public SpecLookupRepository( DapperContext dapperContext ) : base( dapperContext ) { }
+    public SpecRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public async Task<SpecLookupsModel?> Get()
+    public async Task<SpecsModel?> Get()
     {
         return await TryQueryAsync( GetQuery );
     }
-    public async Task<IEnumerable<SpecLookupModel>?> GetView()
+    public async Task<IEnumerable<SpecModel>?> GetView()
     {
-        return await TryQueryAsync( Query<SpecLookupModel>, null, PROCEDURE_GET_VIEW );
+        return await TryQueryAsync( Query<SpecModel>, null, PROCEDURE_GET_VIEW );
     }
-    public async Task<SpecLookupEditModel?> GetEdit( int specId )
+    public async Task<SpecEditModel?> GetEdit( int specId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_SPEC_ID, specId );
         return await TryQueryAsync( GetEditQuery, p );
     }
-    public async Task<int> Insert( SpecLookupEdit dto )
+    public async Task<int> Insert( SpecEdit dto )
     {
         DynamicParameters p = GetInsertParams( dto );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( SpecLookupEdit dto )
+    public async Task<bool> Update( SpecEdit dto )
     {
         DynamicParameters p = GetUpdateParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
@@ -49,37 +49,36 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
     
-    static async Task<SpecLookupsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<SpecsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, commandType: CommandType.StoredProcedure );
 
         if ( multi is null )
             return null;
 
-        return new SpecLookupsModel
+        return new SpecsModel
         {
-            GlobalSpecs = await multi.ReadAsync<int>(),
-            SpecCategories = await multi.ReadAsync<SpecLookupCategoryModel>(),
-            SpecLookups = await multi.ReadAsync<SpecLookupModel>(),
-            SpecValues = await multi.ReadAsync<SpecLookupValueModel>()
+            Specs = await multi.ReadAsync<SpecModel>(),
+            SpecCategories = await multi.ReadAsync<SpecCategoryModel>(),
+            SpecValues = await multi.ReadAsync<SpecValueModel>()
         };
     }
-    static async Task<SpecLookupEditModel?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<SpecEditModel?> GetEditQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? result = await connection.QueryMultipleAsync( PROCEDURE_GET_EDIT, dynamicParams, commandType: CommandType.StoredProcedure );
 
         if ( result is null )
             return null;
         
-        return new SpecLookupEditModel
+        return new SpecEditModel
         {
-            Spec = await result.ReadSingleOrDefaultAsync<SpecLookupModel>(),
-            Categories = await result.ReadAsync<SpecLookupCategoryModel>(),
-            Values = await result.ReadAsync<SpecLookupValueModel>()
+            Spec = await result.ReadSingleOrDefaultAsync<SpecModel>(),
+            Categories = await result.ReadAsync<SpecCategoryModel>(),
+            Values = await result.ReadAsync<SpecValueModel>()
         };
     }
     
-    static DynamicParameters GetInsertParams( SpecLookupEdit dto )
+    static DynamicParameters GetInsertParams( SpecEdit dto )
     {
         var parameters = new DynamicParameters();
 
@@ -87,14 +86,15 @@ public class SpecLookupRepository : DapperRepository, ISpecLookupRepository
         
         parameters.Add( PARAM_SPEC_NAME, dto.SpecName );
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
-        parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable.AsTableValuedParameter( TVP_PRIMARY_CATEGORIES ) );
+        parameters.Add( PARAM_SPEC_AVOID, dto.IsAvoid );
+        parameters.Add( PARAM_CATEGORY_IDS, categoriesTable.AsTableValuedParameter( TVP_CATEGORY_IDS ) );
 
         DataTable valuesTable = GetStringValuesTable( dto.ValuesByIdAsString, COL_SPEC_VALUE_ID, COL_SPEC_VALUE );
         parameters.Add( PARAM_SPEC_VALUES, valuesTable.AsTableValuedParameter( TVP_SPEC_VALUES ) );
         
         return parameters;
     }
-    static DynamicParameters GetUpdateParams( SpecLookupEdit dto )
+    static DynamicParameters GetUpdateParams( SpecEdit dto )
     {
         DynamicParameters parameters = GetInsertParams( dto );
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );

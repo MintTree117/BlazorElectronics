@@ -1,7 +1,7 @@
 using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
-using BlazorElectronics.Server.Services.SpecLookups;
+using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Server.Services.Vendors;
 using BlazorElectronics.Shared.Categories;
@@ -18,7 +18,7 @@ public class AdminSeedController : _AdminController
 {
     readonly IVendorService _vendorService;
     readonly ICategoryService _categoryService;
-    readonly ISpecLookupService _lookupService;
+    readonly ISpecsService _lookupService;
     readonly IUserSeedService _userSeedService;
     readonly IProductSeedService _productSeedService;
 
@@ -30,7 +30,7 @@ public class AdminSeedController : _AdminController
         IUserSeedService userSeedService, 
         IProductSeedService productSeedService, 
         IVendorService vendorService, 
-        ISpecLookupService lookupService )
+        ISpecsService lookupService )
         : base( logger, userAccountService, sessionService )
     {
         _categoryService = categoryService;
@@ -41,7 +41,7 @@ public class AdminSeedController : _AdminController
     }
 
     [HttpPost( "products" )]
-    public async Task<ActionResult<ServiceReply<bool>>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 
@@ -49,9 +49,11 @@ public class AdminSeedController : _AdminController
             return GetReturnFromReply( adminReply );
 
         ServiceReply<CategoriesResponse?> categories = await _categoryService.GetCategories();
-        ServiceReply<SpecLookupsResponse?> lookups = await _lookupService.GetLookups( categories.Data.PrimaryIds );
+        ServiceReply<SpecsResponse?> lookups = await _lookupService.GetLookups( categories.Data.PrimaryIds );
         ServiceReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
         ServiceReply<List<int>?> users = await UserAccountService.GetIds();
+        
+        Logger.LogError(users.Data.Count.ToString());
 
         if ( !categories.Success || !lookups.Success || !vendors.Success || !users.Success )
             return NotFound( NOT_FOUND_MESSAGE );
@@ -59,12 +61,12 @@ public class AdminSeedController : _AdminController
         ServiceReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data!, lookups.Data!, vendors.Data!, users.Data! );
 
         return seedResult.Success
-            ? Ok( seedResult )
+            ? Ok( seedResult.Data )
             : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR + seedResult.Message );
     }
 
     [HttpPost( "users" )]
-    public async Task<ActionResult<ServiceReply<bool>>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
 

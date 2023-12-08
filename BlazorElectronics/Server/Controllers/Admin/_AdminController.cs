@@ -13,7 +13,7 @@ public class _AdminController : UserController
         : base( logger, userAccountService, sessionService ) { }
 
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequest? request )
+    public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequest request )
     {
         ServiceReply<bool> reply = await ValidateAndAuthorizeAdmin( request );
         return GetReturnFromReply( reply );

@@ -1,5 +1,3 @@
-using BlazorElectronics.Shared.Enums;
-
 namespace BlazorElectronics.Server.Models.Vendors;
 
 public sealed class VendorCategoryModel

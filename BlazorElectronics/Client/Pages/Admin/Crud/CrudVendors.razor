@@ -22,22 +22,28 @@
                     <label for="Name" class="form-label">Vendor Name</label>
                     <InputText @bind-Value="ItemEdit.VendorName" class="form-control" id="Name"></InputText>
                 </div>
+                
                 <div class="mb-3">
                     <label for="Url" class="form-label">Vendor Url</label>
-                    <InputText @bind-Value="ItemEdit.VendorName" class="form-control" id="Url"></InputText>
+                    <InputText @bind-Value="ItemEdit.VendorUrl" class="form-control" id="Url"></InputText>
                 </div>
-                <div class="mb-3">
-                    <h4>Category Selection</h4>
-                    @foreach ( CategorySelectionOption option in CategoryHelper.PrimarySelection )
-                    {
-                        <div class="form-check">
-                            <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>
-                            <label class="form-check-label" for="@option.Id">@option.Name</label>
-                        </div>
-                    }
-                </div>
+                
+                @if ( !ItemEdit.IsGlobal )
+                {
+                    <div class="mb-3">
+                        <h4>Category Selection</h4>
+                        @foreach ( CategorySelectionOption option in CategoryHelper.PrimarySelection )
+                        {
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>
+                                <label class="form-check-label" for="@option.Id">@option.Name</label>
+                            </div>
+                        }
+                    </div>
+                }
+
                 <div class="mb-3 form-check">
-                    <InputCheckbox @bind-Value="ItemEdit.IsGlobal" class="form-check-input" id="Global"></InputCheckbox>
+                    <input type="checkbox" checked="@ItemEdit.IsGlobal" @onchange="HandleGlobalChange" class="form-check-input" id="Global" />
                     <label class="form-check-label" for="Global">Is Global</label>
                 </div>
                 

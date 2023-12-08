@@ -14,7 +14,7 @@ public abstract class ApiService
         Logger = logger;
     }
     
-    protected static string ConvertSpecValuesToString( IEnumerable<SpecLookupValueModel> values )
+    protected static string ConvertSpecValuesToString( IEnumerable<SpecValueModel> values )
     {
         List<string> specValues = values
             .OrderBy( spec => spec.SpecValueId )

@@ -5,5 +5,5 @@ namespace BlazorElectronics.Client.Services.SpecLookups;
 
 public interface ISpecLookupServiceClient
 {
-    Task<ServiceReply<SpecLookupsResponse?>> GetSpecLookups();
+    Task<ServiceReply<SpecsResponse?>> GetSpecLookups();
 }

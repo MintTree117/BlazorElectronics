@@ -1,52 +1,52 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Models.SpecLookups;
 using BlazorElectronics.Server.Repositories;
-using BlazorElectronics.Server.Repositories.SpecLookups;
+using BlazorElectronics.Server.Repositories.Specs;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.SpecLookups;
 
-namespace BlazorElectronics.Server.Services.SpecLookups;
+namespace BlazorElectronics.Server.Services.Specs;
 
-public sealed class SpecLookupService : ApiService, ISpecLookupService
+public sealed class SpecsService : ApiService, ISpecsService
 {
     const int MAX_HOURS_BEFORE_CACHE_INVALIDATION = 4;
-    CachedObject<SpecLookupsResponse>? _cachedSpecData;
+    CachedObject<SpecsResponse>? _cachedSpecData;
 
-    readonly ISpecLookupRepository _repository;
+    readonly ISpecRepository _repository;
     
-    public SpecLookupService( ILogger<ApiService> logger, ISpecLookupRepository repository )
+    public SpecsService( ILogger<ApiService> logger, ISpecRepository repository )
         : base( logger )
     {
         _repository = repository;
     }
     
-    public async Task<ServiceReply<SpecLookupsResponse?>> GetLookups( List<int> primaryCategories )
+    public async Task<ServiceReply<SpecsResponse?>> GetLookups( List<int> primaryCategories )
     {
         if ( CacheValid() )
-            return new ServiceReply<SpecLookupsResponse?>( _cachedSpecData!.Object );
+            return new ServiceReply<SpecsResponse?>( _cachedSpecData!.Object );
 
         try
         {
-            SpecLookupsModel? model = await _repository.Get();
-            SpecLookupsResponse? response = MapResponse( model, primaryCategories );
+            SpecsModel? model = await _repository.Get();
+            SpecsResponse? response = MapResponse( model, primaryCategories );
 
-            _cachedSpecData = response is not null ? new CachedObject<SpecLookupsResponse>( response ) : null;
+            _cachedSpecData = response is not null ? new CachedObject<SpecsResponse>( response ) : null;
 
             return response is not null 
-                ? new ServiceReply<SpecLookupsResponse?>( response ) 
-                : new ServiceReply<SpecLookupsResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<SpecsResponse?>( response ) 
+                : new ServiceReply<SpecsResponse?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<SpecLookupsResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<SpecsResponse?>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<List<CrudView>?>> GetView()
     {
         try
         {
-            IEnumerable<SpecLookupModel>? models = await _repository.GetView();
+            IEnumerable<SpecModel>? models = await _repository.GetView();
             List<CrudView>? dto = MapView( models );
 
             return dto is not null
@@ -59,24 +59,24 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
             return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<SpecLookupEdit?>> GetEdit( int specId )
+    public async Task<ServiceReply<SpecEdit?>> GetEdit( int specId )
     {
         try
         {
-            SpecLookupEditModel? model = await _repository.GetEdit( specId );
-            SpecLookupEdit? dto = MapEdit( model );
+            SpecEditModel? model = await _repository.GetEdit( specId );
+            SpecEdit? dto = MapEdit( model );
 
             return dto is not null
-                ? new ServiceReply<SpecLookupEdit?>( dto )
-                : new ServiceReply<SpecLookupEdit?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<SpecEdit?>( dto )
+                : new ServiceReply<SpecEdit?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<SpecLookupEdit?>( ServiceErrorType.ServerError );
+            return new ServiceReply<SpecEdit?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> Add( SpecLookupEdit dto )
+    public async Task<ServiceReply<int>> Add( SpecEdit dto )
     {
         try
         {
@@ -92,7 +92,7 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> Update( SpecLookupEdit dto )
+    public async Task<ServiceReply<bool>> Update( SpecEdit dto )
     {
         try
         {
@@ -125,40 +125,44 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
         }
     }
     
-    static SpecLookupsResponse? MapResponse( SpecLookupsModel? model, List<int> primaryIds )
+    static SpecsResponse? MapResponse( SpecsModel? model, IEnumerable<int> primaryIds )
     {
-        if ( model?.GlobalSpecs is null || model.SpecCategories is null || model.SpecLookups is null || model.SpecValues is null )
+        if ( model?.SpecCategories is null || model.Specs is null || model.SpecValues is null )
             return null;
 
-        List<int> globalIds = model.GlobalSpecs.ToList();
+        List<int> globalIds = new();
         Dictionary<int, List<int>> idsByCategory = primaryIds.ToDictionary( id => id, id => new List<int>() );
 
-        foreach ( SpecLookupCategoryModel sc in model.SpecCategories )
+        foreach ( SpecCategoryModel sc in model.SpecCategories )
         {
             idsByCategory[ sc.PrimaryCategoryId ].Add( sc.SpecId );
         }
 
-        var responsesById = new Dictionary<int, SpecLookup>();
+        var responsesById = new Dictionary<int, Spec>();
 
-        foreach ( SpecLookupModel m in model.SpecLookups )
+        foreach ( SpecModel m in model.Specs )
         {
+            if ( m.IsGlobal )
+                globalIds.Add( m.SpecId );
+            
             List<string> specValues = model.SpecValues
                 .Where( spec => spec.SpecId == m.SpecId )
                 .OrderBy( spec => spec.SpecValueId )
                 .Select( spec => spec.SpecValue )
                 .ToList();
 
-            responsesById.Add( m.SpecId, new SpecLookup
+            responsesById.Add( m.SpecId, new Spec
             {
                 SpecId = m.SpecId,
+                IsAvoid = m.IsAvoid,
                 SpecName = m.SpecName,
                 Values = specValues
             } );
         }
 
-        return new SpecLookupsResponse( globalIds, idsByCategory, responsesById );
+        return new SpecsResponse( globalIds, idsByCategory, responsesById );
     }
-    static List<CrudView>? MapView( IEnumerable<SpecLookupModel>? models )
+    static List<CrudView>? MapView( IEnumerable<SpecModel>? models )
     {
         if ( models is null )
             return null;
@@ -167,7 +171,7 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
             .Select( m => new CrudView { Id = m.SpecId, Name = m.SpecName } )
             .ToList();
     }
-    static SpecLookupEdit? MapEdit( SpecLookupEditModel? model )
+    static SpecEdit? MapEdit( SpecEditModel? model )
     {
         if ( model?.Spec is null )
             return null;
@@ -180,10 +184,12 @@ public sealed class SpecLookupService : ApiService, ISpecLookupService
             ? ConvertSpecValuesToString( model.Values )
             : string.Empty;
 
-        return new SpecLookupEdit
+        return new SpecEdit
         {
             SpecId = model.Spec.SpecId,
             SpecName = model.Spec.SpecName,
+            IsGlobal = model.Spec.IsGlobal,
+            IsAvoid = model.Spec.IsAvoid,
             PrimaryCategories = categories,
             ValuesByIdAsString = values
         };

@@ -5,7 +5,7 @@ using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Server.Repositories.Sessions;
-using BlazorElectronics.Server.Repositories.SpecLookups;
+using BlazorElectronics.Server.Repositories.Specs;
 using BlazorElectronics.Server.Repositories.Users;
 using BlazorElectronics.Server.Repositories.Vendors;
 using BlazorElectronics.Server.Services.Cart;
@@ -13,7 +13,7 @@ using BlazorElectronics.Server.Services.Categories;
 using BlazorElectronics.Server.Services.Features;
 using BlazorElectronics.Server.Services.Products;
 using BlazorElectronics.Server.Services.Sessions;
-using BlazorElectronics.Server.Services.SpecLookups;
+using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Server.Services.Vendors;
 
@@ -33,9 +33,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 
-builder.Services.AddScoped<IProductDetailsRepository, ProductDetailsRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
-builder.Services.AddScoped<IProductSeedRepository, ProductSeedRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductSeedService, ProductSeedService>();
 
@@ -52,8 +52,8 @@ builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 
-builder.Services.AddScoped<ISpecLookupRepository, SpecLookupRepository>();
-builder.Services.AddScoped<ISpecLookupService, SpecLookupService>();
+builder.Services.AddScoped<ISpecRepository, SpecRepository>();
+builder.Services.AddScoped<ISpecsService, SpecsService>();
 
 WebApplication app = builder.Build();
 

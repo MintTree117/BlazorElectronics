@@ -1,6 +1,5 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Shared.Categories;
 using Dapper;
 
@@ -50,7 +49,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         }
 
         DynamicParameters p = new();
-        p.Add( PARAM_CATEGORIES, table.AsTableValuedParameter( TVP_CATEGORIES_BULK ) );
+        p.Add( PARAM_CATEGORIES, table.AsTableValuedParameter( TVP_CATEGORIES ) );
 
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_BULK_INSERT );
     }

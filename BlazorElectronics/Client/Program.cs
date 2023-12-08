@@ -30,7 +30,7 @@ builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCrudService<CategoryView, CategoryEdit>, AdminCrudService<CategoryView, CategoryEdit>>();
 builder.Services.AddScoped<IAdminCrudService<CrudView, FeaturedDealEdit>, AdminCrudService<CrudView, FeaturedDealEdit>>();
 builder.Services.AddScoped<IAdminCrudService<CrudView, FeatureEdit>, AdminCrudService<CrudView, FeatureEdit>>();
-builder.Services.AddScoped<IAdminCrudService<CrudView, SpecLookupEdit>, AdminCrudService<CrudView, SpecLookupEdit>>();
+builder.Services.AddScoped<IAdminCrudService<CrudView, SpecEdit>, AdminCrudService<CrudView, SpecEdit>>();
 builder.Services.AddScoped<IAdminCrudService<CrudView, VendorEdit>, AdminCrudService<CrudView, VendorEdit>>();
 builder.Services.AddScoped<IAdminSeedService, AdminSeedService>();
 builder.Services.AddScoped<IAdminCategoryHelper, AdminCategoryHelper>();

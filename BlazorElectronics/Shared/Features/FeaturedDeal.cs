@@ -6,5 +6,5 @@ public class FeaturedDeal
     public string ProductName { get; init; } = string.Empty;
     public decimal Price { get; init; }
     public decimal SalePrice { get; init; }
-    public string Image { get; init; } = string.Empty;
+    public string Image { get; set; } = string.Empty;
 }

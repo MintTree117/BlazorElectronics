@@ -1,6 +1,5 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Shared.Features;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -24,7 +23,7 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     public FeaturesRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<FeaturesModel?> Get()
+    public async Task<FeaturesResponse?> Get()
     {
         return await TryQueryAsync( GetQuery );
     }
@@ -85,17 +84,17 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_DEAL );
     }
 
-    static async Task<FeaturesModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<FeaturesResponse?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, dynamicParams, commandType: CommandType.StoredProcedure );
 
         if ( multi is null )
             return null;
 
-        return new FeaturesModel
+        return new FeaturesResponse
         {
-            Features = await multi.ReadAsync<Feature>(),
-            Deals = await multi.ReadAsync<FeaturedDeal>()
+            Features = ( await multi.ReadAsync<Feature>() ).ToList(),
+            Deals = ( await multi.ReadAsync<FeaturedDeal>() ).ToList()
         };
     }
 

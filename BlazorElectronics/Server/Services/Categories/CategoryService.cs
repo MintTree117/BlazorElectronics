@@ -1,6 +1,5 @@
 using BlazorElectronics.Server.Dtos;
 using BlazorElectronics.Server.Dtos.Categories;
-using BlazorElectronics.Server.Models.Categories;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Shared.Categories;
@@ -177,37 +176,24 @@ public class CategoryService : ApiService, ICategoryService
     }
     static CategoriesResponse MapResponses( List<CategoryModel> models )
     {
-        Dictionary<int, CategoryResponse> responses = new();
+        Dictionary<int, CategoryModel> responses = new();
         List<int> primaryIds = new();
         
         foreach ( CategoryModel m in models )
         {
-            CategoryResponse r = MapResponse( m );
-            responses.Add( r.Id, r );
+            responses.Add( m.CategoryId, m );
             
             if ( m.Tier == CategoryTier.Primary )
-                primaryIds.Add( r.Id );
+                primaryIds.Add( m.CategoryId );
         }
 
-        foreach ( CategoryResponse r in responses.Values )
+        foreach ( CategoryModel m in responses.Values )
         {
-            if ( responses.TryGetValue( r.ParentId, out CategoryResponse? parent ) )
-                parent.Children.Add( r );
+            if ( responses.TryGetValue( m.ParentCategoryId, out CategoryModel? parent ) )
+                parent.Children.Add( m );
         }
 
         return new CategoriesResponse( responses, primaryIds );
-    }
-    static CategoryResponse MapResponse( CategoryModel model )
-    {
-        return new CategoryResponse
-        {
-            Id = model.CategoryId,
-            ParentId = model.ParentCategoryId,
-            Tier = model.Tier,
-            Name = model.Name,
-            Url = model.ApiUrl,
-            ImageUrl = model.ImageUrl
-        };
     }
     static Dictionary<string, int> MapUrls( IEnumerable<CategoryModel> models )
     {

@@ -5,8 +5,8 @@ namespace BlazorElectronics.Client.Services.Admin;
 
 public sealed class AdminSeedService : AdminServiceClient, IAdminSeedService
 {
-    const string API_PATH_PRODUCTS = "api/AdminProduct/seed";
-    const string API_PATH_USERS = "api/AdminUser/seed";
+    const string API_PATH_PRODUCTS = "api/AdminSeed/products";
+    const string API_PATH_USERS = "api/AdminSeed/users";
     
     public AdminSeedService( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }

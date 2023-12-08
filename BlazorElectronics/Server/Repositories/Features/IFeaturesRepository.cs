@@ -1,11 +1,10 @@
-using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Repositories.Features;
 
 public interface IFeaturesRepository
 {
-    Task<FeaturesModel?> Get();
+    Task<FeaturesResponse?> Get();
     Task<IEnumerable<Feature>?> GetFeatures();
     Task<IEnumerable<FeaturedDeal>?> GetDeals();
     Task<FeatureEdit?> GetFeature( int featureId );

@@ -1,7 +1,7 @@
 using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Shared.Categories;
-
+/*
 public sealed class CategoryResponse
 {
     public int Id { get; init; }
@@ -11,4 +11,4 @@ public sealed class CategoryResponse
     public string Url { get; init; } = string.Empty;
     public string ImageUrl { get; init; } = string.Empty;
     public List<CategoryResponse> Children { get; set; } = new();
-}
+}*/

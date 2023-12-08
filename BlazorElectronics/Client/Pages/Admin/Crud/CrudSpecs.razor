@@ -2,7 +2,7 @@
 @using BlazorElectronics.Shared;
 @using BlazorElectronics.Shared.SpecLookups;
 @using BlazorElectronics.Client.Models
-@inherits CrudPage<CrudView, SpecLookupEdit>
+@inherits CrudPage<CrudView, SpecEdit>
 
 <div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
@@ -22,25 +22,36 @@
                     <label for="Name" class="form-label">Spec Name</label>
                     <InputText @bind-Value="ItemEdit.SpecName" class="form-control" id="Name"></InputText>
                 </div>
-                <div class="mb-3">
-                    <h4>Category Selection</h4>
-                    @foreach ( CategorySelectionOption option in CategoryHelper.PrimarySelection )
-                    {
-                        <div class="form-check">
-                            <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>
-                            <label class="form-check-label" for="@option.Id">@option.Name</label>
-                        </div>
-                    }
-                </div>
+                
+                @if ( !ItemEdit.IsGlobal )
+                {
+                    <div class="mb-3">
+                        <h4>Category Selection</h4>
+                        @foreach ( CategorySelectionOption option in CategoryHelper.PrimarySelection )
+                        {
+                            <div class="form-check" @key="option">
+                                <InputCheckbox @bind-Value="option.IsSelected" class="form-check-input" id="@option.Id"/>
+                                <label class="form-check-label" for="@option.Id">@option.Name</label>
+                            </div>
+                        }
+                    </div>
+                }
+
                 <div class="mb-3">
                     <label for="Values" class="form-label">Values: comma separated, sorted</label>
                     <InputTextArea @bind-Value="ItemEdit.ValuesByIdAsString" class="form-control" id="Values"></InputTextArea>
                 </div>
+                
                 <div class="mb-3 form-check">
-                    <InputCheckbox @bind-Value="ItemEdit.IsGlobal" class="form-check-input" id="Global"></InputCheckbox>
+                    <InputCheckbox type="checkbox" @bind-Value="ItemEdit.IsAvoid" class="form-check-input" id="Avoid" />
+                    <label class="form-check-label" for="Avoid">Is Avoid</label>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" checked="@ItemEdit.IsGlobal" @onchange="HandleGlobalChange" class="form-check-input" id="Global" />
                     <label class="form-check-label" for="Global">Is Global</label>
                 </div>
-                
+
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-success btn-icon">
                         <i class="oi oi-cloud-upload"></i> Submit

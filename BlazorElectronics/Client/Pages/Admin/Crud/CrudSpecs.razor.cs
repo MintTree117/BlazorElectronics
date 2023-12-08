@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudSpecs : CrudPage<CrudView, SpecLookupEdit>
+public sealed partial class CrudSpecs : CrudPage<CrudView, SpecEdit>
 {
     [Inject] public IAdminCategoryHelper CategoryHelper { get; set; } = default!;
-
+    
     protected override async Task OnInitializedAsync()
     {
         ItemTitle = "Spec Lookup";
@@ -35,10 +35,22 @@ public sealed partial class CrudSpecs : CrudPage<CrudView, SpecLookupEdit>
         ItemEdit.PrimaryCategories = CategoryHelper.GetSelectedPrimaryOptions();
         await base.Submit();
     }
+    public override void CreateItem()
+    {
+        base.CreateItem();
+        CategoryHelper.ResetPrimarySelection();
+        StateHasChanged();
+    }
     public override async Task EditItem( int itemId )
     {
         await base.EditItem( itemId );
         CategoryHelper.SetPrimaryOptions( ItemEdit.PrimaryCategories );
+        StateHasChanged();
+    }
+    void HandleGlobalChange( ChangeEventArgs e )
+    {
+        ItemEdit.IsGlobal = !ItemEdit.IsGlobal;
+        CategoryHelper.ResetPrimarySelection();
         StateHasChanged();
     }
 }

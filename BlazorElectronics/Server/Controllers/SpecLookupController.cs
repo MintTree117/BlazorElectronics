@@ -1,4 +1,4 @@
-using BlazorElectronics.Server.Repositories.SpecLookups;
+using BlazorElectronics.Server.Repositories.Specs;
 using BlazorElectronics.Shared.SpecLookups;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,15 +8,15 @@ namespace BlazorElectronics.Server.Controllers;
 [ApiController]
 public class SpecLookupController : ControllerBase
 {
-    readonly ISpecLookupRepository _repository;
+    readonly ISpecRepository _repository;
 
-    public SpecLookupController( ISpecLookupRepository repository)
+    public SpecLookupController( ISpecRepository repository)
     {
         _repository = repository;
     }
 
     [HttpGet( "get-spec-lookups" )]
-    public async Task<ActionResult<ServiceReply<SpecLookupsResponse>>> GetSpecLookups()
+    public async Task<ActionResult<ServiceReply<SpecsResponse>>> GetSpecLookups()
     {
         return Ok( await _repository.Get() );
     }

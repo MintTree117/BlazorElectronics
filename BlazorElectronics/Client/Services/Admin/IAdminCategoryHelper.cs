@@ -8,11 +8,12 @@ public interface IAdminCategoryHelper
 {
     public const string DEFAULT_ERROR_MESSAGE = "Failed to get categories: no response message!";
     
-    public List<CategoryView> Categories { get; set; }
+    List<CategoryView> Categories { get; set; }
     List<CategorySelectionOption> PrimarySelection { get; set; }
 
     Task<ServiceReply<bool>> Init();
     
+    void ResetPrimarySelection();
     void SetPrimaryOptions( List<int> modelCategories );
     List<int> GetSelectedPrimaryOptions();
 }

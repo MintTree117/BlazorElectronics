@@ -1,5 +1,4 @@
 using BlazorElectronics.Server.Dtos;
-using BlazorElectronics.Server.Models.Features;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Features;
 using BlazorElectronics.Shared.Enums;
@@ -26,20 +25,14 @@ public class FeaturesService : ApiService, IFeaturesService
         
         try
         {
-            FeaturesModel? model = await _repository.Get();
+            FeaturesResponse? response = await _repository.Get();
 
-            if ( model is null )
+            if ( response is null )
                 return new ServiceReply<FeaturesResponse?>( ServiceErrorType.NotFound );
 
-            FeaturesResponse r = new()
-            {
-                Features = model.Features is not null ? model.Features.ToList() : new List<Feature>(),
-                Deals = model.Deals is not null ? model.Deals.ToList() : new List<FeaturedDeal>()
-            };
+            _cachedFeatures = new CachedObject<FeaturesResponse>( response );
 
-            _cachedFeatures = new CachedObject<FeaturesResponse>( r );
-
-            return new ServiceReply<FeaturesResponse?>( r );
+            return new ServiceReply<FeaturesResponse?>( response );
         }
         catch ( RepositoryException e )
         {

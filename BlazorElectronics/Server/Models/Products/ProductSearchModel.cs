@@ -2,18 +2,9 @@ namespace BlazorElectronics.Server.Models.Products;
 
 public sealed class ProductSearchModel
 {
-    public ProductSearchModel( int totalCount, int productId, string productTitle, int productRating, string productThumbnail )
-    {
-        TotalCount = totalCount;
-        ProductId = productId;
-        ProductTitle = productTitle;
-        ProductRating = productRating;
-        ProductThumbnail = productThumbnail;
-    }
-    
-    public int TotalCount { get; }
-    public int ProductId { get; }
-    public string ProductTitle { get; }
-    public int ProductRating { get; }
-    public string ProductThumbnail { get; }
+    public int TotalCount { get; init; }
+    public int ProductId { get; init; }
+    public string ProductTitle { get; init; } = string.Empty;
+    public float ProductRating { get; init; }
+    public string ProductThumbnail { get; init; } = string.Empty;
 }

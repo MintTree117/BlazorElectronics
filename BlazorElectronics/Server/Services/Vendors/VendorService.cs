@@ -9,7 +9,7 @@ namespace BlazorElectronics.Server.Services.Vendors;
 
 public sealed class VendorService : ApiService, IVendorService
 {
-    const int MAX_VENDOR_LIFE = 8;
+    const int MAX_VENDOR_LIFE = 0;
 
     readonly IVendorRepository _repository;
     CachedObject<VendorsResponse>? _cachedVendors;
@@ -130,15 +130,10 @@ public sealed class VendorService : ApiService, IVendorService
             return null;
         
         var response = new VendorsResponse();
-
+        
         foreach ( VendorModel v in model.Vendors )
         {
-            response.VendorsById.TryAdd( v.VendorId, new Vendor
-            {
-                VendorId = v.VendorId,
-                VendorName = v.VendorName,
-                VendorUrl = v.VendorUrl
-            } );
+            response.VendorsById.TryAdd( v.VendorId, v );
         }
 
         foreach ( VendorCategoryModel c in model.Categories )

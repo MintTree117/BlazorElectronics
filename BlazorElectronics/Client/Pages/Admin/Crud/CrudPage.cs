@@ -104,7 +104,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
         PropertyInfo? propertyInfo = item.GetType().GetProperty( propertyName );
         return ( propertyInfo != null ? propertyInfo.GetValue( item ) : "" ) ?? "NULL VALUE";
     }
-    public void CreateItem()
+    public virtual void CreateItem()
     {
         PageTitle = $"Create {ItemTitle}";
         ItemEdit = new Tedit();
@@ -185,14 +185,14 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ?? "Failed to insert spec, no response message!" );
+            SetActionMessage( false, reply.Message ?? "Failed to insert item, no response message!" );
             return;
         }
         
         ItemEdit.SetId( reply.Data );
         NewItem = false;
         
-        SetActionMessage( true, "Successfully added spec." );
+        SetActionMessage( true, "Successfully added item." );
         StateHasChanged();
     }
     async Task SubmitUpdate()
@@ -201,11 +201,11 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ?? "Failed to update spec, no response message!" );
+            SetActionMessage( false, reply.Message ?? "Failed to update item, no response message!" );
             return;
         }
 
-        SetActionMessage( true, "Successfully updated spec." );
+        SetActionMessage( true, "Successfully updated item." );
         StateHasChanged();
     }
 }

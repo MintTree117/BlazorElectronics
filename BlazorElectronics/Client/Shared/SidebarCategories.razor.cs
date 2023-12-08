@@ -26,19 +26,19 @@ public partial class SidebarCategories : RazorView
 
     void SelectCategory( int categoryId )
     {
-        CategoryResponse category = categoriesResponse.CategoriesById[ categoryId ];
-        currentCategoryIds = category.Children.Select( c => c.Id ).ToList();
-        currentParentId = category.Id;
+        CategoryModel category = categoriesResponse.CategoriesById[ categoryId ];
+        currentCategoryIds = category.Children.Select( c => c.CategoryId ).ToList();
+        currentParentId = category.CategoryId;
     }
     void GoBack()
     {
         if ( !currentParentId.HasValue ) 
             return;
-        
-        CategoryResponse parentCategory = categoriesResponse.CategoriesById[ currentParentId.Value ];
-        currentParentId = parentCategory.ParentId;
+
+        CategoryModel parentCategory = categoriesResponse.CategoriesById[ currentParentId.Value ];
+        currentParentId = parentCategory.ParentCategoryId;
         currentCategoryIds = currentParentId.HasValue
-            ? categoriesResponse.CategoriesById[ currentParentId.Value ].Children.Select( c => c.Id ).ToList()
+            ? categoriesResponse.CategoriesById[ currentParentId.Value ].Children.Select( c => c.CategoryId ).ToList()
             : categoriesResponse.PrimaryIds;
     }
 }

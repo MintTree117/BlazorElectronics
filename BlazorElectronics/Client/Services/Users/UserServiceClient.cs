@@ -88,7 +88,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     protected async Task<ServiceReply<T?>> TryUserRequest<T>( string apiRoute )
     {
         ServiceReply<UserSessionResponse?> sessionReply = await TryGetLocalUserSession();
-
+        
         if ( !sessionReply.Success || sessionReply.Data is null )
         {
             Logger.LogError( sessionReply.ErrorType + sessionReply.Message );

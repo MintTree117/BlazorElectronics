@@ -1,5 +1,6 @@
 using System.Xml.Linq;
-using BlazorElectronics.Server.Models.Products.Seed;
+using BlazorElectronics.Server.Models.Products;
+using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
@@ -11,54 +12,75 @@ namespace BlazorElectronics.Server.Services.Products;
 public sealed class ProductSeedService : ApiService, IProductSeedService
 {
     const int SAFETY = 200;
-    readonly Random _random = new();
+    Random _random = new();
 
-    readonly IProductSeedRepository _repository;
-    
-    public ProductSeedService( ILogger<ApiService> logger, IProductSeedRepository repository )
+    readonly IProductRepository _productRepository;
+    readonly IProductReviewRepository _reviewRepository;
+
+    public ProductSeedService( ILogger<ApiService> logger, IProductRepository productRepository, IProductReviewRepository reviewRepository )
         : base( logger )
     {
-        _repository = repository;
+        _productRepository = productRepository;
+        _reviewRepository = reviewRepository;
     }
     
-    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categories, SpecLookupsResponse lookups, VendorsResponse vendors, List<int> users )
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categories, SpecsResponse lookups, VendorsResponse vendors, List<int> users )
     {
-        List<ProductSeedModel> models = new();
+        _random = new Random();
+        
+        List<ProductModel> models = new();
 
-        for ( int primaryCategory = 1; primaryCategory <= 5; primaryCategory++ )
+        await Task.Run( () =>
         {
-            for ( int i = 0; i < amount; i++ )
+            for ( int primaryCategory = 1; primaryCategory <= 5; primaryCategory++ )
             {
-                models.Add( GetSeedModel( primaryCategory, i, categories, lookups, vendors ) );
+                for ( int i = 0; i < amount; i++ )
+                {
+                    models.Add( GetSeedModel( primaryCategory, i, categories, lookups, vendors, users ) );
+                }
+            }
+        } );
+
+        foreach ( ProductModel m in models )
+        {
+            try
+            {
+                int productId = await _productRepository.Insert( m );
+
+                if ( productId <= 0 )
+                    return new ServiceReply<bool>( false );
+
+                foreach ( ProductReview r in m.Reviews )
+                {
+                    r.ProductId = productId;
+                    int reviewResult = await _reviewRepository.Insert( r );
+                    
+                    if ( reviewResult <= 0 )
+                        return new ServiceReply<bool>( false );
+                }
+            }
+            catch ( RepositoryException e )
+            {
+                Logger.LogError( e.Message, e );
+                return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to seed products!" );
             }
         }
 
-        try
-        {
-            bool result = await _repository.SeedProducts( models );
-            return result
-                ? new ServiceReply<bool>( true )
-                : new ServiceReply<bool>( ServiceErrorType.NotFound, "Failed to seed products!" );
-        }
-        catch ( ServiceException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to seed products!" );
-        }
+        return new ServiceReply<bool>( true );
     }
     
     // BASE MODEL
-    ProductSeedModel GetSeedModel( int primaryCategory, int i, CategoriesResponse categoriesResponse, SpecLookupsResponse lookups, VendorsResponse vendors )
+    ProductModel GetSeedModel( int primaryCategory, int i, CategoriesResponse categoriesResponse, SpecsResponse lookups, VendorsResponse vendors, IReadOnlyList<int> users )
     {
-        ProductSeedModel model = new()
+        ProductModel model = new()
         {
             VendorId = PickRandomVendor( primaryCategory, vendors ),
-            Title = ProductSeedData.PRODUCT_TITLES[ primaryCategory ] + " " + i,
-            ThumbnailUrl = ProductSeedData.PRODUCT_IMAGES[ primaryCategory ],
+            Title = ProductSeedData.PRODUCT_TITLES[ primaryCategory - 1 ] + " " + i,
+            ThumbnailUrl = ProductSeedData.PRODUCT_THUMBNAILS[ primaryCategory - 1 ],
+            Images = ProductSeedData.PRODUCT_IMAGES[ primaryCategory - 1 ].ToList(),
             Price = GetRandomDecimal( ProductSeedData.MIN_PRICE, ProductSeedData.MAX_PRICE ),
             ReleaseDate = GetRandomDate( ProductSeedData.MIN_RELEASE_DATE, ProductSeedData.MAX_RELEASE_DATE ),
             NumberSold = GetRandomInt( 0, ProductSeedData.MAX_NUM_SOLD ),
-            HasDrm = GetRandomBoolean(),
             Description = GetRandomDescription( primaryCategory ),
         };
 
@@ -85,6 +107,8 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             5 => GetCoursesXml(),
             _ => throw new ArgumentOutOfRangeException( nameof( primaryCategory ), primaryCategory, null )
         };
+
+        model.Reviews = GetRandomReviews( primaryCategory, users );
 
         return model;
     }
@@ -118,7 +142,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         if ( !GetRandomBoolean() ) 
             return root.ToString();
         
-        var narrator = new XElement( "Narrator", GetRandomSpec( ProductSeedData.ISBNS ) );
+        var narrator = new XElement( "Narrator", GetRandomSpec( ProductSeedData.NAMES ) );
         var audioLength = new XElement( "AudioLength", GetRandomInt( 0, ProductSeedData.MAX_AUDIO_LENGTH ).ToString() );
         root.Add( narrator );
         root.Add( audioLength );
@@ -143,7 +167,6 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     string GetGameXml()
     {
         var developer = new XElement( "Developer", GetRandomSpec( ProductSeedData.GAME_DEVELOPERS ) );
-        var hasMultiplayer = new XElement( "HasMultiplayer", GetRandomBoolean().ToString() );
         var hasOfflineMode = new XElement( "HasOfflineMode", GetRandomBoolean().ToString() );
         var hasInGamePurchases = new XElement( "HasInGamePurchases", GetRandomBoolean().ToString() );
         var hasControllerSupport = new XElement( "HasControllerSupport", GetRandomBoolean().ToString() );
@@ -151,12 +174,11 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         var root = new XElement( "RootElement" );
         root.Add( developer );
-        root.Add( hasMultiplayer );
         root.Add( hasOfflineMode );
         root.Add( hasInGamePurchases );
         root.Add( hasControllerSupport );
         root.Add( fileSize );
-
+        
         return root.ToString();
     }
     string GetMoviesTvXml()
@@ -188,18 +210,19 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         root.Add( requirements );
         root.Add( durationWeeks );
         root.Add( hasSubtitles );
-
+        
         return root.ToString();
     }
+    // IMAGES
     // CATEGORY
     IEnumerable<int> GetRandomCategories( int currentCategory, List<int> categories, CategoriesResponse categoriesResponse )
     {
-        CategoryResponse response = categoriesResponse.CategoriesById[ currentCategory ];
+        CategoryModel categoryModel = categoriesResponse.CategoriesById[ currentCategory ];
         
-        if ( response.Children.Count <= 0 )
+        if ( categoryModel.Children.Count <= 0 )
             return categories;
 
-        List<int> subcategories = PickRandomCategories( response ).ToList();
+        List<int> subcategories = PickRandomCategories( categoryModel ).ToList();
         categories.AddRange( subcategories );
 
         foreach ( int category in subcategories )
@@ -209,11 +232,11 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         return categories;
     }
-    IEnumerable<int> PickRandomCategories( CategoryResponse response )
+    IEnumerable<int> PickRandomCategories( CategoryModel category )
     {
         var picked = new HashSet<int>();
 
-        int maxIndex = response.Children.Count - 1;
+        int maxIndex = category.Children.Count - 1;
         int amount = GetRandomInt( 1, ProductSeedData.MAX_CATEGORIES );
         int count = 0;
 
@@ -228,19 +251,37 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
                     break;
             }
 
-            picked.Add( response.Children[ i ].Id );
+            picked.Add( category.Children[ i ].CategoryId );
         }
         
         return picked.ToList();
     }
+    // REVIEWS
+    List<ProductReview> GetRandomReviews( int category, IReadOnlyList<int> userIds )
+    {
+        List<ProductReview> reviews = new();
+        int amount = GetRandomInt( 1, 20 );
+
+        for ( int i = 0; i < amount; i++ )
+        {
+            reviews.Add( new ProductReview
+            {
+                UserId = userIds[ GetRandomInt( 0, userIds.Count - 1 ) ],
+                Review = GetRandomSpec( ProductSeedData.PRODUCT_REVIEWS[ category - 1 ] ),
+                Rating = GetRandomInt( 1, 5 )
+            } );
+        }
+
+        return reviews;
+    }
     // SPEC LOOKUP
-    Dictionary<int, List<int>> GetRandomLookups( List<int> ids, SpecLookupsResponse lookups )
+    Dictionary<int, List<int>> GetRandomLookups( List<int> ids, SpecsResponse lookups )
     {
         Dictionary<int, List<int>> specs = new();
 
         foreach ( int i in ids )
         {
-            SpecLookup response = lookups.ResponsesBySpecId[ i ];
+            Spec response = lookups.SpecsById[ i ];
             List<int> valueIds = PickRandomSpecValueIds( response.Values.Count );
             specs.Add( i, valueIds );
         }
@@ -300,8 +341,9 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     // VENDORS
     int PickRandomVendor( int category, VendorsResponse vendors )
     {
-        List<int> vendorIds = vendors.VendorIdsByCategory[ category ];
-        return vendorIds[ GetRandomInt( 0, vendorIds.Count - 1 ) ];
+        return vendors.VendorIdsByCategory.TryGetValue( category, out List<int>? ids ) 
+            ? ids[ GetRandomInt( 0, ids.Count - 1 ) ]
+            : 0;
     }
     // RANDOM VALUES
     DateTime GetRandomDate( DateTime min, DateTime max )

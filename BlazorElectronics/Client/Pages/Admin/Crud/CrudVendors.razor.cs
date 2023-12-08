@@ -35,10 +35,22 @@ public sealed partial class CrudVendors : CrudPage<CrudView, VendorEdit>
         ItemEdit.PrimaryCategories = CategoryHelper.GetSelectedPrimaryOptions();
         await base.Submit();
     }
+    public override void CreateItem()
+    {
+        base.CreateItem();
+        CategoryHelper.SetPrimaryOptions( ItemEdit.PrimaryCategories );
+        StateHasChanged();
+    }
     public override async Task EditItem( int itemId )
     {
         await base.EditItem( itemId );
         CategoryHelper.SetPrimaryOptions( ItemEdit.PrimaryCategories );
+        StateHasChanged();
+    }
+    void HandleGlobalChange( ChangeEventArgs e )
+    {
+        ItemEdit.IsGlobal = !ItemEdit.IsGlobal;
+        CategoryHelper.ResetPrimarySelection();
         StateHasChanged();
     }
 }

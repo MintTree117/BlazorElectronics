@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Models.SpecLookups;
 
-public class SpecLookupValueModel
+public class SpecValueModel
 {
     public int SpecId { get; set; }
     public int SpecValueId { get; set; }

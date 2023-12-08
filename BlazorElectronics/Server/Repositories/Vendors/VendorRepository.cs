@@ -86,7 +86,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
         parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
 
         DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategories );
-        parameters.Add( PARAM_PRIMARY_CATEGORIES, categoriesTable.AsTableValuedParameter( TVP_PRIMARY_CATEGORIES ) );
+        parameters.Add( PARAM_CATEGORY_IDS, categoriesTable.AsTableValuedParameter( TVP_CATEGORY_IDS ) );
         
         return parameters;
     }

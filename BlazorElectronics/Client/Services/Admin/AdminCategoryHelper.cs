@@ -32,6 +32,13 @@ public sealed class AdminCategoryHelper : AdminServiceClient, IAdminCategoryHelp
 
         return new ServiceReply<bool>( true );
     }
+    public void ResetPrimarySelection()
+    {
+        PrimarySelection = Categories
+            .Where( c => c.Tier == CategoryTier.Primary )
+            .Select( c => new CategorySelectionOption( c.Id, c.Name ) )
+            .ToList();
+    }
     public void SetPrimaryOptions( List<int> modelCategories )
     {
         foreach ( CategorySelectionOption option in PrimarySelection )

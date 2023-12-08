@@ -22,7 +22,7 @@ public partial class TestSeedPage : AdminPage
 
         PageIsLoaded = true;
     }
-
+    
     async Task SeedProducts()
     {
         ServiceReply<bool> reply = await SeedService.SeedProducts( ProductCount );

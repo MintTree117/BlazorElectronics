@@ -28,14 +28,14 @@ public class CartRepository : DapperRepository, ICartRepository
         p.Add( PARAM_USER_ID, userId );
 
         DataTable table = new();
-        table.Columns.Add( TVP_COL_CART_PRODUCT_ID, typeof( int ) );
-        table.Columns.Add( TVP_COL_CART_ITEM_QUANTITY, typeof( int ) );
+        table.Columns.Add( COL_PRODUCT_ID, typeof( int ) );
+        table.Columns.Add( COL_CART_ITEM_QUANTITY, typeof( int ) );
 
         foreach ( CartItem item in request.Items )
         {
             DataRow row = table.NewRow();
-            row[ TVP_COL_CART_PRODUCT_ID ] = item.ProductId;
-            row[ TVP_COL_CART_ITEM_QUANTITY ] = item.Quantity;
+            row[ COL_PRODUCT_ID ] = item.ProductId;
+            row[ COL_CART_ITEM_QUANTITY ] = item.Quantity;
             table.Rows.Add( row );
         }
 
