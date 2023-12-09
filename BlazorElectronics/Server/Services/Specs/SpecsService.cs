@@ -3,7 +3,7 @@ using BlazorElectronics.Server.Models.SpecLookups;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Specs;
 using BlazorElectronics.Shared.Enums;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 
 namespace BlazorElectronics.Server.Services.Specs;
 
@@ -20,7 +20,7 @@ public sealed class SpecsService : ApiService, ISpecsService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<SpecsResponse?>> GetLookups( List<int> primaryCategories )
+    public async Task<ServiceReply<SpecsResponse?>> GetSpecs( List<int> primaryCategoryIds )
     {
         if ( CacheValid() )
             return new ServiceReply<SpecsResponse?>( _cachedSpecData!.Object );
@@ -28,7 +28,7 @@ public sealed class SpecsService : ApiService, ISpecsService
         try
         {
             SpecsModel? model = await _repository.Get();
-            SpecsResponse? response = MapResponse( model, primaryCategories );
+            SpecsResponse? response = MapResponse( model, primaryCategoryIds );
 
             _cachedSpecData = response is not null ? new CachedObject<SpecsResponse>( response ) : null;
 
@@ -125,13 +125,18 @@ public sealed class SpecsService : ApiService, ISpecsService
         }
     }
     
-    static SpecsResponse? MapResponse( SpecsModel? model, IEnumerable<int> primaryIds )
+    static SpecsResponse? MapResponse( SpecsModel? model, List<int> primaryCategoryIds )
     {
         if ( model?.SpecCategories is null || model.Specs is null || model.SpecValues is null )
             return null;
 
         List<int> globalIds = new();
-        Dictionary<int, List<int>> idsByCategory = primaryIds.ToDictionary( id => id, id => new List<int>() );
+        Dictionary<int, List<int>> idsByCategory = new();
+
+        foreach ( int c in primaryCategoryIds )
+        {
+            idsByCategory.TryAdd( c, new List<int>() );
+        }
 
         foreach ( SpecCategoryModel sc in model.SpecCategories )
         {

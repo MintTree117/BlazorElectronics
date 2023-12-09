@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared.SpecLookups;
+namespace BlazorElectronics.Shared.Specs;
 
 public sealed class Spec
 {

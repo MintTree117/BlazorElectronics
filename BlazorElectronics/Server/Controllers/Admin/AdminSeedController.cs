@@ -5,7 +5,7 @@ using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Server.Services.Users;
 using BlazorElectronics.Server.Services.Vendors;
 using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Users;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +49,7 @@ public class AdminSeedController : _AdminController
             return GetReturnFromReply( adminReply );
 
         ServiceReply<CategoriesResponse?> categories = await _categoryService.GetCategories();
-        ServiceReply<SpecsResponse?> lookups = await _lookupService.GetLookups( categories.Data.PrimaryIds );
+        ServiceReply<SpecsResponse?> lookups = await _lookupService.GetSpecs( categories.Data.PrimaryIds );
         ServiceReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
         ServiceReply<List<int>?> users = await UserAccountService.GetIds();
         

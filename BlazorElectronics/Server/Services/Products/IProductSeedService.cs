@@ -1,5 +1,5 @@
 using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Services.Products;

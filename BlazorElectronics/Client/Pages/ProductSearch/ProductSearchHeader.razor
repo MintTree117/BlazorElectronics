@@ -1,0 +1,45 @@
+@inherits RazorView
+
+<div class="container-fluid">
+    <div class="row mb-2">
+        <!-- Breadcrumb and Dropdown in a flex container -->
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Breadcrumb Nav -->
+            <nav aria-label="breadcrumb" class="flex-grow-1">
+                <ol class="breadcrumb h4 mb-0"> <!-- Adjust h4 to your preferred size -->
+                    @foreach ( KeyValuePair<string, string> kvp in _urls )
+                    {
+                        if ( kvp.Equals(_urls.Last()) )
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">@_urls.Last().Key</li>
+                        }
+                        else
+                        {
+                            <li class="breadcrumb-item">
+                                <button @onclick="() => Page.NavigateBack(kvp.Value)">@kvp.Key</button>
+                            </li>
+                        }
+                    }
+                </ol>
+            </nav>
+
+            <!-- Sort By Dropdown -->
+            <div class="ms-auto">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Order by: @_currentSortOption
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        @for ( int i = 0; i < _sortOptions.Count; i++ )
+                        {
+                            int localIndex = i; // Create a local copy of the loop variable
+                            <li><button class="dropdown-item" type="button" @onclick="() => SelectOption(localIndex)">@_sortOptions[localIndex]</button></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Content Here -->
+</div>

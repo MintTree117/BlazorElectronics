@@ -18,7 +18,6 @@ public class ProductDetailsResponse
     public int NumberSold { get; init; }
     public string VariantTypeName { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
-    public List<ProductVariantResponse> Variants { get; init; } = new();
     public List<ProductImageResponse> Images { get; init; } = new();
     public List<ProductReview_DTO> Reviews { get; init; } = new();
 }

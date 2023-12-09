@@ -1,5 +1,5 @@
 using BlazorElectronics.Server.Models.SpecLookups;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 
 namespace BlazorElectronics.Server.Repositories.Specs;
 

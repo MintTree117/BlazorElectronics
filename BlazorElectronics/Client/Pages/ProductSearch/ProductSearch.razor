@@ -1,0 +1,23 @@
+@page "/search/{primaryCategory}/{secondaryCategory}/{tertiaryCategory}"
+@page "/search/{primaryCategory}/{secondaryCategory}"
+@page "/search/{primaryCategory}"
+@page "/search"
+@inherits PageView
+
+<div class="container-md">
+    <div class="row">
+        <ProductSearchHeader Page="@this"></ProductSearchHeader>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 d-none d-md-block">
+            <div class="collapse d-md-block" id="filterColumn">
+                <ProductFilters Page="@this"></ProductFilters>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <ProductSearchList></ProductSearchList>
+        </div>
+    </div>
+</div>

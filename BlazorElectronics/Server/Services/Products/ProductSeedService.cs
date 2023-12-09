@@ -4,7 +4,7 @@ using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Products;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Services.Products;

@@ -1,7 +1,7 @@
 using System.Data;
 using BlazorElectronics.Server.DbContext;
 using BlazorElectronics.Server.Models.SpecLookups;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 using Dapper;
 using Microsoft.Data.SqlClient;
 

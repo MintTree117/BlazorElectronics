@@ -1,7 +1,13 @@
-namespace BlazorElectronics.Shared.SpecLookups;
+using System.Text.Json.Serialization;
+
+namespace BlazorElectronics.Shared.Specs;
 
 public sealed class SpecsResponse
 {
+    public SpecsResponse()
+    {
+        
+    }
     public SpecsResponse( List<int> globalIds, Dictionary<int, List<int>> categories, Dictionary<int, Spec> specs )
     {
         GlobalSpecIds = globalIds;

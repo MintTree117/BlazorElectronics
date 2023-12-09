@@ -1,7 +1,7 @@
 using BlazorElectronics.Server.Services.Sessions;
 using BlazorElectronics.Server.Services.Specs;
 using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 

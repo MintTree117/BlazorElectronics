@@ -6,18 +6,18 @@ namespace BlazorElectronics.Server.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class VendorController : _Controller
+public class VendorsController : _Controller
 {
     readonly IVendorService _vendorService;
     
-    public VendorController( ILogger<_Controller> logger, IVendorService vendorService )
+    public VendorsController( ILogger<_Controller> logger, IVendorService vendorService )
         : base( logger )
     {
         _vendorService = vendorService;
     }
     
-    [HttpGet]
-    public async Task<ActionResult<VendorsResponse>> GetVendors()
+    [HttpGet( "get" )]
+    public async Task<ActionResult<VendorsResponse?>> GetVendors()
     {
         ServiceReply<VendorsResponse?> reply = await _vendorService.GetVendors();
         return GetReturnFromReply( reply );

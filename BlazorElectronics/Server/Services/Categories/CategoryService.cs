@@ -1,5 +1,4 @@
 using BlazorElectronics.Server.Dtos;
-using BlazorElectronics.Server.Dtos.Categories;
 using BlazorElectronics.Server.Repositories;
 using BlazorElectronics.Server.Repositories.Categories;
 using BlazorElectronics.Shared.Categories;
@@ -13,19 +12,27 @@ public class CategoryService : ApiService, ICategoryService
     const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
     readonly ICategoryRepository _repository;
 
-    CachedObject<CategoryData>? _cachedData;
+    CachedObject<CategoriesResponse>? _cachedData;
 
     public CategoryService( ILogger<ApiService> logger, ICategoryRepository repository ) : base( logger )
     {
         _repository = repository;
     }
-    
+
+    public async Task<ServiceReply<List<int>?>> GetPrimaryCategoryIds()
+    {
+        ServiceReply<bool> getReply = await TryGetData();
+
+        return getReply.Success && _cachedData is not null
+            ? new ServiceReply<List<int>?>( _cachedData.Object.PrimaryIds )
+            : new ServiceReply<List<int>?>( getReply.ErrorType, getReply.Message );
+    }
     public async Task<ServiceReply<CategoriesResponse?>> GetCategories()
     {
         ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedData is not null
-            ? new ServiceReply<CategoriesResponse?>( _cachedData.Object.Response )
+            ? new ServiceReply<CategoriesResponse?>( _cachedData.Object )
             : new ServiceReply<CategoriesResponse?>( getReply.ErrorType, getReply.Message );
     }
     public async Task<ServiceReply<int>> ValidateCategoryUrl( string url )
@@ -166,18 +173,15 @@ public class CategoryService : ApiService, ICategoryService
     {
         await Task.Run( () =>
         {
-            List<CategoryModel> list = models.ToList();
-
-            CategoriesResponse response = MapResponses( list );
-            Dictionary<string, int> urls = MapUrls( list );
-
-            _cachedData = new CachedObject<CategoryData>( new CategoryData( response, urls ) );
+            CategoriesResponse response = MapResponses( models.ToList() );
+            _cachedData = new CachedObject<CategoriesResponse>( response );
         } );
     }
     static CategoriesResponse MapResponses( List<CategoryModel> models )
     {
         Dictionary<int, CategoryModel> responses = new();
         List<int> primaryIds = new();
+        Dictionary<string, int> urls = new();
         
         foreach ( CategoryModel m in models )
         {
@@ -193,18 +197,12 @@ public class CategoryService : ApiService, ICategoryService
                 parent.Children.Add( m );
         }
 
-        return new CategoriesResponse( responses, primaryIds );
-    }
-    static Dictionary<string, int> MapUrls( IEnumerable<CategoryModel> models )
-    {
-        Dictionary<string, int> urls = new();
-
         foreach ( CategoryModel m in models )
         {
             urls.TryAdd( m.ApiUrl, m.CategoryId );
         }
 
-        return urls;
+        return new CategoriesResponse( responses, primaryIds, urls );
     }
     static async Task<List<CategoryView>?> MapView( IEnumerable<CategoryModel>? models )
     {

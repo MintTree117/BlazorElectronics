@@ -5,6 +5,7 @@ namespace BlazorElectronics.Server.Services.Categories;
 public interface ICategoryService
 {
     // USER
+    Task<ServiceReply<List<int>?>> GetPrimaryCategoryIds(); 
     Task<ServiceReply<CategoriesResponse?>> GetCategories();
     Task<ServiceReply<int>> ValidateCategoryUrl( string url );
 

@@ -17,8 +17,6 @@ public class ProductSearchRequest
     public int? MinPrice { get; set; } = null;
     public int? MaxPrice { get; set; } = null;
     public int? MinRating { get; set; } = null;
-    
-    public object? CategoryFilters { get; set; }
 
     public List<int>? Vendors { get; set; }
     public Dictionary<int, List<int>>? LookupIncludes { get; set; }

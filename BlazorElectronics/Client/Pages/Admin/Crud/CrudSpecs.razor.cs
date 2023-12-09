@@ -1,6 +1,6 @@
 using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Shared;
-using BlazorElectronics.Shared.SpecLookups;
+using BlazorElectronics.Shared.Specs;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;

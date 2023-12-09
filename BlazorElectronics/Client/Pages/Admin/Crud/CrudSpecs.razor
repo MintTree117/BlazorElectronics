@@ -1,8 +1,7 @@
 @page "/admin/crud/spec-lookups"
 @using BlazorElectronics.Shared;
-@using BlazorElectronics.Shared.SpecLookups;
 @using BlazorElectronics.Client.Models
-@inherits CrudPage<CrudView, SpecEdit>
+@inherits CrudPage<CrudView, BlazorElectronics.Shared.Specs.SpecEdit>
 
 <div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
