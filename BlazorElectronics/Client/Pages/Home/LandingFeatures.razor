@@ -3,7 +3,8 @@
 @inherits RazorView
 
 @if ( _featuredProducts is not null )
-    {<div class="featured-products-container">
+{
+    <div class="featured-products-container">
         <div id="featured-products-carousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 @for ( int i = 0; i < _featuredProducts.Count; i++ )
@@ -33,9 +34,6 @@
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Next</span>
             </button>
-            <div class="category-list-container">
-                
-            </div>
             <div class="featured-products-fade">
             </div>
         </div>

@@ -837,9 +837,7 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/staticwebassets.pack.json
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/staticwebassets.build.json
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/staticwebassets.development.json
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/scopedcss/Shared/MainLayout.razor.rz.scp.css
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/scopedcss/bundle/BlazorElectronics.Client.styles.css
-/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/scopedcss/projectbundle/BlazorElectronics.Client.bundle.scp.css
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.csproj.CopyComplete
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/BlazorElectronics.Client.dll
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/refint/BlazorElectronics.Client.dll

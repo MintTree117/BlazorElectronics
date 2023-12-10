@@ -12,18 +12,19 @@
 @inject NavigationManager NavManager
 
 <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle user-button"
+    <button class="btn btn-warning dropdown-toggle"
             @onclick="ToggleUserMenu"
             @onfocusout="HideUserMenu">
         <i class="oi oi-person"></i>
     </button>
+    
     <div class="dropdown-menu dropdown-menu-right @_userMenuCssClass">
         @if ( _isAuthorized )
         {
             <a class="dropdown-item" href="profile">Profile</a>
             <hr/>
             <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
-            
+
             @if ( _isAdmin )
             {
                 <hr/>

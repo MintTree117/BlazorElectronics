@@ -4,19 +4,17 @@
 @page "/search"
 @inherits PageView
 
-<div class="container-md">
-    <div class="row">
-        <ProductSearchHeader Page="@this"></ProductSearchHeader>
-    </div>
+<ProductSearchHeader Page="@this"></ProductSearchHeader>
 
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 d-none d-md-block">
+        <div class="col-md-2 d-none d-md-block">
             <div class="collapse d-md-block" id="filterColumn">
                 <ProductFilters Page="@this"></ProductFilters>
             </div>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-10">
             <ProductSearchList></ProductSearchList>
         </div>
     </div>

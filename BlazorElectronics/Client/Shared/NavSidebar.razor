@@ -1,0 +1,68 @@
+@inherits RazorView
+
+<div class="nav-sidebar @_navMenuCssClass bg-light">
+    <div class="bg-dark px-4 py-4 d-flex align-items-center justify-content-between">
+        @if ( _sessionMeta is not null )
+        {
+            <a class="text-decoration-none link-light" href="profile">Welcome, @_sessionMeta.Username</a>
+        }
+        else
+        {
+            <a href="text-decoration-none link-light">Hello, Sign In</a>
+        }
+        <button class="btn btn-primary">
+            <i class="oi oi-x" onclick="@ToggleSidebar"></i>
+        </button>
+    </div>
+    <ul class="p-0">
+        <li class="px-4 py-3 fw-bold text-dark sidebar-title">Shop Products</li>
+        <li><a class="px-4 py-2 link-dark text-decoration-none" href="">All Products</a></li>
+        <li><a class="px-4 py-2 link-dark text-decoration-none" href="">On Sale</a></li>
+        <li><a class="px-4 py-2 link-dark text-decoration-none" href="">Featured</a></li>
+        
+        <li class="sidebar-separator"></li>
+        
+        <li class="px-4 py-3 fw-bold text-dark sidebar-title">Shop Categories</li>
+        @foreach ( int id in currentCategoryIds )
+        {
+            if ( currentParentId.HasValue )
+            {
+                <li class="list-group-item">
+                    <button class="btn btn-link" @onclick="GoBack">Back</button>
+                </li>
+            }
+            <li>
+                <a class="px-4 py-2 link-dark text-decoration-none" href="">@_categories.CategoriesById[ id ].Name</a>
+            </li>
+        }
+        
+        <li class="sidebar-separator"></li>
+
+        @if ( _isAdmin )
+        {
+            <li class="px-4 py-3 fw-bold text-dark sidebar-title">Admin Functions</li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/bulk/categories">Bulk Categories</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/bulk/product-keys">Bulk Keys</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/crud/categories">Crud Categories</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/crud/featured-deals">Crud Deals</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/crud/features">Crud Features</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/crud/specs">Crud Specs</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/crud/vendors">Crud Vendors</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="admin/seed">Seed Db</a></li>
+        }
+        
+        <li class="sidebar-separator"></li>
+        <li class="px-4 py-3 fw-bold text-dark sidebar-title">Account</li>
+        @if ( !_isAuthorized )
+        {
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="">Sign In</a></li>
+        }
+        else
+        {
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="">Account</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="">Orders</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="">Cart</a></li>
+            <li><a class="px-4 py-2 link-dark text-decoration-none" href="">Sign Out</a></li>
+        }
+    </ul>
+</div>

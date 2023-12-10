@@ -1,11 +1,10 @@
-
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.DtosOutbound.Products
 @using BlazorElectronics.Shared.Products
 @using BlazorElectronics.Shared.Products.Search
 @inject NavigationManager NavigationManager;
 
-<div class="input-group product-search-bar">
+<div class="input-group">
     <input class="form-control" 
            @bind-value="_searchText"
            @bind-value:event="oninput"
@@ -27,17 +26,11 @@
     </div>
 </div>
 
-@code {
-    string _exceptionMessage = string.Empty;
+@code 
+{
     ElementReference _searchInputElement;
     string _searchText = string.Empty;
     List<string> _suggestions = new();
-
-    protected override async Task OnAfterRenderAsync( bool firstRender )
-    {
-        //if ( firstRender )
-            //await _searchInputElement.FocusAsync();
-    }
 
     void SearchProducts()
     {

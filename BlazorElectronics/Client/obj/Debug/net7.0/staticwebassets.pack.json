@@ -185,10 +185,6 @@
       "PackagePath": "staticwebassets/_framework/blazor.webassembly.js.gz"
     },
     {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/scopedcss/bundle/BlazorElectronics.Client.styles.css",
-      "PackagePath": "staticwebassets/BlazorElectronics.Client.styles.css"
-    },
-    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/CpuAmdDefault.jpg",
       "PackagePath": "staticwebassets/Images/CpuAmdDefault.jpg"
     },
@@ -199,6 +195,10 @@
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/DefaultThumbnail.jpg",
       "PackagePath": "staticwebassets/Images/DefaultThumbnail.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/blazor.jpg",
+      "PackagePath": "staticwebassets/Images/blazor.jpg"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/default.jpg",
@@ -215,10 +215,6 @@
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/featuredproduct3.png",
       "PackagePath": "staticwebassets/Images/featuredproduct3.png"
-    },
-    {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/logo.png",
-      "PackagePath": "staticwebassets/Images/logo.png"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",
@@ -291,18 +287,6 @@
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/products.css",
       "PackagePath": "staticwebassets/css/products.css"
-    },
-    {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/razor-page.css",
-      "PackagePath": "staticwebassets/css/razor-page.css"
-    },
-    {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/favicon.png",
-      "PackagePath": "staticwebassets/favicon.png"
-    },
-    {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/icon-192.png",
-      "PackagePath": "staticwebassets/icon-192.png"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/index.html",

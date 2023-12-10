@@ -18,22 +18,26 @@
     </div>
 
     <div class="mb-3">
-        <label for="minPrice" class="form-label">Minimum Price</label>
-        <input type="number" class="form-control" id="minPrice" @bind="@MinPrice">
-    </div>
-
-    <div class="mb-3">
-        <label for="maxPrice" class="form-label">Maximum Price</label>
-        <input type="number" class="form-control" id="maxPrice" @bind="@MaxPrice">
+    <label class="form-label">Price Range</label>
+        <div class="d-flex justify-content-between">
+            <div class="me-1">
+                <small class="text-muted">Min</small>
+                <input type="number" class="form-control" id="minPrice" aria-label="Minimum price" @bind="@MinPrice">
+            </div>
+            <div class="ms-1">
+                <small class="text-muted">Max</small>
+                <input type="number" class="form-control" id="maxPrice" aria-label="Maximum price" @bind="@MaxPrice">
+            </div>
+        </div>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Minimum Rating:</label>
         <div class="d-flex flex-column">
-            @for (int i = 5; i >= 1; i--)
+            @for ( int i = 5; i >= 1; i-- )
             {
                 int localIndex = i;
-                <button type="button" class="btn btn-outline-primary mb-2" @onclick="() => SetMinimumRating(localIndex)">
+                <button type="button" class="btn mb-2 ps-0 d-flex justify-content-start align-items-center" @onclick="() => SetMinimumRating( localIndex )">
                     @for ( int j = 1; j <= 5; j++ )
                     {
                         if ( j <= localIndex )
@@ -52,13 +56,13 @@
     </div>
     
     <div class="mb-3">
-        @foreach (Spec s in _specs.Values)
+        @foreach ( Spec s in _specs.Values )
         {
             <div class="mb-3 d-grid">
                 <!-- Toggle Button with Icon -->
-                <button class="btn btn-toggle-collapse d-flex align-items-center justify-content-between" type="button"
+                <button class="btn ps-0 d-flex align-items-center justify-content-between" type="button"
                         @onclick="() => ToggleCollapse( s.SpecId )">
-                    @s.SpecName
+                    <span>@s.SpecName</span>
                     <i class="oi @(_collapsedSpecs[ s.SpecId ] ? "oi-plus" : "oi-minus") "></i>
                 </button>
 

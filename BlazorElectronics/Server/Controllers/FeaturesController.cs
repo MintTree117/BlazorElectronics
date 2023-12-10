@@ -16,7 +16,7 @@ public class FeaturesController : _Controller
         _featuresService = featuresService;
     }
 
-    [HttpGet( "get-features" )]
+    [HttpGet( "get" )]
     public async Task<ActionResult<FeaturesResponse>> GetFeaturedProducts()
     {
         ServiceReply<FeaturesResponse?> featureReply = await _featuresService.GetFeatures();

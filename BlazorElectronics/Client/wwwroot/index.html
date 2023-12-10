@@ -4,23 +4,34 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>BlazorElectronics</title>
+    <title>Blazor Media</title>
     <base href="/" />
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="BlazorElectronics.Client.styles.css" rel="stylesheet" />
-    <link href="css/razor-page.css" rel="stylesheet"/>
     <link href="css/nav.css" rel="stylesheet"/>
     <link href="css/home.css" rel="stylesheet"/>
     <link href="css/products.css" rel="stylesheet"/>
     <link href="css/categorylist.css" rel="stylesheet"/>
     <link href="css/cart.css" rel="stylesheet"/>
     <link href="css/forms.css" rel="stylesheet"/>
+</head>
+
+<body>
+    <div id="app">
+        <div class="loading-container">
+            <div class="loading-circle"></div>
+            <p>Loading Website...</p>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss"></a>
+    </div>
     <script type="text/javascript">
         function startCarousel() {
             let myCarousel = document.querySelector('#featured-products-carousel')
@@ -32,22 +43,6 @@
             })
         }
     </script>
-</head>
-
-<body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
 </body>
 
 </html>
