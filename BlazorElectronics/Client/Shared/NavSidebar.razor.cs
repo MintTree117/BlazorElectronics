@@ -7,16 +7,16 @@ namespace BlazorElectronics.Client.Shared;
 public partial class NavSidebar : RazorView, IDisposable
 {
     [Parameter] public NavMenu NavMenu { get; set; } = default!;
-    
+
+    bool _show = false;
     bool _collapseNavMenu = true;
-    string? _navMenuCssClass => _collapseNavMenu ? "nav-sidebar-hide" : "";
     bool _isAuthorized = false;
     bool _isAdmin = false;
 
     SessionMeta? _sessionMeta;
-    CategoriesResponse _categories = new();
-    List<int> currentCategoryIds = new();
-    int? currentParentId;
+    CategoryData _categories = new();
+    List<CategoryModel> _primaryCategories = new();
+    int? _currentParentId = null;
 
     protected override void OnInitialized()
     {
@@ -26,10 +26,13 @@ public partial class NavSidebar : RazorView, IDisposable
         NavMenu.OnToggleSidebar += ToggleSidebar;
     }
 
-    void SetCategories( CategoriesResponse? r )
+    void SetCategories( CategoryData? r )
     {
+        if ( r is null )
+            return;
+        
         _categories = r;
-        currentCategoryIds = r.PrimaryIds;
+        _primaryCategories = r.GetPrimaryCategories();
         StateHasChanged();
     }
     void SetAuthorization( SessionMeta? session )
@@ -48,12 +51,12 @@ public partial class NavSidebar : RazorView, IDisposable
         _isAdmin = _sessionMeta.Type == SessionType.Admin;
         StateHasChanged();
     }
-    void ToggleSidebar()
+    void ToggleSidebar( bool show )
     {
-        _collapseNavMenu = !_collapseNavMenu;
+        _show = show;
         StateHasChanged();
     }
-    
+
     public void Dispose()
     {
         NavMenu.OnToggleSidebar -= ToggleSidebar;
@@ -61,21 +64,25 @@ public partial class NavSidebar : RazorView, IDisposable
         NavMenu.OnCategoriesLoaded -= SetCategories;
     }
 
-    void SelectCategory( int categoryId )
+    List<CategoryModel> GetCurrentCategories()
     {
-        CategoryModel category = _categories.CategoriesById[ categoryId ];
-        currentCategoryIds = category.Children.Select( c => c.CategoryId ).ToList();
-        currentParentId = category.CategoryId;
+        return _currentParentId is not null
+            ? _categories.CategoriesById[ _currentParentId.Value ].Children
+            : _primaryCategories;
     }
-    void GoBack()
+    void NextCategory( CategoryModel c )
     {
-        if ( !currentParentId.HasValue )
+        _currentParentId = c.CategoryId;
+        StateHasChanged();
+    }
+    void PreviousCategory()
+    {
+        if ( _currentParentId is null )
             return;
+        
+        CategoryModel parentCategory = _categories.CategoriesById[ _currentParentId.Value ];
+        _currentParentId = parentCategory.ParentCategoryId;
 
-        CategoryModel parentCategory = _categories.CategoriesById[ currentParentId.Value ];
-        currentParentId = parentCategory.ParentCategoryId;
-        currentCategoryIds = currentParentId.HasValue
-            ? _categories.CategoriesById[ currentParentId.Value ].Children.Select( c => c.CategoryId ).ToList()
-            : _categories.PrimaryIds;
+        StateHasChanged();
     }
 }

@@ -24,9 +24,9 @@ public partial class ProductSearch : PageView
 
     bool _hasCategory;
     int _primaryCategoryId;
-    int _currentCategoryId;
+    CategoryModel _currentCategory = new();
 
-    CategoriesResponse categories = new();
+    CategoryData? categories;
     SpecsResponse? specs;
     VendorsResponse? vendors;
     
@@ -34,14 +34,16 @@ public partial class ProductSearch : PageView
     {
         await base.OnInitializedAsync();
 
+        //NavManager.LocationChanged += HandleLocationChanged;
+        
         if ( !await GetData() )
             return;
-
-        if ( !ParseUrl() )
+        
+        if ( !ParseUrl( categories! ) )
             return;
 
         OnSetBreadcrumb?.Invoke( GetBreadcrumbNavigation() );
-        OnSetFilters?.Invoke( GetSubcategories(), GetSpecFilters(), GetVendorFilters() );
+        OnSetFilters?.Invoke( _currentCategory.Children, GetSpecFilters(), GetVendorFilters() );
 
         PageIsLoaded = true;
     }
@@ -50,7 +52,7 @@ public partial class ProductSearch : PageView
     {
         List<Task> apiTasks = new();
         
-        Task<ServiceReply<CategoriesResponse?>> categoryTask = CategoryService.GetCategories();
+        Task<ServiceReply<CategoryData?>> categoryTask = CategoryService.GetCategories();
         Task<ServiceReply<SpecsResponse?>> specTask = SpecService.GetSpecLookups();
         Task<ServiceReply<VendorsResponse?>> vendorTask = VendorService.GetVendors();
 
@@ -60,7 +62,7 @@ public partial class ProductSearch : PageView
 
         await Task.WhenAll( apiTasks );
 
-        ServiceReply<CategoriesResponse?> categoryReply = categoryTask.Result;
+        ServiceReply<CategoryData?> categoryReply = categoryTask.Result;
         ServiceReply<SpecsResponse?> specReply = specTask.Result;
         ServiceReply<VendorsResponse?> vendorReply = vendorTask.Result;
 
@@ -76,73 +78,45 @@ public partial class ProductSearch : PageView
 
         return true;
     }
-    bool ParseUrl()
+    bool ParseUrl( CategoryData cData )
     {
         if ( string.IsNullOrWhiteSpace( PrimaryCategory ) )
             return true;
 
-        if ( !categories.Urls.TryGetValue( PrimaryCategory, out _primaryCategoryId ) )
-        {
-            SetActionMessage( false, "Invalid url!" );
+        string categoryUrl = PrimaryCategory;
+
+        if ( !string.IsNullOrWhiteSpace( SecondaryCategory ) )
+            categoryUrl = $"{categoryUrl}/{SecondaryCategory}";
+        if ( !string.IsNullOrWhiteSpace( TertiaryCategory ) )
+            categoryUrl = $"{categoryUrl}/{TertiaryCategory}";
+
+        if ( !cData.Urls.TryGetValue( PrimaryCategory, out _primaryCategoryId ) )
             return false;
-        }
-        
+        if ( !cData.Urls.TryGetValue( categoryUrl, out int categoryId ) )
+            return false;
+        if ( !cData.CategoriesById.TryGetValue( categoryId, out CategoryModel? category ) )
+            return false;
+
+        _currentCategory = category;
         _hasCategory = true;
-        _currentCategoryId = _primaryCategoryId;
-
-        if ( string.IsNullOrWhiteSpace( SecondaryCategory ) )
-            return true;
-
-        if ( !categories.Urls.TryGetValue( SecondaryCategory, out int secondaryId ) )
-        {
-            SetActionMessage( false, "Invalid url!" );
-            return false;
-        }
-
-        _currentCategoryId = secondaryId;
-
-        if ( string.IsNullOrWhiteSpace( TertiaryCategory ) )
-            return true;
-
-        if ( !categories.Urls.TryGetValue( TertiaryCategory, out int tertiaryId ) )
-        {
-            SetActionMessage( false, "Invalid url!" );
-            return false;
-        }
-
-        _currentCategoryId = tertiaryId;
 
         return true;
     }
-    Dictionary<string, string> GetBreadcrumbNavigation()
+    Dictionary<string,string> GetBreadcrumbNavigation()
     {
-        Dictionary<string, string> urls = new() { { "Search", "/search" } };
-
-        if ( !_hasCategory )
-            return urls;
-
-        if ( !categories.Urls.TryGetValue( PrimaryCategory, out int id ) || !categories.CategoriesById.TryGetValue( id, out CategoryModel? m ) )
-            return urls;
+        Dictionary<string, string> urls = new() { { "Search", Routes.SEARCH } };
         
-        urls.Add( m.Name, $"/search/{PrimaryCategory}" );
+        string cUrl = Routes.SEARCH;
+        CategoryModel m = _currentCategory;
 
-        if ( !categories.Urls.TryGetValue( PrimaryCategory, out id ) || !categories.CategoriesById.TryGetValue( id, out m ) )
-            return urls;
-
-        urls.Add( m.Name, $"/search/{PrimaryCategory}/{SecondaryCategory}" );
-
-        if ( !categories.Urls.TryGetValue( PrimaryCategory, out id ) || !categories.CategoriesById.TryGetValue( id, out m ) )
-            return urls;
-
-        urls.Add( m.Name, $"/search/{PrimaryCategory}/{SecondaryCategory}/{TertiaryCategory}" );
+        do
+        {
+            cUrl = $"{cUrl}/{m.ApiUrl}";
+            urls.Add( m.Name, cUrl );
+        } 
+        while ( m.ParentCategoryId is not null );
 
         return urls;
-    }
-    List<CategoryModel> GetSubcategories()
-    {
-        return categories.CategoriesById.TryGetValue( _currentCategoryId, out CategoryModel? category )
-            ? category.Children
-            : new List<CategoryModel>();
     }
     Dictionary<int, Spec> GetSpecFilters()
     {

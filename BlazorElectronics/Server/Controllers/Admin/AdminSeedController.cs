@@ -48,7 +48,7 @@ public class AdminSeedController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<CategoriesResponse?> categories = await _categoryService.GetCategories();
+        ServiceReply<CategoryData?> categories = await _categoryService.GetCategoryData();
         ServiceReply<SpecsResponse?> lookups = await _lookupService.GetSpecs( categories.Data.PrimaryIds );
         ServiceReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
         ServiceReply<List<int>?> users = await UserAccountService.GetIds();

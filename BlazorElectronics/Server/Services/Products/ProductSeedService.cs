@@ -24,7 +24,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         _reviewRepository = reviewRepository;
     }
     
-    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoriesResponse categories, SpecsResponse lookups, VendorsResponse vendors, List<int> users )
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryData categories, SpecsResponse lookups, VendorsResponse vendors, List<int> users )
     {
         _random = new Random();
         
@@ -70,7 +70,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     
     // BASE MODEL
-    ProductModel GetSeedModel( int primaryCategory, int i, CategoriesResponse categoriesResponse, SpecsResponse lookups, VendorsResponse vendors, IReadOnlyList<int> users )
+    ProductModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, SpecsResponse lookups, VendorsResponse vendors, IReadOnlyList<int> users )
     {
         ProductModel model = new()
         {
@@ -88,7 +88,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             model.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) model.Price );
 
         model.Categories.Add( primaryCategory );
-        model.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoriesResponse ) );
+        model.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoryData ) );
         
         GetRandomLookups( lookups.GlobalSpecIds, lookups )
             .ToList()
@@ -215,9 +215,9 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     // IMAGES
     // CATEGORY
-    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> categories, CategoriesResponse categoriesResponse )
+    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> categories, CategoryData categoryData )
     {
-        CategoryModel categoryModel = categoriesResponse.CategoriesById[ currentCategory ];
+        CategoryModel categoryModel = categoryData.CategoriesById[ currentCategory ];
         
         if ( categoryModel.Children.Count <= 0 )
             return categories;
@@ -227,7 +227,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         foreach ( int category in subcategories )
         {
-            categories.AddRange( GetRandomCategories( category, categories, categoriesResponse ) );
+            categories.AddRange( GetRandomCategories( category, categories, categoryData ) );
         }
 
         return categories;

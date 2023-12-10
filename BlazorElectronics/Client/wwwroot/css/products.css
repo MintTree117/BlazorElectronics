@@ -154,3 +154,9 @@
         left: 0;
     }
 }
+
+.breadcrumb-btn {
+    padding: 0; /* Adjust to match the li padding */
+    font-size: inherit; /* Inherits the font size from the breadcrumb */
+    line-height: inherit; /* Inherits the line height from the breadcrumb */
+}

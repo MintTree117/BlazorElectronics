@@ -9,30 +9,24 @@ namespace BlazorElectronics.Client.Shared;
 
 public partial class NavMenu : RazorView
 {
-    public event Action<CategoriesResponse?>? OnCategoriesLoaded;
+    public event Action<CategoryData?>? OnCategoriesLoaded;
     public event Action<SessionMeta?>? OnSessionLoaded;
-    public event Action? OnToggleSidebar;
+    public event Action<bool>? OnToggleSidebar;
     
     [Inject] public ICategoryServiceClient CategoryService { get; set; } = default!;
     [Inject] public IUserServiceClient UserService { get; set; } = default!;
 
+    bool _showSidebar = false;
     bool _loadedCategories = false;
     string _categoryMessage = "Loading Categories...";
     
-    CategoriesResponse? _categories;
-    
-    public const string HREF_HOME = "";
-
-    public void NavigateTo( string url )
-    {
-        
-    }
+    CategoryData? _categories;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        Task<ServiceReply<CategoriesResponse?>> categoryTask = CategoryService.GetCategories();
+        Task<ServiceReply<CategoryData?>> categoryTask = CategoryService.GetCategories();
         Task<SessionMeta?> userTask = UserService.GetSessionMeta();
 
         List<Task> tasks = new();
@@ -48,9 +42,9 @@ public partial class NavMenu : RazorView
         OnSessionLoaded?.Invoke( userTask.Result );
     }
 
-    void ToggleSidebar()
+    void OpenSidebar()
     {
-        OnToggleSidebar?.Invoke();
+        OnToggleSidebar?.Invoke( true );
     }
     void GoToHome()
     {

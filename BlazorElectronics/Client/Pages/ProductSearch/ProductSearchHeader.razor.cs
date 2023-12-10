@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.ProductSearch;
 
-public partial class ProductSearchHeader : RazorView
+public partial class ProductSearchHeader : RazorView, IDisposable
 {
     string _currentSortOption = "Choose an option";
     int _selectedSortOption = -1;
@@ -49,13 +49,11 @@ public partial class ProductSearchHeader : RazorView
     {
         Page.OnSetBreadcrumb += SetBreadcrumbUrls;
     }
-
-    void SetBreadcrumbUrls( Dictionary<string, string> urls )
+    void SetBreadcrumbUrls( Dictionary<string,string> urls )
     {
         _urls = urls;
         StateHasChanged();
     }
-
     public void Dispose()
     {
         Page.OnSetBreadcrumb -= SetBreadcrumbUrls;

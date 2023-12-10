@@ -64,7 +64,7 @@ public class ProductService : ApiService, IProductService
             ? new ServiceReply<ProductSearchResponse?>( await MapProductSearchToResponse( models ) ) 
             : new ServiceReply<ProductSearchResponse?>( ServiceErrorType.NotFound );
     }
-    public async Task<ServiceReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoriesResponse categoriesResponse )
+    public async Task<ServiceReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoryData categoryData )
     {
         return new ServiceReply<ProductDetailsResponse?>();
     }

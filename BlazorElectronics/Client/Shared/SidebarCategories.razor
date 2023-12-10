@@ -15,7 +15,7 @@
             {
                 <li class="list-group-item">
                     <button class="btn btn-link" @onclick="@(() => SelectCategory( categoryId ))">
-                        @categoriesResponse.CategoriesById[ categoryId ].Name
+                        @_categoryData.CategoriesById[ categoryId ].Name
                     </button>
                 </li>
             }

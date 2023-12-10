@@ -12,7 +12,8 @@ public class CategoryService : ApiService, ICategoryService
     const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
     readonly ICategoryRepository _repository;
 
-    CachedObject<CategoriesResponse>? _cachedData;
+    CachedObject<CategoryData>? _cachedData;
+    CachedObject<List<CategoryResponse>>? _cachedResponse;
 
     public CategoryService( ILogger<ApiService> logger, ICategoryRepository repository ) : base( logger )
     {
@@ -27,13 +28,21 @@ public class CategoryService : ApiService, ICategoryService
             ? new ServiceReply<List<int>?>( _cachedData.Object.PrimaryIds )
             : new ServiceReply<List<int>?>( getReply.ErrorType, getReply.Message );
     }
-    public async Task<ServiceReply<CategoriesResponse?>> GetCategories()
+    public async Task<ServiceReply<CategoryData?>> GetCategoryData()
     {
         ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedData is not null
-            ? new ServiceReply<CategoriesResponse?>( _cachedData.Object )
-            : new ServiceReply<CategoriesResponse?>( getReply.ErrorType, getReply.Message );
+            ? new ServiceReply<CategoryData?>( _cachedData.Object )
+            : new ServiceReply<CategoryData?>( getReply.ErrorType, getReply.Message );
+    }
+    public async Task<ServiceReply<List<CategoryResponse>?>> GetCategoryResponse()
+    {
+        ServiceReply<bool> getReply = await TryGetData();
+
+        return getReply.Success && _cachedResponse is not null
+            ? new ServiceReply<List<CategoryResponse>?>( _cachedResponse.Object )
+            : new ServiceReply<List<CategoryResponse>?>( getReply.ErrorType, getReply.Message );
     }
     public async Task<ServiceReply<int>> ValidateCategoryUrl( string url )
     {
@@ -173,36 +182,26 @@ public class CategoryService : ApiService, ICategoryService
     {
         await Task.Run( () =>
         {
-            CategoriesResponse response = MapResponses( models.ToList() );
-            _cachedData = new CachedObject<CategoriesResponse>( response );
+            List<CategoryModel> list = models.ToList();
+            List<CategoryResponse> response = MapResponse( list );
+            CategoryData data = new ( list );
+            _cachedData = new CachedObject<CategoryData>( data );
+            _cachedResponse = new CachedObject<List<CategoryResponse>>( response );
         } );
     }
-    static CategoriesResponse MapResponses( List<CategoryModel> models )
+    static List<CategoryResponse> MapResponse( IEnumerable<CategoryModel> models )
     {
-        Dictionary<int, CategoryModel> responses = new();
-        List<int> primaryIds = new();
-        Dictionary<string, int> urls = new();
-        
-        foreach ( CategoryModel m in models )
-        {
-            responses.Add( m.CategoryId, m );
-            
-            if ( m.Tier == CategoryTier.Primary )
-                primaryIds.Add( m.CategoryId );
-        }
-
-        foreach ( CategoryModel m in responses.Values )
-        {
-            if ( responses.TryGetValue( m.ParentCategoryId, out CategoryModel? parent ) )
-                parent.Children.Add( m );
-        }
-
-        foreach ( CategoryModel m in models )
-        {
-            urls.TryAdd( m.ApiUrl, m.CategoryId );
-        }
-
-        return new CategoriesResponse( responses, primaryIds, urls );
+        return models
+            .Select( m => new CategoryResponse
+            {
+                ParentId = m.ParentCategoryId,
+                Id = m.CategoryId,
+                Tier = m.Tier,
+                ImageUrl = m.ImageUrl,
+                Name = m.Name,
+                Url = m.ApiUrl
+            } )
+            .ToList();
     }
     static async Task<List<CategoryView>?> MapView( IEnumerable<CategoryModel>? models )
     {

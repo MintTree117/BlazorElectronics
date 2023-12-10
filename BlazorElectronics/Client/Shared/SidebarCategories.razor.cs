@@ -9,24 +9,24 @@ public partial class SidebarCategories : RazorView
 {
     [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
 
-    CategoriesResponse categoriesResponse = new();
+    CategoryData _categoryData = new();
     List<int> currentCategoryIds = new();
     int? currentParentId;
     
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<CategoriesResponse?> reply = await CategoryService.GetCategories();
+        ServiceReply<CategoryData?> reply = await CategoryService.GetCategories();
 
         if ( !reply.Success || reply.Data is null )
             return;
 
-        categoriesResponse = reply.Data;
-        currentCategoryIds = categoriesResponse.PrimaryIds;
+        _categoryData = reply.Data;
+        currentCategoryIds = _categoryData.PrimaryIds;
     }
 
     void SelectCategory( int categoryId )
     {
-        CategoryModel category = categoriesResponse.CategoriesById[ categoryId ];
+        CategoryModel category = _categoryData.CategoriesById[ categoryId ];
         currentCategoryIds = category.Children.Select( c => c.CategoryId ).ToList();
         currentParentId = category.CategoryId;
     }
@@ -35,10 +35,10 @@ public partial class SidebarCategories : RazorView
         if ( !currentParentId.HasValue ) 
             return;
 
-        CategoryModel parentCategory = categoriesResponse.CategoriesById[ currentParentId.Value ];
+        CategoryModel parentCategory = _categoryData.CategoriesById[ currentParentId.Value ];
         currentParentId = parentCategory.ParentCategoryId;
         currentCategoryIds = currentParentId.HasValue
-            ? categoriesResponse.CategoriesById[ currentParentId.Value ].Children.Select( c => c.CategoryId ).ToList()
-            : categoriesResponse.PrimaryIds;
+            ? _categoryData.CategoriesById[ currentParentId.Value ].Children.Select( c => c.CategoryId ).ToList()
+            : _categoryData.PrimaryIds;
     }
 }

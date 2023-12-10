@@ -36,8 +36,46 @@
     display: none;
 }
 
-.sidebar-separator {
-    border-bottom-color: rgb(213, 219, 219);
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+.nav-sidebar {
+    /* Adjust the overall padding and margin of the sidebar */
+    padding: 0;
+    margin: 0;
+}
+
+.nav-sidebar .bg-dark {
+    /* Spacing and alignment for the top section */
+    padding: 1rem; /* Adjust as needed */
+}
+
+.sidebar-header {
+    /* Styling for section headers */
+    font-weight: bold;
+    padding: 0.75rem 1rem; /* Vertical and horizontal padding */
+    color: #333; /* Adjust color as needed */
+    background-color: #f8f9fa; /* Light background for headers */
+    margin: 0; /* Remove default margins */
+}
+
+.nav-sidebar .nav-link {
+    /* Styling for navigation links */
+    display: block;
+    padding: 0.5rem 1rem; /* Consistent padding with headers */
+    color: #333; /* Bootstrap primary link color */
+    text-decoration: none; /* No underline */
+}
+
+.nav-sidebar .nav-link:hover, .nav-sidebar .btn:hover {
+    /* Hover effect for links */
+    background-color: #e9ecef; /* Light grey background on hover */
+    color: #333; /* Slightly darker blue on hover */
+}
+
+.nav-sidebar .nav-item {
+    /* Spacing between navigation items */
+    margin: 0; /* Remove default margin */
+}
+
+.nav-sidebar hr {
+    /* Styling for horizontal dividers */
+    margin: 0; /* Remove default margins */
 }

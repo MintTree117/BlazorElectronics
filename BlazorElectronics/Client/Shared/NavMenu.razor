@@ -9,13 +9,14 @@
     
     <div class="container-fluid py-3 bg-dark text-white border-bottom shadow-bottom">
         <div class="d-flex flex-nowrap align-items-center justify-content-between top-nav">
-            <button class="btn btn-secondary" onclick="@ToggleSidebar">
+            <button class="btn btn-secondary" onclick="@OpenSidebar">
                 <i class="oi oi-menu"></i>
             </button>
             <button class="btn logo-button px-1 py-0" onclick="@GoToHome">
                 <img src="/Images/blazor.jpg" alt="Home">
             </button>
             <ProductSearchBar></ProductSearchBar>
+            <UserButton></UserButton>
             <CartCounter></CartCounter>
         </div>
     </div>

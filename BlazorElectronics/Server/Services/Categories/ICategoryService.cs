@@ -6,7 +6,8 @@ public interface ICategoryService
 {
     // USER
     Task<ServiceReply<List<int>?>> GetPrimaryCategoryIds(); 
-    Task<ServiceReply<CategoriesResponse?>> GetCategories();
+    Task<ServiceReply<CategoryData?>> GetCategoryData();
+    Task<ServiceReply<List<CategoryResponse>?>> GetCategoryResponse();
     Task<ServiceReply<int>> ValidateCategoryUrl( string url );
 
     // ADMIN
