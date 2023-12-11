@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 
@@ -28,7 +30,16 @@ public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit
     {
         return $"Edit {ItemEdit.Tier} {ItemTitle}";
     }
-    
+
+    protected override async Task SubmitNew()
+    {
+        if ( string.IsNullOrWhiteSpace( ItemEdit.ApiUrl ) )
+        {
+            ItemEdit.ApiUrl = ConvertToUrlFriendly( ItemEdit.Name );
+        }
+        
+        await base.SubmitNew();
+    }
     public override void CreateItem()
     {
         base.CreateItem();
@@ -53,5 +64,35 @@ public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit
     void SortByParent()
     {
         ItemsView = ItemsView.OrderBy( c => c.ParentCategoryId ).ToList();
+    }
+
+    static string ConvertToUrlFriendly( string text )
+    {
+        // Normalize Unicode characters
+        //text = text.Normalize( NormalizationForm.FormKD );
+
+        // Remove or replace special characters
+        StringBuilder sb = new();
+        foreach ( char c in text )
+        {
+            if ( char.IsLetterOrDigit( c ) || c == '-' )
+            {
+                sb.Append( c );
+            }
+            else if ( char.IsWhiteSpace( c ) )
+            {
+                sb.Append( '-' );
+            }
+        }
+
+        string urlFriendly = sb.ToString();
+
+        // Convert to lowercase
+        urlFriendly = urlFriendly.ToLower();
+
+        // Trim extra hyphens
+        urlFriendly = Regex.Replace( urlFriendly, "-+", "-" ).Trim( '-' );
+
+        return urlFriendly;
     }
 }

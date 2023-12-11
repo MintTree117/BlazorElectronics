@@ -185,7 +185,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
 
         await LoadView();
     }
-    async Task SubmitNew()
+    protected virtual async Task SubmitNew()
     {
         ServiceReply<int> reply = await CrudService.Add( $"{ApiPath}/add", ItemEdit );
 
@@ -198,7 +198,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
         ItemEdit.SetId( reply.Data );
         NewItem = false;
 
-        InvokeAlert( AlertType.Success, $"Successfully updated {ItemTitle}" );
+        InvokeAlert( AlertType.Success, $"Successfully created {ItemTitle}" );
         StateHasChanged();
     }
     async Task SubmitUpdate()
