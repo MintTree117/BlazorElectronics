@@ -1,0 +1,15 @@
+@using BlazorElectronics.Client.Pages
+
+<div class="d-flex align-items-center justify-content-between">
+    <button type="submit" class="btn btn-success btn-lg btn-icon">
+        <i class="oi oi-cloud-upload"></i> Submit
+    </button>
+    <div class="ms-2">
+        <AlertMessage Page="@Page"></AlertMessage>
+    </div>
+</div>
+
+@code 
+{
+    [Parameter] public PageView Page { get; set; } = default!;
+}

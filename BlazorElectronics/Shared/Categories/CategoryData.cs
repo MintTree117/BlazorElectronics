@@ -58,10 +58,10 @@ public sealed class CategoryData
                 parent.Children.Add( m );
         }
 
-        /*foreach ( CategoryModel m in models )
+        foreach ( CategoryModel m in models )
         {
             m.ApiUrl = BuildApiUrl( m, m.ApiUrl, CategoriesById );
-        }*/
+        }
 
         foreach ( CategoryModel m in models )
         {
@@ -70,13 +70,14 @@ public sealed class CategoryData
     }
     static string BuildApiUrl( CategoryModel m, string url, Dictionary<int, CategoryModel> responses )
     {
-        if ( m.ParentCategoryId is null || !responses.TryGetValue( m.ParentCategoryId.Value, out CategoryModel? parent ) )
-            return url;
+        while ( true )
+        {
+            if ( m.ParentCategoryId is null || !responses.TryGetValue( m.ParentCategoryId.Value, out CategoryModel? parent ) ) 
+                return url;
 
-        url = $"{parent.ApiUrl}/{url}";
-
-        // Pass 'parent' instead of 'm' for the recursive call
-        return BuildApiUrl( parent, url, responses );
+            url = $"{parent.ApiUrl}/{url}";
+            m = parent;
+        }
     }
     public bool ValidateUrl( string url, out int categoryId )
     {

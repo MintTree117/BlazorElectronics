@@ -1,6 +1,5 @@
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
-using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
@@ -23,24 +22,36 @@ public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit
     {
         base.GenerateTableMeta();
         THeadMeta.Add( "Category Tier", SortByTier );
+        THeadMeta.Add( "Category Parent", SortByParent );
     }
     protected override string GetEditTitle()
     {
         return $"Edit {ItemEdit.Tier} {ItemTitle}";
     }
     
-    void HandleTierChange( ChangeEventArgs e )
+    public override void CreateItem()
     {
-        StateHasChanged();
+        base.CreateItem();
+        ItemEdit.Tier = CategoryTier.Primary;
+        ItemEdit.PrimaryId = 1;
+        ItemEdit.ParentCategoryId = null;
+    }
+    List<CategoryView> GetPrimary()
+    {
+        return ItemsView.Where( c => c.Tier == CategoryTier.Primary ).ToList();
     }
     List<CategoryView> GetEditParents()
     {
-        return Enum.TryParse( ( ( int ) ItemEdit.Tier - 1 ).ToString(), out CategoryTier parentTier )
-            ? ItemsView.Where( item => item.Tier == parentTier ).ToList()
-            : new List<CategoryView>();
+        return ItemEdit.Tier == CategoryTier.Tertiary 
+            ? ItemsView.Where( c => c.ParentCategoryId == ItemEdit.PrimaryId ).ToList() 
+            : ItemsView.Where( c => c.Tier == CategoryTier.Primary ).ToList();
     }
     void SortByTier()
     {
         ItemsView = ItemsView.OrderBy( c => c.Tier ).ToList();
+    }
+    void SortByParent()
+    {
+        ItemsView = ItemsView.OrderBy( c => c.ParentCategoryId ).ToList();
     }
 }

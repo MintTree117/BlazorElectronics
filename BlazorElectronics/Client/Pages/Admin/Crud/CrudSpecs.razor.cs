@@ -22,7 +22,7 @@ public sealed partial class CrudSpecs : CrudPage<CrudView, SpecEdit>
 
         if ( !categoryResponse.Success )
         {
-            SetActionMessage( false, categoryResponse.Message ?? "Failed to get categories!" );
+            //SetActionMessage( false, categoryResponse.Message ?? "Failed to get categories!" );
             return;
         }
 

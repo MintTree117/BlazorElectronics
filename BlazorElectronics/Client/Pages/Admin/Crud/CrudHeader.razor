@@ -1,0 +1,19 @@
+@typeparam TItem where TItem : BlazorElectronics.Shared.CrudView
+@typeparam TEdit where TEdit : BlazorElectronics.Shared.ICrudEdit, new()
+
+<div class="form-header d-flex justify-content-between align-items-center mb-3">
+    <h3>@Page.PageTitle</h3>
+    <div>
+        <button class="btn btn-outline-secondary me-2" type="button" @onclick="@Page.ReloadNew">
+            <span class="oi oi-reload"></span> Refresh
+        </button>
+        <button class="btn btn-outline-primary" type="button" @onclick="@Page.GoBack">
+            <span class="oi oi-arrow-left"></span> Back
+        </button>
+    </div>
+</div>
+
+@code 
+{
+    [Parameter] public CrudPage<TItem, TEdit> Page { get; set; } = null!;
+}

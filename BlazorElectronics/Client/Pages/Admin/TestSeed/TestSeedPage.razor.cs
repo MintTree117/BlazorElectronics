@@ -26,13 +26,13 @@ public partial class TestSeedPage : AdminPage
     async Task SeedProducts()
     {
         ServiceReply<bool> reply = await SeedService.SeedProducts( ProductCount );
-        SetActionMessage( reply.Success, reply.Success ? "Successfully seeded products." : reply.Message ?? FAIL_SEED_MESSAGE );
+        //SetActionMessage( reply.Success, reply.Success ? "Successfully seeded products." : reply.Message ?? FAIL_SEED_MESSAGE );
     }
 
     async Task SeedUsers()
     {
         Logger.LogError( "hit" );
         ServiceReply<bool> reply = await SeedService.SeedUsers( UserCount );
-        SetActionMessage( reply.Success, reply.Success ? "Successfully seeded users." : reply.Message ?? FAIL_SEED_MESSAGE );
+        //SetActionMessage( reply.Success, reply.Success ? "Successfully seeded users." : reply.Message ?? FAIL_SEED_MESSAGE );
     }
 }

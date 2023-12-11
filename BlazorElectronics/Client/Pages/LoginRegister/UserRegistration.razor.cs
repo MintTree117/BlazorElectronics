@@ -17,12 +17,12 @@ public partial class UserRegistration : PageView
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ?? "Failed to register!" );
+            InvokeAlert( AlertType.Danger, reply.Message ?? "Failed to register!" );
             return;
         }
         
         _registered = true;
-        SetActionMessage( true, "Successfully registered account!" );
+        InvokeAlert( AlertType.Success, "Successfully registered account!" );
         StateHasChanged();
     }
 }

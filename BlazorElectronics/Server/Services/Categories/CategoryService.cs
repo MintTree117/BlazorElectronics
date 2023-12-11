@@ -211,7 +211,7 @@ public class CategoryService : ApiService, ICategoryService
         return await Task.Run( () =>
         {
             return models
-                .Select( m => new CategoryView { Id = m.CategoryId, Tier = m.Tier, Name = m.Name } )
+                .Select( m => new CategoryView { Id = m.CategoryId, ParentCategoryId = m.ParentCategoryId, Tier = m.Tier, Name = m.Name } )
                 .ToList();
         } );
     }
@@ -223,7 +223,7 @@ public class CategoryService : ApiService, ICategoryService
         return new CategoryEdit
         {
             CategoryId = model.CategoryId,
-            ParentId = model.ParentCategoryId,
+            ParentCategoryId = model.ParentCategoryId,
             Tier = model.Tier,
             Name = model.Name,
             ApiUrl = model.ApiUrl,

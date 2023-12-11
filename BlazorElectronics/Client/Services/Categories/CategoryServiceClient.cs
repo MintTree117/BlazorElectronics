@@ -26,7 +26,7 @@ public class CategoryServiceClient : ClientService, ICategoryServiceClient
 
         foreach ( string s in _categories.Urls.Keys )
         {
-            //Logger.LogError( s );
+           // Logger.LogError( s );
         }
 
         return _categories is not null

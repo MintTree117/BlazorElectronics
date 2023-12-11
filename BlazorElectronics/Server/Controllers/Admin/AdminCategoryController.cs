@@ -46,13 +46,9 @@ public sealed class AdminCategoryController : _AdminController
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
         
-        Logger.LogError( "hit" );
-        
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
-        
-        Logger.LogError( "validated" );
-        
+
         ServiceReply<bool> reply = await _service.AddBulkCategories( request.Payload );
         return GetReturnFromReply( reply );
     }

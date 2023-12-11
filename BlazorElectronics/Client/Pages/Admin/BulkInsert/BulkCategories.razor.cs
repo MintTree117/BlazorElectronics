@@ -13,7 +13,7 @@ public partial class BulkCategories : AdminPage
 {
     [Inject] public IAdminBulkServiceClient BulkService { get; set; } = default!;
     [Inject] public IAdminCategoryHelper CategoryHelper { get; set; } = default!;
-    readonly CategorySeed _seed = new();
+    CategorySeed _seed = new();
     
     protected override async Task OnInitializedAsync()
     {
@@ -26,22 +26,39 @@ public partial class BulkCategories : AdminPage
 
         if ( !categoryResponse.Success )
         {
-            SetActionMessage( false, categoryResponse.Message ?? IAdminCategoryHelper.DEFAULT_ERROR_MESSAGE );
+            SetViewMessage( false, categoryResponse.Message ?? IAdminCategoryHelper.DEFAULT_ERROR_MESSAGE );
             return;
         }
-        
+
+        if ( CategoryHelper.Categories.All( c => c.Tier != CategoryTier.Primary ) )
+        {
+            InvokeAlert( AlertType.Danger, "There are no Primary Categories!" );
+            return;
+        }
+
         PageIsLoaded = true;
+        NewBulk();
     }
 
-    void HandleTierChange( ChangeEventArgs e )
+    void NewBulk()
     {
+        _seed = new CategorySeed
+        {
+            Tier = CategoryTier.Secondary,
+            ParentCategoryId = 0,
+            PrimaryId = 1
+        };
         StateHasChanged();
+    }
+    List<CategoryView> GetPrimary()
+    {
+        return CategoryHelper.Categories.Where( c => c.Tier == CategoryTier.Primary ).ToList();
     }
     List<CategoryView> GetEditParents()
     {
-        return Enum.TryParse( ( ( int ) _seed.Tier - 1 ).ToString(), out CategoryTier parentTier )
-            ? CategoryHelper.Categories.Where( item => item.Tier == parentTier ).ToList()
-            : new List<CategoryView>();
+        return _seed.Tier == CategoryTier.Tertiary
+            ? CategoryHelper.Categories.Where( c => c.ParentCategoryId == _seed.PrimaryId ).ToList()
+            : CategoryHelper.Categories.Where( c => c.Tier == CategoryTier.Primary ).ToList();
     }
     async Task Submit()
     {
@@ -52,32 +69,30 @@ public partial class BulkCategories : AdminPage
         List<CategoryEdit> categories = names
             .Select( s => new CategoryEdit
             {
-                ParentId = _seed.ParentCategoryId,
+                ParentCategoryId = _seed.ParentCategoryId,
                 Tier = _seed.Tier,
                 Name = s,
                 ApiUrl = ConvertToUrlFriendly( s ),
                 ImageUrl = "default"
             } )
             .ToList();
-        
-        Logger.LogError( categories.Count.ToString() );
 
         ServiceReply<bool> reply = await BulkService.BulkInsertCategories( categories );
 
         if ( !reply.Success )
         {
             Logger.LogError( reply.ErrorType + reply.Message );
-            SetActionMessage( false, reply.ErrorType + reply.Message );
+            InvokeAlert( AlertType.Danger, reply.ErrorType + reply.Message );
             return;
         }
 
-        SetActionMessage( true, "Successfully inserted categories." );
+        InvokeAlert( AlertType.Success, "Successfully inserted bulk categories." );
     }
 
     static string ConvertToUrlFriendly( string text )
     {
         // Normalize Unicode characters
-        text = text.Normalize( NormalizationForm.FormKD );
+        //text = text.Normalize( NormalizationForm.FormKD );
 
         // Remove or replace special characters
         StringBuilder sb = new();

@@ -1,0 +1,59 @@
+@inherits RazorView
+@implements IDisposable
+
+@if ( !string.IsNullOrWhiteSpace( _message ) )
+{
+    <div class="alert flex-grow-1 d-flex align-items-center justify-content-between mb-0 @GetAlertCss()" role="alert">
+        <div>
+            @_message
+        </div>
+        <button class="btn ms-2 @GetButtonCss()" @onclick="Close">
+            <i class="oi oi-x"></i>
+        </button>
+    </div>
+}
+
+@code 
+{
+    [Parameter] public PageView Page { get; set; } = null!;
+
+    public void Dispose()
+    {
+        Page.SetAlert -= SetAlert;
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Page.SetAlert += SetAlert;
+    }
+    void SetAlert( AlertType type, string message )
+    {
+        _type = type;
+        _message = message;
+    }
+    void Close()
+    {
+        _message = string.Empty;
+    }
+    string GetAlertCss()
+    {
+        return _type switch {
+            AlertType.Success => "alert-success",
+            AlertType.Warning => "alert-warning",
+            AlertType.Danger => "alert-danger",
+            _ => ""
+        };
+    }
+    string GetButtonCss()
+    {
+        return _type switch {
+            AlertType.Success => "btn-outline-success",
+            AlertType.Warning => "btn-outline-warning",
+            AlertType.Danger => "btn-outline-danger",
+            _ => ""
+            };
+    }
+    
+    string _message = string.Empty;
+    AlertType _type = AlertType.Success;
+}

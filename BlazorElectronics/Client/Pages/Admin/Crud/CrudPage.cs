@@ -13,7 +13,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
     const string ERROR_GET_EDIT = "Failed to get item for edit!";
 
     public string PageTitle { get; private set; } = "CrudPage";
-    protected string ItemTitle = "CrudItem";
+    protected string ItemTitle = "Item";
     
     protected string ApiPath = string.Empty;
 
@@ -104,12 +104,18 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
         PropertyInfo? propertyInfo = item.GetType().GetProperty( propertyName );
         return ( propertyInfo != null ? propertyInfo.GetValue( item ) : "" ) ?? "NULL VALUE";
     }
+    public void ReloadNew()
+    {
+        CreateItem();
+    }
     public virtual void CreateItem()
     {
         PageTitle = $"Create {ItemTitle}";
         ItemEdit = new Tedit();
         IsEditing = true;
         NewItem = true;
+        
+        StateHasChanged();
     }
     public virtual async Task EditItem( int itemId )
     {
@@ -139,11 +145,11 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
 
         if ( !result.Success )
         {
-            SetActionMessage( false, $"Failed to delete item {itemId}. {result.Message}" );
+            InvokeAlert( AlertType.Danger, $"Failed to delete {ItemTitle} {itemId}. {result.ErrorType + result.Message}" );
             return;
         }
-
-        SetActionMessage( true, $"Successfully deleted item {itemId}." );
+        
+        InvokeAlert( AlertType.Success, $"Successfully deleted {ItemTitle} {itemId}." );
         await LoadView();
         StateHasChanged();
     }
@@ -185,14 +191,14 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ?? "Failed to insert item, no response message!" );
+            InvokeAlert( AlertType.Danger, reply.Message ?? $"Failed to insert {ItemTitle}, no response message!" );
             return;
         }
         
         ItemEdit.SetId( reply.Data );
         NewItem = false;
-        
-        SetActionMessage( true, "Successfully added item." );
+
+        InvokeAlert( AlertType.Success, $"Successfully updated {ItemTitle}" );
         StateHasChanged();
     }
     async Task SubmitUpdate()
@@ -201,11 +207,11 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Ted
 
         if ( !reply.Success )
         {
-            SetActionMessage( false, reply.Message ?? "Failed to update item, no response message!" );
+            InvokeAlert( AlertType.Danger, reply.Message ?? $"Failed to update {ItemTitle}, no response message!" );
             return;
         }
 
-        SetActionMessage( true, "Successfully updated item." );
+        InvokeAlert( AlertType.Success, $"Successfully updated {ItemTitle}." );
         StateHasChanged();
     }
 }

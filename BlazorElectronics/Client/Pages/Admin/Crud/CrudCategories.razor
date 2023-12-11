@@ -1,6 +1,7 @@
 @page "/admin/crud/categories"
 @using BlazorElectronics.Shared.Categories
 @using BlazorElectronics.Shared.Enums
+@using BlazorElectronics.Client.Shared
 @inherits CrudPage<CategoryView, CategoryEdit>
 
 <div class="container-sm form-wrapper">
@@ -14,55 +15,66 @@
         }
         else
         {
-            <CrudEditTitle Page="@this"></CrudEditTitle>
+            <CrudHeader Page="@this"></CrudHeader>
 
             <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
                 @if ( NewItem )
                 {
                     <div class="mb-3">
                         <label for="Tier" class="form-label">Category Tier</label>
-                        <InputSelect @bind-Value="ItemEdit.Tier" @onchange="HandleTierChange" class="form-control" id="Tier">
+                        <InputSelect @bind-Value="ItemEdit.Tier" class="form-control" id="Tier">
                             @foreach ( CategoryTier tier in Enum.GetValues<CategoryTier>() )
                             {
-                                <option value="@tier">@tier</option>
+                                <option value="@tier.ToString()">@tier</option>
                             }
                         </InputSelect>
                     </div>
-                }
-                @if ( ItemEdit.Tier != CategoryTier.Primary )
-                {
 
-                    <div class="mb-3">
-                        <label for="Parent" class="form-label">Parent Category</label>
-                        <InputSelect @bind-Value="ItemEdit.ParentId" class="form-control" id="Parent">
-                            @foreach ( CategoryView item in GetEditParents() )
-                            {
-                                <option value="@item.Id">@item.Name</option>
-                            }
-                        </InputSelect>
-                    </div>
+                    if ( ItemEdit.Tier == CategoryTier.Tertiary )
+                    {
+                        <div class="mb-3">
+                            <label for="Primary" class="form-label">Primary Category</label>
+                            <InputSelect @bind-Value="ItemEdit.PrimaryId" class="form-control" id="Primary">
+                                @foreach ( CategoryView item in GetPrimary() )
+                                {
+                                    <option value="@item.Id.ToString()">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    }
+
+                    if ( ItemEdit.Tier != CategoryTier.Primary )
+                    {
+                        <div class="mb-3">
+                            <label for="Parent" class="form-label">Parent Category</label>
+                            <InputSelect @bind-Value="ItemEdit.ParentCategoryId" class="form-control" id="Parent">
+                                <option value="">Null</option>
+                                @foreach ( CategoryView item in GetEditParents() )
+                                {
+                                    <option value="@item.Id.ToString()">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    }
                 }
+
                 <div class="mb-3">
                     <label for="Name" class="form-label">Category Name</label>
                     <InputText @bind-Value="ItemEdit.Name" class="form-control" id="Name"></InputText>
                 </div>
+                
                 <div class="mb-3">
                     <label for="ApiUrl" class="form-label">Api Url</label>
                     <InputText @bind-Value="ItemEdit.ApiUrl" class="form-control" id="ApiUrl"></InputText>
                 </div>
+                
                 <div class="mb-3">
                     <label for="ImageUrl" class="form-label">Image Url</label>
                     <InputText @bind-Value="ItemEdit.ImageUrl" class="form-control" id="ImageUrl"></InputText>
                 </div>
-
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-success btn-icon">
-                        <i class="oi oi-cloud-upload"></i> Submit
-                    </button>
-                </div>
+                
+                <FormSubmit Page="@this"></FormSubmit>
             </EditForm>
-
-            <ActionMessage Page="@this"></ActionMessage>
         }
     }
 </div>

@@ -26,10 +26,10 @@ public partial class BulkProductKeys : AdminPage
         if ( !reply.Success )
         {
             Logger.LogError( reply.ErrorType + reply.Message );
-            SetActionMessage( false, reply.ErrorType + reply.Message );
+            //SetActionMessage( false, reply.ErrorType + reply.Message );
             return;
         }
 
-        SetActionMessage( true, "Successfully inserted product keys." );
+        //SetActionMessage( true, "Successfully inserted product keys." );
     }
 }

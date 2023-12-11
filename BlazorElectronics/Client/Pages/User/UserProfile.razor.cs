@@ -10,10 +10,7 @@ public partial class UserProfile : UserPage
     async Task ChangePassword()
     {
         ServiceReply<bool> result = await UserService.ChangePassword( _changeRequest );
-
-        if ( result.Success )
-            SetActionMessage( true, "Successfully changed password." );
-        else
-            SetActionMessage( false, "Failed to change password; no response message!" );
+        
+        
     }
 }

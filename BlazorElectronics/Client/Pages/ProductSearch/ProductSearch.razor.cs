@@ -68,7 +68,7 @@ public partial class ProductSearch : PageView
 
         if ( categoryReply is not { Success: true, Data: not null } )
         {
-            SetActionMessage( false, "Failed to load product categories! " + categoryReply.ErrorType + categoryReply.Message );
+            InvokeAlert( AlertType.Danger, "Failed to load product categories! " + categoryReply.ErrorType + categoryReply.Message );
             return false;   
         }
         

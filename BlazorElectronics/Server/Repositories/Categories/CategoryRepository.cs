@@ -39,7 +39,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         foreach ( CategoryEdit c in dtos )
         {
             DataRow row = table.NewRow();
-            row[ COL_CATEGORY_PARENT_ID ] = c.ParentId;
+            row[ COL_CATEGORY_PARENT_ID ] = c.ParentCategoryId;
             row[ COL_CATEGORY_TIER ] = c.Tier;
             row[ COL_CATEGORY_NAME ] = c.Name;
             row[ COL_CATEGORY_URL ] = c.ApiUrl;
@@ -73,7 +73,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
     static DynamicParameters GetInsertParameters( CategoryEdit dto )
     {
         DynamicParameters p = new();
-        p.Add( PARAM_CATEGORY_PARENT_ID, dto.ParentId );
+        p.Add( PARAM_CATEGORY_PARENT_ID, dto.ParentCategoryId );
         p.Add( PARAM_CATEGORY_TIER, dto.Tier );
         p.Add( PARAM_CATEGORY_NAME, dto.Name );
         p.Add( PARAM_CATEGORY_API_URL, dto.ApiUrl );

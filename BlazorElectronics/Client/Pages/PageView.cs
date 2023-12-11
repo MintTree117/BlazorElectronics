@@ -5,15 +5,17 @@ namespace BlazorElectronics.Client.Pages;
 
 public abstract class PageView : RazorView
 {
+    public event Action<AlertType, string>? SetAlert;
+    
     protected bool PageIsLoaded = false;
     public bool PageIsRedirecting { get; private set; }
     
     const string MESSAGE_SUCCESS_CLASS = "text-success";
     const string MESSAGE_FAILURE_CLASS = "text-danger";
     public string ViewMessageClass { get; private set; } = MESSAGE_FAILURE_CLASS;
-    public string ActionMessageClass { get; private set; } = MESSAGE_FAILURE_CLASS;
+    //public string ActionMessageClass { get; private set; } = MESSAGE_FAILURE_CLASS;
     public string ViewMessage { get; private set; } = "Loading Data...";
-    public string ActionMessage { get; private set; } = string.Empty;
+    //public string ActionMessage { get; private set; } = string.Empty;
     
     const int PAGE_REDIRECTION_WAIT_MILLISECONDS = 3000;
     const string PAGE_RETURN_URL_PARAM = "returnUrl";
@@ -47,12 +49,11 @@ public abstract class PageView : RazorView
         ViewMessageClass = success ? MESSAGE_SUCCESS_CLASS : MESSAGE_FAILURE_CLASS;
         ViewMessage = message;
     }
-    protected void SetActionMessage( bool success, string message )
+    protected void InvokeAlert( AlertType type, string message )
     {
-        ActionMessageClass = success ? MESSAGE_SUCCESS_CLASS : MESSAGE_FAILURE_CLASS;
-        ActionMessage = message;
+        SetAlert?.Invoke( type, message );
     }
-    
+
     void CountdownTimerElapsed( object? sender, System.Timers.ElapsedEventArgs e )
     {
         if ( PageRedirectCountdown > 0 )
