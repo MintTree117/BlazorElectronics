@@ -28,15 +28,14 @@ public partial class ProductFilters : RazorView, IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Page.OnSetFilters += OnSetFilters;
+        Page.InitializeFilters += InitializeFilters;
     }
-
-
+    
     void ToggleCollapse( int specId )
     {
         _collapsedSpecs[ specId ] = !_collapsedSpecs[ specId ];
     }
-    void OnSetFilters( List<CategoryModel>? subCategories, Dictionary<int,Spec> specs, List<VendorModel> vendors )
+    void InitializeFilters( List<CategoryModel>? subCategories, Dictionary<int,Spec> specs, List<VendorModel> vendors )
     {
         _subCategories = subCategories;
         _specs = specs;
@@ -109,6 +108,6 @@ public partial class ProductFilters : RazorView, IDisposable
     
     public void Dispose()
     {
-        Page.OnSetFilters -= OnSetFilters;
+        Page.InitializeFilters -= InitializeFilters;
     }
 }

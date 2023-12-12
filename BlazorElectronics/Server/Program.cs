@@ -1,21 +1,11 @@
 global using BlazorElectronics.Shared;
-using BlazorElectronics.Server.DbContext;
-using BlazorElectronics.Server.Repositories.Cart;
-using BlazorElectronics.Server.Repositories.Categories;
-using BlazorElectronics.Server.Repositories.Features;
-using BlazorElectronics.Server.Repositories.Products;
-using BlazorElectronics.Server.Repositories.Sessions;
-using BlazorElectronics.Server.Repositories.Specs;
-using BlazorElectronics.Server.Repositories.Users;
-using BlazorElectronics.Server.Repositories.Vendors;
+using BlazorElectronics.Server.Api.Interfaces;
+using BlazorElectronics.Server.Core;
+using BlazorElectronics.Server.Core.Interfaces;
+using BlazorElectronics.Server.Core.Services;
+using BlazorElectronics.Server.Data;
+using BlazorElectronics.Server.Data.Repositories;
 using BlazorElectronics.Server.Services.Cart;
-using BlazorElectronics.Server.Services.Categories;
-using BlazorElectronics.Server.Services.Features;
-using BlazorElectronics.Server.Services.Products;
-using BlazorElectronics.Server.Services.Sessions;
-using BlazorElectronics.Server.Services.Specs;
-using BlazorElectronics.Server.Services.Users;
-using BlazorElectronics.Server.Services.Vendors;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

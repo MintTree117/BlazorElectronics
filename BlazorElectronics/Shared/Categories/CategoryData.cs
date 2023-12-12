@@ -58,27 +58,45 @@ public sealed class CategoryData
                 parent.Children.Add( m );
         }
 
+        // Create a new dictionary to hold the full URLs.
+        var fullUrls = new Dictionary<int, string>();
+
         foreach ( CategoryModel m in models )
         {
-            m.ApiUrl = BuildApiUrl( m, m.ApiUrl, CategoriesById );
+            // Use the refactored method to build the full URL and store it in the new dictionary.
+            fullUrls[ m.CategoryId ] = BuildApiUrl( m, CategoriesById );
         }
 
         foreach ( CategoryModel m in models )
         {
+            // Update the model's ApiUrl with the full URL from the dictionary.
+            m.ApiUrl = fullUrls[ m.CategoryId ];
+
+            // Continue with adding to Urls dictionary.
             Urls.TryAdd( m.ApiUrl, m.CategoryId );
         }
     }
-    static string BuildApiUrl( CategoryModel m, string url, Dictionary<int, CategoryModel> responses )
+    static string BuildApiUrl( CategoryModel m, Dictionary<int, CategoryModel> responses )
     {
-        while ( true )
+        // Base case: If no parent, return the category's own URL.
+        if ( m.ParentCategoryId == null )
         {
-            if ( m.ParentCategoryId is null || !responses.TryGetValue( m.ParentCategoryId.Value, out CategoryModel? parent ) ) 
-                return url;
-
-            url = $"{parent.ApiUrl}/{url}";
-            m = parent;
+            return m.ApiUrl;
         }
+
+        // If the category has a parent, recursively get the parent's URL.
+        if ( responses.TryGetValue( m.ParentCategoryId.Value, out CategoryModel parent ) )
+        {
+            string parentUrl = BuildApiUrl( parent, responses );
+
+            // Construct the full URL by combining parent URL with the current URL.
+            return $"{parentUrl}/{m.ApiUrl}";
+        }
+
+        // If no parent is found in the responses, return the current URL.
+        return m.ApiUrl;
     }
+    
     public bool ValidateUrl( string url, out int categoryId )
     {
         categoryId = -1;

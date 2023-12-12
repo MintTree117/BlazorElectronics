@@ -8,4 +8,6 @@ public sealed class ProductResponse
     public decimal Price { get; set; }
     public decimal? SalePrice { get; set; }
     public float Rating { get; set; }
+    public int NumberSold { get; set; }
+    public int NumberReviews { get; set; }
 }

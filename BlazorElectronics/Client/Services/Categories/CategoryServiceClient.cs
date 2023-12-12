@@ -24,11 +24,6 @@ public class CategoryServiceClient : ClientService, ICategoryServiceClient
 
         _categories = new CategoryData( reply.Data );
 
-        foreach ( string s in _categories.Urls.Keys )
-        {
-           // Logger.LogError( s );
-        }
-
         return _categories is not null
             ? new ServiceReply<CategoryData?>( _categories )
             : new ServiceReply<CategoryData?>( reply.ErrorType, reply.Message );

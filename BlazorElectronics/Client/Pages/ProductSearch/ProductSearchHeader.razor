@@ -15,7 +15,7 @@
                         else
                         {
                             <li class="breadcrumb-item">
-                                <a class="link-dark" href="" @onclick="() => Page.NavigateBack( kvp.Value )">@kvp.Key</a>
+                                <a class="link-dark" href="" @onclick="() => NavManager.NavigateTo( kvp.Value )">@kvp.Key</a>
                             </li>
                         }
                     }

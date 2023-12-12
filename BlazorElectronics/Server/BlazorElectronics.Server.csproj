@@ -21,5 +21,17 @@
         <ProjectReference Include="..\Shared\BlazorElectronics.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Api\Pages\Error.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Api\Dtos\" />
+    </ItemGroup>
+
 
 </Project>
