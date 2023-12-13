@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Shared.Products;
+namespace BlazorElectronics.Shared.Products.Search;
 
 public sealed class ProductResponse
 {

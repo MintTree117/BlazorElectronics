@@ -1,0 +1,41 @@
+<nav aria-label="Search Result Pagination">
+    <ul class="pagination">
+        <li class="page-item @GetDisabledClass(1)">
+            <a class="page-link" href="javascript:void(0)" @onclick="() => ChangePage( CurrentPage - 1 )">Previous</a>
+        </li>
+        
+        @for ( var i = StartPage; i <= EndPage; i++ )
+        {
+            int index = i;
+            <li class="page-item @(CurrentPage == i ? "active" : "")">
+                <a class="page-link" href="javascript:void(0)" @onclick="() => ChangePage( index )">@i</a>
+            </li>
+        }
+        
+        <li class="page-item @GetDisabledClass( TotalPages )">
+            <a class="page-link" href="javascript:void(0)" @onclick="() => ChangePage( CurrentPage + 1 )">Next</a>
+        </li>
+    </ul>
+</nav>
+
+@code 
+{
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
+    int StartPage => Math.Max( 1, CurrentPage - 1 );
+    int EndPage => Math.Min( TotalPages, CurrentPage + 1 );
+
+    void ChangePage( int page )
+    {
+        if ( page < 1 || page > TotalPages )
+        {
+            return;
+        }
+
+        CurrentPage = page;
+        OnPageChanged.InvokeAsync( page );
+    }
+    string GetDisabledClass( int page ) => page == 1 || page == TotalPages ? "disabled" : "";
+}

@@ -47,6 +47,11 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             throw new ServiceException( e.Message, e );
         }
     }
+    public async Task<string?> GetProductSearchQuery( ProductSearchRequest searchRequest )
+    {
+        SearchQueryObject query = await BuildProductSearchQuery( searchRequest );
+        return query.SearchQuery;
+    }
     public async Task<IEnumerable<ProductSearchModel>?> GetProductSearch( ProductSearchRequest searchRequest )
     {
         SearchQueryObject searchQueryObject = await BuildProductSearchQuery( searchRequest );
@@ -66,8 +71,19 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
 
         await Task.Run( () =>
         {
+            const string pSelection = $"{TABLE_PRODUCTS}.{COL_PRODUCT_ID}," +
+                                      $"{TABLE_PRODUCTS}.{COL_VENDOR_ID}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_TITLE}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_THUMBNAIL}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_RELEASE_DATE}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_PRICE}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_IS_FEATURED}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_NUMBER_SOLD}," +
+                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_NUMBER_REVIEWS}";
+            
             builder.Append( $"WITH Results AS (" );
-            builder.Append( $"SELECT *, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
+            builder.Append( $" SELECT DISTINCT {TABLE_PRODUCTS}.*, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
             AppendCategoryJoin( builder, request.CategoryId );
             AppendSpecLookupJoin( builder, filters?.SpecsInclude is not null || filters?.SpecsExlude is not null );
@@ -94,7 +110,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $" OFFSET {PARAM_QUERY_OFFSET} ROWS" );
             builder.Append( $" FETCH NEXT {PARAM_QUERY_ROWS} ROWS ONLY;" );
 
-            dynamicParams.Add( PARAM_QUERY_OFFSET, Math.Max( 0, request.Page - 1 ) );
+            dynamicParams.Add( PARAM_QUERY_OFFSET, Math.Max( 0, request.Page - 1 ) * request.Rows );
             dynamicParams.Add( PARAM_QUERY_ROWS, request.Rows );
         } );
         
@@ -129,8 +145,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         if ( categoryId is null )
             return;
         
-        builder.Append( $" AND {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_ID} = {PARAM_CATEGORY_ID} )" );
-        
+        builder.Append( $" AND {TABLE_PRODUCT_CATEGORIES}.{COL_CATEGORY_ID} = {PARAM_CATEGORY_ID}" );
         dynamicParams.Add( PARAM_CATEGORY_ID, categoryId.Value );
     }
     static void AppendSearchTextCondition( StringBuilder builder, DynamicParameters dynamicParams, string? searchText )
@@ -237,7 +252,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
                 builder.Append( $" ORDER BY {COL_PRODUCT_RATING} DESC" );
                 break;
             case ProductSortType.BestSelling:
-                builder.Append( $" ORDER BY {COL_PRODUCT_NUMBER_SOLD} DESCR" );
+                builder.Append( $" ORDER BY {COL_PRODUCT_NUMBER_SOLD} DESC" );
                 break;
             case ProductSortType.MostReviews:
                 builder.Append( $" ORDER BY {COL_PRODUCT_NUMBER_REVIEWS} DESC" );

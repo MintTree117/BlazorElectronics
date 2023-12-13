@@ -1,4 +1,5 @@
 using BlazorElectronics.Shared.DtosOutbound.Products;
+using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Shared.Products;
 

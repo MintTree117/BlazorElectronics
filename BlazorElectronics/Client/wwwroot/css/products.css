@@ -1,115 +1,16 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.product-search-result img {
+    width: 300px;
+    height: 300px;
+    max-width: 300px;
+    max-height: 300px;
+}
+
+.fa-star-checked {
+    color: yellow;
 }
 
 .price {
     color: green;
-}
-
-/* PRODUCT LIST */
-
-.pl-item {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: row;
-}
-
-.pl-item-img-wrapper {
-    max-width: 200px;
-    max-height: 200px;
-    text-align: center;
-    margin: 0 10px 10px 10px;
-}
-
-.pl-item-img {
-    width: 100%;
-    height: auto;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    transition: transform .2s;
-}
-
-.pl-item-img:hover {
-    transform: scale(1.1);
-}
-
-.pl-item-body {
-    display: flex;
-    flex-direction: column;
-}
-
-.pl-item {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: row;
-}
-
-/* PRODUCT DETAILS */
-
-.pd-page {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.pd-top {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: row;
-}
-
-.pd-images-wrapper {
-    min-width: 300px;
-    min-height: 300px;
-    text-align: center;
-}
-
-.pd-img-selected-wrapper {
-    text-align: center;
-}
-
-.pd-img-selected {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.pd-img-selection {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    background-color: gray;
-}
-
-.pd-img-mini {
-    width: 100%;
-    height: 100%;
-    max-width: 100px;
-    max-height: 100px;
-}
-
-.pd-summary {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    background-color: blue;
-}
-
-.pd-pricing {
-    display: flex;
-    flex-direction: column;
-}
-
-.pd-content {
-    display: flex;
-    flex-direction: column;
-    background-color: red;
 }
 
 .btn-toggle-collapse {
@@ -122,39 +23,6 @@
     font-size: 1.25em; /* Adjust the font size as needed */
     font-weight: bold; /* Optional, for emphasis */
 }
-
-@media (max-width: 1023.98px) {
-    .media {
-        flex-direction: column;
-    }
-    .media-img-wrapper {
-        width: 100%;
-        height: auto;
-        text-align: center;
-    }
-    .media-body {
-        text-align: center;
-    }
-    
-    .product-details .media-img-wrapper {
-        width: 100%;
-        height: auto;
-    }
-    
-    .product-details .media-img {
-        max-width: 300px;
-    }
-
-    #filterColumn.collapsing,
-    #filterColumn.show {
-        position: fixed;
-        z-index: 1050; /* Higher than the navbar */
-        width: 100%;
-        top: 0;
-        left: 0;
-    }
-}
-
 .breadcrumb-btn {
     padding: 0; /* Adjust to match the li padding */
     font-size: inherit; /* Inherits the font size from the breadcrumb */

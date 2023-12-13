@@ -54,12 +54,15 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
                 foreach ( ProductReview r in m.Reviews )
                 {
-                    r.ProductId = productId;
-                    int reviewResult = await _reviewRepository.Insert( r );
+                    //r.ProductId = productId;
+                    //int reviewResult = await _reviewRepository.Insert( r );
                     
-                    if ( reviewResult <= 0 )
-                        return new ServiceReply<bool>( false );
+                    //if ( reviewResult <= 0 )
+                        //return new ServiceReply<bool>( false );
                 }
+                
+                //await _productRepository.UpdateReviewCount();
+                //await _productRepository.UpdateRatings();
             }
             catch ( RepositoryException e )
             {
@@ -78,7 +81,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         {
             VendorId = PickRandomVendor( primaryCategory, vendors ),
             Title = ProductSeedData.PRODUCT_TITLES[ primaryCategory - 1 ] + " " + i,
-            ThumbnailUrl = ProductSeedData.PRODUCT_THUMBNAILS[ primaryCategory - 1 ],
+            ThumbnailUrl = $"/Images/{ProductSeedData.PRODUCT_THUMBNAILS[ primaryCategory - 1 ]}",
             Images = ProductSeedData.PRODUCT_IMAGES[ primaryCategory - 1 ].ToList(),
             Price = GetRandomDecimal( ProductSeedData.MIN_PRICE, ProductSeedData.MAX_PRICE ),
             ReleaseDate = GetRandomDate( ProductSeedData.MIN_RELEASE_DATE, ProductSeedData.MAX_RELEASE_DATE ),
@@ -245,15 +248,18 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         while ( picked.Count < amount )
         {
             int i = GetRandomInt( 0, maxIndex );
+            int index = category.Children[ i ].CategoryId;
 
-            if ( picked.Contains( i ) )
+            if ( picked.Contains( index ) )
             {
                 count++;
                 if ( count > SAFETY )
                     break;
+                
+                continue;
             }
 
-            picked.Add( category.Children[ i ].CategoryId );
+            picked.Add( index );
         }
         
         return picked.ToList();
@@ -361,17 +367,12 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     int GetRandomInt( int min, int max )
     {
-        // Check if the arguments are valid
         if ( min >= max )
-        {
-            throw new ArgumentOutOfRangeException( nameof( min ), "minValue must be less than maxValue" );
-        }
+            throw new ArgumentOutOfRangeException( nameof( min ), "min must be less than max" );
 
-        // Generate a random double, cast it to float, and adjust the range
-        int range = max - min;
-        int randomInt = ( int ) _random.NextDouble(); // This will be between 0.0 and 1.0
-        return ( randomInt * range ) + min;
+        return _random.Next( min, max );
     }
+
     float GetRandomFloat( float minValue, float maxValue )
     {
         // Check if the arguments are valid

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "QofH6j6HB0i1Y9uuobjkqWgeOgvh4NVH+a86WpsBAp0=",
+  "Hash": "9sWnr0qnNfq+GXdG0By0UKKz5kxK+OVsGDPt2BjL450=",
   "Source": "BlazorElectronics.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -8109,12 +8109,12 @@
       "OriginalItemSpec": "wwwroot/Images/blazor.jpg"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/CpuAmdDefault.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/BooksThumbnail.jpg",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/CpuAmdDefault.jpg",
+      "RelativePath": "Images/BooksThumbnail.jpg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8123,15 +8123,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/CpuAmdDefault.jpg"
+      "OriginalItemSpec": "wwwroot/Images/BooksThumbnail.jpg"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/CpuIntelDefault.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/CoursesThumbnail.jpg",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/CpuIntelDefault.jpg",
+      "RelativePath": "Images/CoursesThumbnail.jpg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8140,15 +8140,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/CpuIntelDefault.jpg"
+      "OriginalItemSpec": "wwwroot/Images/CoursesThumbnail.jpg"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/default.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/FeaturedEbook.png",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/default.jpg",
+      "RelativePath": "Images/FeaturedEbook.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8157,15 +8157,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/default.jpg"
+      "OriginalItemSpec": "wwwroot/Images/FeaturedEbook.png"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/DefaultThumbnail.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/FeaturedGame.png",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/DefaultThumbnail.jpg",
+      "RelativePath": "Images/FeaturedGame.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8174,15 +8174,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/DefaultThumbnail.jpg"
+      "OriginalItemSpec": "wwwroot/Images/FeaturedGame.png"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/featuredproduct1.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/FeaturedMovie.png",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/featuredproduct1.jpg",
+      "RelativePath": "Images/FeaturedMovie.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8191,15 +8191,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/featuredproduct1.jpg"
+      "OriginalItemSpec": "wwwroot/Images/FeaturedMovie.png"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/featuredproduct2.jpg",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/MoviesTvThumbnail.jpg",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/featuredproduct2.jpg",
+      "RelativePath": "Images/MoviesTvThumbnail.jpg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8208,15 +8208,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/featuredproduct2.jpg"
+      "OriginalItemSpec": "wwwroot/Images/MoviesTvThumbnail.jpg"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/featuredproduct3.png",
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/SoftwareThumbnail.jpg",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
       "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
       "BasePath": "/",
-      "RelativePath": "Images/featuredproduct3.png",
+      "RelativePath": "Images/SoftwareThumbnail.jpg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -8225,7 +8225,24 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/featuredproduct3.png"
+      "OriginalItemSpec": "wwwroot/Images/SoftwareThumbnail.jpg"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/VideoGamesThumbnail.jpg",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "Images/VideoGamesThumbnail.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/Images/VideoGamesThumbnail.jpg"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/index.html",

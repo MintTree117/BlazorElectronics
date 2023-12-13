@@ -5,6 +5,7 @@ using BlazorElectronics.Client.Services.Categories;
 using Blazored.LocalStorage;
 using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Client.Services.Features;
+using BlazorElectronics.Client.Services.Products;
 using BlazorElectronics.Client.Services.Specs;
 using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Client.Services.Users.Cart;
@@ -25,6 +26,7 @@ builder.Services.AddScoped( sp => new HttpClient { BaseAddress = new Uri( builde
 builder.Services.AddScoped<ICartServiceClient, CartServiceClient>();
 builder.Services.AddScoped<ICategoryServiceClient, CategoryServiceClient>();
 builder.Services.AddScoped<IFeaturesServiceClient, FeaturesServiceClient>();
+builder.Services.AddScoped<IProductServiceClient, ProductServiceClient>();
 builder.Services.AddScoped<ISpecServiceClient, SpecServiceClient>();
 builder.Services.AddScoped<IVendorServiceClient, VendorServiceClient>();
 

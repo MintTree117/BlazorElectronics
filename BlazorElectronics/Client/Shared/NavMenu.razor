@@ -7,9 +7,9 @@
     
     <NavSidebar NavMenu="@this"></NavSidebar>
     
-    <div class="container-fluid py-3 bg-dark text-white border-bottom shadow-bottom">
-        <div class="d-flex flex-nowrap align-items-center justify-content-between top-nav">
-            <button class="btn btn-secondary" onclick="@OpenSidebar">
+    <div class="container-fluid py-3 top-nav text-white border-bottom border-light">
+        <div class="d-flex flex-nowrap align-items-center justify-content-between top-nav-inner">
+            <button class="btn btn-outline-light" onclick="@OpenSidebar">
                 <i class="oi oi-menu"></i>
             </button>
             <button class="btn logo-button px-1 py-0" onclick="@GoToHome">
@@ -20,7 +20,7 @@
             <CartCounter></CartCounter>
         </div>
     </div>
-    <div class="container-fluid bg-dark text-white border-bottom shadow-bottom">
+    <div class="container-fluid py-1 text-white shadow-bottom top-nav-secondary">
         @if ( _categories is not null )
         {
             <div class="d-flex flex-nowrap align-items-center justify-content-evenly">

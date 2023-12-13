@@ -12,6 +12,9 @@ public class ProductRepository : DapperRepository, IProductRepository
     const string PROCEDURE_UPDATE = "Update_Product";
     const string PROCEDURE_DELETE = "Delete_Product";
 
+    const string PROCEDURE_UPDATE_PRODUCT_RATING = "Update_ProductRatings";
+    const string PROCEDURE_UPDATE_PRODUCT_REVIEW_COUNT = "Update_ProductReviewCount";
+
     public ProductRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
     
@@ -36,6 +39,14 @@ public class ProductRepository : DapperRepository, IProductRepository
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, productId );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
+    }
+    public async Task<bool> UpdateRatings()
+    {
+        return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_PRODUCT_RATING );
+    }
+    public async Task<bool> UpdateReviewCount()
+    {
+        return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_PRODUCT_REVIEW_COUNT );
     }
 
     static DataTable GetCategoriesTable( List<int> categories )

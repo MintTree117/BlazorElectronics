@@ -1,8 +1,13 @@
 .top-nav {
+    background-color: #444952;
+}
+
+.top-nav-inner {
     gap: 10px;
-    height: 3.5rem;
-    padding-top: 10px;
-    padding-bottom: 10px;
+}
+
+.top-nav-secondary {
+    background-color: #31343b;
 }
 
 .top-nav .btn {

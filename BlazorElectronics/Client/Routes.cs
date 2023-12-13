@@ -3,6 +3,7 @@ namespace BlazorElectronics.Client;
 public static class Routes
 {
     public const string HOME = "/";
+    public const string PRODUCT = "/product";
     public const string SEARCH = "/search";
     public const string FEATURES = $"{SEARCH}?featured=true";
     public const string SALES = $"{SEARCH}?sales=true";

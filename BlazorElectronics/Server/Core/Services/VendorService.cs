@@ -33,7 +33,7 @@ public sealed class VendorService : ApiService, IVendorService
             VendorsResponse? response = MapResponse( model );
             _cachedVendors = response is not null ? new CachedObject<VendorsResponse>( response ) : null;
             
-            return response is not null 
+            return response is not null
                 ? new ServiceReply<VendorsResponse?>( response ) 
                 : new ServiceReply<VendorsResponse?>( ServiceErrorType.NotFound );
         }

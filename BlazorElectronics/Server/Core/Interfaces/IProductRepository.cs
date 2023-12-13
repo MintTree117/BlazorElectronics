@@ -8,4 +8,7 @@ public interface IProductRepository
     Task<int> Insert( ProductModel model );
     Task<bool> Update( ProductModel model );
     Task<bool> Delete( int productId );
+
+    Task<bool> UpdateRatings();
+    Task<bool> UpdateReviewCount();
 }

@@ -16,6 +16,8 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server
 build_property._RazorSourceGeneratorDebug = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/Pages/Error.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/Api/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = QXBpL1BhZ2VzL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
 build_metadata.AdditionalFiles.CssScope = 

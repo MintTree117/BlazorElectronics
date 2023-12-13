@@ -1,1 +1,34 @@
+@using BlazorElectronics.Shared.Products.Search
+@using BlazorElectronics.Client.Shared
 @inherits RazorView
+
+@if ( _search is null )
+{
+    <span>Loading Products...</span>
+}
+else if ( _search.Products.Count <= 0 )
+{
+    <span>No Matches Found.</span>
+}
+else
+{
+    <h4>Results</h4>
+    
+    foreach ( ProductResponse p in _search.Products )
+    {
+        int roundedRating = ( int ) Math.Round( p.Rating );
+        <div class="product-search-result">
+            <a href="@Routes.PRODUCT/@p.Id">
+                <img src="@p.Thumbnail" alt="@p.Title"/>
+            </a>
+            <a href="@Routes.PRODUCT/@p.Id">
+                <h4>@p.Title</h4>
+            </a>
+            <span>@p.Price</span>
+            <span>@p.SalePrice</span>
+            <span>@p.NumberSold</span>
+            <StarRating Rating="@p.Rating"></StarRating>
+            <span>@p.NumberReviews</span>
+        </div>
+    }
+}

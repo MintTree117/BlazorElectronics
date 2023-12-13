@@ -29,9 +29,9 @@ public abstract class DapperRepository
     protected const string TVP_CATEGORY_IDS = "TVP_CategoryIds";
     protected const string TVP_CATEGORIES = "TVP_Categories";
     protected const string PARAM_CATEGORY_IDS = $"@{TVP_CATEGORY_IDS}";
-    protected const string PARAM_CATEGORIES = $@"{TVP_CATEGORIES}";
-    protected const string PARAM_CATEGORY_ID = $@"{COL_CATEGORY_ID}";
-    protected const string PARAM_CATEGORY_PARENT_ID = $@"{COL_CATEGORY_PARENT_ID}";
+    protected const string PARAM_CATEGORIES = $"@{TVP_CATEGORIES}";
+    protected const string PARAM_CATEGORY_ID = $"@{COL_CATEGORY_ID}";
+    protected const string PARAM_CATEGORY_PARENT_ID = $"@{COL_CATEGORY_PARENT_ID}";
     protected const string PARAM_CATEGORY_TIER = $"@{COL_CATEGORY_TIER}";
     protected const string PARAM_CATEGORY_NAME = $"@{COL_CATEGORY_NAME}";
     protected const string PARAM_CATEGORY_API_URL = $"@{COL_CATEGORY_URL}";

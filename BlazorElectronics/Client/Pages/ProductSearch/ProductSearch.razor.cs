@@ -201,7 +201,7 @@ public partial class ProductSearch : PageView
 
         await SearchProducts();
     }
-    public async Task ApplyPagination( int page )
+    async Task ApplyPagination( int page )
     {
         _currentPage = page;
 
@@ -217,6 +217,8 @@ public partial class ProductSearch : PageView
             Rows = _currentRows,
             Page = _currentPage
         };
+        
+        Logger.LogError( request.CategoryId.ToString() );
         
         ServiceReply<ProductSearchResponse?> reply = await ProductService.GetProductSearch( request );
 

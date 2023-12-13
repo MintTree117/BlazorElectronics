@@ -3,7 +3,7 @@ namespace BlazorElectronics.Server.Core.Services;
 public static class ProductSeedData
 {
     public static readonly string[] PRODUCT_TITLES = { "Book", "Software", "Video Game", "Movie/Tv", "Course" };
-    public static readonly string[] PRODUCT_THUMBNAILS = { "BookThumb.jpg", "SoftwareThumb.jpg", "GameThumb.jpg", "VideoThumb.jpg", "CourseThumb.jpg" };
+    public static readonly string[] PRODUCT_THUMBNAILS = { "BooksThumbnail.jpg", "SoftwareThumbnail.jpg", "VideoGamesThumbnail.jpg", "MoviesTvThumbnail.jpg", "CoursesThumbnail.jpg" };
     public static readonly string[][] PRODUCT_IMAGES =
     {
         new[] { "Book1.jpg", "Book2.jpg", "Book3.jpg" },
