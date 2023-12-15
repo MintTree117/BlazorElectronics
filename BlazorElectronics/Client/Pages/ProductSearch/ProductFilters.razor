@@ -1,85 +1,132 @@
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Shared.Categories
 @using BlazorElectronics.Shared.Specs
+@using BlazorElectronics.Client.Shared
+@using BlazorElectronics.Shared.Vendors
 @inherits RazorView
 
-<div class="filter-container">
-    <div class="mb-3 d-grid">
-        <button class="btn btn-primary" type="button" @onclick="ApplyFilters">Apply Filters</button>
+<div class="product-filters">
+    
+    <h4 class="text-decoration-underline">Filters</h4>
+    
+    <div class="product-filters-section d-grid">
+        <button class="btn btn-primary" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
     </div>
 
-    <div class="mb-3">
-        <input type="checkbox" class="form-check-input" id="inStockCheckbox" @bind="@InStock">
-        <label for="inStockCheckbox" class="form-check-label">In Stock</label>
-    </div>
-
-    <div class="mb-3">
-        <input type="checkbox" class="form-check-input" id="mustHaveSaleCheckbox" @bind="@OnSale">
-        <label for="mustHaveSaleCheckbox" class="form-check-label">On Sale</label>
-    </div>
-
-    <div class="mb-3">
-    <label class="form-label">Price Range</label>
-        <div class="d-flex justify-content-between">
-            <div class="me-1">
-                <small class="text-muted">Min</small>
-                <input type="number" class="form-control" id="minPrice" aria-label="Minimum price" @bind="@MinPrice">
+    @if ( _subCategories is not null )
+    {
+        <div class="product-filters-section d-grid">
+            <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_CATEGORY )">
+                <span>Sub-Categories</span>
+                <i class="oi @GetCollapseIcon( SECTION_CATEGORY )"></i>
+            </button>
+            <div class="@GetCollapseDisplay( SECTION_CATEGORY )">
+                <ul class="list-unstyled d-flex flex-column">
+                    @foreach ( CategoryModel c in _subCategories )
+                    {
+                        <a class="link-dark text-decoration-none" href="@Routes.SEARCH/@c.ApiUrl/@_searchText">@c.Name</a>
+                    }
+                </ul>
             </div>
-            <div class="ms-1">
-                <small class="text-muted">Max</small>
-                <input type="number" class="form-control" id="maxPrice" aria-label="Maximum price" @bind="@MaxPrice">
+        </div>
+    }
+
+    <div class="product-filters-section d-grid">
+        <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_TRENDS )">
+            <span>Trends/Availability</span>
+            <i class="oi @GetCollapseIcon( SECTION_TRENDS )"></i>
+        </button>
+        <div class="@GetCollapseDisplay( SECTION_TRENDS )">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="InStock" @bind="@InStock">
+                <label for="InStock" class="form-check-label">In Stock</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="Featured" @bind="@InStock">
+                <label for="Featured" class="form-check-label">Featured</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="Sale" @bind="@InStock">
+                <label for="Sale" class="form-check-label">On Sale</label>
             </div>
         </div>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Minimum Rating:</label>
-        <div class="d-flex flex-column">
-            @for ( int i = 5; i >= 1; i-- )
-            {
-                int localIndex = i;
-                <button type="button" class="btn mb-2 ps-0 d-flex justify-content-start align-items-center" @onclick="() => SetMinimumRating( localIndex )">
-                    @for ( int j = 1; j <= 5; j++ )
-                    {
-                        if ( j <= localIndex )
-                        {
-                            <span class="fa fa-star fa-star-checked"></span>
-                        }
-                        else
-                        {
-                            <span class="fa fa-star"></span>
-                        }
-                    }
-                    & up
-                </button>
-            }
+    <div class="product-filters-section d-grid">
+        <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_PRICE )">
+            <span>Pricing</span>
+            <i class="oi @GetCollapseIcon( SECTION_PRICE )"></i>
+        </button>
+        <div class="@GetCollapseDisplay( SECTION_PRICE )">
+            <div class="d-flex justify-content-between">
+                <div class="me-1">
+                    <small class="text-muted">Min</small>
+                    <input type="number" class="form-control" id="minPrice" aria-label="Minimum price" @bind="@MinPrice">
+                </div>
+                <div class="ms-1">
+                    <small class="text-muted">Max</small>
+                    <input type="number" class="form-control" id="maxPrice" aria-label="Maximum price" @bind="@MaxPrice">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-filters-section d-grid">
+        <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_RATING )">
+            <span>User Rating</span>
+            <i class="oi @GetCollapseIcon( SECTION_RATING )"></i>
+        </button>
+        <div class="@GetCollapseDisplay( SECTION_RATING )">
+            <div class="d-flex flex-column ">
+                @for ( int i = 5; i >= 1; i-- )
+                {
+                    int index = i;
+                    <button type="button" class="btn mb-2 ps-0 d-flex justify-content-start align-items-center" @onclick="() => SetMinimumRating( index )">
+                        <StarRating Rating="@index" ></StarRating>
+                        & up
+                    </button>
+                }
+            </div>
         </div>
     </div>
     
-    <div class="mb-3">
-        @foreach ( Spec s in _specs.Values )
-        {
-            <div class="mb-3 d-grid">
-                <!-- Toggle Button with Icon -->
-                <button class="btn ps-0 d-flex align-items-center justify-content-between" type="button"
-                        @onclick="() => ToggleCollapse( s.SpecId )">
-                    <span>@s.SpecName</span>
-                    <i class="oi @(_collapsedSpecs[ s.SpecId ] ? "oi-plus" : "oi-minus") "></i>
-                </button>
-
-                <!-- Collapsible Content -->
-                <div class="@( _collapsedSpecs[ s.SpecId ] ? "collapse" : "collapse show")" id="collapse-@s.SpecId">
-                    @for ( int i = 0; i < s.Values.Count; i++ )
-                    {
-                        string id = s.SpecName + i;
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input"
-                                   @bind="@_selectedSpecs[ ( s.SpecId, i ) ]" id="@id"/>
-                            <label class="form-check-label" for="@id">@s.Values[ i ]</label>
-                        </div>
-                    }
+    <div class="product-filters-section d-grid">
+        <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_VENDORS )">
+            <span>Vendors</span>
+            <i class="oi @GetCollapseIcon( SECTION_VENDORS )"></i>
+        </button>
+        <div class="@GetCollapseDisplay( SECTION_VENDORS )">
+            @foreach ( VendorModel v in _vendors )
+            {
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input"
+                           @bind="@_selectedVendors[ v.VendorId ]" id="@v.VendorId"/>
+                    <label class="form-check-label" for="@v.VendorId">@v.VendorName</label>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 
+    @foreach ( Spec s in _specs.Values )
+    {
+        <div class="product-filters-section d-grid">
+            <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( s.SpecName )">
+                <span>@s.SpecName</span>
+                <i class="oi @GetCollapseIcon( s.SpecName )"></i>
+            </button>
+            
+            <div class="@GetCollapseDisplay( s.SpecName )">
+                @for ( int i = 0; i < s.Values.Count; i++ )
+                {
+                    int index = i;
+                    string id = s.SpecName + index;
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               @bind="@_selectedSpecs[ ( s.SpecId, index ) ]" id="@id"/>
+                        <label class="form-check-label" for="@id">@s.Values[ index ]</label>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>

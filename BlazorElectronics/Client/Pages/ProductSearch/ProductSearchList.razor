@@ -12,23 +12,42 @@ else if ( _search.Products.Count <= 0 )
 }
 else
 {
-    <h4>Results</h4>
-    
-    foreach ( ProductResponse p in _search.Products )
-    {
-        int roundedRating = ( int ) Math.Round( p.Rating );
-        <div class="product-search-result">
-            <a href="@Routes.PRODUCT/@p.Id">
-                <img src="@p.Thumbnail" alt="@p.Title"/>
-            </a>
-            <a href="@Routes.PRODUCT/@p.Id">
-                <h4>@p.Title</h4>
-            </a>
-            <span>@p.Price</span>
-            <span>@p.SalePrice</span>
-            <span>@p.NumberSold</span>
-            <StarRating Rating="@p.Rating"></StarRating>
-            <span>@p.NumberReviews</span>
+    <div class="product-list-container">
+        <h4 class="text-decoration-underline">Results</h4>
+
+        <div class="product-list-inner">
+            @foreach ( ProductResponse p in _search.Products )
+            {
+                int roundedRating = ( int ) Math.Round( p.Rating );
+                <div class="product-list-item mb-3">
+                    <a href="@Routes.PRODUCT/@p.Id" class="mb-2 product-list-image">
+                        <img class="img-fluid" src="@p.Thumbnail" alt="@p.Title"/>
+                    </a>
+                    <div class="product-list-details bg-light">
+                        <a href="@Routes.PRODUCT/@p.Id" class="product-list-title">
+                            <h4 class="mb-1">@p.Title</h4>
+                        </a>
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <StarRating Rating="@p.Rating"></StarRating>
+                            <span>@p.NumberReviews reviews</span>
+                            <span>Sold: @p.NumberSold</span>
+                        </div>
+                        @if ( p.SalePrice is not null )
+                        {
+                            <div class="d-flex flex-column">
+                                <span class="text-decoration-line-through">@p.Price</span>
+                                <span class="price">@p.SalePrice</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="price">@p.Price</span>
+                        }
+                        <button class="btn btn-primary">Add To Cart</button>
+                    </div>
+                </div>
+            }
         </div>
-    }
+    </div>
+
 }

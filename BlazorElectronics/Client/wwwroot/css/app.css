@@ -12,7 +12,7 @@ html, body {
 
 main {
     min-height: 100vh;
-    background-image: linear-gradient(to bottom left, #b8cbdb, #566878 );
+    /*background-image: linear-gradient(to bottom left, #b8cbdb, #566878 );*/
 }
 
 
@@ -62,7 +62,7 @@ main {
 }
 
 .shadow-bottom {
-    box-shadow: 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.2);
 }
 
 h3 {
@@ -112,5 +112,17 @@ h4 {
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+.lg-content-wrapper {
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+@media only screen and (min-width: 1600px) {
+    .lg-content-wrapper {
+        padding-left: 250px;
+        padding-right: 250px;
     }
 }

@@ -20,4 +20,6 @@ public static class Routes
     public const string CRUD_SPECS = "";
     public const string CRUD_VENDORS = "";
     public const string SEED_DB = "";
+
+    public const string SEARCH_TEXT_PARAM = "searchText";
 }

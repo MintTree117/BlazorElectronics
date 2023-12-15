@@ -114,8 +114,8 @@ public abstract class DapperRepository
     // CART
     protected const string COL_CART_ITEM_QUANTITY = "Quantity";
     protected const string TVP_CART_ITEMS = "TVP_CartItems";
-    protected const string PARAM_CART_ITEMS = $@"{TVP_CART_ITEMS}";
-    protected const string PARAM_CART_QUANTITY = $@"{COL_CART_ITEM_QUANTITY}";
+    protected const string PARAM_CART_ITEMS = $"@{TVP_CART_ITEMS}";
+    protected const string PARAM_CART_QUANTITY = $"@{COL_CART_ITEM_QUANTITY}";
 
     // EXCEPTION CONSTS
     const int MAX_RETRIES = 3;

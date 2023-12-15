@@ -39,20 +39,20 @@ public class ProductService : ApiService, IProductService
             return new ServiceReply<string?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<ProductSuggestionsResponse?>> GetProductSuggestions( ProductSuggestionRequest request )
+    public async Task<ServiceReply<List<string>?>> GetProductSuggestions( string searchText )
     {
-        return new ServiceReply<ProductSuggestionsResponse?>( null );
-        /*Task<IEnumerable<string>?> repoFunction = _productSearchRepository.GetSearchSuggestions( request.SearchText!, request.CategoryIdMap!.CategoryType, request.CategoryIdMap.CategoryId );
-        ApiReply<IEnumerable<string>?> repoReply = await ExecuteIoCall( async () => await repoFunction );
-
-        if ( !repoReply.Success )
-            return new ApiReply<ProductSuggestionsResponse?>( repoReply.Message );
-
-        return new ApiReply<ProductSuggestionsResponse?> {
-            Data = await MapSearchSuggestionsToResponse( repoReply.Data! ),
-            Success = true,
-            Message = "Found matching results."
-        };*/
+        try
+        {
+            IEnumerable<string>? result = await _productSearchRepository.GetSearchSuggestions( searchText );
+            return result is not null
+                ? new ServiceReply<List<string>?>( result.ToList() )
+                : new ServiceReply<List<string>?>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e, e.Message );
+            return new ServiceReply<List<string>?>( ServiceErrorType.ServerError );
+        }
     }
     public async Task<ServiceReply<ProductSearchResponse?>> GetProductSearch( ProductSearchRequest request )
     {

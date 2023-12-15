@@ -205,6 +205,10 @@
       "PackagePath": "staticwebassets/Images/FeaturedMovie.png"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Logo.svg",
+      "PackagePath": "staticwebassets/Images/Logo.svg"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/MoviesTvThumbnail.jpg",
       "PackagePath": "staticwebassets/Images/MoviesTvThumbnail.jpg"
     },
@@ -215,10 +219,6 @@
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/VideoGamesThumbnail.jpg",
       "PackagePath": "staticwebassets/Images/VideoGamesThumbnail.jpg"
-    },
-    {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/blazor.jpg",
-      "PackagePath": "staticwebassets/Images/blazor.jpg"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/css/app.css",

@@ -9,6 +9,14 @@ namespace BlazorElectronics.Client.Pages.ProductSearch;
 public partial class ProductFilters : RazorView, IDisposable
 {
     [Parameter] public ProductSearch Page { get; set; } = default!;
+
+    const string SECTION_CATEGORY = "Categories";
+    const string SECTION_TRENDS = "Trends";
+    const string SECTION_PRICE = "Pricing";
+    const string SECTION_RATING = "Rating";
+    const string SECTION_VENDORS = "Vendors";
+
+    string _searchText = string.Empty;
     
     bool InStock { get; set; } = false;
     bool OnSale { get; set; } = false;
@@ -16,12 +24,12 @@ public partial class ProductFilters : RazorView, IDisposable
     int? MinPrice { get; set; } = null;
     int? MaxPrice { get; set; } = null;
     int? MinRating { get; set; } = null;
-
+    
     List<CategoryModel>? _subCategories = new();
-    Dictionary<int, Spec>? _specs = new();
-    List<VendorModel>? _vendors = new();
-
-    Dictionary<int, bool> _collapsedSpecs = new();
+    Dictionary<int, Spec> _specs = new();
+    List<VendorModel> _vendors = new();
+    
+    Dictionary<string, bool> _collapsedSections = new();
     Dictionary<(int specId, int specValueId), bool> _selectedSpecs = new();
     Dictionary<int, bool> _selectedVendors = new();
 
@@ -29,14 +37,28 @@ public partial class ProductFilters : RazorView, IDisposable
     {
         base.OnInitialized();
         Page.InitializeFilters += InitializeFilters;
+        _collapsedSections.Add( SECTION_CATEGORY, false );
+        _collapsedSections.Add( SECTION_TRENDS, false );
+        _collapsedSections.Add( SECTION_PRICE, false );
+        _collapsedSections.Add( SECTION_RATING, false );
+        _collapsedSections.Add( SECTION_VENDORS, true );
     }
-    
-    void ToggleCollapse( int specId )
+
+    void ToggleSectionCollapse( string sectionName )
     {
-        _collapsedSpecs[ specId ] = !_collapsedSpecs[ specId ];
+        _collapsedSections[ sectionName ] = !_collapsedSections[ sectionName ];
     }
-    void InitializeFilters( List<CategoryModel>? subCategories, Dictionary<int,Spec> specs, List<VendorModel> vendors )
+    string GetCollapseIcon( string sectionName )
     {
+        return _collapsedSections[ sectionName ] ? "oi-plus" : "oi-minus";
+    }
+    string GetCollapseDisplay( string sectionName )
+    {
+        return _collapsedSections[ sectionName ] ? "collapse" : "collapse-show";
+    }
+    void InitializeFilters( string? searchText, List<CategoryModel>? subCategories, Dictionary<int,Spec> specs, List<VendorModel> vendors )
+    {
+        _searchText = searchText ?? string.Empty;
         _subCategories = subCategories;
         _specs = specs;
         _vendors = vendors;
@@ -46,7 +68,7 @@ public partial class ProductFilters : RazorView, IDisposable
 
         foreach ( Spec s in _specs.Values )
         {
-            _collapsedSpecs.Add( s.SpecId, true );
+            _collapsedSections.Add( s.SpecName, true );
             
             for ( int i = 0; i < s.Values.Count; i++ )
             {
@@ -59,7 +81,7 @@ public partial class ProductFilters : RazorView, IDisposable
             _selectedVendors.Add( v.VendorId, false );
         }
     }
-    void ApplyFilters()
+    async Task ApplyFilters()
     {
         ProductSearchFilters filters = new()
         {
@@ -95,6 +117,8 @@ public partial class ProductFilters : RazorView, IDisposable
             
             filters.Vendors.Add( kvp.Key );
         }
+
+        await Page.ApplyFilters( filters );
     }
 
     void SetMinimumRating( int rating )

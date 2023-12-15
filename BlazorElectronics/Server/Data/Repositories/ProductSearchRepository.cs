@@ -1,4 +1,3 @@
-using System.Data;
 using System.Text;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
@@ -21,7 +20,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     const string PARAM_SPEC_VALUE_ID = "@filterSpec_";
 
     // STORED PROCEDURES
-    const string STORED_PROCEDURE_GET_SEARCH_SUGGESTIONS = "Get_ProductSearchSuggestions";
+    const string STORED_PROCEDURE_GET_SUGGESTIONS = "Get_ProductSuggestions";
 
     // CONSTRUCTOR
     public ProductSearchRepository( DapperContext dapperContext ) : base( dapperContext ) { }
@@ -29,23 +28,9 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     // PUBLIC API
     public async Task<IEnumerable<string>?> GetSearchSuggestions( string searchText )
     {
-        var dynamicParams = new DynamicParameters();
-        dynamicParams.Add( PARAM_SEARCH_TEXT, searchText );
-
-        try
-        {
-            await using SqlConnection connection = await _dbContext.GetOpenConnection();
-            return await connection.QueryAsync<string>(
-                STORED_PROCEDURE_GET_SEARCH_SUGGESTIONS, dynamicParams, commandType: CommandType.StoredProcedure );
-        }
-        catch ( SqlException e )
-        {
-            throw new ServiceException( e.Message, e );
-        }
-        catch ( Exception e )
-        {
-            throw new ServiceException( e.Message, e );
-        }
+        DynamicParameters p = new();
+        p.Add( PARAM_SEARCH_TEXT, searchText );
+        return await TryQueryAsync( Query<string>, p, STORED_PROCEDURE_GET_SUGGESTIONS );
     }
     public async Task<string?> GetProductSearchQuery( ProductSearchRequest searchRequest )
     {
@@ -99,14 +84,14 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
                 AppendHasSaleCondition( builder, filters.OnSale );
                 AppendRatingConditions( builder, dynamicParams, filters.MinRating );
                 AppendPriceConditions( builder, dynamicParams, filters.MinPrice, filters.MaxPrice );
-                AppendLookupConditions( builder, dynamicParams, filters.SpecsInclude, false );
-                AppendLookupConditions( builder, dynamicParams, filters.SpecsExlude, true );
+                AppendSpecConditions( builder, dynamicParams, filters.SpecsInclude, false );
+                AppendSpecConditions( builder, dynamicParams, filters.SpecsExlude, true );
             }
 
             builder.Append( " )" );
             builder.Append( $" SELECT *, TotalCount" );
             builder.Append( $" FROM Results" );
-            AppendSort( builder, dynamicParams, request.SortType );
+            AppendSort( builder, request.SortType );
             builder.Append( $" OFFSET {PARAM_QUERY_OFFSET} ROWS" );
             builder.Append( $" FETCH NEXT {PARAM_QUERY_ROWS} ROWS ONLY;" );
 
@@ -159,7 +144,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     }
     static void AppendVendorCondition( StringBuilder builder, DynamicParameters dynamicParams, List<int>? vendors )
     {
-        if ( vendors is null )
+        if ( vendors is null || vendors.Count <= 0 )
             return;
 
         var inParams = new List<string>();
@@ -170,8 +155,8 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             dynamicParams.Add( paramName, vendors[ i ] );
         }
         
-        string valuesClause = string.Join( ", ", inParams.Select( p => "@" + p ) );
-        string finalQuery = $"AND {TABLE_PRODUCTS}.{COL_VENDOR_ID} IN ({valuesClause})";
+        string valuesClause = string.Join( ", ", inParams );
+        string finalQuery = $" AND {TABLE_PRODUCTS}.{COL_VENDOR_ID} IN ({valuesClause})";
 
         builder.Append( finalQuery );
     }
@@ -205,16 +190,16 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             dynamicParams.Add( PARAM_MAX_PRICE, maxPrice.Value );
         }
     }
-    static void AppendLookupConditions( StringBuilder builder, DynamicParameters dynamicParams, Dictionary<int, List<int>>? lookups, bool exclude )
+    static void AppendSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, Dictionary<int, List<int>>? specs, bool exclude )
     {
-        if ( lookups is null )
+        if ( specs is null || specs.Count <=0 )
             return;
 
         string condition = exclude
             ? " NOT IN "
             : " IN ";
 
-        foreach ( (int specId, List<int>? valueIds) in lookups )
+        foreach ( (int specId, List<int>? valueIds) in specs )
         {
             // Create parameter names for IN clause
             var inParams = new List<string>();
@@ -225,17 +210,17 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
                 dynamicParams.Add( paramName, valueIds[ i ] );
             }
 
-            string valuesClause = string.Join( ", ", inParams.Select( p => "@" + p ) );
+            string valuesClause = string.Join( ", ", inParams );
 
             // Append the condition with IN clause
-            string finalQuery = $" AND ({TABLE_PRODUCT_SPECS}.{COL_SPEC_ID} = @{PARAM_SPEC_ID}{TABLE_PRODUCT_SPECS})";
+            string finalQuery = $" AND ({TABLE_PRODUCT_SPECS}.{COL_SPEC_ID} = {PARAM_SPEC_ID}{TABLE_PRODUCT_SPECS})";
             finalQuery += $" AND {TABLE_PRODUCT_SPECS}.{COL_SPEC_VALUE_ID} {condition} ({valuesClause})";
 
             builder.Append( finalQuery );
             dynamicParams.Add( $"{PARAM_SPEC_ID}{TABLE_PRODUCT_SPECS}", specId );
         }
     }
-    static void AppendSort( StringBuilder builder, DynamicParameters dynamicParams, ProductSortType sortType )
+    static void AppendSort( StringBuilder builder, ProductSortType sortType )
     {
         switch ( sortType )
         {

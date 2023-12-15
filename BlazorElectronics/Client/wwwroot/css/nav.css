@@ -1,20 +1,21 @@
-.top-nav {
-    background-color: #444952;
-}
-
 .top-nav-inner {
     gap: 10px;
 }
 
 .top-nav-secondary {
-    background-color: #31343b;
+    
 }
 
-.top-nav .btn {
+.big-searchbar {
+    flex-grow: 1;
+    max-width: 1000px;
+}
+
+.top-nav .btn, .top-nav a {
     height: 50px;
 }
 
-.logo-button img {
+.logo img {
     height: 100%;
     width: auto;
 }
@@ -23,8 +24,23 @@
     display: block;
 }
 
+.top-nav .btn:hover {
+    border: 1px solid black;
+}
+
 .top-nav .oi {
     width: 2rem;
+    font-size: 24px;
+}
+
+.cart-counter {
+    position: relative;
+}
+
+.cart-counter span {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .nav-sidebar {

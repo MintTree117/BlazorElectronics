@@ -2,7 +2,9 @@
 @using BlazorElectronics.Shared.DtosOutbound.Products
 @using BlazorElectronics.Shared.Products
 @using BlazorElectronics.Shared.Products.Search
-@inject NavigationManager NavigationManager;
+@using BlazorElectronics.Client.Services.Products
+@inherits RazorView
+@inject IProductServiceClient ProductService
 
 <div class="input-group">
     <input class="form-control" 
@@ -31,13 +33,10 @@
     ElementReference _searchInputElement;
     string _searchText = string.Empty;
     List<string> _suggestions = new();
-
+    
     void SearchProducts()
     {
-        //ProductService.ClearSearchRequest();
-        //ProductService.UpdateSearchText( _searchText );
-        //string? url = ProductService.GetProductSearchUrl();
-        //NavigationManager.NavigateTo( string.IsNullOrEmpty( url ) ? "/" : url );
+        NavManager.NavigateTo( $"{Routes.SEARCH}?searchText={_searchText}" );
     }
     async Task HandleSearch( KeyboardEventArgs args )
     {
@@ -46,14 +45,14 @@
         else if ( _searchText.Length < 1 )
             return;
 
-        ServiceReply<ProductSuggestionsResponse?>? suggestionResponse = null;// await ProductService.GetProductSearchSuggestions( _searchText );
+        ServiceReply<List<string>?> reply = await ProductService.GetProductSearchSuggestions( _searchText );
         
-        if ( suggestionResponse?.Data == null || !suggestionResponse.Success )
+        if ( reply.Data is null || !reply.Success )
         {
             _suggestions = new List<string>();
             return;
         }
 
-        _suggestions = suggestionResponse.Data.Suggestions;
+        _suggestions = reply.Data;
     }
 }

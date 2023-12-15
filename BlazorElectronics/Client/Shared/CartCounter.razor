@@ -6,8 +6,9 @@
 @inject ICartServiceClient CartService
 @inject NavigationManager NavManager;
 
-<button class="btn btn-outline-info cart-counter btn-icon" @onclick="GoToCart">
-    <i class="oi oi-cart"></i>@_cartCount
+<button class="btn cart-counter" @onclick="GoToCart">
+    <i class="oi oi-cart"></i>
+    <span>@_cartCount</span>
 </button>
 
 @code 

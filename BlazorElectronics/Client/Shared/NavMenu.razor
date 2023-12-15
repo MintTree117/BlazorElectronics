@@ -7,20 +7,33 @@
     
     <NavSidebar NavMenu="@this"></NavSidebar>
     
-    <div class="container-fluid py-3 top-nav text-white border-bottom border-light">
+    <div class="container-fluid border-bottom py-3 top-nav bg-light">
         <div class="d-flex flex-nowrap align-items-center justify-content-between top-nav-inner">
-            <button class="btn btn-outline-light" onclick="@OpenSidebar">
-                <i class="oi oi-menu"></i>
-            </button>
-            <button class="btn logo-button px-1 py-0" onclick="@GoToHome">
-                <img src="/Images/blazor.jpg" alt="Home">
-            </button>
+            <div class="d-flex align-items-center justify-content-between gap-3">
+                <button class="btn" onclick="@OpenSidebar">
+                    <i class="oi oi-menu"></i>
+                </button>
+                <a class="logo" href="@Routes.HOME">
+                    <img src="/Images/Logo.svg" alt="Blazor">
+                </a>
+            </div>
+            <div class="d-none d-lg-flex big-searchbar mx-lg-auto">
+                <ProductSearchBar></ProductSearchBar>
+            </div>
+            <div class="d-flex align-items-center justify-content-between gap-3">
+                <UserButton></UserButton>
+                <CartCounter></CartCounter>
+            </div>
+        </div>
+    
+        <!-- Second row exclusively for search bar on small screens -->
+        <div class="container-fluid d-lg-none mt-3">
             <ProductSearchBar></ProductSearchBar>
-            <UserButton></UserButton>
-            <CartCounter></CartCounter>
         </div>
     </div>
-    <div class="container-fluid py-1 text-white shadow-bottom top-nav-secondary">
+
+
+    <div class="d-none d-lg-block container-fluid py-1 bg-light border-bottom shadow-bottom top-nav-secondary">
         @if ( _categories is not null )
         {
             <div class="d-flex flex-nowrap align-items-center justify-content-evenly">
@@ -29,7 +42,7 @@
                     {
                         if ( _categories.CategoriesById.TryGetValue( id, out CategoryModel? c ) )
                         {
-                            <li class="nav-item mx-4"><a class="nav-link link-light" href="search/@c.ApiUrl">@c.Name</a></li>
+                            <li class="nav-item mx-4"><a class="nav-link link-dark" href="search/@c.ApiUrl">@c.Name</a></li>
                         }
                     }
                 </ul>

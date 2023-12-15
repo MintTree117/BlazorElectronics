@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "9sWnr0qnNfq+GXdG0By0UKKz5kxK+OVsGDPt2BjL450=",
+  "Hash": "55GvOkxZMQs/Gi5TfC7yBwyWaxKZ9pjZYdYRjVD0HuE=",
   "Source": "BlazorElectronics.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -8092,23 +8092,6 @@
       "OriginalItemSpec": "wwwroot/css/products.css"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/blazor.jpg",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Discovered",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "Images/blazor.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/Images/blazor.jpg"
-    },
-    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/BooksThumbnail.jpg",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Discovered",
@@ -8192,6 +8175,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/Images/FeaturedMovie.png"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Logo.svg",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "Images/Logo.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/Images/Logo.svg"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/MoviesTvThumbnail.jpg",

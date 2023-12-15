@@ -1,18 +1,73 @@
-.product-search-result img {
-    width: 300px;
-    height: 300px;
-    max-width: 300px;
-    max-height: 300px;
+/*--- PRODUCT LIST ---*/
+.product-list-container {
+    width: 100%;
+}
+.product-list-inner {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: start;
+}
+.product-list-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-width: 100%;
+    flex-grow: 1;
+    padding: 0;
+}
+.product-list-image {
+    width: 40%;
+    min-width: 40%;
+    max-width: 40%;
+}
+.product-list-item img {
+    width: 100%;
+    height: auto;
+}
+.product-list-details {
+    flex-grow: 1;
+    flex-shrink: 0;
+    padding-left: 30px;
+}
+.product-list-title, .product-list-title h4 {
+    margin-top: 0;
+    padding-top: 0;
+    font-size: 1.4em;
 }
 
-.fa-star-checked {
-    color: yellow;
+/*--- SEARCH FILTERS ---*/
+.product-filters {
+    padding-left: 10px;
+    padding-right: 10px;
+    position: absolute;
+    display: none;
+    width: 100%;
+    height: auto;
 }
-
-.price {
-    color: green;
+.product-filters-show {
+    display: block;
 }
-
+.product-filters-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid lightgray;
+}
+.product-filters-section .collapse-show {
+    margin-top: 10px;
+    padding-left: 8px;
+}
+.product-filters-button {
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.product-filters-button span {
+    font-weight: bolder;
+    font-size: larger;
+}
 .btn-toggle-collapse {
     background: none;
     color: inherit;
@@ -23,8 +78,58 @@
     font-size: 1.25em; /* Adjust the font size as needed */
     font-weight: bold; /* Optional, for emphasis */
 }
+
+/*--- SHARED ---*/
+.fa-star-checked {
+    color: #f5bc42;
+}
+
+.price {
+    font-weight: bold;
+    color: green;
+}
+
 .breadcrumb-btn {
     padding: 0; /* Adjust to match the li padding */
     font-size: inherit; /* Inherits the font size from the breadcrumb */
     line-height: inherit; /* Inherits the line height from the breadcrumb */
+}
+
+@media only screen and (min-width: 1200px) {
+    .product-filters {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 250px;
+        max-width: 25%;
+        padding: 0 25px 0 0;
+    }
+    .product-list-inner {
+        flex-direction: row;
+    }
+    .product-list-item {
+        flex-direction: column;
+        width: 32%;
+        max-width: 32%;
+        min-width: 32%;
+        margin-right: 2%;
+        padding: 0;
+    }
+    .product-list-item:nth-child(3) {
+        margin-right: 0;
+    }
+    .product-list-image {
+        max-width: 100%;
+        width: 100%;
+        min-width: 100%;
+    }
+    .product-list-details {
+        padding: 0;
+    }
+
+    .product-list-title, .product-list-title h4 {
+        margin-top: 0;
+        padding-top: 0;
+        font-size: 1em;
+    }
 }

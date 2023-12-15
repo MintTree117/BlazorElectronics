@@ -6,17 +6,10 @@
 @using BlazorElectronics.Client.Shared
 
 <ProductSearchHeader Page="@this"></ProductSearchHeader>
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-2 d-none d-md-block">
-            <div class="collapse d-md-block" id="filterColumn">
-                <ProductFilters Page="@this"></ProductFilters>
-            </div>
-        </div>
-        <div class="col-md-10">
-            <ProductSearchList Page="@this"></ProductSearchList>
-            <Pagination CurrentPage="@_currentPage" TotalPages="@_currentRows" OnPageChanged="ApplyPagination"></Pagination>
-        </div>
+<div class="container-fluid lg-content-wrapper">
+    <div class="d-flex w-100">
+        <ProductFilters Page="@this"></ProductFilters>
+        <ProductSearchList Page="@this"></ProductSearchList>
     </div>
+    <Pagination CurrentPage="@_currentPage" TotalPages="@_currentRows" OnPageChanged="ApplyPagination"></Pagination>
 </div>

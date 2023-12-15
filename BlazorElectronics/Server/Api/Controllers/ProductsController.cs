@@ -21,7 +21,11 @@ public class ProductsController : _Controller
     {
         ProductSearchRequest r = new()
         {
-            CategoryId = 1
+            CategoryId = 1,
+            Filters = new ProductSearchFilters
+            {
+                SpecsInclude = new Dictionary<int, List<int>>() { { 1, new List<int>(){ 1 } } }
+            }
         };
         ServiceReply<string?> reply = await _productService.GetProductSearchQueryString( r );
         return GetReturnFromReply( reply );
@@ -30,6 +34,12 @@ public class ProductsController : _Controller
     public async Task<ActionResult<ProductResponse?>> SearchProducts( [FromBody] ProductSearchRequest request )
     {
         ServiceReply<ProductSearchResponse?> reply = await _productService.GetProductSearch( request );
+        return GetReturnFromReply( reply );
+    }
+    [HttpPost( "suggestions" )]
+    public async Task<ActionResult<List<string>?>> SearchSuggestions( [FromBody] string searchText )
+    {
+        ServiceReply<List<string>?> reply = await _productService.GetProductSuggestions( searchText );
         return GetReturnFromReply( reply );
     }
 }

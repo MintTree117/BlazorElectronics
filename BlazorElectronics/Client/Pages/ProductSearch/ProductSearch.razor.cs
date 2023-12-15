@@ -9,13 +9,14 @@ using BlazorElectronics.Shared.Products.Search;
 using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace BlazorElectronics.Client.Pages.ProductSearch;
 
-public partial class ProductSearch : PageView
+public partial class ProductSearch : PageView, IDisposable
 {
     public event Action<Dictionary<string,string>>? InitializeHeader; 
-    public event Action<List<CategoryModel>?, Dictionary<int, Spec>, List<VendorModel>>? InitializeFilters;
+    public event Action<string?, List<CategoryModel>?, Dictionary<int, Spec>, List<VendorModel>>? InitializeFilters;
     public event Action<ProductSearchResponse>? OnProductSearch;
 
     [Inject] IProductServiceClient ProductService { get; set; } = default!;
@@ -29,6 +30,7 @@ public partial class ProductSearch : PageView
 
     CategoryModel? _primaryCategory;
     CategoryModel? _currentCategory;
+    string? _searchText;
 
     CategoryData? categories;
     SpecsResponse? specs;
@@ -38,13 +40,19 @@ public partial class ProductSearch : PageView
     int _currentRows = 10;
     int _currentPage = 1;
     ProductSearchResponse? _searchResults;
-    
+
+    public void Dispose()
+    {
+        NavManager.LocationChanged -= HandleLocationChanged;
+    }
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-
+        
         if ( !await GetMetaData() )
             return;
+
+        NavManager.LocationChanged += HandleLocationChanged;
 
         await LoadPage();
     }
@@ -86,7 +94,7 @@ public partial class ProductSearch : PageView
             return;
 
         InitializeHeader?.Invoke( GetBreadcrumbNavigation() );
-        InitializeFilters?.Invoke( _currentCategory?.Children, GetSpecFilters(), GetVendorFilters() );
+        InitializeFilters?.Invoke( _searchText, GetCategoryFilters(), GetSpecFilters(), GetVendorFilters() );
 
         await SearchProducts();
 
@@ -94,6 +102,10 @@ public partial class ProductSearch : PageView
     }
     bool ParseUrl( CategoryData cData )
     {
+        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
+        Dictionary<string, string> queryParams = ParseQuery( uri.Query );
+        queryParams.TryGetValue( Routes.SEARCH_TEXT_PARAM, out _searchText );
+
         if ( string.IsNullOrWhiteSpace( PrimaryCategory ) )
             return true;
 
@@ -143,6 +155,15 @@ public partial class ProductSearch : PageView
 
         return urls;
     }
+    List<CategoryModel> GetCategoryFilters()
+    {
+        if ( _currentCategory is null )
+            return categories?.GetPrimaryCategories() ?? new List<CategoryModel>();
+
+        return _currentCategory.Children.Count > 0
+            ? _currentCategory.Children
+            : new List<CategoryModel>();
+    }
     Dictionary<int, Spec> GetSpecFilters()
     {
         if ( specs is null )
@@ -183,6 +204,10 @@ public partial class ProductSearch : PageView
         return vendorsCategory;
     }
 
+    void HandleLocationChanged( object? obj, LocationChangedEventArgs args )
+    {
+        NavManager.NavigateTo( NavManager.Uri, true );
+    }
     public async Task ApplyFilters( ProductSearchFilters filters )
     {
         _searchFilters = filters;
@@ -211,14 +236,13 @@ public partial class ProductSearch : PageView
     {
         ProductSearchRequest request = new()
         {
+            SearchText = _searchText,
             CategoryId = _currentCategory?.CategoryId,
             SortType = _sortType,
             Filters = _searchFilters,
             Rows = _currentRows,
             Page = _currentPage
         };
-        
-        Logger.LogError( request.CategoryId.ToString() );
         
         ServiceReply<ProductSearchResponse?> reply = await ProductService.GetProductSearch( request );
 
