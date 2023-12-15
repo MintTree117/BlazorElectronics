@@ -98,19 +98,6 @@ public class ProductService : ApiService, IProductService
             return request;
         } );
     }
-    static async Task<ProductSuggestionsResponse> MapSearchSuggestionsToResponse( IEnumerable<string> suggestions )
-    {
-        var suggestionList = new List<string>();
-
-        await Task.Run( () =>
-        {
-            suggestionList = suggestions.ToList();
-        } );
-
-        return new ProductSuggestionsResponse {
-            Suggestions = suggestionList
-        };
-    }
     static async Task<ProductSearchResponse?> MapProductSearchToResponse( IEnumerable<ProductSearchModel>? models )
     {
         if ( models is null )
@@ -123,6 +110,13 @@ public class ProductService : ApiService, IProductService
             foreach ( ProductSearchModel p in models )
             {
                 dto.TotalMatches = p.TotalCount;
+                
+                List<int> categoryIds = new();
+                foreach ( var c in p.CategoryIds.Split( "," ).ToList() )
+                {
+                    if ( int.TryParse( c, out int value ) )
+                        categoryIds.Add( value );
+                }
 
                 dto.Products.Add( new ProductResponse
                 {
@@ -133,7 +127,9 @@ public class ProductService : ApiService, IProductService
                     Price = p.Price,
                     SalePrice = p.SalePrice,
                     NumberSold = p.NumberSold,
-                    NumberReviews = p.NumberReviews
+                    NumberReviews = p.NumberReviews,
+                    Categories = categoryIds,
+                    Description = p.Description
                 } );
             }
 

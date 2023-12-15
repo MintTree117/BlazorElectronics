@@ -5,12 +5,15 @@ using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products.Search;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Data.Repositories;
 
 public sealed class ProductSearchRepository : DapperRepository, IProductSearchRepository
 {
     // QUERY PARAM NAMES
+    const string CTE_PAGINATED = "PaginatedResults";
+    const string CTE_CATEGORIES = "ProductsWithCategories";
     const string PARAM_MIN_RATING = $"@Min{COL_PRODUCT_RATING}";
     const string PARAM_MIN_PRICE = "@MinPrice";
     const string PARAM_MAX_PRICE = "@MaxPrice";
@@ -67,7 +70,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
                                       $"{TABLE_PRODUCTS}.{COL_PRODUCT_NUMBER_SOLD}," +
                                       $"{TABLE_PRODUCTS}.{COL_PRODUCT_NUMBER_REVIEWS}";
             
-            builder.Append( $"WITH Results AS (" );
+            builder.Append( $"WITH {CTE_PAGINATED} AS (" );
             builder.Append( $" SELECT DISTINCT {TABLE_PRODUCTS}.*, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
             AppendCategoryJoin( builder, request.CategoryId );
@@ -88,9 +91,20 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
                 AppendSpecConditions( builder, dynamicParams, filters.SpecsExlude, true );
             }
 
+            builder.Append( " )," );
+
+            builder.Append( $"{CTE_CATEGORIES} AS (" );
+            builder.Append( $" SELECT P.{COL_PRODUCT_ID}, STRING_AGG( C.{COL_CATEGORY_ID}, ', ' )" );
+            builder.Append( $" AS CategoryIds FROM {CTE_PAGINATED} P" );
+            builder.Append( $" INNER JOIN {TABLE_PRODUCT_CATEGORIES} C ON P.{COL_PRODUCT_ID} = C.{COL_PRODUCT_ID} " );
+            builder.Append( $"GROUP BY P.{COL_PRODUCT_ID}" );
             builder.Append( " )" );
-            builder.Append( $" SELECT *, TotalCount" );
-            builder.Append( $" FROM Results" );
+            
+            builder.Append( $" SELECT P.*, PD.{COL_PRODUCT_DESCR}, PC.CategoryIds, TotalCount" );
+            builder.Append( $" FROM {CTE_PAGINATED} P" );
+            builder.Append( $" LEFT JOIN {TABLE_PRODUCT_DESCRIPTIONS} PD ON P.{COL_PRODUCT_ID} = PD.{COL_PRODUCT_ID}" );
+            builder.Append( $" LEFT JOIN {CTE_CATEGORIES} PC ON P.{COL_PRODUCT_ID} = PC.{COL_PRODUCT_ID}" );
+            
             AppendSort( builder, request.SortType );
             builder.Append( $" OFFSET {PARAM_QUERY_OFFSET} ROWS" );
             builder.Append( $" FETCH NEXT {PARAM_QUERY_ROWS} ROWS ONLY;" );

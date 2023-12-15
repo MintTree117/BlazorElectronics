@@ -220,22 +220,23 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     // IMAGES
     // CATEGORY
-    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> categories, CategoryData categoryData )
+    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> pickedCategories, CategoryData categoryData )
     {
         CategoryModel categoryModel = categoryData.CategoriesById[ currentCategory ];
-        
+
         if ( categoryModel.Children.Count <= 0 )
-            return categories;
+            return new List<int>(); // Return an empty list instead of the original one
 
         List<int> subcategories = PickRandomCategories( categoryModel ).ToList();
-        categories.AddRange( subcategories );
+        List<int> newPickedCategories = new List<int>( subcategories ); // Create a new list for this call
 
         foreach ( int category in subcategories )
         {
-            categories.AddRange( GetRandomCategories( category, categories, categoryData ) );
+            // Merge the results from the recursive calls into the new list
+            newPickedCategories.AddRange( GetRandomCategories( category, newPickedCategories, categoryData ) );
         }
 
-        return categories;
+        return newPickedCategories.Distinct(); // Remove duplicates before returning
     }
     IEnumerable<int> PickRandomCategories( CategoryModel category )
     {

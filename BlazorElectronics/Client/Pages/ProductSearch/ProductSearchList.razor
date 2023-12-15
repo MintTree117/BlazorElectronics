@@ -1,5 +1,6 @@
 @using BlazorElectronics.Shared.Products.Search
 @using BlazorElectronics.Client.Shared
+@using BlazorElectronics.Shared.Categories
 @inherits RazorView
 
 @if ( _search is null )
@@ -19,31 +20,50 @@ else
             @foreach ( ProductResponse p in _search.Products )
             {
                 int roundedRating = ( int ) Math.Round( p.Rating );
-                <div class="product-list-item mb-3">
-                    <a href="@Routes.PRODUCT/@p.Id" class="mb-2 product-list-image">
-                        <img class="img-fluid" src="@p.Thumbnail" alt="@p.Title"/>
+                <div class="product-card mb-3">
+                    
+                    <a href="@Routes.PRODUCT/@p.Id" class="product-card-image">
+                        <img class="rounded-start" src="@p.Thumbnail" alt="@p.Title"/>
                     </a>
-                    <div class="product-list-details bg-light">
-                        <a href="@Routes.PRODUCT/@p.Id" class="product-list-title">
-                            <h4 class="mb-1">@p.Title</h4>
-                        </a>
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <StarRating Rating="@p.Rating"></StarRating>
-                            <span>@p.NumberReviews reviews</span>
-                            <span>Sold: @p.NumberSold</span>
-                        </div>
-                        @if ( p.SalePrice is not null )
-                        {
-                            <div class="d-flex flex-column">
-                                <span class="text-decoration-line-through">@p.Price</span>
-                                <span class="price">@p.SalePrice</span>
+                    
+                    <div class="product-card-body">
+                        <div class="product-card-info">
+                            <a href="@Routes.PRODUCT/@p.Id">
+                                <h4>@p.Title</h4>
+                            </a>
+                            
+                            <div>
+                                <StarRating Rating="@p.Rating"></StarRating>
+                                <span>@p.NumberReviews reviews</span>
+                                <span>Sold: @p.NumberSold</span>
                             </div>
-                        }
-                        else
-                        {
-                            <span class="price">@p.Price</span>
-                        }
-                        <button class="btn btn-primary">Add To Cart</button>
+                            <div class="product-card-categories">
+                                @foreach ( int id in p.Categories )
+                                {
+                                    if ( !_categories.TryGetValue( id, out CategoryModel? c ) )
+                                        continue;
+
+                                    <a class="btn-sm btn-outline-secondary" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>
+                                }
+                            </div>
+                            
+                            <p class="product-card-description">@p.Description</p>
+                        </div>
+                        <div class="product-card-pricing">
+                            @if ( p.SalePrice is not null )
+                            {
+                                <div class="d-flex flex-column">
+                                    <span class="text-decoration-line-through">@p.Price</span>
+                                    <span class="price">@p.SalePrice</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="price">@p.Price</span>
+                            }
+                            <button class="btn btn-primary">Add To Cart</button>
+                            <a class="btn btn-secondary" href="@Routes.PRODUCT/@p.Id">View Details</a>
+                        </div>
                     </div>
                 </div>
             }

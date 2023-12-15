@@ -10,4 +10,6 @@ public sealed class ProductResponse
     public float Rating { get; set; }
     public int NumberSold { get; set; }
     public int NumberReviews { get; set; }
+    public List<int> Categories { get; set; } = new();
+    public string Description { get; set; } = string.Empty;
 }
