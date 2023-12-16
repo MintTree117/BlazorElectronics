@@ -5,12 +5,17 @@
 @using BlazorElectronics.Shared.Vendors
 @inherits RazorView
 
-<div class="product-filters">
+<div class="product-filters @_showFiltersCss">
     
-    <h4 class="text-decoration-underline">Filters</h4>
-    
-    <div class="product-filters-section d-grid">
-        <button class="btn btn-primary" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
+    <h4 class="text-decoration-underline me-3">Filters</h4>
+
+    <div class="d-flex flex-row justify-content-between mb-3">
+        <div class="d-grid w-100">
+            <button class="btn btn-primary w-100" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
+        </div>
+        <button class="btn btn-outline-secondary product-filters-exit ms-3" onclick="@HideFilters">
+            <i class="oi oi-x"></i>
+        </button>
     </div>
 
     @if ( _subCategories is not null )
@@ -42,11 +47,11 @@
                 <label for="InStock" class="form-check-label">In Stock</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="Featured" @bind="@InStock">
+                <input type="checkbox" class="form-check-input" id="Featured" @bind="@Featured">
                 <label for="Featured" class="form-check-label">Featured</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="Sale" @bind="@InStock">
+                <input type="checkbox" class="form-check-input" id="Sale" @bind="@OnSale">
                 <label for="Sale" class="form-check-label">On Sale</label>
             </div>
         </div>
@@ -59,11 +64,11 @@
         </button>
         <div class="@GetCollapseDisplay( SECTION_PRICE )">
             <div class="d-flex justify-content-between">
-                <div class="me-1">
+                <div class="me-1 filter-pricing">
                     <small class="text-muted">Min</small>
                     <input type="number" class="form-control" id="minPrice" aria-label="Minimum price" @bind="@MinPrice">
                 </div>
-                <div class="ms-1">
+                <div class="ms-1 filter-pricing">
                     <small class="text-muted">Max</small>
                     <input type="number" class="form-control" id="maxPrice" aria-label="Maximum price" @bind="@MaxPrice">
                 </div>

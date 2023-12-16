@@ -1,10 +1,10 @@
 @inherits RazorView
 
 <div class="container-fluid mb-3 py-3 border-bottom shadow-bottom lg-content-wrapper">
-    <div class="row">
-        <div class="d-flex justify-content-between align-items-center">
-            
-            <nav aria-label="breadcrumb" class="flex-grow-1">
+    <div class="product-list-header">
+        
+        <div class="product-list-breadcrumb d-flex flex-row align-items-center w-100">
+            <nav aria-label="breadcrumb">
                 <ol class="breadcrumb h4 mb-0"> <!-- Adjust h4 to your preferred size -->
                     @foreach ( KeyValuePair<string, string> kvp in _urls )
                     {
@@ -21,23 +21,36 @@
                     }
                 </ol>
             </nav>
-            
-            <div class="ms-auto">
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Order by: @_currentSortOption
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        @for ( int i = 0; i < _sortOptions.Count; i++ )
-                        {
-                            int localIndex = i; // Create a local copy of the loop variable
-                            <li><button class="dropdown-item" type="button" @onclick="() => SelectOption( localIndex )">@_sortOptions[ localIndex ]</button></li>
-                        }
-                    </ul>
-                </div>
-            </div>
-            
+            <span class="d-block ms-3 text-muted">Viewing @_rowsPerPage of @_totalResults results</span>
         </div>
-    </div>
 
+        <div class="product-header-buttons">
+            <button class="btn btn-primary filters-mobile-button me-2" onclick="@Page.OpenFilters">Filters</button>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="Rows" data-bs-toggle="dropdown" aria-expanded="false">
+                    Rows: @_rowsPerPage
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="Rows">
+                    @for ( int i = 0; i < _rowsPerPageOptions.Count; i++ )
+                    {
+                        int localIndex = i; // Create a local copy of the loop variable
+                        <li><button class="dropdown-item" type="button" @onclick="async () => await SelectRows( localIndex )">@_rowsPerPageOptions[ localIndex ]</button></li>
+                    }
+                </ul>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="SortBy" data-bs-toggle="dropdown" aria-expanded="false">
+                    Order by: @_currentSortOption
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="SortBy">
+                    @for ( int i = 0; i < _sortOptions.Count; i++ )
+                    {
+                        int localIndex = i; // Create a local copy of the loop variable
+                        <li><button class="dropdown-item" type="button" @onclick="async () => await SelectSort( localIndex )">@_sortOptions[ localIndex ]</button></li>
+                    }
+                </ul>
+            </div>
+        </div>
+            
+    </div>
 </div>

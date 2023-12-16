@@ -15,9 +15,10 @@ namespace BlazorElectronics.Client.Pages.ProductSearch;
 
 public partial class ProductSearch : PageView, IDisposable
 {
+    public event Action? OnOpenFilters; 
     public event Action<Dictionary<string,string>>? InitializeHeader; 
     public event Action<string?, List<CategoryModel>?, Dictionary<int, Spec>, List<VendorModel>>? InitializeFilters;
-    public event Action<ProductSearchResponse, Dictionary<int,CategoryModel>>? OnProductSearch;
+    public event Action<ProductSearchResponse, Dictionary<int,CategoryModel>, Dictionary<int, VendorModel>>? OnProductSearch;
 
     [Inject] IProductServiceClient ProductService { get; set; } = default!;
     [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
@@ -208,6 +209,10 @@ public partial class ProductSearch : PageView, IDisposable
     {
         NavManager.NavigateTo( NavManager.Uri, true );
     }
+    public void OpenFilters()
+    {
+        OnOpenFilters?.Invoke();
+    }
     public async Task ApplyFilters( ProductSearchFilters filters )
     {
         _searchFilters = filters;
@@ -253,7 +258,7 @@ public partial class ProductSearch : PageView, IDisposable
         }
 
         _searchResults = reply.Data;
-        OnProductSearch?.Invoke( _searchResults, categories.CategoriesById );
+        OnProductSearch?.Invoke( _searchResults, categories.CategoriesById, vendors.VendorsById );
         StateHasChanged();
     }
 }

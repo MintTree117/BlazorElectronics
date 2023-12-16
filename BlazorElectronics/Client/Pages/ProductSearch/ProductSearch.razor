@@ -7,9 +7,11 @@
 
 <ProductSearchHeader Page="@this"></ProductSearchHeader>
 <div class="container-fluid lg-content-wrapper">
-    <div class="d-flex w-100">
+    <div class="d-flex w-100 product-search-body">
         <ProductFilters Page="@this"></ProductFilters>
         <ProductSearchList Page="@this"></ProductSearchList>
     </div>
-    <Pagination CurrentPage="@_currentPage" TotalPages="@_currentRows" OnPageChanged="ApplyPagination"></Pagination>
+    <div class="w-100 d-flex flex-row align-items-center justify-content-end">
+        <Pagination CurrentPage="@_currentPage" TotalPages="@_currentRows" OnPageChanged="ApplyPagination"></Pagination>
+    </div>
 </div>

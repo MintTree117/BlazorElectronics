@@ -115,14 +115,9 @@ h4 {
     }
 }
 
-.lg-content-wrapper {
-    padding-left: 40px;
-    padding-right: 40px;
-}
-
 @media only screen and (min-width: 1600px) {
     .lg-content-wrapper {
-        padding-left: 250px;
-        padding-right: 250px;
+        padding-left: 150px;
+        padding-right: 150px;
     }
 }

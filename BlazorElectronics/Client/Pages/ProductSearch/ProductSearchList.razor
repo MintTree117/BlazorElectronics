@@ -1,6 +1,7 @@
 @using BlazorElectronics.Shared.Products.Search
 @using BlazorElectronics.Client.Shared
 @using BlazorElectronics.Shared.Categories
+@using BlazorElectronics.Shared.Vendors
 @inherits RazorView
 
 @if ( _search is null )
@@ -20,49 +21,60 @@ else
             @foreach ( ProductResponse p in _search.Products )
             {
                 int roundedRating = ( int ) Math.Round( p.Rating );
-                <div class="product-card mb-3">
-                    
+                <div class="product-card">
                     <a href="@Routes.PRODUCT/@p.Id" class="product-card-image">
-                        <img class="rounded-start" src="@p.Thumbnail" alt="@p.Title"/>
+                        <img src="@p.Thumbnail" alt="@p.Title"/>
                     </a>
-                    
                     <div class="product-card-body">
-                        <div class="product-card-info">
-                            <a href="@Routes.PRODUCT/@p.Id">
+                        <div class="mb-2">
+                            <a class="product-card-title" href="@Routes.PRODUCT/@p.Id">
                                 <h4>@p.Title</h4>
                             </a>
-                            
-                            <div>
+                        
+                            <div class="d-flex flex-row">
                                 <StarRating Rating="@p.Rating"></StarRating>
-                                <span>@p.NumberReviews reviews</span>
-                                <span>Sold: @p.NumberSold</span>
+                                <a class="ms-3 text-decoration-none" href="@Routes.PRODUCT/@p.Id?showReviews=true">@p.NumberReviews</a>
                             </div>
-                            <div class="product-card-categories">
-                                @foreach ( int id in p.Categories )
-                                {
-                                    if ( !_categories.TryGetValue( id, out CategoryModel? c ) )
-                                        continue;
-
-                                    <a class="btn-sm btn-outline-secondary" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>
-                                }
-                            </div>
-                            
-                            <p class="product-card-description">@p.Description</p>
+                            <span class="text-muted"><small>@p.NumberSold purchased</small></span>
                         </div>
-                        <div class="product-card-pricing">
+                        <div class="d-flex flex-grow-1 flex-row flex-wrap align-items-center align-content-center">
+                            @foreach ( int id in p.Categories )
+                            {
+                                if ( !_categories.TryGetValue( id, out CategoryModel? c ) )
+                                    continue;
+                                            
+                                <a class="d-inline-block btn btn-sm btn-outline-secondary me-2 mb-2" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>
+                            }
+                        </div>
+                        <div>
+                            <p class="product-card-description">@p.Description</p>
+                        
+                            <span class="mb-1 text-muted"><small>Sold By:</small></span>
+                        
+                            @if ( _vendors.TryGetValue( p.VendorId, out VendorModel? v ) )
+                            {
+                                <a class="product-card-vendor mb-2" href="@v.VendorUrl">@v.VendorName</a>
+                            }
+                            else
+                            {
+                                <a class="product-card-vendor mb-2" href="@Routes.HOME">Blazor Media</a>
+                            }
+                        
                             @if ( p.SalePrice is not null )
                             {
-                                <div class="d-flex flex-column">
-                                    <span class="text-decoration-line-through">@p.Price</span>
-                                    <span class="price">@p.SalePrice</span>
+                                <div>
+                                    <span class="original-price">$@p.Price</span>
+                                    <span class="sale-price">$@p.SalePrice</span>
                                 </div>
                             }
                             else
                             {
-                                <span class="price">@p.Price</span>
+                                <span class="price">$@p.Price</span>
                             }
-                            <button class="btn btn-primary">Add To Cart</button>
-                            <a class="btn btn-secondary" href="@Routes.PRODUCT/@p.Id">View Details</a>
+                            <div class="w-100">
+                                <button class="btn btn-primary fw-bolder w-100 mt-2">Buy Now</button>
+                                <a class="btn btn-outline-secondary fw-bolder w-100 mt-2" href="@Routes.PRODUCT/@p.Id">Details</a>
+                            </div>
                         </div>
                     </div>
                 </div>

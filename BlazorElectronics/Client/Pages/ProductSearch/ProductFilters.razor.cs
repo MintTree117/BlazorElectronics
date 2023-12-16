@@ -16,13 +16,15 @@ public partial class ProductFilters : RazorView, IDisposable
     const string SECTION_RATING = "Rating";
     const string SECTION_VENDORS = "Vendors";
 
+    string _showFiltersCss = string.Empty;
     string _searchText = string.Empty;
     
     bool InStock { get; set; } = false;
+    bool Featured { get; set; } = false;
     bool OnSale { get; set; } = false;
-    
-    int? MinPrice { get; set; } = null;
-    int? MaxPrice { get; set; } = null;
+
+    decimal? MinPrice { get; set; } = null;
+    decimal? MaxPrice { get; set; } = null;
     int? MinRating { get; set; } = null;
     
     List<CategoryModel>? _subCategories = new();
@@ -37,6 +39,7 @@ public partial class ProductFilters : RazorView, IDisposable
     {
         base.OnInitialized();
         Page.InitializeFilters += InitializeFilters;
+        Page.OnOpenFilters += ShowFilters;
         _collapsedSections.Add( SECTION_CATEGORY, false );
         _collapsedSections.Add( SECTION_TRENDS, false );
         _collapsedSections.Add( SECTION_PRICE, false );
@@ -44,6 +47,17 @@ public partial class ProductFilters : RazorView, IDisposable
         _collapsedSections.Add( SECTION_VENDORS, true );
     }
 
+    void ShowFilters()
+    {
+        _showFiltersCss = "d-flex";
+        StateHasChanged();
+    }
+    void HideFilters()
+    {
+        _showFiltersCss = "d-none";
+        StateHasChanged();
+    }
+    
     void ToggleSectionCollapse( string sectionName )
     {
         _collapsedSections[ sectionName ] = !_collapsedSections[ sectionName ];
@@ -133,5 +147,6 @@ public partial class ProductFilters : RazorView, IDisposable
     public void Dispose()
     {
         Page.InitializeFilters -= InitializeFilters;
+        Page.OnOpenFilters -= ShowFilters;
     }
 }

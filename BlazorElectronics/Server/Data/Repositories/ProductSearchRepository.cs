@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
@@ -189,18 +190,18 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_RATING} >= {PARAM_MIN_RATING}" );
         dynamicParams.Add( PARAM_MIN_RATING, minRating.Value );
     }
-    static void AppendPriceConditions( StringBuilder builder, DynamicParameters dynamicParams, int? minPrice, int? maxPrice )
+    static void AppendPriceConditions( StringBuilder builder, DynamicParameters dynamicParams, decimal? minPrice, decimal? maxPrice )
     {
-        const string priceColumn = $"COALESCE({TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE}, {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE})";
-
         if ( minPrice.HasValue )
         {
-            builder.Append( $" AND {priceColumn} >= {PARAM_MIN_PRICE}" );
-            dynamicParams.Add( PARAM_MIN_PRICE, minPrice.Value );
+            builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE} >= {PARAM_MIN_PRICE}" );
+            builder.Append( $" OR {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} >= {PARAM_MIN_PRICE} )" );
+            dynamicParams.Add( PARAM_MIN_PRICE, minPrice.Value, DbType.Decimal );
         }
         if ( maxPrice.HasValue )
         {
-            builder.Append( $" AND {priceColumn} <= {PARAM_MAX_PRICE}" );
+            builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE} <= {PARAM_MIN_PRICE}" );
+            builder.Append( $" OR {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} <= {PARAM_MIN_PRICE} )" );
             dynamicParams.Add( PARAM_MAX_PRICE, maxPrice.Value );
         }
     }

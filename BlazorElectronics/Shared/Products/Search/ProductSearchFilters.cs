@@ -5,8 +5,8 @@ public sealed class ProductSearchFilters
     public DateTime? MinReleaseDate { get; set; }
     public bool? InStock { get; set; } = false;
     public bool? OnSale { get; set; } = false;
-    public int? MinPrice { get; set; } = null;
-    public int? MaxPrice { get; set; } = null;
+    public decimal? MinPrice { get; set; } = null;
+    public decimal? MaxPrice { get; set; } = null;
     public int? MinRating { get; set; } = null;
     
     public List<int> Vendors { get; set; } = new();

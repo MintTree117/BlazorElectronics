@@ -121,6 +121,7 @@ public class ProductService : ApiService, IProductService
                 dto.Products.Add( new ProductResponse
                 {
                     Id = p.ProductId,
+                    VendorId = p.VendorId,
                     Title = p.Title,
                     Thumbnail = p.Thumbnail,
                     Rating = p.Rating,

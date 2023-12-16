@@ -1,5 +1,6 @@
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Products.Search;
+using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.ProductSearch;
@@ -10,6 +11,7 @@ public partial class ProductSearchList : RazorView, IDisposable
     
     ProductSearchResponse? _search;
     Dictionary<int, CategoryModel> _categories = new();
+    Dictionary<int, VendorModel> _vendors = new();
 
     public void Dispose()
     {
@@ -20,10 +22,11 @@ public partial class ProductSearchList : RazorView, IDisposable
         base.OnInitialized();
         Page.OnProductSearch += OnSearch;
     }
-    void OnSearch( ProductSearchResponse? search, Dictionary<int, CategoryModel> categories )
+    void OnSearch( ProductSearchResponse? search, Dictionary<int, CategoryModel> categories, Dictionary<int, VendorModel> vendors )
     {
         _search = search;
         _categories = categories;
+        _vendors = vendors;
         StateHasChanged();
     }
 }

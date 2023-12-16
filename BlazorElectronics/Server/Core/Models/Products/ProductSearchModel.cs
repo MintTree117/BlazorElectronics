@@ -4,6 +4,7 @@ public sealed class ProductSearchModel
 {
     public int TotalCount { get; init; }
     public int ProductId { get; init; }
+    public int VendorId { get; set; }
     public string Title { get; init; } = string.Empty;
     public float Rating { get; init; }
     public string Thumbnail { get; init; } = string.Empty;
