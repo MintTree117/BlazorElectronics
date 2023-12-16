@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Products;
 
 namespace BlazorElectronics.Server.Api.Interfaces;
 
-public interface IProductReviewService
+public interface IReviewService
 {
     Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( int productId, int rows, int page );
 }

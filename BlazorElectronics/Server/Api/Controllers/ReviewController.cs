@@ -6,11 +6,11 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class ProductReviewController : _Controller
+public class ReviewController : _Controller
 {
-    readonly IProductReviewService _reviewService;
+    readonly IReviewService _reviewService;
     
-    public ProductReviewController( ILogger<_Controller> logger, IProductReviewService reviewService )
+    public ReviewController( ILogger<_Controller> logger, IReviewService reviewService )
         : base( logger )
     {
         _reviewService = reviewService;

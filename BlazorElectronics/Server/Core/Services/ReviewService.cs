@@ -9,11 +9,11 @@ using BlazorElectronics.Shared.Products;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class ProductReviewService : ApiService, IProductReviewService
+public sealed class ReviewService : ApiService, IReviewService
 {
-    readonly IProductReviewRepository _repository;
+    readonly IReviewRepository _repository;
 
-    public ProductReviewService( ILogger<ApiService> logger, IProductReviewRepository repository )
+    public ReviewService( ILogger<ApiService> logger, IReviewRepository repository )
         : base( logger )
     {
         _repository = repository;
@@ -36,7 +36,6 @@ public sealed class ProductReviewService : ApiService, IProductReviewService
             return new ServiceReply<List<ProductReviewDto>?>( ServiceErrorType.ServerError );
         }
     }
-
     static async Task<List<ProductReviewDto>?> MapModelsToDto( IEnumerable<ProductReviewModel>? models )
     {
         if ( models is null )

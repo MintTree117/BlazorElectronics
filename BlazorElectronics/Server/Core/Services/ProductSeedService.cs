@@ -17,16 +17,16 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     Random _random = new();
 
     readonly IProductRepository _productRepository;
-    readonly IProductReviewRepository _reviewRepository;
+    readonly IReviewRepository _reviewRepository;
 
-    public ProductSeedService( ILogger<ApiService> logger, IProductRepository productRepository, IProductReviewRepository reviewRepository )
+    public ProductSeedService( ILogger<ApiService> logger, IProductRepository productRepository, IReviewRepository reviewRepository )
         : base( logger )
     {
         _productRepository = productRepository;
         _reviewRepository = reviewRepository;
     }
     
-    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryData categories, SpecsResponse lookups, VendorsResponse vendors, List<int> users )
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryData categories, SpecsResponse lookups, VendorsResponse vendors)
     {
         _random = new Random();
         
@@ -38,7 +38,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             {
                 for ( int i = 0; i < amount; i++ )
                 {
-                    models.Add( GetSeedModel( primaryCategory, i, categories, lookups, vendors, users ) );
+                    models.Add( GetSeedModel( primaryCategory, i, categories, lookups, vendors ) );
                 }
             }
         } );
@@ -51,18 +51,6 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
                 if ( productId <= 0 )
                     return new ServiceReply<bool>( false );
-
-                foreach ( ProductReviewModel r in m.Reviews )
-                {
-                    //r.ProductId = productId;
-                    //int reviewResult = await _reviewRepository.Insert( r );
-                    
-                    //if ( reviewResult <= 0 )
-                        //return new ServiceReply<bool>( false );
-                }
-                
-                //await _productRepository.UpdateReviewCount();
-                //await _productRepository.UpdateRatings();
             }
             catch ( RepositoryException e )
             {
@@ -75,22 +63,22 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     
     // BASE MODEL
-    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, SpecsResponse lookups, VendorsResponse vendors, IReadOnlyList<int> users )
+    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, SpecsResponse lookups, VendorsResponse vendors )
     {
         ProductEditModel editModel = new()
         {
             VendorId = PickRandomVendor( primaryCategory, vendors ),
-            Title = ProductSeedData.PRODUCT_TITLES[ primaryCategory - 1 ] + " " + i,
-            ThumbnailUrl = $"/Images/{ProductSeedData.PRODUCT_THUMBNAILS[ primaryCategory - 1 ]}",
-            Images = ProductSeedData.PRODUCT_IMAGES[ primaryCategory - 1 ].ToList(),
-            Price = GetRandomDecimal( ProductSeedData.MIN_PRICE, ProductSeedData.MAX_PRICE ),
-            ReleaseDate = GetRandomDate( ProductSeedData.MIN_RELEASE_DATE, ProductSeedData.MAX_RELEASE_DATE ),
-            NumberSold = GetRandomInt( 0, ProductSeedData.MAX_NUM_SOLD ),
+            Title = SeedData.PRODUCT_TITLES[ primaryCategory - 1 ] + " " + i,
+            ThumbnailUrl = $"/Images/{SeedData.PRODUCT_THUMBNAILS[ primaryCategory - 1 ]}",
+            Images = GetProductImages( primaryCategory ),
+            Price = GetRandomDecimal( SeedData.MIN_PRICE, SeedData.MAX_PRICE ),
+            ReleaseDate = GetRandomDate( SeedData.MIN_RELEASE_DATE, SeedData.MAX_RELEASE_DATE ),
+            NumberSold = GetRandomInt( 0, SeedData.MAX_NUM_SOLD ),
             Description = GetRandomDescription( primaryCategory ),
         };
 
         if ( GetRandomBoolean() )
-            editModel.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) editModel.Price );
+            editModel.SalePrice = GetRandomDecimal( SeedData.MIN_PRICE, ( double ) editModel.Price );
 
         editModel.Categories.Add( primaryCategory );
         editModel.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoryData ) );
@@ -113,30 +101,38 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             _ => throw new ArgumentOutOfRangeException( nameof( primaryCategory ), primaryCategory, null )
         };
 
-        editModel.Reviews = GetRandomReviews( primaryCategory, users );
-
         return editModel;
+    }
+    // IMAGES
+    List<string> GetProductImages( int category )
+    {
+        List<string> images = SeedData.PRODUCT_IMAGES[ category - 1 ].ToList();
+        for ( int i = 0; i < images.Count; i++ )
+        {
+            images[ i ] = $"/Images/{i}";
+        }
+        return images;
     }
     // DESCRIPTIONS
     string GetRandomDescription( int category )
     {
         return category switch
         {
-            1 => ProductSeedData.BOOK_DESCR[ GetRandomInt( 0, ProductSeedData.BOOK_DESCR.Length - 1 ) ],
-            2 => ProductSeedData.SOFTWARE_DESCR[ GetRandomInt( 0, ProductSeedData.SOFTWARE_DESCR.Length - 1 ) ],
-            3 => ProductSeedData.GAME_DESCR[ GetRandomInt( 0, ProductSeedData.GAME_DESCR.Length - 1 ) ],
-            4 => ProductSeedData.MOVESTV_DESCR[ GetRandomInt( 0, ProductSeedData.MOVESTV_DESCR.Length - 1 ) ],
-            5 => ProductSeedData.COURSE_DESCR[ GetRandomInt( 0, ProductSeedData.COURSE_DESCR.Length - 1 ) ],
+            1 => SeedData.BOOK_DESCR[ GetRandomInt( 0, SeedData.BOOK_DESCR.Length - 1 ) ],
+            2 => SeedData.SOFTWARE_DESCR[ GetRandomInt( 0, SeedData.SOFTWARE_DESCR.Length - 1 ) ],
+            3 => SeedData.GAME_DESCR[ GetRandomInt( 0, SeedData.GAME_DESCR.Length - 1 ) ],
+            4 => SeedData.MOVESTV_DESCR[ GetRandomInt( 0, SeedData.MOVESTV_DESCR.Length - 1 ) ],
+            5 => SeedData.COURSE_DESCR[ GetRandomInt( 0, SeedData.COURSE_DESCR.Length - 1 ) ],
             _ => string.Empty
         };
     }
     // XML
     string GetBookXml()
     {
-        var author = new XElement( "Author", GetRandomSpec( ProductSeedData.NAMES ) );
-        var publisher = new XElement( "Publisher", GetRandomSpec( ProductSeedData.PUBLISHERS ) );
-        var isbn = new XElement( "ISBN", GetRandomSpec( ProductSeedData.ISBNS ) );
-        var pages = new XElement( "Pages", GetRandomInt( 0, ProductSeedData.MAX_PAGE_LENGTH ).ToString() );
+        var author = new XElement( "Author", GetRandomItem( SeedData.NAMES ) );
+        var publisher = new XElement( "Publisher", GetRandomItem( SeedData.PUBLISHERS ) );
+        var isbn = new XElement( "ISBN", GetRandomItem( SeedData.ISBNS ) );
+        var pages = new XElement( "Pages", GetRandomInt( 0, SeedData.MAX_PAGE_LENGTH ).ToString() );
         
         var root = new XElement( "RootElement" );
         root.Add( author );
@@ -147,8 +143,8 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         if ( !GetRandomBoolean() ) 
             return root.ToString();
         
-        var narrator = new XElement( "Narrator", GetRandomSpec( ProductSeedData.NAMES ) );
-        var audioLength = new XElement( "AudioLength", GetRandomInt( 0, ProductSeedData.MAX_AUDIO_LENGTH ).ToString() );
+        var narrator = new XElement( "Narrator", GetRandomItem( SeedData.NAMES ) );
+        var audioLength = new XElement( "AudioLength", GetRandomInt( 0, SeedData.MAX_AUDIO_LENGTH ).ToString() );
         root.Add( narrator );
         root.Add( audioLength );
 
@@ -156,10 +152,10 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     string GetSoftwareXml()
     {
-        var version = new XElement( "Version", GetRandomSpec( ProductSeedData.SOFTWARE_VERSIONS ) );
-        var developer = new XElement( "Developer", GetRandomSpec( ProductSeedData.SOFTWARE_DEVELOPERS ) );
-        var dependencies = new XElement( "Dependencies", GetRandomSpecs( ProductSeedData.SOFTWARE_DEPENDENCIES, 5 ) );
-        var trialLimitations = new XElement( "TrialLimitations", GetRandomSpec( ProductSeedData.SOFTWARE_TRIAL_LIMITATIONS ) );
+        var version = new XElement( "Version", GetRandomItem( SeedData.SOFTWARE_VERSIONS ) );
+        var developer = new XElement( "Developer", GetRandomItem( SeedData.SOFTWARE_DEVELOPERS ) );
+        var dependencies = new XElement( "Dependencies", GetRandomItems( SeedData.SOFTWARE_DEPENDENCIES, 5 ) );
+        var trialLimitations = new XElement( "TrialLimitations", GetRandomItem( SeedData.SOFTWARE_TRIAL_LIMITATIONS ) );
 
         var root = new XElement( "RootElement" );
         root.Add( version );
@@ -171,11 +167,11 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     string GetGameXml()
     {
-        var developer = new XElement( "Developer", GetRandomSpec( ProductSeedData.GAME_DEVELOPERS ) );
+        var developer = new XElement( "Developer", GetRandomItem( SeedData.GAME_DEVELOPERS ) );
         var hasOfflineMode = new XElement( "HasOfflineMode", GetRandomBoolean().ToString() );
         var hasInGamePurchases = new XElement( "HasInGamePurchases", GetRandomBoolean().ToString() );
         var hasControllerSupport = new XElement( "HasControllerSupport", GetRandomBoolean().ToString() );
-        var fileSize = new XElement( "FileSizeMb", GetRandomInt( ProductSeedData.MIN_FILE_SIZE, ProductSeedData.MAX_FILE_SIZE ).ToString() );
+        var fileSize = new XElement( "FileSizeMb", GetRandomInt( SeedData.MIN_FILE_SIZE, SeedData.MAX_FILE_SIZE ).ToString() );
 
         var root = new XElement( "RootElement" );
         root.Add( developer );
@@ -188,10 +184,10 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     string GetMoviesTvXml()
     {
-        var director = new XElement( "Director", GetRandomSpec( ProductSeedData.DIRECTORS ) );
-        var cast = new XElement( "Cast", GetRandomSpecs( ProductSeedData.NAMES, 10) );
-        var runtimeMinutes = new XElement( "RuntimeMinutes", GetRandomInt( 1, ProductSeedData.MAX_RUNTIME ).ToString() );
-        var episodes = new XElement( "Episodes", GetRandomInt( 1, ProductSeedData.MAX_EPISODES ).ToString() );
+        var director = new XElement( "Director", GetRandomItem( SeedData.DIRECTORS ) );
+        var cast = new XElement( "Cast", GetRandomItems( SeedData.NAMES, 10) );
+        var runtimeMinutes = new XElement( "RuntimeMinutes", GetRandomInt( 1, SeedData.MAX_RUNTIME ).ToString() );
+        var episodes = new XElement( "Episodes", GetRandomInt( 1, SeedData.MAX_EPISODES ).ToString() );
         var hasSubtitles = new XElement( "HasSubtitles", GetRandomBoolean().ToString() );
 
         var root = new XElement( "RootElement" );
@@ -205,9 +201,9 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     string GetCoursesXml()
     {
-        var instructors = new XElement( "Instructors", GetRandomSpecs( ProductSeedData.NAMES, 3 ) );
-        var requirements = new XElement( "Requirements", GetRandomSpecs( ProductSeedData.COURSE_REQUIREMENTS, 5 ) );
-        var durationWeeks = new XElement( "DurationWeeks", GetRandomInt( 1, ProductSeedData.MAX_COURSE_DURATION ).ToString() );
+        var instructors = new XElement( "Instructors", GetRandomItems( SeedData.NAMES, 3 ) );
+        var requirements = new XElement( "Requirements", GetRandomItems( SeedData.COURSE_REQUIREMENTS, 5 ) );
+        var durationWeeks = new XElement( "DurationWeeks", GetRandomInt( 1, SeedData.MAX_COURSE_DURATION ).ToString() );
         var hasSubtitles = new XElement( "HasSubtitles", GetRandomBoolean().ToString() );
 
         var root = new XElement( "RootElement" );
@@ -243,7 +239,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         var picked = new HashSet<int>();
 
         int maxIndex = category.Children.Count - 1;
-        int amount = GetRandomInt( 1, ProductSeedData.MAX_CATEGORIES );
+        int amount = GetRandomInt( 1, SeedData.MAX_CATEGORIES );
         int count = 0;
 
         while ( picked.Count < amount )
@@ -264,24 +260,6 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         }
         
         return picked.ToList();
-    }
-    // REVIEWS
-    List<ProductReviewModel> GetRandomReviews( int category, IReadOnlyList<int> userIds )
-    {
-        List<ProductReviewModel> reviews = new();
-        int amount = GetRandomInt( 1, 20 );
-
-        for ( int i = 0; i < amount; i++ )
-        {
-            reviews.Add( new ProductReviewModel
-            {
-                UserId = userIds[ GetRandomInt( 0, userIds.Count - 1 ) ],
-                Review = GetRandomSpec( ProductSeedData.PRODUCT_REVIEWS[ category - 1 ] ),
-                Rating = GetRandomInt( 1, 5 )
-            } );
-        }
-
-        return reviews;
     }
     // SPEC LOOKUP
     Dictionary<int, List<int>> GetRandomLookups( List<int> ids, SpecsResponse lookups )
@@ -322,12 +300,12 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return alreadyPicked.ToList();
     }
     // SPEC
-    string GetRandomSpec( IReadOnlyList<string> list )
+    string GetRandomItem( IReadOnlyList<string> list )
     {
         int index = GetRandomInt( 0, list.Count - 1 );
         return list[ index ];
     }
-    string GetRandomSpecs( IReadOnlyList<string> list, int max )
+    string GetRandomItems( IReadOnlyList<string> list, int max )
     {
         var specs = new Dictionary<int, string>();
 
@@ -361,7 +339,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         long range = max.Ticks - min.Ticks;
 
         // Create a random range between them
-        long randomTicks = ( long ) ( _random.NextDouble() * range ) + ProductSeedData.MIN_RELEASE_DATE.Ticks;
+        long randomTicks = ( long ) ( _random.NextDouble() * range ) + SeedData.MIN_RELEASE_DATE.Ticks;
 
         // Convert back to DateTime
         return new DateTime( randomTicks );

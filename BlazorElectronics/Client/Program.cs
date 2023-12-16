@@ -27,6 +27,7 @@ builder.Services.AddScoped<ICartServiceClient, CartServiceClient>();
 builder.Services.AddScoped<ICategoryServiceClient, CategoryServiceClient>();
 builder.Services.AddScoped<IFeaturesServiceClient, FeaturesServiceClient>();
 builder.Services.AddScoped<IProductServiceClient, ProductServiceClient>();
+builder.Services.AddScoped<IReviewServiceClient, ReviewServiceClient>();
 builder.Services.AddScoped<ISpecServiceClient, SpecServiceClient>();
 builder.Services.AddScoped<IVendorServiceClient, VendorServiceClient>();
 

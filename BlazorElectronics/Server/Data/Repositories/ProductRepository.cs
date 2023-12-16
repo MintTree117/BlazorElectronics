@@ -23,7 +23,7 @@ public class ProductRepository : DapperRepository, IProductRepository
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, productId );
-        return await TryQueryAsync( QuerySingleOrDefault<ProductModel?>, p, PROCEDURE_GET );
+        return await TryQueryAsync( GetQuery, p );
     }
     public async Task<int> Insert( ProductEditModel editModel )
     {

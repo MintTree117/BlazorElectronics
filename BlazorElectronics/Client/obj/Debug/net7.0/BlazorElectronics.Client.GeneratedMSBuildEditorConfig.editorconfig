@@ -102,20 +102,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZUxvYWRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/ProductSearch/ProductFilters.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdFNlYXJjaC9Qcm9kdWN0RmlsdGVycy5yYXpvcg==
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Products/ProductDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdERldGFpbHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/ProductSearch/ProductSearch.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdFNlYXJjaC9Qcm9kdWN0U2VhcmNoLnJhem9y
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Products/ProductFilters.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdEZpbHRlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/ProductSearch/ProductSearchHeader.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdFNlYXJjaC9Qcm9kdWN0U2VhcmNoSGVhZGVyLnJhem9y
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Products/ProductSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdFNlYXJjaC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/ProductSearch/ProductSearchList.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdFNlYXJjaC9Qcm9kdWN0U2VhcmNoTGlzdC5yYXpvcg==
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Products/ProductSearchHeader.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdFNlYXJjaEhlYWRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Products/ProductSearchList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdFNlYXJjaExpc3QucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/Cart.razor]

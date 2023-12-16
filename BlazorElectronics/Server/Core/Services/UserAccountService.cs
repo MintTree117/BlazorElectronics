@@ -21,7 +21,7 @@ public class UserAccountService : ApiService, IUserAccountService
         _userRepository = userRepository;
     }
 
-    public async Task<ServiceReply<List<int>?>> GetIds()
+    public async Task<ServiceReply<List<int>?>> GetAllIds()
     {
         try
         {

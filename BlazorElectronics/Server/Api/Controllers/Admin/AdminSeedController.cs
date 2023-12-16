@@ -14,25 +14,34 @@ public class AdminSeedController : _AdminController
     readonly IVendorService _vendorService;
     readonly ICategoryService _categoryService;
     readonly ISpecsService _lookupService;
-    readonly IUserSeedService _userSeedService;
+    readonly IProductService _productService;
+    readonly IUserAccountService _userSerice;
+
     readonly IProductSeedService _productSeedService;
+    readonly IReviewSeedService _reviewSeedService;
+    readonly IUserSeedService _userSeedService;
 
     public AdminSeedController( 
         ILogger<UserController> logger, 
         IUserAccountService userAccountService, 
         ISessionService sessionService,
         ICategoryService categoryService,
-        IUserSeedService userSeedService, 
-        IProductSeedService productSeedService, 
-        IVendorService vendorService, 
-        ISpecsService lookupService )
+        IVendorService vendorService,
+        ISpecsService lookupService,
+        IProductService productService,
+        IProductSeedService productSeedService,
+        IReviewSeedService reviewSeedService,
+        IUserSeedService userSeedService, IUserAccountService userSerice )
         : base( logger, userAccountService, sessionService )
     {
         _categoryService = categoryService;
         _userSeedService = userSeedService;
+        _userSerice = userSerice;
         _productSeedService = productSeedService;
+        _reviewSeedService = reviewSeedService;
         _vendorService = vendorService;
         _lookupService = lookupService;
+        _productService = productService;
     }
 
     [HttpPost( "products" )]
@@ -43,21 +52,47 @@ public class AdminSeedController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<CategoryData?> categories = await _categoryService.GetCategoryData();
-        ServiceReply<SpecsResponse?> lookups = await _lookupService.GetSpecs( categories.Data.PrimaryIds );
-        ServiceReply<VendorsResponse?> vendors = await _vendorService.GetVendors();
-        ServiceReply<List<int>?> users = await UserAccountService.GetIds();
+        ServiceReply<CategoryData?> categoryReply = await _categoryService.GetCategoryData();
         
-        Logger.LogError(users.Data.Count.ToString());
+        if ( !categoryReply.Success || categoryReply.Data is null )
+            return GetReturnFromReply( categoryReply );
+        
+        ServiceReply<SpecsResponse?> lookupReply = await _lookupService.GetSpecs( categoryReply.Data.PrimaryIds );
 
-        if ( !categories.Success || !lookups.Success || !vendors.Success || !users.Success )
-            return NotFound( NOT_FOUND_MESSAGE );
+        if ( !lookupReply.Success || lookupReply.Data is null )
+            return GetReturnFromReply( lookupReply );
+        
+        ServiceReply<VendorsResponse?> vendorReply = await _vendorService.GetVendors();
 
-        ServiceReply<bool> seedResult = await _productSeedService.SeedProducts( request.Payload.Value, categories.Data!, lookups.Data!, vendors.Data!, users.Data! );
+        if ( !vendorReply.Success || vendorReply.Data is null )
+            return GetReturnFromReply( vendorReply );
 
-        return seedResult.Success
-            ? Ok( seedResult.Data )
-            : StatusCode( StatusCodes.Status500InternalServerError, INTERNAL_SERVER_ERROR + seedResult.Message );
+        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( request.Payload.Value, categoryReply.Data, lookupReply.Data, vendorReply.Data );
+
+        return GetReturnFromReply( seedReply );
+    }
+
+    [HttpPost( "reviews" )]
+    public async Task<ActionResult<bool>> SeedReviews( [FromBody] UserDataRequest<IntDto> request )
+    {
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+
+        if ( !adminReply.Success )
+            return GetReturnFromReply( adminReply );
+
+        ServiceReply<List<int>> productReply = await _productService.GetAllIds();
+
+        if ( !productReply.Success || productReply.Data is null )
+            return GetReturnFromReply( productReply );
+
+        ServiceReply<List<int>?> userReply = await _userSerice.GetAllIds();
+
+        if ( !userReply.Success || userReply.Data is null )
+            return GetReturnFromReply( userReply );
+
+        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( request.Payload.Value, productReply.Data, userReply.Data );
+
+        return GetReturnFromReply( seedReply );
     }
 
     [HttpPost( "users" )]

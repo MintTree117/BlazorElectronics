@@ -24,7 +24,7 @@ builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductSeedService, ProductSeedService>();

@@ -2,7 +2,7 @@ using BlazorElectronics.Server.Core.Models.Products;
 
 namespace BlazorElectronics.Server.Core.Interfaces;
 
-public interface IProductReviewRepository
+public interface IReviewRepository
 {
     Task<IEnumerable<ProductReviewModel>?> GetForProduct( int productId, int rows, int page );
     Task<IEnumerable<ProductReviewModel>?> GetForUser( int userId, int rows, int page );

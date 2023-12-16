@@ -15,5 +15,4 @@ public sealed class ProductEditModel
     public List<string> Images { get; set; } = new();
     public Dictionary<int, List<int>> SpecLookups { get; set; } = new();
     public string XmlSpecs { get; set; } = string.Empty;
-    public List<ProductReviewModel> Reviews { get; set; } = new();
 }

@@ -11,7 +11,7 @@ namespace BlazorElectronics.Client.Pages.Products;
 public partial class ProductDetails : PageView
 {
     [Inject] public IProductServiceClient ProductService { get; init; } = default!;
-    [Inject] public IProductReviewServiceClient ReviewService { get; set; } = default!;
+    [Inject] public IReviewServiceClient ReviewService { get; set; } = default!;
     [Inject] public ISpecServiceClient LookupService { get; set; } = default!;
 
     [Parameter] public string ProductId { get; set; } = string.Empty;
@@ -35,7 +35,7 @@ public partial class ProductDetails : PageView
         
         if ( !productReply.Success || productReply.Data is null )
         {
-            InvokeAlert( AlertType.Danger, $"Failed to fetch product details! {productReply.ErrorType} : {productReply.Message}" );
+            SetViewMessage( false, $"Failed to fetch product details! {productReply.ErrorType} : {productReply.Message}" );
             PageIsLoaded = true;
             return;
         }

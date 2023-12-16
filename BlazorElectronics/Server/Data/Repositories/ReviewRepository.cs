@@ -4,7 +4,7 @@ using Dapper;
 
 namespace BlazorElectronics.Server.Data.Repositories;
 
-public sealed class ProductReviewRepository : DapperRepository, IProductReviewRepository
+public sealed class ReviewRepository : DapperRepository, IReviewRepository
 {
     const string PROCEDURE_GET_FOR_PRODUCT = "Get_ProductReviews";
     const string PROCEDURE_GET_FOR_USER = "Get_UserProductReviews";
@@ -13,7 +13,7 @@ public sealed class ProductReviewRepository : DapperRepository, IProductReviewRe
     const string PROCEDURE_UPDATE = "Update_ProductReview";
     const string PROCEDURE_DELETE = "Delete_ProductReview";
 
-    public ProductReviewRepository( DapperContext dapperContext )
+    public ReviewRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
     public async Task<IEnumerable<ProductReviewModel>?> GetForProduct( int productId, int rows, int page )

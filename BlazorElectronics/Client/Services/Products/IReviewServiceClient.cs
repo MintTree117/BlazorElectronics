@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.ProductReviews;
 
 namespace BlazorElectronics.Client.Services.Products;
 
-public interface IProductReviewServiceClient
+public interface IReviewServiceClient
 {
     Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( GetProductReviewsDto dto );
 }

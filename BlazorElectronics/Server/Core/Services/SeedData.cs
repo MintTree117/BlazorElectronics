@@ -1,16 +1,16 @@
 namespace BlazorElectronics.Server.Core.Services;
 
-public static class ProductSeedData
+public static class SeedData
 {
     public static readonly string[] PRODUCT_TITLES = { "Book", "Software", "Video Game", "Movie/Tv", "Course" };
     public static readonly string[] PRODUCT_THUMBNAILS = { "BooksThumbnail.jpg", "SoftwareThumbnail.jpg", "VideoGamesThumbnail.jpg", "MoviesTvThumbnail.jpg", "CoursesThumbnail.jpg" };
     public static readonly string[][] PRODUCT_IMAGES =
     {
-        new[] { "Book1.jpg", "Book2.jpg", "Book3.jpg" },
-        new[] { "Software1.jpg", "Software2.jpg", "Software3.jpg" },
-        new[] { "Game1.jpg", "Game2.jpg", "Game3.jpg" },
-        new[] { "Video1.jpg", "Video2.jpg", "Video3.jpg" },
-        new[] { "Course1.jpg", "Course2.jpg", "Course3.jpg" },
+        new[] { "Book1.jpg", "Book2.jpg", "Book3.jpg", "Book4.jpg" },
+        new[] { "Software1.jpg", "Software2.jpg", "Software3.jpg", "Software4.jpg" },
+        new[] { "Game1.jpg", "Game2.jpg", "Game3.jpg", "Game4.jpg" },
+        new[] { "Video1.jpg", "Video2.jpg", "Video3.jpg", "Video4.jpg" },
+        new[] { "Course1.jpg", "Course2.jpg", "Course3.jpg", "Course4.jpg" },
     };
 
     public const int MAX_CATEGORIES = 3;

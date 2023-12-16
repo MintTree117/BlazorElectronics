@@ -4,12 +4,12 @@ using BlazorElectronics.Shared.ProductReviews;
 
 namespace BlazorElectronics.Client.Services.Products;
 
-public sealed class ProductReviewServiceClient : ClientService, IProductReviewServiceClient
+public sealed class ReviewServiceClient : ClientService, IReviewServiceClient
 {
     const string API_ROUTE = "api/ProductReviews";
     const string API_ROUTE_PRODUCT = $"{API_ROUTE}/for-product";
     
-    public ProductReviewServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
+    public ReviewServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
     public async Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( GetProductReviewsDto dto )

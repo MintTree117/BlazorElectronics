@@ -25,7 +25,11 @@ public class ProductService : ApiService, IProductService
         _productSearchRepository = productSearchRepository;
         _productRepository = productRepository;
     }
-    
+
+    public Task<ServiceReply<List<int>>> GetAllIds()
+    {
+        throw new NotImplementedException();
+    }
     public async Task<ServiceReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
     {
         try
