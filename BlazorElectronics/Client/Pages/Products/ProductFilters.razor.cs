@@ -4,7 +4,7 @@ using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.ProductSearch;
+namespace BlazorElectronics.Client.Pages.Products;
 
 public partial class ProductFilters : RazorView, IDisposable
 {

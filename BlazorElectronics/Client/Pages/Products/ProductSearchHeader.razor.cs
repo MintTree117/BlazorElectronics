@@ -1,15 +1,14 @@
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products.Search;
-using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.ProductSearch;
+namespace BlazorElectronics.Client.Pages.Products;
 
 public partial class ProductSearchHeader : RazorView, IDisposable
 {
-    [Parameter] public ProductSearch Page { get; set; } = default!;
+    [Parameter] public Products.ProductSearch Page { get; set; } = default!;
     
     string _currentSortOption = ProductSortType.Featured.ToString();
     List<string> _sortOptions = Enum.GetNames<ProductSortType>().ToList();

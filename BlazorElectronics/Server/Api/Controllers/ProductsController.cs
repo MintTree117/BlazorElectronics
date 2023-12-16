@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Api.Interfaces;
+using BlazorElectronics.Shared.Products;
 using BlazorElectronics.Shared.Products.Search;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public class ProductsController : _Controller
     }
 
     [HttpGet( "search-query" )]
-    public async Task<ActionResult<ProductResponse?>> SearchQuery()
+    public async Task<ActionResult<ProductSummaryResponse?>> SearchQuery()
     {
         ProductSearchRequest r = new()
         {
@@ -31,7 +32,7 @@ public class ProductsController : _Controller
         return GetReturnFromReply( reply );
     }
     [HttpPost( "search" )]
-    public async Task<ActionResult<ProductResponse?>> SearchProducts( [FromBody] ProductSearchRequest request )
+    public async Task<ActionResult<ProductSummaryResponse?>> SearchProducts( [FromBody] ProductSearchRequest request )
     {
         ServiceReply<ProductSearchResponse?> reply = await _productService.GetProductSearch( request );
         return GetReturnFromReply( reply );
@@ -40,6 +41,12 @@ public class ProductsController : _Controller
     public async Task<ActionResult<List<string>?>> SearchSuggestions( [FromBody] string searchText )
     {
         ServiceReply<List<string>?> reply = await _productService.GetProductSuggestions( searchText );
+        return GetReturnFromReply( reply );
+    }
+    [HttpPost( "details" )]
+    public async Task<ActionResult<ProductDto?>> GetDetails( [FromBody] int productId )
+    {
+        ServiceReply<ProductDto?> reply = await _productService.GetProductDetails( productId );
         return GetReturnFromReply( reply );
     }
 }

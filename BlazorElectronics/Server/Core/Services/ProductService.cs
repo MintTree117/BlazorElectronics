@@ -1,11 +1,11 @@
+using System.Xml.Linq;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
 using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Services;
-using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
-using BlazorElectronics.Shared.Outbound.Products;
+using BlazorElectronics.Shared.Products;
 using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Core.Services;
@@ -18,14 +18,14 @@ public class ProductService : ApiService, IProductService
     const int MAX_PRODUCT_LIST_ROWS = 100;
     const int MAX_SEARCH_TEXT_LENGTH = 64;
     const int MAX_FILTER_ID_LENGTH = 8;
-
+    
     public ProductService( ILogger<ApiService> logger, IProductSearchRepository productSearchRepository, IProductRepository productRepository )
         : base( logger )
     {
         _productSearchRepository = productSearchRepository;
         _productRepository = productRepository;
     }
-
+    
     public async Task<ServiceReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
     {
         try
@@ -71,11 +71,23 @@ public class ProductService : ApiService, IProductService
             return new ServiceReply<ProductSearchResponse?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<ProductDetailsResponse?>> GetProductDetails( int productId, CategoryData categoryData )
+    public async Task<ServiceReply<ProductDto?>> GetProductDetails( int productId )
     {
-        return new ServiceReply<ProductDetailsResponse?>();
-    }
+        try
+        {
+            ProductModel? model = await _productRepository.Get( productId );
+            ProductDto? dto = await MapProductToDto( model );
 
+            return dto is not null
+                ? new ServiceReply<ProductDto?>( dto )
+                : new ServiceReply<ProductDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<ProductDto?>( ServiceErrorType.ServerError );
+        }
+    }
     static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest request )
     {
         return await Task.Run( () =>
@@ -118,7 +130,7 @@ public class ProductService : ApiService, IProductService
                         categoryIds.Add( value );
                 }
 
-                dto.Products.Add( new ProductResponse
+                dto.Products.Add( new ProductSummaryResponse
                 {
                     Id = p.ProductId,
                     VendorId = p.VendorId,
@@ -136,5 +148,66 @@ public class ProductService : ApiService, IProductService
 
             return dto;
         } );
+    }
+    static async Task<ProductDto?> MapProductToDto( ProductModel? model )
+    {
+        if ( model?.Product is null )
+            return null;
+
+        return await Task.Run( () =>
+        {
+            ProductDto dto = new()
+            {
+                Id = model.Product.ProductId,
+                VendorId = model.Product.VendorId,
+                Title = model.Product.Title,
+                Thumbnail = model.Product.Thumbnail,
+                Price = model.Product.Price,
+                SalePrice = model.Product.SalePrice,
+                ReleaseDate = model.Product.ReleaseDate,
+                IsFeatured = model.Product.IsFeatured,
+                Rating = model.Product.Rating,
+                NumberReviews = model.Product.NumberReviews,
+                NumberSold = model.Product.NumberSold,
+                Description = model.Description.Description,
+                XmlSpecsAggregated = ParseFromXml( model.XmlSpecs.XmlSpecs )
+            };
+
+            foreach ( ProductCategoryModel c in model.Categories )
+                dto.Categories.Add( c.CategoryId );
+
+            foreach ( ProductSpecLookupModel l in model.SpecLookups )
+            {
+                if ( !dto.LookupSpecs.TryGetValue( l.SpecId, out List<int>? values ) )
+                {
+                    values = new List<int>();
+                    dto.LookupSpecs.Add( l.SpecId, values );
+                }
+
+                values.Add( l.SpecValueId );
+            }
+
+            return dto;
+        } );
+    }
+
+    static Dictionary<string, string> ParseFromXml( string xmlString )
+    {
+        XDocument doc = XDocument.Parse( xmlString );
+        Dictionary<string, string> dict = new();
+
+        foreach ( XElement e in doc.Descendants() )
+        {
+            if ( !dict.ContainsKey( e.Name.LocalName ) )
+            {
+                dict.Add( e.Name.LocalName, e.Value );
+            }
+            else
+            {
+                dict[ e.Name.LocalName ] += ", " + e.Value;
+            }
+        }
+        
+        return dict;
     }
 }

@@ -18,6 +18,8 @@ public abstract class DapperRepository
 
     // SHARED
     protected const string PARAM_IS_GLOBAL = "@IsGlobal";
+    protected const string PARAM_ROWS = "@Rows";
+    protected const string PARAM_OFFSET = "@Offset";
     
     // CATEGORIES
     protected const string COL_CATEGORY_ID = "CategoryId";

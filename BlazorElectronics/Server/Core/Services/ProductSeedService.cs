@@ -30,7 +30,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     {
         _random = new Random();
         
-        List<ProductModel> models = new();
+        List<ProductEditModel> models = new();
 
         await Task.Run( () =>
         {
@@ -43,7 +43,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             }
         } );
 
-        foreach ( ProductModel m in models )
+        foreach ( ProductEditModel m in models )
         {
             try
             {
@@ -52,7 +52,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
                 if ( productId <= 0 )
                     return new ServiceReply<bool>( false );
 
-                foreach ( ProductReview r in m.Reviews )
+                foreach ( ProductReviewModel r in m.Reviews )
                 {
                     //r.ProductId = productId;
                     //int reviewResult = await _reviewRepository.Insert( r );
@@ -75,9 +75,9 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     
     // BASE MODEL
-    ProductModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, SpecsResponse lookups, VendorsResponse vendors, IReadOnlyList<int> users )
+    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, SpecsResponse lookups, VendorsResponse vendors, IReadOnlyList<int> users )
     {
-        ProductModel model = new()
+        ProductEditModel editModel = new()
         {
             VendorId = PickRandomVendor( primaryCategory, vendors ),
             Title = ProductSeedData.PRODUCT_TITLES[ primaryCategory - 1 ] + " " + i,
@@ -90,20 +90,20 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         };
 
         if ( GetRandomBoolean() )
-            model.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) model.Price );
+            editModel.SalePrice = GetRandomDecimal( ProductSeedData.MIN_PRICE, ( double ) editModel.Price );
 
-        model.Categories.Add( primaryCategory );
-        model.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoryData ) );
+        editModel.Categories.Add( primaryCategory );
+        editModel.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoryData ) );
         
         GetRandomLookups( lookups.GlobalSpecIds, lookups )
             .ToList()
-            .ForEach( x => model.SpecLookups[ x.Key ] = x.Value );
+            .ForEach( x => editModel.SpecLookups[ x.Key ] = x.Value );
 
         GetRandomLookups( lookups.SpecIdsByCategory[ primaryCategory ], lookups )
             .ToList()
-            .ForEach( x => model.SpecLookups[ x.Key ] = x.Value );
+            .ForEach( x => editModel.SpecLookups[ x.Key ] = x.Value );
 
-        model.XmlSpecs = primaryCategory switch
+        editModel.XmlSpecs = primaryCategory switch
         {
             1 => GetBookXml(),
             2 => GetSoftwareXml(),
@@ -113,9 +113,9 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             _ => throw new ArgumentOutOfRangeException( nameof( primaryCategory ), primaryCategory, null )
         };
 
-        model.Reviews = GetRandomReviews( primaryCategory, users );
+        editModel.Reviews = GetRandomReviews( primaryCategory, users );
 
-        return model;
+        return editModel;
     }
     // DESCRIPTIONS
     string GetRandomDescription( int category )
@@ -266,14 +266,14 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return picked.ToList();
     }
     // REVIEWS
-    List<ProductReview> GetRandomReviews( int category, IReadOnlyList<int> userIds )
+    List<ProductReviewModel> GetRandomReviews( int category, IReadOnlyList<int> userIds )
     {
-        List<ProductReview> reviews = new();
+        List<ProductReviewModel> reviews = new();
         int amount = GetRandomInt( 1, 20 );
 
         for ( int i = 0; i < amount; i++ )
         {
-            reviews.Add( new ProductReview
+            reviews.Add( new ProductReviewModel
             {
                 UserId = userIds[ GetRandomInt( 0, userIds.Count - 1 ) ],
                 Review = GetRandomSpec( ProductSeedData.PRODUCT_REVIEWS[ category - 1 ] ),

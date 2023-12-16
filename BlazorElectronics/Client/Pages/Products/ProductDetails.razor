@@ -1,0 +1,86 @@
+@page "/product/{productId}"
+@inherits PageView
+@using BlazorElectronics.Client.Shared
+@using BlazorElectronics.Shared.ProductReviews
+
+<div class="container-sm">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <div class="mt-4">
+            <div class="product-details-top">
+            
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            
+                <div class="product-title">
+                    <h2>@_product.Title</h2>
+                    <div>
+                        <StarRating Rating="@_product.Rating"></StarRating>
+                        <span>@_product.NumberReviews</span>
+                    </div>
+                    <div class="my-2">
+                        @if ( _product.SalePrice is not null )
+                        {
+                            <div>
+                                <span class="original-price">$@_product.Price</span>
+                                <span class="sale-price">$@_product.SalePrice</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="price">$@_product.Price</span>
+                        }
+                        <button class="btn btn-primary">Add to Cart</button>
+                    </div>
+                </div>
+            
+                <div class="mt-2">
+                    <h4>Specifications</h4>
+                    <table class="product-details-table">
+                        <tbody>
+                        @foreach ( KeyValuePair<string, string> kvp in _product.XmlSpecsAggregated )
+                        {
+                            <tr>
+                                <th>@kvp.Key</th>
+                                <td>@kvp.Value</td>
+                            </tr>
+                        }
+                        @foreach ( KeyValuePair<string, string> kvp in _lookupSpecsAggregated )
+                        {
+                            <tr>
+                                <th>@kvp.Key</th>
+                                <td>@kvp.Value</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+    
+                <div class="mt-2">
+                    <h4>Reviews</h4>
+                    @foreach( ProductReviewDto review in _reviews )
+                    {
+                        <div>
+                            <strong>@review.Username</strong>
+                            <StarRating Rating="@review.Rating"></StarRating>
+                            <p>@review.Review</p>
+                        </div>
+                    }
+                    <Pagination></Pagination>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -18,7 +18,7 @@ else
         <h4 class="text-decoration-underline">Results</h4>
 
         <div class="product-list-inner">
-            @foreach ( ProductResponse p in _search.Products )
+            @foreach ( ProductSummaryResponse p in _search.Products )
             {
                 int roundedRating = ( int ) Math.Round( p.Rating );
                 <div class="product-card">

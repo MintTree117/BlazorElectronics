@@ -16,28 +16,33 @@ public sealed class ProductReviewRepository : DapperRepository, IProductReviewRe
     public ProductReviewRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<IEnumerable<ProductReview>?> GetForProduct( int productId, int rows, int offset )
+    public async Task<IEnumerable<ProductReviewModel>?> GetForProduct( int productId, int rows, int page )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_PRODUCT_ID, productId );
+        p.Add( PARAM_ROWS, rows );
+        p.Add( PARAM_OFFSET, rows * page );
+
+        return await TryQueryAsync( Query<ProductReviewModel>, p, PROCEDURE_GET_FOR_PRODUCT );
+    }
+    public async Task<IEnumerable<ProductReviewModel>?> GetForUser( int userId, int rows, int page )
     {
         throw new NotImplementedException();
     }
-    public async Task<IEnumerable<ProductReview>?> GetForUser( int userId, int rows, int offset )
-    {
-        throw new NotImplementedException();
-    }
-    public async Task<ProductReview?> GetEdit( int reviewId )
+    public async Task<ProductReviewModel?> GetEdit( int reviewId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_REVIEW_ID, reviewId );
-        return await TryQueryAsync( QuerySingleOrDefault<ProductReview?>, p, PROCEDURE_GET_EDIT );
+        return await TryQueryAsync( QuerySingleOrDefault<ProductReviewModel?>, p, PROCEDURE_GET_EDIT );
     }
-    public async Task<int> Insert( ProductReview review )
+    public async Task<int> Insert( ProductReviewModel reviewModel )
     {
-        DynamicParameters p = GetInsertParams( review );
+        DynamicParameters p = GetInsertParams( reviewModel );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( ProductReview review )
+    public async Task<bool> Update( ProductReviewModel reviewModel )
     {
-        DynamicParameters p = GetUpdateParams( review );
+        DynamicParameters p = GetUpdateParams( reviewModel );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
     }
     public async Task<bool> Delete( int reviewId )
@@ -47,7 +52,7 @@ public sealed class ProductReviewRepository : DapperRepository, IProductReviewRe
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
 
-    static DynamicParameters GetInsertParams( ProductReview model )
+    static DynamicParameters GetInsertParams( ProductReviewModel model )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, model.ProductId );
@@ -56,7 +61,7 @@ public sealed class ProductReviewRepository : DapperRepository, IProductReviewRe
         p.Add( PARAM_PRODUCT_REVIEW, model.Review );
         return p;
     }
-    static DynamicParameters GetUpdateParams( ProductReview model )
+    static DynamicParameters GetUpdateParams( ProductReviewModel model )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_REVIEW_ID, model.ReviewId );

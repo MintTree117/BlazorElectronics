@@ -2,6 +2,7 @@ using System.Data;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
 using Dapper;
+using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Data.Repositories;
 
@@ -24,14 +25,14 @@ public class ProductRepository : DapperRepository, IProductRepository
         p.Add( PARAM_PRODUCT_ID, productId );
         return await TryQueryAsync( QuerySingleOrDefault<ProductModel?>, p, PROCEDURE_GET );
     }
-    public async Task<int> Insert( ProductModel model )
+    public async Task<int> Insert( ProductEditModel editModel )
     {
-        DynamicParameters p = GetInsertParams( model );
+        DynamicParameters p = GetInsertParams( editModel );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( ProductModel model )
+    public async Task<bool> Update( ProductEditModel editModel )
     {
-        DynamicParameters p = GetUpdateParams( model );
+        DynamicParameters p = GetUpdateParams( editModel );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
     }
     public async Task<bool> Delete( int productId )
@@ -47,6 +48,24 @@ public class ProductRepository : DapperRepository, IProductRepository
     public async Task<bool> UpdateReviewCount()
     {
         return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_PRODUCT_REVIEW_COUNT );
+    }
+
+    static async Task<ProductModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    {
+        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, dynamicParams, commandType: CommandType.StoredProcedure );
+
+        if ( multi is null )
+            return null;
+
+        return new ProductModel
+        {
+            Product = await multi.ReadSingleOrDefaultAsync<ProductSummaryModel>(),
+            Description = await multi.ReadSingleOrDefaultAsync<ProductDescriptionModel>(),
+            Categories = await multi.ReadAsync<ProductCategoryModel>(),
+            Images = await multi.ReadAsync<ProductImageModel>(),
+            SpecLookups = await multi.ReadAsync<ProductSpecLookupModel>(),
+            XmlSpecs = await multi.ReadSingleOrDefaultAsync<ProductXmlModel>()
+        };
     }
 
     static DataTable GetCategoriesTable( List<int> categories )
@@ -97,7 +116,7 @@ public class ProductRepository : DapperRepository, IProductRepository
         return table;
     }
 
-    static DynamicParameters GetInsertParams( ProductModel m )
+    static DynamicParameters GetInsertParams( ProductEditModel m )
     {
         DynamicParameters p = new();
         p.Add( PARAM_VENDOR_ID, m.VendorId );
@@ -117,7 +136,7 @@ public class ProductRepository : DapperRepository, IProductRepository
 
         return p;
     }
-    static DynamicParameters GetUpdateParams( ProductModel m )
+    static DynamicParameters GetUpdateParams( ProductEditModel m )
     {
         DynamicParameters p = GetInsertParams( m );
         p.Add( PARAM_PRODUCT_ID, m.ProductId );
