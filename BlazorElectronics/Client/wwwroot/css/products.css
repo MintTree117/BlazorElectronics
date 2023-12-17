@@ -79,8 +79,19 @@
     margin-right: 5px;
     font-size: 0.8em;
 }
+
 .product-card-description {
     display: none;
+    font-size: 0.9em; /* Slightly smaller font size */
+    line-height: 1.4; /* Improves readability */
+    color: #555; /* Slightly muted color */
+    margin-top: 10px; /* Space above the description */
+    text-align: justify; /* Justifies the text for a cleaner look */
+    overflow: hidden; /* Ensures the text doesn't overflow */
+    text-overflow: ellipsis; /* Adds an ellipsis if the text overflows */
+    display: -webkit-box; /* Needed for line clamping */
+    -webkit-line-clamp: 3; /* Limits to 3 lines */
+    -webkit-box-orient: vertical; /* Orient the text vertically */
 }
 .product-card-vendor {
     text-decoration: none;
@@ -169,6 +180,53 @@
     font-size: inherit; /* Inherits the font size from the breadcrumb */
     line-height: inherit; /* Inherits the line height from the breadcrumb */
 }
+.product-categories {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+}
+
+/*--- PRODUCT DETAILS ---*/
+.product-details-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+    padding: 20px;
+}
+.product-details-top {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: start;
+}
+.product-details-image {
+    width: 100%;
+    height: auto;
+}
+.product-details-overview {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+.product-details-overview-bottom {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-description {
+    display: block;
+    font-size: 1em; /* Slightly smaller font size */
+    line-height: 1.4; /* Improves readability */
+    color: #555; /* Slightly muted color */
+    text-align: justify; /* Justifies the text for a cleaner look */
+    overflow: hidden; /* Ensures the text doesn't overflow */
+    text-overflow: ellipsis; /* Adds an ellipsis if the text overflows */
+    display: -webkit-box; /* Needed for line clamping */
+    -webkit-box-orient: vertical; /* Orient the text vertically */
+}
 
 @media only screen and (max-width: 1200px) {
     .product-filters {
@@ -213,6 +271,29 @@
 }
 
 @media only screen and (min-width: 768px) {
+    .product-details-top {
+        flex-direction: row;
+    }
+    .product-details-image {
+        min-width: 400px;
+        max-width: 400px;
+    }
+    .product-details-overview {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .product-details-overview {
+        justify-content: space-between;
+    }
+    .product-categories {
+        flex-grow: 0;
+    }
+    .product-details-overview-bottom {
+        flex-grow: 1;
+        flex-shrink: 0;
+        justify-content: flex-end;
+    }
+    
     .product-list-header {
         flex-direction: row; /* Inline items */
         justify-content: space-between; /* Space between nav and buttons */
@@ -233,16 +314,6 @@
     }
     .product-card-description {
         display: block;
-        font-size: 0.9em; /* Slightly smaller font size */
-        line-height: 1.4; /* Improves readability */
-        color: #555; /* Slightly muted color */
-        margin-top: 10px; /* Space above the description */
-        text-align: justify; /* Justifies the text for a cleaner look */
-        overflow: hidden; /* Ensures the text doesn't overflow */
-        text-overflow: ellipsis; /* Adds an ellipsis if the text overflows */
-        display: -webkit-box; /* Needed for line clamping */
-        -webkit-line-clamp: 3; /* Limits to 3 lines */
-        -webkit-box-orient: vertical; /* Orient the text vertically */
     }
 }
 
@@ -250,6 +321,13 @@
     .product-card {
         min-width: 24%;
         max-width: 24%;
+    }
+    .product-details-container {
+        padding: 0;
+    }
+    .product-details-overview {
+        padding: 0;
+        padding-left: 20px;
     }
 }
 

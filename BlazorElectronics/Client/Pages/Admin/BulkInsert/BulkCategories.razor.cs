@@ -50,11 +50,11 @@ public partial class BulkCategories : AdminPage
         };
         StateHasChanged();
     }
-    List<CategoryView> GetPrimary()
+    List<CategoryViewDtoDto> GetPrimary()
     {
         return CategoryHelper.Categories.Where( c => c.Tier == CategoryTier.Primary ).ToList();
     }
-    List<CategoryView> GetEditParents()
+    List<CategoryViewDtoDto> GetEditParents()
     {
         return _seed.Tier == CategoryTier.Tertiary
             ? CategoryHelper.Categories.Where( c => c.ParentCategoryId == _seed.PrimaryId ).ToList()
@@ -66,8 +66,8 @@ public partial class BulkCategories : AdminPage
             .Split( "," )
             .ToList();
 
-        List<CategoryEdit> categories = names
-            .Select( s => new CategoryEdit
+        List<CategoryEditDtoDto> categories = names
+            .Select( s => new CategoryEditDtoDto
             {
                 ParentCategoryId = _seed.ParentCategoryId,
                 Tier = _seed.Tier,

@@ -8,11 +8,11 @@ public sealed class CategoryData
     {
         
     }
-    public CategoryData( List<CategoryResponse> responses )
+    public CategoryData( List<CategoryLightDto> responses )
     {
-        foreach ( CategoryResponse r in responses )
+        foreach ( CategoryLightDto r in responses )
         {
-            CategoriesById.Add( r.Id, new CategoryModel
+            CategoriesById.Add( r.Id, new CategoryFullDto
             {
                 CategoryId = r.Id,
                 ParentCategoryId = r.ParentId,
@@ -28,9 +28,9 @@ public sealed class CategoryData
 
         BuildData();
     }
-    public CategoryData( List<CategoryModel> models )
+    public CategoryData( List<CategoryFullDto> models )
     {
-        foreach ( CategoryModel m in models )
+        foreach ( CategoryFullDto m in models )
         {
             CategoriesById.Add( m.CategoryId, m );
 
@@ -41,33 +41,33 @@ public sealed class CategoryData
         BuildData();
     }
     
-    public Dictionary<int, CategoryModel> CategoriesById { get; init; } = new();
+    public Dictionary<int, CategoryFullDto> CategoriesById { get; init; } = new();
     public List<int> PrimaryIds { get; init; } = new();
     public Dictionary<string, int> Urls { get; init; } = new();
 
     void BuildData()
     {
-        Dictionary<int, CategoryModel>.ValueCollection models = CategoriesById.Values;
+        Dictionary<int, CategoryFullDto>.ValueCollection models = CategoriesById.Values;
         
-        foreach ( CategoryModel m in models )
+        foreach ( CategoryFullDto m in models )
         {
             if ( m.ParentCategoryId is null or null )
                 continue;
 
-            if ( CategoriesById.TryGetValue( m.ParentCategoryId.Value, out CategoryModel? parent ) )
+            if ( CategoriesById.TryGetValue( m.ParentCategoryId.Value, out CategoryFullDto? parent ) )
                 parent.Children.Add( m );
         }
 
         // Create a new dictionary to hold the full URLs.
         var fullUrls = new Dictionary<int, string>();
 
-        foreach ( CategoryModel m in models )
+        foreach ( CategoryFullDto m in models )
         {
             // Use the refactored method to build the full URL and store it in the new dictionary.
             fullUrls[ m.CategoryId ] = BuildApiUrl( m, CategoriesById );
         }
 
-        foreach ( CategoryModel m in models )
+        foreach ( CategoryFullDto m in models )
         {
             // Update the model's ApiUrl with the full URL from the dictionary.
             m.ApiUrl = fullUrls[ m.CategoryId ];
@@ -76,7 +76,7 @@ public sealed class CategoryData
             Urls.TryAdd( m.ApiUrl, m.CategoryId );
         }
     }
-    static string BuildApiUrl( CategoryModel m, Dictionary<int, CategoryModel> responses )
+    static string BuildApiUrl( CategoryFullDto m, Dictionary<int, CategoryFullDto> responses )
     {
         // Base case: If no parent, return the category's own URL.
         if ( m.ParentCategoryId == null )
@@ -85,7 +85,7 @@ public sealed class CategoryData
         }
 
         // If the category has a parent, recursively get the parent's URL.
-        if ( responses.TryGetValue( m.ParentCategoryId.Value, out CategoryModel parent ) )
+        if ( responses.TryGetValue( m.ParentCategoryId.Value, out CategoryFullDto parent ) )
         {
             string parentUrl = BuildApiUrl( parent, responses );
 
@@ -112,7 +112,7 @@ public sealed class CategoryData
             if ( !Urls.TryGetValue( u, out int id ) )
                 return false;
 
-            if ( !CategoriesById.TryGetValue( id, out CategoryModel? r ) )
+            if ( !CategoriesById.TryGetValue( id, out CategoryFullDto? r ) )
                 return false;
 
             if ( r.Tier != ( CategoryTier ) count )
@@ -124,7 +124,7 @@ public sealed class CategoryData
 
         return true;
     }
-    public List<CategoryModel> GetPrimaryCategories()
+    public List<CategoryFullDto> GetPrimaryCategories()
     {
         return ( from id in PrimaryIds select CategoriesById[ id ] ).ToList();
     }

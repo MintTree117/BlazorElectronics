@@ -12,11 +12,11 @@ public partial class LandingFeatures : RazorView
     [Inject] IJSRuntime JsRuntime { get; init; } = default!;
     
     bool _isCarouselInitialized = false;
-    List<Feature>? _featuredProducts;
+    List<FeatureDto>? _featuredProducts;
 
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<List<Feature>?> reply = await FeaturesService.GetFeatures();
+        ServiceReply<List<FeatureDto>?> reply = await FeaturesService.GetFeatures();
 
         if ( reply.Success )
             _featuredProducts = reply.Data;

@@ -18,7 +18,7 @@ else
         <h4 class="text-decoration-underline">Results</h4>
 
         <div class="product-list-inner">
-            @foreach ( ProductSummaryResponse p in _search.Products )
+            @foreach ( ProductSummaryDto p in _search.Products )
             {
                 int roundedRating = ( int ) Math.Round( p.Rating );
                 <div class="product-card">
@@ -37,10 +37,10 @@ else
                             </div>
                             <span class="text-muted"><small>@p.NumberSold purchased</small></span>
                         </div>
-                        <div class="d-flex flex-grow-1 flex-row flex-wrap align-items-center align-content-center">
+                        <div class="product-categories">
                             @foreach ( int id in p.Categories )
                             {
-                                if ( !_categories.TryGetValue( id, out CategoryModel? c ) )
+                                if ( !_categories.TryGetValue( id, out CategoryFullDto? c ) )
                                     continue;
                                             
                                 <a class="d-inline-block btn btn-sm btn-outline-secondary me-2 mb-2" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>
@@ -51,7 +51,7 @@ else
                         
                             <span class="mb-1 text-muted"><small>Sold By:</small></span>
                         
-                            @if ( _vendors.TryGetValue( p.VendorId, out VendorModel? v ) )
+                            @if ( _vendors.TryGetValue( p.VendorId, out VendorDto? v ) )
                             {
                                 <a class="product-card-vendor mb-2" href="@v.VendorUrl">@v.VendorName</a>
                             }

@@ -7,14 +7,14 @@ public interface ICategoryService
     // USER
     Task<ServiceReply<List<int>?>> GetPrimaryCategoryIds(); 
     Task<ServiceReply<CategoryData?>> GetCategoryData();
-    Task<ServiceReply<List<CategoryResponse>?>> GetCategoryResponse();
+    Task<ServiceReply<List<CategoryLightDto>?>> GetCategoryResponse();
     Task<ServiceReply<int>> ValidateCategoryUrl( string url );
 
     // ADMIN
-    Task<ServiceReply<List<CategoryView>?>> GetCategoriesView();
-    Task<ServiceReply<CategoryEdit?>> GetCategoryEdit( int categoryId );
-    Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEdit> categories );
-    Task<ServiceReply<int>> AddCategory( CategoryEdit dto );
-    Task<ServiceReply<bool>> UpdateCategory( CategoryEdit dto );
+    Task<ServiceReply<List<CategoryViewDtoDto>?>> GetCategoriesView();
+    Task<ServiceReply<CategoryEditDtoDto?>> GetCategoryEdit( int categoryId );
+    Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEditDtoDto> categories );
+    Task<ServiceReply<int>> AddCategory( CategoryEditDtoDto dtoDto );
+    Task<ServiceReply<bool>> UpdateCategory( CategoryEditDtoDto dtoDto );
     Task<ServiceReply<bool>> RemoveCategory( int categoryId );
 }

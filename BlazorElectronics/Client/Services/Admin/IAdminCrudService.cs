@@ -2,7 +2,7 @@ using BlazorElectronics.Shared;
 
 namespace BlazorElectronics.Client.Services.Admin;
 
-public interface IAdminCrudService<Tview,Tedit> where Tview : CrudView
+public interface IAdminCrudService<Tview,Tedit> where Tview : CrudViewDto
 {
     Task<ServiceReply<List<Tview>?>> GetView( string path );
     Task<ServiceReply<Tedit?>> GetEdit( string path, IntDto itemId );

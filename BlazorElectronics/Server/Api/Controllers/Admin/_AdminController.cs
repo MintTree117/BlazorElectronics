@@ -12,13 +12,13 @@ public class _AdminController : UserController
         : base( logger, userAccountService, sessionService ) { }
 
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequest request )
+    public async Task<ActionResult<bool>> AuthorizeAdmin( [FromBody] UserRequestDto requestDto )
     {
-        ServiceReply<bool> reply = await ValidateAndAuthorizeAdmin( request );
+        ServiceReply<bool> reply = await ValidateAndAuthorizeAdmin( requestDto );
         return GetReturnFromReply( reply );
     }
 
-    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeAdmin( UserRequest? request )
+    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeAdmin( UserRequestDto? request )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
@@ -27,7 +27,7 @@ public class _AdminController : UserController
 
         return await UserAccountService.VerifyAdmin( userReply.Data );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeAdminId( UserRequest? request )
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeAdminId( UserRequestDto? request )
     { 
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 

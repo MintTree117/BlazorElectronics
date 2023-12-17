@@ -25,21 +25,21 @@ public class UserController : _Controller
         return dto;
     }
 
-    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeUser( UserRequest? request )
+    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeUser( UserRequestDto? request )
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<bool>( ServiceErrorType.ValidationError );
 
         return await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( UserRequest? request )
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( UserRequestDto? request )
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
         return await SessionService.AuthorizeSessionId( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId<T>( UserDataRequest<T>? request ) where T : class
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId<T>( UserDataRequestDto<T>? request ) where T : class
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<int>( ServiceErrorType.ValidationError );
@@ -47,12 +47,12 @@ public class UserController : _Controller
         return await SessionService.AuthorizeSessionId( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
     
-    static bool ValidateUserHttp( UserRequest? request )
+    static bool ValidateUserHttp( UserRequestDto? request )
     {
         return request is not null && 
                ValidateRequestSession( request.SessionId, request.SessionToken );
     }
-    static bool ValidateUserHttp<T>( UserDataRequest<T>? request ) where T : class
+    static bool ValidateUserHttp<T>( UserDataRequestDto<T>? request ) where T : class
     {
         return request?.Payload is not null && 
                ValidateRequestSession( request.SessionId, request.SessionToken );

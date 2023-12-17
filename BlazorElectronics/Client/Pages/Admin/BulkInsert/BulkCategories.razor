@@ -34,7 +34,7 @@
                 <div class="mb-3">
                     <label for="Tier" class="form-label">Primary Category</label>
                     <InputSelect @bind-Value="_seed.PrimaryId" class="form-control" id="Primary">
-                        @foreach ( CategoryView item in GetPrimary() )
+                        @foreach ( CategoryViewDtoDto item in GetPrimary() )
                         {
                             <option value="@item.Id.ToString()">@item.Name</option>
                         }
@@ -45,7 +45,7 @@
             <div class="mb-3">
                 <label for="Parent" class="form-label">Parent Category</label>
                 <InputSelect @bind-Value="_seed.ParentCategoryId" class="form-control" id="Parent">
-                    @foreach ( CategoryView item in GetEditParents() )
+                    @foreach ( CategoryViewDtoDto item in GetEditParents() )
                     {
                         <option value="@item.Id.ToString()">@item.Name</option>
                     }

@@ -5,5 +5,5 @@ namespace BlazorElectronics.Client.Services.Vendors;
 
 public interface IVendorServiceClient
 {
-    Task<ServiceReply<VendorsResponse?>> GetVendors();
+    Task<ServiceReply<VendorsDto?>> GetVendors();
 }

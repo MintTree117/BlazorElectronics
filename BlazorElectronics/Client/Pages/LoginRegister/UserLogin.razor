@@ -6,17 +6,17 @@
     
     <h3>UserLogin</h3>
 
-    <EditForm Model="_loginRequest" OnValidSubmit="@(async () => await HandleLogin() )">
+    <EditForm Model="_loginRequestDto" OnValidSubmit="@(async () => await HandleLogin() )">
         <DataAnnotationsValidator/>
         <div class="mb-3">
             <label for="email">Email</label>
-            <InputText class="form-control" id="email" @bind-Value="_loginRequest.EmailOrUsername"/>
-            <ValidationMessage For="@(() => _loginRequest.EmailOrUsername)"/>
+            <InputText class="form-control" id="email" @bind-Value="_loginRequestDto.EmailOrUsername"/>
+            <ValidationMessage For="@(() => _loginRequestDto.EmailOrUsername)"/>
         </div>
         <div class="mb-3">
             <label for="password">Password</label>
-            <InputText class="form-control" id="password" @bind-Value="_loginRequest.Password" type="password"/>
-            <ValidationMessage For="@(() => _loginRequest.Password)"/>
+            <InputText class="form-control" id="password" @bind-Value="_loginRequestDto.Password" type="password"/>
+            <ValidationMessage For="@(() => _loginRequestDto.Password)"/>
         </div>
         <button class="btn btn-primary" type="submit">Login</button>
     </EditForm>

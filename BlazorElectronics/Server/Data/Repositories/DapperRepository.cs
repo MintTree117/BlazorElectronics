@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using BlazorElectronics.Server.Core;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -20,6 +21,7 @@ public abstract class DapperRepository
     protected const string PARAM_IS_GLOBAL = "@IsGlobal";
     protected const string PARAM_ROWS = "@Rows";
     protected const string PARAM_OFFSET = "@Offset";
+    protected const string PARAM_REVIEW_SORT_TYPE = "@ReviewSort";
     
     // CATEGORIES
     protected const string COL_CATEGORY_ID = "CategoryId";

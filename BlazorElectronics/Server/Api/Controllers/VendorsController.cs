@@ -17,9 +17,9 @@ public class VendorsController : _Controller
     }
     
     [HttpGet( "get" )]
-    public async Task<ActionResult<VendorsResponse?>> GetVendors()
+    public async Task<ActionResult<VendorsDto?>> GetVendors()
     {
-        ServiceReply<VendorsResponse?> reply = await _vendorService.GetVendors();
+        ServiceReply<VendorsDto?> reply = await _vendorService.GetVendors();
         return GetReturnFromReply( reply );
     }
 }

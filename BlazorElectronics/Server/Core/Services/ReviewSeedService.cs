@@ -29,7 +29,7 @@ public sealed class ReviewSeedService : ApiService, IReviewSeedService
                 int id = await _repository.Insert( r );
 
                 if ( id <= 0 )
-                    return new ServiceReply<bool>( ServiceErrorType.ServerError );
+                    Logger.LogError( "Insertion failed" );
             }
             catch ( RepositoryException e )
             {
@@ -46,16 +46,15 @@ public sealed class ReviewSeedService : ApiService, IReviewSeedService
         {
             List<ProductReviewModel> reviews = new();
 
-            for ( int i = 0; i < amount; i++ )
+            foreach ( int id in productIds )
             {
-                int productId = GetRandomInt( 0, productIds.Count - 1 );
-                int productAmount = GetRandomInt( 5, 20 );
+                int productAmount = GetRandomInt( 1, amount );
 
                 for ( int j = 0; j < productAmount; j++ )
                 {
                     reviews.Add( new ProductReviewModel
                     {
-                        ProductId = productId,
+                        ProductId = id,
                         UserId = userIds[ GetRandomInt( 0, userIds.Count - 1 ) ],
                         Review = GetRandomItem( SeedData.PRODUCT_REVIEWS[ GetRandomInt( 0, SeedData.PRODUCT_REVIEWS.Length - 1 ) ] ),
                         Rating = GetRandomInt( 1, 5 )

@@ -13,7 +13,7 @@ public class UserAccountController : UserController
     public UserAccountController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
 
     [HttpPost( "register" )]
-    public async Task<ActionResult<UserSessionResponse>> Register( [FromBody] UserRegisterRequest? request )
+    public async Task<ActionResult<SessionReplyDto>> Register( [FromBody] RegisterRequestDto? request )
     {
         if ( !ValidateRegisterRequest( request ) )
             return BadRequest( BAD_REQUEST_MESSAGE );
@@ -22,7 +22,7 @@ public class UserAccountController : UserController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "login" )]
-    public async Task<ActionResult<UserSessionResponse>> Login( [FromBody] UserLoginRequest? request )
+    public async Task<ActionResult<SessionReplyDto>> Login( [FromBody] LoginRequestDto? request )
     {
         if ( !ValidateLoginRequest( request ) )
             return BadRequest( BAD_REQUEST_MESSAGE );
@@ -37,7 +37,7 @@ public class UserAccountController : UserController
         if ( !sessionReply.Success )
             return GetReturnFromReply( sessionReply );
 
-        var session = new UserSessionResponse
+        var session = new SessionReplyDto
         {
             Email = loginReply.Data.Email,
             Username = loginReply.Data.Username,
@@ -49,13 +49,13 @@ public class UserAccountController : UserController
         return Ok( session );
     }
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<bool>> AuthorizeSession( [FromBody] UserRequest request )
+    public async Task<ActionResult<bool>> AuthorizeSession( [FromBody] UserRequestDto requestDto )
     {
-        ServiceReply<bool> authorizeReply = await ValidateAndAuthorizeUser( request );
+        ServiceReply<bool> authorizeReply = await ValidateAndAuthorizeUser( requestDto );
         return GetReturnFromReply( authorizeReply );
     }
     [HttpPost( "change-password" )]
-    public async Task<ActionResult<bool>> ChangePassword( [FromBody] UserDataRequest<PasswordChangeRequest>? request )
+    public async Task<ActionResult<bool>> ChangePassword( [FromBody] UserDataRequestDto<PasswordRequestDto>? request )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
@@ -69,7 +69,7 @@ public class UserAccountController : UserController
         return GetReturnFromReply( passwordReply );
     }
     [HttpPost( "logout" )]
-    public async Task<ActionResult<bool>> Logout( [FromBody] UserRequest? request )
+    public async Task<ActionResult<bool>> Logout( [FromBody] UserRequestDto? request )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
 
@@ -80,7 +80,7 @@ public class UserAccountController : UserController
         return GetReturnFromReply( deleteReply );
     }
 
-    static bool ValidateRegisterRequest( UserRegisterRequest? request )
+    static bool ValidateRegisterRequest( RegisterRequestDto? request )
     {
         if ( request is null )
             return false;
@@ -91,7 +91,7 @@ public class UserAccountController : UserController
 
         return validUsername && validEmail && validPassword;
     }
-    static bool ValidateLoginRequest( UserLoginRequest? request )
+    static bool ValidateLoginRequest( LoginRequestDto? request )
     {
         if (request is null )
             return false;
@@ -101,7 +101,7 @@ public class UserAccountController : UserController
 
         return validEmailOrUsername && validPassword;
     }
-    static bool ValidateChangePasswordRequest( PasswordChangeRequest? dto )
+    static bool ValidateChangePasswordRequest( PasswordRequestDto? dto )
     {
         return dto is not null && !string.IsNullOrWhiteSpace( dto.Password );
     }

@@ -17,8 +17,8 @@ public partial class ProductSearch : PageView, IDisposable
 {
     public event Action? OnOpenFilters; 
     public event Action<Dictionary<string,string>>? InitializeHeader; 
-    public event Action<string?, List<CategoryModel>?, Dictionary<int, Spec>, List<VendorModel>>? InitializeFilters;
-    public event Action<ProductSearchResponse, Dictionary<int,CategoryModel>, Dictionary<int, VendorModel>>? OnProductSearch;
+    public event Action<string?, List<CategoryFullDto>?, Dictionary<int, LookupSpec>, List<VendorDto>>? InitializeFilters;
+    public event Action<ProductSearchReplyDto, Dictionary<int,CategoryFullDto>, Dictionary<int, VendorDto>>? OnProductSearch;
 
     [Inject] IProductServiceClient ProductService { get; set; } = default!;
     [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
@@ -29,18 +29,18 @@ public partial class ProductSearch : PageView, IDisposable
     [Parameter] public string SecondaryCategory { get; init; } = string.Empty;
     [Parameter] public string TertiaryCategory { get; init; } = string.Empty;
 
-    CategoryModel? _primaryCategory;
-    CategoryModel? _currentCategory;
+    CategoryFullDto? _primaryCategory;
+    CategoryFullDto? _currentCategory;
     string? _searchText;
 
     CategoryData? categories;
-    SpecsResponse? specs;
-    VendorsResponse? vendors;
-    ProductSearchFilters? _searchFilters;
+    LookupSpecsDto? specs;
+    VendorsDto? vendors;
+    ProductFiltersDto? _searchFilters;
     ProductSortType _sortType;
     int _currentRows = 10;
     int _currentPage = 1;
-    ProductSearchResponse? _searchResults;
+    ProductSearchReplyDto? _searchResults;
 
     public void Dispose()
     {
@@ -62,8 +62,8 @@ public partial class ProductSearch : PageView, IDisposable
         List<Task> apiTasks = new();
         
         Task<ServiceReply<CategoryData?>> categoryTask = CategoryService.GetCategories();
-        Task<ServiceReply<SpecsResponse?>> specTask = SpecService.GetSpecLookups();
-        Task<ServiceReply<VendorsResponse?>> vendorTask = VendorService.GetVendors();
+        Task<ServiceReply<LookupSpecsDto?>> specTask = SpecService.GetSpecLookups();
+        Task<ServiceReply<VendorsDto?>> vendorTask = VendorService.GetVendors();
 
         apiTasks.Add( categoryTask );
         apiTasks.Add( specTask );
@@ -72,8 +72,8 @@ public partial class ProductSearch : PageView, IDisposable
         await Task.WhenAll( apiTasks );
 
         ServiceReply<CategoryData?> categoryReply = categoryTask.Result;
-        ServiceReply<SpecsResponse?> specReply = specTask.Result;
-        ServiceReply<VendorsResponse?> vendorReply = vendorTask.Result;
+        ServiceReply<LookupSpecsDto?> specReply = specTask.Result;
+        ServiceReply<VendorsDto?> vendorReply = vendorTask.Result;
 
         if ( categoryReply is not { Success: true, Data: not null } )
         {
@@ -119,7 +119,7 @@ public partial class ProductSearch : PageView, IDisposable
         
         if ( !cData.Urls.TryGetValue( categoryUrl, out int categoryId ) )
             return false;
-        if ( !cData.CategoriesById.TryGetValue( categoryId, out CategoryModel? category ) )
+        if ( !cData.CategoriesById.TryGetValue( categoryId, out CategoryFullDto? category ) )
             return false;
 
         _currentCategory = category;
@@ -143,7 +143,7 @@ public partial class ProductSearch : PageView, IDisposable
         if ( categories is null )
             return urls;
         
-        CategoryModel? m = _currentCategory;
+        CategoryFullDto? m = _currentCategory;
 
         while ( m is not null )
         {
@@ -156,21 +156,21 @@ public partial class ProductSearch : PageView, IDisposable
 
         return urls;
     }
-    List<CategoryModel> GetCategoryFilters()
+    List<CategoryFullDto> GetCategoryFilters()
     {
         if ( _currentCategory is null )
-            return categories?.GetPrimaryCategories() ?? new List<CategoryModel>();
+            return categories?.GetPrimaryCategories() ?? new List<CategoryFullDto>();
 
         return _currentCategory.Children.Count > 0
             ? _currentCategory.Children
-            : new List<CategoryModel>();
+            : new List<CategoryFullDto>();
     }
-    Dictionary<int, Spec> GetSpecFilters()
+    Dictionary<int, LookupSpec> GetSpecFilters()
     {
         if ( specs is null )
-            return new Dictionary<int, Spec>();
+            return new Dictionary<int, LookupSpec>();
 
-        Dictionary<int, Spec> specFilters = specs.GlobalSpecIds
+        Dictionary<int, LookupSpec> specFilters = specs.GlobalSpecIds
             .ToDictionary( id => id, id => specs.SpecsById[ id ] );
 
         if ( _primaryCategory is null || !specs.SpecIdsByCategory.TryGetValue( _primaryCategory.CategoryId, out List<int>? specsCategory ) )
@@ -183,22 +183,22 @@ public partial class ProductSearch : PageView, IDisposable
 
         return specFilters;
     }
-    List<VendorModel> GetVendorFilters()
+    List<VendorDto> GetVendorFilters()
     {
         if ( vendors is null )
-            return new List<VendorModel>();
+            return new List<VendorDto>();
 
         if ( _primaryCategory is null )
             return vendors.VendorsById.Values.ToList();
 
         if ( !vendors.VendorIdsByCategory.TryGetValue( _primaryCategory.CategoryId, out List<int>? vendorIds ) )
-            return new List<VendorModel>();
+            return new List<VendorDto>();
 
-        List<VendorModel> vendorsCategory = new();
+        List<VendorDto> vendorsCategory = new();
 
         foreach ( int id in vendorIds )
         {
-            if ( vendors.VendorsById.TryGetValue( id, out VendorModel? m ) )
+            if ( vendors.VendorsById.TryGetValue( id, out VendorDto? m ) )
                 vendorsCategory.Add( m );
         }
 
@@ -213,9 +213,9 @@ public partial class ProductSearch : PageView, IDisposable
     {
         OnOpenFilters?.Invoke();
     }
-    public async Task ApplyFilters( ProductSearchFilters filters )
+    public async Task ApplyFilters( ProductFiltersDto filtersDto )
     {
-        _searchFilters = filters;
+        _searchFilters = filtersDto;
 
         await SearchProducts();
     }
@@ -239,7 +239,7 @@ public partial class ProductSearch : PageView, IDisposable
     }
     async Task SearchProducts()
     {
-        ProductSearchRequest request = new()
+        ProductSearchRequestDto requestDto = new()
         {
             SearchText = _searchText,
             CategoryId = _currentCategory?.CategoryId,
@@ -249,7 +249,7 @@ public partial class ProductSearch : PageView, IDisposable
             Page = _currentPage
         };
         
-        ServiceReply<ProductSearchResponse?> reply = await ProductService.GetProductSearch( request );
+        ServiceReply<ProductSearchReplyDto?> reply = await ProductService.GetProductSearch( requestDto );
 
         if ( !reply.Success || reply.Data is null )
         {

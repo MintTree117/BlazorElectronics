@@ -45,9 +45,9 @@ public class AdminSeedController : _AdminController
     }
 
     [HttpPost( "products" )]
-    public async Task<ActionResult<bool>> SeedProducts( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> SeedProducts( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
@@ -57,25 +57,24 @@ public class AdminSeedController : _AdminController
         if ( !categoryReply.Success || categoryReply.Data is null )
             return GetReturnFromReply( categoryReply );
         
-        ServiceReply<SpecsResponse?> lookupReply = await _lookupService.GetSpecs( categoryReply.Data.PrimaryIds );
+        ServiceReply<LookupSpecsDto?> lookupReply = await _lookupService.GetSpecs( categoryReply.Data.PrimaryIds );
 
         if ( !lookupReply.Success || lookupReply.Data is null )
             return GetReturnFromReply( lookupReply );
         
-        ServiceReply<VendorsResponse?> vendorReply = await _vendorService.GetVendors();
+        ServiceReply<VendorsDto?> vendorReply = await _vendorService.GetVendors();
 
         if ( !vendorReply.Success || vendorReply.Data is null )
             return GetReturnFromReply( vendorReply );
 
-        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( request.Payload.Value, categoryReply.Data, lookupReply.Data, vendorReply.Data );
+        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( requestDto.Payload.Value, categoryReply.Data, lookupReply.Data, vendorReply.Data );
 
         return GetReturnFromReply( seedReply );
     }
-
     [HttpPost( "reviews" )]
-    public async Task<ActionResult<bool>> SeedReviews( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> SeedReviews( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
@@ -89,21 +88,26 @@ public class AdminSeedController : _AdminController
 
         if ( !userReply.Success || userReply.Data is null )
             return GetReturnFromReply( userReply );
+        
+        Logger.LogError( productReply.Data.Count.ToString() );
 
-        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( request.Payload.Value, productReply.Data, userReply.Data );
+        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( requestDto.Payload.Value, productReply.Data, userReply.Data );
 
-        return GetReturnFromReply( seedReply );
+        if ( !seedReply.Success )
+            return GetReturnFromReply( seedReply );
+
+        ServiceReply<bool> updateReply = await _productService.UpdateProductsReviewData();
+        return GetReturnFromReply( updateReply );
     }
-
     [HttpPost( "users" )]
-    public async Task<ActionResult<bool>> SeedUsers( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> SeedUsers( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> seedReply = await _userSeedService.SeedUsers( request!.Payload!.Value );
+        ServiceReply<bool> seedReply = await _userSeedService.SeedUsers( requestDto!.Payload!.Value );
         return GetReturnFromReply( seedReply );
     }
 }

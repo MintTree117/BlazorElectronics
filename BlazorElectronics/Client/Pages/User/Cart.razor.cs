@@ -8,11 +8,11 @@ namespace BlazorElectronics.Client.Pages.User;
 public partial class Cart : PageView
 {
     [Inject] ICartServiceClient CartService { get; init; } = default!;
-    CartResponse? _cart;
+    CartReplyDto? _cart;
 
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<CartResponse?> reply = await CartService.GetCart();
+        ServiceReply<CartReplyDto?> reply = await CartService.GetCart();
 
         PageIsLoaded = true;
         

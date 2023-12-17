@@ -40,7 +40,7 @@
                 <ul class="nav">
                     @foreach ( int id in _categories.PrimaryIds )
                     {
-                        if ( _categories.CategoriesById.TryGetValue( id, out CategoryModel? c ) )
+                        if ( _categories.CategoriesById.TryGetValue( id, out CategoryFullDto? c ) )
                         {
                             <li class="nav-item mx-4"><a class="nav-link link-dark" href="search/@c.ApiUrl">@c.Name</a></li>
                         }

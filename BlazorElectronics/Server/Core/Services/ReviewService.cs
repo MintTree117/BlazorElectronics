@@ -4,8 +4,8 @@ using BlazorElectronics.Server.Core.Models.Products;
 using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
-using BlazorElectronics.Shared.ProductReviews;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Reviews;
 
 namespace BlazorElectronics.Server.Core.Services;
 
@@ -19,11 +19,11 @@ public sealed class ReviewService : ApiService, IReviewService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( int productId, int rows, int page )
+    public async Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( GetProductReviewsDto dto )
     {
         try
         {
-            IEnumerable<ProductReviewModel>? models = await _repository.GetForProduct( productId, rows, page );
+            IEnumerable<ProductReviewModel>? models = await _repository.GetForProduct( dto );
             List<ProductReviewDto>? dtos = await MapModelsToDto( models );
 
             return dtos is not null
@@ -44,7 +44,7 @@ public sealed class ReviewService : ApiService, IReviewService
         return await Task.Run( () => ( 
                 from m in models 
                 where !string.IsNullOrWhiteSpace( m.Username ) 
-                select new ProductReviewDto { Username = m.Username, Rating = m.Rating, Review = m.Review } )
+                select new ProductReviewDto { Username = m.Username, Rating = m.Rating, Review = m.Review, Date = m.Date} )
             .ToList() );
     }
 }

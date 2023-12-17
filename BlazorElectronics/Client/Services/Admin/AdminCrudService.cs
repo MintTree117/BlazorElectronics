@@ -3,7 +3,7 @@ using BlazorElectronics.Shared;
 
 namespace BlazorElectronics.Client.Services.Admin;
 
-public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCrudService<Tview,Tedit> where Tview : CrudView where Tedit : class
+public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCrudService<Tview,Tedit> where Tview : CrudViewDto where Tedit : class
 {
     public AdminCrudService( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }

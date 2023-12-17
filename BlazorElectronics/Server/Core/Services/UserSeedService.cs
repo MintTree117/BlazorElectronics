@@ -18,9 +18,9 @@ public sealed class UserSeedService : ApiService, IUserSeedService
     
     public async Task<ServiceReply<bool>> SeedUsers( int amount )
     {
-        List<UserRegisterRequest> seeds = await GetUserSeeds( amount );
+        List<RegisterRequestDto> seeds = await GetUserSeeds( amount );
 
-        foreach ( UserRegisterRequest seed in seeds )
+        foreach ( RegisterRequestDto seed in seeds )
         {
             ServiceReply<UserLoginDto?> seedReply = await _userAccountService.Register( seed.Username, seed.Username, seed.Password, seed.Phone );
             
@@ -30,11 +30,11 @@ public sealed class UserSeedService : ApiService, IUserSeedService
 
         return new ServiceReply<bool>( true );
     }
-    static async Task<List<UserRegisterRequest>> GetUserSeeds( int amount )
+    static async Task<List<RegisterRequestDto>> GetUserSeeds( int amount )
     {
         return await Task.Run( () =>
         {
-            List<UserRegisterRequest> seeds = new();
+            List<RegisterRequestDto> seeds = new();
             var generator = new UserAccountGenerator();
 
             for ( int i = 0; i < amount; i++ )
@@ -52,9 +52,9 @@ public sealed class UserSeedService : ApiService, IUserSeedService
         readonly HashSet<string> usedEmails = new();
         readonly Random random = new();
 
-        public UserRegisterRequest GenerateRandomUserAccount()
+        public RegisterRequestDto GenerateRandomUserAccount()
         {
-            var userAccount = new UserRegisterRequest
+            var userAccount = new RegisterRequestDto
             {
                 Username = GenerateUniqueUsername(),
                 Email = GenerateUniqueEmail(),

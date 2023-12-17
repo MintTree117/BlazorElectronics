@@ -15,7 +15,7 @@ public partial class NavSidebar : RazorView, IDisposable
 
     SessionMeta? _sessionMeta;
     CategoryData _categories = new();
-    List<CategoryModel> _primaryCategories = new();
+    List<CategoryFullDto> _primaryCategories = new();
     int? _currentParentId = null;
 
     protected override void OnInitialized()
@@ -64,13 +64,13 @@ public partial class NavSidebar : RazorView, IDisposable
         NavMenu.OnCategoriesLoaded -= SetCategories;
     }
 
-    List<CategoryModel> GetCurrentCategories()
+    List<CategoryFullDto> GetCurrentCategories()
     {
         return _currentParentId is not null
             ? _categories.CategoriesById[ _currentParentId.Value ].Children
             : _primaryCategories;
     }
-    void NextCategory( CategoryModel c )
+    void NextCategory( CategoryFullDto c )
     {
         _currentParentId = c.CategoryId;
         StateHasChanged();
@@ -80,8 +80,8 @@ public partial class NavSidebar : RazorView, IDisposable
         if ( _currentParentId is null )
             return;
         
-        CategoryModel parentCategory = _categories.CategoriesById[ _currentParentId.Value ];
-        _currentParentId = parentCategory.ParentCategoryId;
+        CategoryFullDto parentCategoryFull = _categories.CategoriesById[ _currentParentId.Value ];
+        _currentParentId = parentCategoryFull.ParentCategoryId;
 
         StateHasChanged();
     }

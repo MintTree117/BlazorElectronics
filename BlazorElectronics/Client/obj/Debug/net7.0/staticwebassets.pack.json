@@ -185,8 +185,40 @@
       "PackagePath": "staticwebassets/_framework/blazor.webassembly.js.gz"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Book1.jpg",
+      "PackagePath": "staticwebassets/Images/Book1.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Book2.jpg",
+      "PackagePath": "staticwebassets/Images/Book2.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Book3.jpg",
+      "PackagePath": "staticwebassets/Images/Book3.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Book4.jpg",
+      "PackagePath": "staticwebassets/Images/Book4.jpg"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/BooksThumbnail.jpg",
       "PackagePath": "staticwebassets/Images/BooksThumbnail.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Course1.jpg",
+      "PackagePath": "staticwebassets/Images/Course1.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Course2.jpg",
+      "PackagePath": "staticwebassets/Images/Course2.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Course3.jpg",
+      "PackagePath": "staticwebassets/Images/Course3.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Course4.jpg",
+      "PackagePath": "staticwebassets/Images/Course4.jpg"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/CoursesThumbnail.jpg",
@@ -205,6 +237,22 @@
       "PackagePath": "staticwebassets/Images/FeaturedMovie.png"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Game1.jpg",
+      "PackagePath": "staticwebassets/Images/Game1.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Game2.jpg",
+      "PackagePath": "staticwebassets/Images/Game2.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Game3.jpg",
+      "PackagePath": "staticwebassets/Images/Game3.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Game4.jpg",
+      "PackagePath": "staticwebassets/Images/Game4.jpg"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Logo.svg",
       "PackagePath": "staticwebassets/Images/Logo.svg"
     },
@@ -213,8 +261,40 @@
       "PackagePath": "staticwebassets/Images/MoviesTvThumbnail.jpg"
     },
     {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Software1.jpg",
+      "PackagePath": "staticwebassets/Images/Software1.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Software2.jpg",
+      "PackagePath": "staticwebassets/Images/Software2.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Software3.jpg",
+      "PackagePath": "staticwebassets/Images/Software3.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Software4.jpg",
+      "PackagePath": "staticwebassets/Images/Software4.jpg"
+    },
+    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/SoftwareThumbnail.jpg",
       "PackagePath": "staticwebassets/Images/SoftwareThumbnail.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Video1.jpg",
+      "PackagePath": "staticwebassets/Images/Video1.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Video2.jpg",
+      "PackagePath": "staticwebassets/Images/Video2.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Video3.jpg",
+      "PackagePath": "staticwebassets/Images/Video3.jpg"
+    },
+    {
+      "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/Video4.jpg",
+      "PackagePath": "staticwebassets/Images/Video4.jpg"
     },
     {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/wwwroot/Images/VideoGamesThumbnail.jpg",

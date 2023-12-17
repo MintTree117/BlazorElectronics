@@ -27,9 +27,9 @@ public partial class ProductFilters : RazorView, IDisposable
     decimal? MaxPrice { get; set; } = null;
     int? MinRating { get; set; } = null;
     
-    List<CategoryModel>? _subCategories = new();
-    Dictionary<int, Spec> _specs = new();
-    List<VendorModel> _vendors = new();
+    List<CategoryFullDto>? _subCategories = new();
+    Dictionary<int, LookupSpec> _specs = new();
+    List<VendorDto> _vendors = new();
     
     Dictionary<string, bool> _collapsedSections = new();
     Dictionary<(int specId, int specValueId), bool> _selectedSpecs = new();
@@ -70,7 +70,7 @@ public partial class ProductFilters : RazorView, IDisposable
     {
         return _collapsedSections[ sectionName ] ? "collapse" : "collapse-show";
     }
-    void InitializeFilters( string? searchText, List<CategoryModel>? subCategories, Dictionary<int,Spec> specs, List<VendorModel> vendors )
+    void InitializeFilters( string? searchText, List<CategoryFullDto>? subCategories, Dictionary<int,LookupSpec> specs, List<VendorDto> vendors )
     {
         _searchText = searchText ?? string.Empty;
         _subCategories = subCategories;
@@ -80,7 +80,7 @@ public partial class ProductFilters : RazorView, IDisposable
         _selectedSpecs = new Dictionary<(int specId, int specValueId), bool>();
         _selectedVendors = new Dictionary<int, bool>();
 
-        foreach ( Spec s in _specs.Values )
+        foreach ( LookupSpec s in _specs.Values )
         {
             _collapsedSections.Add( s.SpecName, true );
             
@@ -90,14 +90,14 @@ public partial class ProductFilters : RazorView, IDisposable
             }
         }
 
-        foreach ( VendorModel v in vendors )
+        foreach ( VendorDto v in vendors )
         {
             _selectedVendors.Add( v.VendorId, false );
         }
     }
     async Task ApplyFilters()
     {
-        ProductSearchFilters filters = new()
+        ProductFiltersDto filtersDto = new()
         {
             InStock = InStock,
             OnSale = OnSale,
@@ -112,8 +112,8 @@ public partial class ProductFilters : RazorView, IDisposable
                 continue;
 
             Dictionary<int, List<int>> d = _specs[ kvp.Key.specId ].IsAvoid
-                ? filters.SpecsExlude
-                : filters.SpecsInclude;
+                ? filtersDto.SpecsExlude
+                : filtersDto.SpecsInclude;
 
             if ( !d.TryGetValue( kvp.Key.specId, out List<int>? values ) )
             {
@@ -129,10 +129,10 @@ public partial class ProductFilters : RazorView, IDisposable
             if ( !kvp.Value)
                 continue;
             
-            filters.Vendors.Add( kvp.Key );
+            filtersDto.Vendors.Add( kvp.Key );
         }
 
-        await Page.ApplyFilters( filters );
+        await Page.ApplyFilters( filtersDto );
     }
 
     void SetMinimumRating( int rating )

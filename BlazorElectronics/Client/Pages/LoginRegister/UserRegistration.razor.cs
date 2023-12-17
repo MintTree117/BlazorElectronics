@@ -8,7 +8,7 @@ namespace BlazorElectronics.Client.Pages.LoginRegister;
 public partial class UserRegistration : PageView
 {
     [Inject] IUserServiceClient UserService { get; set; } = default!;
-    readonly UserRegisterRequest _user = new();
+    readonly RegisterRequestDto _user = new();
     bool _registered = false;
 
     async Task HandleRegistration()

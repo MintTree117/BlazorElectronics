@@ -5,7 +5,6 @@ using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Services;
 using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Data.Repositories;
-using BlazorElectronics.Server.Services.Cart;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +23,13 @@ builder.Services.AddScoped<IFeaturesService, FeaturesService>();
 builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductSeedService, ProductSeedService>();
+
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IReviewSeedService, ReviewSeedService>();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();

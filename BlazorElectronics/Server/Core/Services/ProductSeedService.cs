@@ -26,7 +26,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         _reviewRepository = reviewRepository;
     }
     
-    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryData categories, SpecsResponse lookups, VendorsResponse vendors)
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryData categories, LookupSpecsDto lookups, VendorsDto vendors)
     {
         _random = new Random();
         
@@ -63,7 +63,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     }
     
     // BASE MODEL
-    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, SpecsResponse lookups, VendorsResponse vendors )
+    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, LookupSpecsDto lookups, VendorsDto vendors )
     {
         ProductEditModel editModel = new()
         {
@@ -106,10 +106,20 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     // IMAGES
     List<string> GetProductImages( int category )
     {
+        string imageName = category switch
+        {
+            1 => "Book",
+            2 => "Software",
+            3 => "Game",
+            4 => "Video",
+            5 => "Course",
+            _ => throw new ArgumentOutOfRangeException( nameof( category ), category, null )
+        };
+        
         List<string> images = SeedData.PRODUCT_IMAGES[ category - 1 ].ToList();
         for ( int i = 0; i < images.Count; i++ )
         {
-            images[ i ] = $"/Images/{i}";
+            images[ i ] = $"/Images/{imageName}{i+1}.jpg";
         }
         return images;
     }
@@ -218,12 +228,12 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     // CATEGORY
     IEnumerable<int> GetRandomCategories( int currentCategory, List<int> pickedCategories, CategoryData categoryData )
     {
-        CategoryModel categoryModel = categoryData.CategoriesById[ currentCategory ];
+        CategoryFullDto categoryFullDto = categoryData.CategoriesById[ currentCategory ];
 
-        if ( categoryModel.Children.Count <= 0 )
+        if ( categoryFullDto.Children.Count <= 0 )
             return new List<int>(); // Return an empty list instead of the original one
 
-        List<int> subcategories = PickRandomCategories( categoryModel ).ToList();
+        List<int> subcategories = PickRandomCategories( categoryFullDto ).ToList();
         List<int> newPickedCategories = new List<int>( subcategories ); // Create a new list for this call
 
         foreach ( int category in subcategories )
@@ -234,18 +244,18 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         return newPickedCategories.Distinct(); // Remove duplicates before returning
     }
-    IEnumerable<int> PickRandomCategories( CategoryModel category )
+    IEnumerable<int> PickRandomCategories( CategoryFullDto categoryFull )
     {
         var picked = new HashSet<int>();
 
-        int maxIndex = category.Children.Count - 1;
+        int maxIndex = categoryFull.Children.Count - 1;
         int amount = GetRandomInt( 1, SeedData.MAX_CATEGORIES );
         int count = 0;
 
         while ( picked.Count < amount )
         {
             int i = GetRandomInt( 0, maxIndex );
-            int index = category.Children[ i ].CategoryId;
+            int index = categoryFull.Children[ i ].CategoryId;
 
             if ( picked.Contains( index ) )
             {
@@ -262,13 +272,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return picked.ToList();
     }
     // SPEC LOOKUP
-    Dictionary<int, List<int>> GetRandomLookups( List<int> ids, SpecsResponse lookups )
+    Dictionary<int, List<int>> GetRandomLookups( List<int> ids, LookupSpecsDto lookups )
     {
         Dictionary<int, List<int>> specs = new();
 
         foreach ( int i in ids )
         {
-            Spec response = lookups.SpecsById[ i ];
+            LookupSpec response = lookups.SpecsById[ i ];
             List<int> valueIds = PickRandomSpecValueIds( response.Values.Count );
             specs.Add( i, valueIds );
         }
@@ -326,7 +336,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
         return string.Join( ",", specs.Values );
     }
     // VENDORS
-    int PickRandomVendor( int category, VendorsResponse vendors )
+    int PickRandomVendor( int category, VendorsDto vendors )
     {
         return vendors.VendorIdsByCategory.TryGetValue( category, out List<int>? ids ) 
             ? ids[ GetRandomInt( 0, ids.Count - 1 ) ]

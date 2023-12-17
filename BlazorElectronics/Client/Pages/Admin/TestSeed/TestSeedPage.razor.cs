@@ -11,6 +11,7 @@ public partial class TestSeedPage : AdminPage
     [Inject] IAdminSeedService SeedService { get; init; } = default!;
 
     readonly IntDto ProductCount = new();
+    readonly IntDto ReviewCount = new();
     readonly IntDto UserCount = new();
 
     protected override async Task OnInitializedAsync()
@@ -28,10 +29,13 @@ public partial class TestSeedPage : AdminPage
         ServiceReply<bool> reply = await SeedService.SeedProducts( ProductCount );
         InvokeAlert( reply.Success ? AlertType.Success : AlertType.Danger, reply.Success ? "Successfully seeded products." : reply.Message ?? FAIL_SEED_MESSAGE );
     }
-
+    async Task SeedReviews()
+    {
+        ServiceReply<bool> reply = await SeedService.SeedReviews( ReviewCount );
+        InvokeAlert( reply.Success ? AlertType.Success : AlertType.Danger, reply.Success ? "Successfully seeded reviews." : reply.Message ?? FAIL_SEED_MESSAGE );
+    }
     async Task SeedUsers()
     {
-        Logger.LogError( "hit" );
         ServiceReply<bool> reply = await SeedService.SeedUsers( UserCount );
         InvokeAlert( reply.Success ? AlertType.Success : AlertType.Danger, reply.Success ? "Successfully seeded users." : reply.Message ?? FAIL_SEED_MESSAGE );
     }

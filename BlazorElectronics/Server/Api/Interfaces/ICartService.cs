@@ -4,10 +4,10 @@ namespace BlazorElectronics.Server.Api.Interfaces;
 
 public interface ICartService
 {
-    Task<ServiceReply<CartResponse?>> GetCart( int userId );
-    Task<ServiceReply<CartResponse?>> UpdateCart( int userId, CartRequest request );
-    Task<ServiceReply<CartResponse?>> AddToCart( int userId, CartItem item );
-    Task<ServiceReply<CartResponse?>> UpdateQuantity( int userId, CartItem item );
-    Task<ServiceReply<CartResponse?>> RemoveFromCart( int userId, int productId );
+    Task<ServiceReply<CartReplyDto?>> GetCart( int userId );
+    Task<ServiceReply<CartReplyDto?>> UpdateCart( int userId, CartRequestDto requestDto );
+    Task<ServiceReply<CartReplyDto?>> AddToCart( int userId, CartItemDto itemDto );
+    Task<ServiceReply<CartReplyDto?>> UpdateQuantity( int userId, CartItemDto itemDto );
+    Task<ServiceReply<CartReplyDto?>> RemoveFromCart( int userId, int productId );
     Task<ServiceReply<bool>> ClearCart( int userId );
 }

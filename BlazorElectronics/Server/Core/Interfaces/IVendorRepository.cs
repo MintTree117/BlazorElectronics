@@ -6,9 +6,9 @@ namespace BlazorElectronics.Server.Core.Interfaces;
 public interface IVendorRepository
 {
     Task<VendorsModel?> Get();
-    Task<IEnumerable<VendorModel>?> GetView();
+    Task<IEnumerable<VendorDto>?> GetView();
     Task<VendorEditModel?> GetEdit( int vendorId );
-    Task<int> Insert( VendorEdit dto );
-    Task<bool> Update( VendorEdit dto );
+    Task<int> Insert( VendorEditDtoDto dtoDto );
+    Task<bool> Update( VendorEditDtoDto dtoDto );
     Task<bool> Delete( int vendorId );
 }

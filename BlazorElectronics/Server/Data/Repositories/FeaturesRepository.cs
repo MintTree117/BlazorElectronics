@@ -23,48 +23,48 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
     public FeaturesRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<FeaturesResponse?> Get()
+    public async Task<FeaturesReplyDto?> Get()
     {
         return await TryQueryAsync( GetQuery );
     }
-    public async Task<IEnumerable<Feature>?> GetFeatures()
+    public async Task<IEnumerable<FeatureDto>?> GetFeatures()
     {
-        return await TryQueryAsync( Query<Feature>, null, PROCEDURE_GET_FEATURES );
+        return await TryQueryAsync( Query<FeatureDto>, null, PROCEDURE_GET_FEATURES );
     }
-    public async Task<IEnumerable<FeaturedDeal>?> GetDeals()
+    public async Task<IEnumerable<FeaturedDealDto>?> GetDeals()
     {
-        return await TryQueryAsync( Query<FeaturedDeal>, null, PROCEDURE_GET_DEALS );
+        return await TryQueryAsync( Query<FeaturedDealDto>, null, PROCEDURE_GET_DEALS );
     }
-    public async Task<FeatureEdit?> GetFeature( int featureId )
+    public async Task<FeatureDtoEditDto?> GetFeature( int featureId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_FEATURE_ID, featureId );
 
-        return await TryQueryAsync( QuerySingleOrDefault<FeatureEdit?>, p, PROCEDURE_GET_FEATURE );
+        return await TryQueryAsync( QuerySingleOrDefault<FeatureDtoEditDto?>, p, PROCEDURE_GET_FEATURE );
     }
-    public async Task<FeaturedDealEdit?> GetDeal( int productId )
+    public async Task<FeaturedDealDtoEditDto?> GetDeal( int productId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, productId );
 
-        return await TryQueryAsync( QuerySingleOrDefault<FeaturedDealEdit?>, p, PROCEDURE_GET_DEAL );
+        return await TryQueryAsync( QuerySingleOrDefault<FeaturedDealDtoEditDto?>, p, PROCEDURE_GET_DEAL );
     }
-    public async Task<int> InsertFeature( FeatureEdit dto )
+    public async Task<int> InsertFeature( FeatureDtoEditDto dto )
     {
         DynamicParameters p = GetFeatureInsertParams( dto );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT_FEATURE );
     }
-    public async Task<int> InsertDeal( FeaturedDealEdit dto )
+    public async Task<int> InsertDeal( FeaturedDealDtoEditDto dto )
     {
         DynamicParameters p = GetDealParams( dto );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT_DEAL );
     }
-    public async Task<bool> UpdateFeature( FeatureEdit dto )
+    public async Task<bool> UpdateFeature( FeatureDtoEditDto dto )
     {
         DynamicParameters p = GetFeatureUpdateParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_FEATURE );
     }
-    public async Task<bool> UpdateDeal( FeaturedDealEdit dto )
+    public async Task<bool> UpdateDeal( FeaturedDealDtoEditDto dto )
     {
         DynamicParameters p = GetDealParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_DEAL );
@@ -84,21 +84,21 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_DEAL );
     }
 
-    static async Task<FeaturesResponse?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<FeaturesReplyDto?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, dynamicParams, commandType: CommandType.StoredProcedure );
 
         if ( multi is null )
             return null;
 
-        return new FeaturesResponse
+        return new FeaturesReplyDto
         {
-            Features = ( await multi.ReadAsync<Feature>() ).ToList(),
-            Deals = ( await multi.ReadAsync<FeaturedDeal>() ).ToList()
+            Features = ( await multi.ReadAsync<FeatureDto>() ).ToList(),
+            Deals = ( await multi.ReadAsync<FeaturedDealDto>() ).ToList()
         };
     }
 
-    static DynamicParameters GetFeatureInsertParams( Feature dto )
+    static DynamicParameters GetFeatureInsertParams( FeatureDto dto )
     {
         DynamicParameters p = new();
         p.Add( PARAM_FEATURE_NAME, dto.Name );
@@ -106,13 +106,13 @@ public class FeaturesRepository : DapperRepository, IFeaturesRepository
         p.Add( PARAM_FEATURE_IMAGE, dto.Image );
         return p;
     }
-    static DynamicParameters GetFeatureUpdateParams( Feature dto )
+    static DynamicParameters GetFeatureUpdateParams( FeatureDto dto )
     {
         DynamicParameters p = GetFeatureInsertParams( dto );
         p.Add( PARAM_FEATURE_ID, dto.FeatureId );
         return p;
     }
-    static DynamicParameters GetDealParams( FeaturedDeal dto )
+    static DynamicParameters GetDealParams( FeaturedDealDto dto )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, dto.ProductId );

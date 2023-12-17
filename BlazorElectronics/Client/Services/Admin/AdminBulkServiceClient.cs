@@ -13,12 +13,12 @@ public sealed class AdminBulkServiceClient : AdminServiceClient, IAdminBulkServi
     public AdminBulkServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEdit> categories )
+    public async Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEditDtoDto> categories )
     {
-        return await TryUserRequest<List<CategoryEdit>, bool>( API_PATH_CATEGORIES, categories );
+        return await TryUserRequest<List<CategoryEditDtoDto>, bool>( API_PATH_CATEGORIES, categories );
     }
-    public async Task<ServiceReply<bool>> BulkInsertKeys( ProductKeys keys )
+    public async Task<ServiceReply<bool>> BulkInsertKeys( ProductKeysDto keysDto )
     {
-        return await TryUserRequest<ProductKeys, bool>( API_PATH_PRODUCT_KEYS, keys );
+        return await TryUserRequest<ProductKeysDto, bool>( API_PATH_PRODUCT_KEYS, keysDto );
     }
 }

@@ -15,6 +15,7 @@ public sealed class ProductDto
     public int NumberSold { get; set; }
     public string Description { get; set; } = string.Empty;
     public List<int> Categories { get; set; } = new();
+    public List<string> Images { get; set; } = new();
     public Dictionary<int, List<int>> LookupSpecs { get; set; } = new();
     public Dictionary<string, string> XmlSpecsAggregated { get; set; } = new();
 }

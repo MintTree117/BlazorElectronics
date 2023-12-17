@@ -9,16 +9,16 @@
         <h3>User Profile</h3>
         <h5>Change Password</h5>
 
-        <EditForm Model="_changeRequest" OnValidSubmit="@(async () => await ChangePassword() )">
+        <EditForm Model="_requestDto" OnValidSubmit="@(async () => await ChangePassword() )">
             <div class="mb-3">
                 <label for="password">New Password</label>
-                <InputText class="form-control" id="password" @bind-Value="_changeRequest.Password" type="password"/>
-                <ValidationMessage For="@(() => _changeRequest.Password)"/>
+                <InputText class="form-control" id="password" @bind-Value="_requestDto.Password" type="password"/>
+                <ValidationMessage For="@(() => _requestDto.Password)"/>
             </div>
             <div class="mb-3">
                 <label for="confirm-password">Confirm New Password</label>
-                <InputText class="form-control" id="confirm-password" @bind-Value="_changeRequest.ConfirmPassword" type="password"/>
-                <ValidationMessage For="@(() => _changeRequest.ConfirmPassword)"/>
+                <InputText class="form-control" id="confirm-password" @bind-Value="_requestDto.ConfirmPassword" type="password"/>
+                <ValidationMessage For="@(() => _requestDto.ConfirmPassword)"/>
             </div>
             <button class="btn btn-primary" type="submit">Apply</button>
         </EditForm>

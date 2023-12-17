@@ -1,5 +1,6 @@
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
+using BlazorElectronics.Shared.Reviews;
 using Dapper;
 
 namespace BlazorElectronics.Server.Data.Repositories;
@@ -8,20 +9,21 @@ public sealed class ReviewRepository : DapperRepository, IReviewRepository
 {
     const string PROCEDURE_GET_FOR_PRODUCT = "Get_ProductReviews";
     const string PROCEDURE_GET_FOR_USER = "Get_UserProductReviews";
-    const string PROCEDURE_GET_EDIT = "Get_ProductReviewEdit";
-    const string PROCEDURE_INSERT = "Insert_ProductReview";
-    const string PROCEDURE_UPDATE = "Update_ProductReview";
-    const string PROCEDURE_DELETE = "Delete_ProductReview";
+    const string PROCEDURE_GET_EDIT = "Get_ReviewEdit";
+    const string PROCEDURE_INSERT = "Insert_Review";
+    const string PROCEDURE_UPDATE = "Update_Review";
+    const string PROCEDURE_DELETE = "Delete_Review";
 
     public ReviewRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<IEnumerable<ProductReviewModel>?> GetForProduct( int productId, int rows, int page )
+    public async Task<IEnumerable<ProductReviewModel>?> GetForProduct( GetProductReviewsDto dto )
     {
         DynamicParameters p = new();
-        p.Add( PARAM_PRODUCT_ID, productId );
-        p.Add( PARAM_ROWS, rows );
-        p.Add( PARAM_OFFSET, rows * page );
+        p.Add( PARAM_PRODUCT_ID, dto.ProductId );
+        p.Add( PARAM_ROWS, dto.Rows );
+        p.Add( PARAM_OFFSET, dto.Rows * ( dto.Page - 1 ) );
+        p.Add( PARAM_REVIEW_SORT_TYPE, dto.SortType );
 
         return await TryQueryAsync( Query<ProductReviewModel>, p, PROCEDURE_GET_FOR_PRODUCT );
     }

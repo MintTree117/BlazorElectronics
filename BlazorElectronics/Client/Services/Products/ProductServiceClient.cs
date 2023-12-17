@@ -19,9 +19,9 @@ public sealed class ProductServiceClient : ClientService, IProductServiceClient
     {
         return await TryPostRequest<List<string>?>( API_ROUTE_SUGGESTIONS, searchText );
     }
-    public async Task<ServiceReply<ProductSearchResponse?>> GetProductSearch( ProductSearchRequest request )
+    public async Task<ServiceReply<ProductSearchReplyDto?>> GetProductSearch( ProductSearchRequestDto requestDto )
     {
-        return await TryPostRequest<ProductSearchResponse?>( API_ROUTE_SEARCH, request );
+        return await TryPostRequest<ProductSearchReplyDto?>( API_ROUTE_SEARCH, requestDto );
     }
     public async Task<ServiceReply<ProductDto?>> GetProductDetails( int productId )
     {

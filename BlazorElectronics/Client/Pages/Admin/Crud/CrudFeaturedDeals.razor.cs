@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudFeaturedDeals : CrudPage<CrudView, FeaturedDealEdit>
+public sealed partial class CrudFeaturedDeals : CrudPage<CrudViewDto, FeaturedDealDtoEditDto>
 {
     protected override async Task OnInitializedAsync()
     {

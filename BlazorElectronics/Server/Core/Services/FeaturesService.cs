@@ -12,7 +12,7 @@ public class FeaturesService : ApiService, IFeaturesService
 {
     const int CACHE_LIFE = 1;
     readonly IFeaturesRepository _repository;
-    CachedObject<FeaturesResponse>? _cachedFeatures;
+    CachedObject<FeaturesReplyDto>? _cachedFeatures;
 
     public FeaturesService( ILogger<ApiService> logger, IFeaturesRepository repository )
         : base( logger )
@@ -20,95 +20,95 @@ public class FeaturesService : ApiService, IFeaturesService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<FeaturesResponse?>> GetFeatures()
+    public async Task<ServiceReply<FeaturesReplyDto?>> GetFeatures()
     {
         if ( _cachedFeatures is not null && _cachedFeatures.IsValid( CACHE_LIFE ) )
-            return new ServiceReply<FeaturesResponse?>( _cachedFeatures.Object );
+            return new ServiceReply<FeaturesReplyDto?>( _cachedFeatures.Object );
         
         try
         {
-            FeaturesResponse? response = await _repository.Get();
+            FeaturesReplyDto? response = await _repository.Get();
 
             if ( response is null )
-                return new ServiceReply<FeaturesResponse?>( ServiceErrorType.NotFound );
+                return new ServiceReply<FeaturesReplyDto?>( ServiceErrorType.NotFound );
 
-            _cachedFeatures = new CachedObject<FeaturesResponse>( response );
+            _cachedFeatures = new CachedObject<FeaturesReplyDto>( response );
 
-            return new ServiceReply<FeaturesResponse?>( response );
+            return new ServiceReply<FeaturesReplyDto?>( response );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeaturesResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<FeaturesReplyDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<List<CrudView>?>> GetFeaturesView()
+    public async Task<ServiceReply<List<CrudViewDto>?>> GetFeaturesView()
     {
         try
         {
-            IEnumerable<Feature>? models = await _repository.GetFeatures();
-            List<CrudView>? dto = MapFeaturesView( models );
+            IEnumerable<FeatureDto>? models = await _repository.GetFeatures();
+            List<CrudViewDto>? dto = MapFeaturesView( models );
 
             return dto is not null
-                ? new ServiceReply<List<CrudView>?>( dto )
-                : new ServiceReply<List<CrudView>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CrudViewDto>?>( dto )
+                : new ServiceReply<List<CrudViewDto>?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CrudViewDto>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<List<CrudView>?>> GetDealsView()
+    public async Task<ServiceReply<List<CrudViewDto>?>> GetDealsView()
     {
         try
         {
-            IEnumerable<FeaturedDeal>? models = await _repository.GetDeals();
-            List<CrudView>? dto = MapDealsView( models );
+            IEnumerable<FeaturedDealDto>? models = await _repository.GetDeals();
+            List<CrudViewDto>? dto = MapDealsView( models );
 
             return dto is not null
-                ? new ServiceReply<List<CrudView>?>( dto )
-                : new ServiceReply<List<CrudView>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CrudViewDto>?>( dto )
+                : new ServiceReply<List<CrudViewDto>?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CrudViewDto>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<FeatureEdit?>> GetFeatureEdit( int featureId )
+    public async Task<ServiceReply<FeatureDtoEditDto?>> GetFeatureEdit( int featureId )
     {
         try
         {
-            FeatureEdit? dto = await _repository.GetFeature( featureId );
+            FeatureDtoEditDto? dto = await _repository.GetFeature( featureId );
 
             return dto is not null
-                ? new ServiceReply<FeatureEdit?>( dto )
-                : new ServiceReply<FeatureEdit?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+                ? new ServiceReply<FeatureDtoEditDto?>( dto )
+                : new ServiceReply<FeatureDtoEditDto?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeatureEdit?>( ServiceErrorType.ServerError );
+            return new ServiceReply<FeatureDtoEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<FeaturedDealEdit?>> GetDealEdit( int productId )
+    public async Task<ServiceReply<FeaturedDealDtoEditDto?>> GetDealEdit( int productId )
     {
         try
         {
-            FeaturedDealEdit? dto = await _repository.GetDeal( productId );
+            FeaturedDealDtoEditDto? dto = await _repository.GetDeal( productId );
 
             return dto is not null
-                ? new ServiceReply<FeaturedDealEdit?>( dto )
-                : new ServiceReply<FeaturedDealEdit?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
+                ? new ServiceReply<FeaturedDealDtoEditDto?>( dto )
+                : new ServiceReply<FeaturedDealDtoEditDto?>( ServiceErrorType.NotFound, NO_DATA_FOUND_MESSAGE );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<FeaturedDealEdit?>( ServiceErrorType.ServerError );
+            return new ServiceReply<FeaturedDealDtoEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> AddFeature( FeatureEdit dto )
+    public async Task<ServiceReply<int>> AddFeature( FeatureDtoEditDto dto )
     {
         try
         {
@@ -124,7 +124,7 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> AddDeal( FeaturedDealEdit dto )
+    public async Task<ServiceReply<int>> AddDeal( FeaturedDealDtoEditDto dto )
     {
         try
         {
@@ -140,7 +140,7 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateFeature( FeatureEdit dto )
+    public async Task<ServiceReply<bool>> UpdateFeature( FeatureDtoEditDto dto )
     {
         try
         {
@@ -156,7 +156,7 @@ public class FeaturesService : ApiService, IFeaturesService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateDeal( FeaturedDealEdit dto )
+    public async Task<ServiceReply<bool>> UpdateDeal( FeaturedDealDtoEditDto dto )
     {
         try
         {
@@ -205,16 +205,16 @@ public class FeaturesService : ApiService, IFeaturesService
         }
     }
 
-    static List<CrudView>? MapFeaturesView( IEnumerable<Feature>? models )
+    static List<CrudViewDto>? MapFeaturesView( IEnumerable<FeatureDto>? models )
     {
         return models?
-            .Select( m => new CrudView { Id = m.FeatureId, Name = m.Name } )
+            .Select( m => new CrudViewDto { Id = m.FeatureId, Name = m.Name } )
             .ToList();
     }
-    static List<CrudView>? MapDealsView( IEnumerable<FeaturedDeal>? models )
+    static List<CrudViewDto>? MapDealsView( IEnumerable<FeaturedDealDto>? models )
     {
         return models?
-            .Select( m => new CrudView { Id = m.ProductId, Name = m.ProductName } )
+            .Select( m => new CrudViewDto { Id = m.ProductId, Name = m.ProductName } )
             .ToList();
     }
 }

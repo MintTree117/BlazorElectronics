@@ -27,7 +27,7 @@
             </button>
             <div class="@GetCollapseDisplay( SECTION_CATEGORY )">
                 <ul class="list-unstyled d-flex flex-column">
-                    @foreach ( CategoryModel c in _subCategories )
+                    @foreach ( CategoryFullDto c in _subCategories )
                     {
                         <a class="link-dark text-decoration-none" href="@Routes.SEARCH/@c.ApiUrl/@_searchText">@c.Name</a>
                     }
@@ -101,7 +101,7 @@
             <i class="oi @GetCollapseIcon( SECTION_VENDORS )"></i>
         </button>
         <div class="@GetCollapseDisplay( SECTION_VENDORS )">
-            @foreach ( VendorModel v in _vendors )
+            @foreach ( VendorDto v in _vendors )
             {
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input"
@@ -112,7 +112,7 @@
         </div>
     </div>
 
-    @foreach ( Spec s in _specs.Values )
+    @foreach ( LookupSpec s in _specs.Values )
     {
         <div class="product-filters-section d-grid">
             <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( s.SpecName )">

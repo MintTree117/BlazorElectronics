@@ -12,7 +12,7 @@ namespace BlazorElectronics.Server.Core.Services;
 public sealed class SpecsService : ApiService, ISpecsService
 {
     const int MAX_HOURS_BEFORE_CACHE_INVALIDATION = 4;
-    CachedObject<SpecsResponse>? _cachedSpecData;
+    CachedObject<LookupSpecsDto>? _cachedSpecData;
 
     readonly ISpecRepository _repository;
     
@@ -22,63 +22,63 @@ public sealed class SpecsService : ApiService, ISpecsService
         _repository = repository;
     }
     
-    public async Task<ServiceReply<SpecsResponse?>> GetSpecs( List<int> primaryCategoryIds )
+    public async Task<ServiceReply<LookupSpecsDto?>> GetSpecs( List<int> primaryCategoryIds )
     {
         if ( CacheValid() )
-            return new ServiceReply<SpecsResponse?>( _cachedSpecData!.Object );
+            return new ServiceReply<LookupSpecsDto?>( _cachedSpecData!.Object );
 
         try
         {
             SpecsModel? model = await _repository.Get();
-            SpecsResponse? response = MapResponse( model, primaryCategoryIds );
+            LookupSpecsDto? response = MapResponse( model, primaryCategoryIds );
 
-            _cachedSpecData = response is not null ? new CachedObject<SpecsResponse>( response ) : null;
+            _cachedSpecData = response is not null ? new CachedObject<LookupSpecsDto>( response ) : null;
 
             return response is not null 
-                ? new ServiceReply<SpecsResponse?>( response ) 
-                : new ServiceReply<SpecsResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<LookupSpecsDto?>( response ) 
+                : new ServiceReply<LookupSpecsDto?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<SpecsResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<LookupSpecsDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<List<CrudView>?>> GetView()
+    public async Task<ServiceReply<List<CrudViewDto>?>> GetView()
     {
         try
         {
             IEnumerable<SpecModel>? models = await _repository.GetView();
-            List<CrudView>? dto = MapView( models );
+            List<CrudViewDto>? dto = MapView( models );
 
             return dto is not null
-                ? new ServiceReply<List<CrudView>?>( dto )
-                : new ServiceReply<List<CrudView>?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<List<CrudViewDto>?>( dto )
+                : new ServiceReply<List<CrudViewDto>?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<CrudView>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CrudViewDto>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<SpecEdit?>> GetEdit( int specId )
+    public async Task<ServiceReply<LookupSpecEditDto?>> GetEdit( int specId )
     {
         try
         {
             SpecEditModel? model = await _repository.GetEdit( specId );
-            SpecEdit? dto = MapEdit( model );
+            LookupSpecEditDto? dto = MapEdit( model );
 
             return dto is not null
-                ? new ServiceReply<SpecEdit?>( dto )
-                : new ServiceReply<SpecEdit?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<LookupSpecEditDto?>( dto )
+                : new ServiceReply<LookupSpecEditDto?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<SpecEdit?>( ServiceErrorType.ServerError );
+            return new ServiceReply<LookupSpecEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> Add( SpecEdit dto )
+    public async Task<ServiceReply<int>> Add( LookupSpecEditDto dto )
     {
         try
         {
@@ -94,7 +94,7 @@ public sealed class SpecsService : ApiService, ISpecsService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> Update( SpecEdit dto )
+    public async Task<ServiceReply<bool>> Update( LookupSpecEditDto dto )
     {
         try
         {
@@ -127,7 +127,7 @@ public sealed class SpecsService : ApiService, ISpecsService
         }
     }
     
-    static SpecsResponse? MapResponse( SpecsModel? model, List<int> primaryCategoryIds )
+    static LookupSpecsDto? MapResponse( SpecsModel? model, List<int> primaryCategoryIds )
     {
         if ( model?.SpecCategories is null || model.Specs is null || model.SpecValues is null )
             return null;
@@ -145,7 +145,7 @@ public sealed class SpecsService : ApiService, ISpecsService
             idsByCategory[ sc.PrimaryCategoryId ].Add( sc.SpecId );
         }
 
-        var responsesById = new Dictionary<int, Spec>();
+        var responsesById = new Dictionary<int, LookupSpec>();
 
         foreach ( SpecModel m in model.Specs )
         {
@@ -158,7 +158,7 @@ public sealed class SpecsService : ApiService, ISpecsService
                 .Select( spec => spec.SpecValue )
                 .ToList();
 
-            responsesById.Add( m.SpecId, new Spec
+            responsesById.Add( m.SpecId, new LookupSpec
             {
                 SpecId = m.SpecId,
                 IsAvoid = m.IsAvoid,
@@ -167,18 +167,18 @@ public sealed class SpecsService : ApiService, ISpecsService
             } );
         }
 
-        return new SpecsResponse( globalIds, idsByCategory, responsesById );
+        return new LookupSpecsDto( globalIds, idsByCategory, responsesById );
     }
-    static List<CrudView>? MapView( IEnumerable<SpecModel>? models )
+    static List<CrudViewDto>? MapView( IEnumerable<SpecModel>? models )
     {
         if ( models is null )
             return null;
 
         return models
-            .Select( m => new CrudView { Id = m.SpecId, Name = m.SpecName } )
+            .Select( m => new CrudViewDto { Id = m.SpecId, Name = m.SpecName } )
             .ToList();
     }
-    static SpecEdit? MapEdit( SpecEditModel? model )
+    static LookupSpecEditDto? MapEdit( SpecEditModel? model )
     {
         if ( model?.Spec is null )
             return null;
@@ -191,7 +191,7 @@ public sealed class SpecsService : ApiService, ISpecsService
             ? ConvertSpecValuesToString( model.Values )
             : string.Empty;
 
-        return new SpecEdit
+        return new LookupSpecEditDto
         {
             SpecId = model.Spec.SpecId,
             SpecName = model.Spec.SpecName,

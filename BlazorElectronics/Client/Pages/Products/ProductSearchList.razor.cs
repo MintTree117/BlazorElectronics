@@ -9,9 +9,9 @@ public partial class ProductSearchList : RazorView, IDisposable
 {
     [Parameter] public ProductSearch Page { get; init; } = default!;
     
-    ProductSearchResponse? _search;
-    Dictionary<int, CategoryModel> _categories = new();
-    Dictionary<int, VendorModel> _vendors = new();
+    ProductSearchReplyDto? _search;
+    Dictionary<int, CategoryFullDto> _categories = new();
+    Dictionary<int, VendorDto> _vendors = new();
 
     public void Dispose()
     {
@@ -22,7 +22,7 @@ public partial class ProductSearchList : RazorView, IDisposable
         base.OnInitialized();
         Page.OnProductSearch += OnSearch;
     }
-    void OnSearch( ProductSearchResponse? search, Dictionary<int, CategoryModel> categories, Dictionary<int, VendorModel> vendors )
+    void OnSearch( ProductSearchReplyDto? search, Dictionary<int, CategoryFullDto> categories, Dictionary<int, VendorDto> vendors )
     {
         _search = search;
         _categories = categories;

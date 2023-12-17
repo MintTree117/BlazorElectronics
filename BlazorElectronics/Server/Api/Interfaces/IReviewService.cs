@@ -1,9 +1,9 @@
-using BlazorElectronics.Shared.ProductReviews;
 using BlazorElectronics.Shared.Products;
+using BlazorElectronics.Shared.Reviews;
 
 namespace BlazorElectronics.Server.Api.Interfaces;
 
 public interface IReviewService
 {
-    Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( int productId, int rows, int page );
+    Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( GetProductReviewsDto dto );
 }

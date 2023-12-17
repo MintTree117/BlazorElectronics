@@ -17,7 +17,7 @@ public class CategoryServiceClient : ClientService, ICategoryServiceClient
         if ( _categories is not null )
             return new ServiceReply<CategoryData?>( _categories );
 
-        ServiceReply<List<CategoryResponse>?> reply = await TryGetRequest<List<CategoryResponse>?>( API_PATH );
+        ServiceReply<List<CategoryLightDto>?> reply = await TryGetRequest<List<CategoryLightDto>?>( API_PATH );
 
         if ( !reply.Success || reply.Data is null )
             return new ServiceReply<CategoryData?>( reply.ErrorType, reply.Message );

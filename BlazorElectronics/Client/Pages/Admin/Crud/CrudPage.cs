@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudView where Tedit : ICrudEdit, new()
+public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudViewDto where Tedit : ICrudEditDto, new()
 {
     [Inject] protected IAdminCrudService<Tview, Tedit> CrudService { get; init; } = default!;
 

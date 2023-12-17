@@ -11,12 +11,12 @@ public sealed class AdminCategoryHelper : AdminServiceClient, IAdminCategoryHelp
     public AdminCategoryHelper( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public List<CategoryView> Categories { get; set; } = new();
+    public List<CategoryViewDtoDto> Categories { get; set; } = new();
     public List<CategorySelectionOption> PrimarySelection { get; set; } = new();
 
     public async Task<ServiceReply<bool>> Init()
     {
-        ServiceReply<List<CategoryView>?> reply = await TryUserRequest<List<CategoryView>?>( "api/AdminCategory/get-view" );
+        ServiceReply<List<CategoryViewDtoDto>?> reply = await TryUserRequest<List<CategoryViewDtoDto>?>( "api/AdminCategory/get-view" );
 
         if ( !reply.Success || reply.Data is null )
         {

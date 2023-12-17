@@ -38,7 +38,7 @@ public partial class ProductSearchHeader : RazorView, IDisposable
         _urls = urls;
         StateHasChanged();
     }
-    void OnSearchResults( ProductSearchResponse search, Dictionary<int, CategoryModel> categories, Dictionary<int, VendorModel> vendors )
+    void OnSearchResults( ProductSearchReplyDto search, Dictionary<int, CategoryFullDto> categories, Dictionary<int, VendorDto> vendors )
     {
         _totalResults = search.TotalMatches;
         StateHasChanged();

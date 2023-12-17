@@ -7,26 +7,26 @@ namespace BlazorElectronics.Client.Services.Features;
 public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
 {
     const string API_PATH = "api/features/get";
-    FeaturesResponse? _response;
+    FeaturesReplyDto? _response;
     
     public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<List<Feature>?>> GetFeatures()
+    public async Task<ServiceReply<List<FeatureDto>?>> GetFeatures()
     {
         ServiceReply<bool> reply = await GetResponse();
 
         return reply.Success && _response is not null
-            ? new ServiceReply<List<Feature>?>( _response.Features )
-            : new ServiceReply<List<Feature>?>( reply.ErrorType, reply.Message );
+            ? new ServiceReply<List<FeatureDto>?>( _response.Features )
+            : new ServiceReply<List<FeatureDto>?>( reply.ErrorType, reply.Message );
     }
-    public async Task<ServiceReply<List<FeaturedDeal>?>> GetFeaturedDeals()
+    public async Task<ServiceReply<List<FeaturedDealDto>?>> GetFeaturedDeals()
     {
         ServiceReply<bool> reply = await GetResponse();
 
         return reply.Success && _response is not null
-            ? new ServiceReply<List<FeaturedDeal>?>( _response.Deals )
-            : new ServiceReply<List<FeaturedDeal>?>( reply.ErrorType, reply.Message );
+            ? new ServiceReply<List<FeaturedDealDto>?>( _response.Deals )
+            : new ServiceReply<List<FeaturedDealDto>?>( reply.ErrorType, reply.Message );
     }
 
     async Task<ServiceReply<bool>> GetResponse()
@@ -34,7 +34,7 @@ public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
         if ( _response is not null )
             return new ServiceReply<bool>( true );
 
-        ServiceReply<FeaturesResponse?> reply = await TryGetRequest<FeaturesResponse?>( API_PATH );
+        ServiceReply<FeaturesReplyDto?> reply = await TryGetRequest<FeaturesReplyDto?>( API_PATH );
         _response = reply.Data;
 
         return _response is not null

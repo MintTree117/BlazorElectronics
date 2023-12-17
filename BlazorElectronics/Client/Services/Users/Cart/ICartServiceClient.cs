@@ -7,10 +7,10 @@ public interface ICartServiceClient
 {
     event Action<int> OnChange;
 
-    Task<ServiceReply<CartResponse?>> GetCart();
-    Task<ServiceReply<CartResponse?>> UpdateCart();
-    Task<ServiceReply<CartResponse?>> AddToCart( CartItem item );
-    Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItem item );
-    Task<ServiceReply<CartResponse?>> RemoveFromCart( int productId );
+    Task<ServiceReply<CartReplyDto?>> GetCart();
+    Task<ServiceReply<CartReplyDto?>> UpdateCart();
+    Task<ServiceReply<CartReplyDto?>> AddToCart( CartItemDto itemDto );
+    Task<ServiceReply<CartReplyDto?>> UpdateCartQuantity( CartItemDto itemDto );
+    Task<ServiceReply<CartReplyDto?>> RemoveFromCart( int productId );
     Task<ServiceReply<bool>> ClearCart();
 }

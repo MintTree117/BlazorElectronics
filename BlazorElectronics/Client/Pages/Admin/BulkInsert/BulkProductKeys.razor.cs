@@ -13,7 +13,7 @@ public partial class BulkProductKeys : AdminPage
 
     async Task Submit()
     {
-        var keys = new ProductKeys
+        var keys = new ProductKeysDto
         {
             ProductId = _seed.ProductId,
             Keys = _seed.Keys

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudSpecs : CrudPage<CrudView, SpecEdit>
+public sealed partial class CrudSpecs : CrudPage<CrudViewDto, LookupSpecEditDto>
 {
     [Inject] public IAdminCategoryHelper CategoryHelper { get; set; } = default!;
     

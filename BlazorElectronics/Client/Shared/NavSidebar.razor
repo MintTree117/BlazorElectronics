@@ -44,7 +44,7 @@
                 <h5 class="sidebar-header mb-0">Shop Categories</h5>
             </div>
             <ul class="nav flex-column">
-                @foreach ( CategoryModel c in GetCurrentCategories() )
+                @foreach ( CategoryFullDto c in GetCurrentCategories() )
                 {
                     <li class="nav-item d-flex align-items-center">
                         <a class="nav-link flex-grow-1" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>

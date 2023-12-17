@@ -8,7 +8,7 @@ public interface ISpecRepository
     Task<SpecsModel?> Get();
     Task<IEnumerable<SpecModel>?> GetView();
     Task<SpecEditModel?> GetEdit( int specId );
-    Task<int> Insert( SpecEdit dto );
-    Task<bool> Update( SpecEdit dto );
+    Task<int> Insert( LookupSpecEditDto dto );
+    Task<bool> Update( LookupSpecEditDto dto );
     Task<bool> Delete( int specId );
 }

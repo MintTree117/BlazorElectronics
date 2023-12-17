@@ -32,12 +32,12 @@ public class SpecRepository : DapperRepository, ISpecRepository
         p.Add( PARAM_SPEC_ID, specId );
         return await TryQueryAsync( GetEditQuery, p );
     }
-    public async Task<int> Insert( SpecEdit dto )
+    public async Task<int> Insert( LookupSpecEditDto dto )
     {
         DynamicParameters p = GetInsertParams( dto );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( SpecEdit dto )
+    public async Task<bool> Update( LookupSpecEditDto dto )
     {
         DynamicParameters p = GetUpdateParams( dto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
@@ -78,7 +78,7 @@ public class SpecRepository : DapperRepository, ISpecRepository
         };
     }
     
-    static DynamicParameters GetInsertParams( SpecEdit dto )
+    static DynamicParameters GetInsertParams( LookupSpecEditDto dto )
     {
         var parameters = new DynamicParameters();
 
@@ -94,7 +94,7 @@ public class SpecRepository : DapperRepository, ISpecRepository
         
         return parameters;
     }
-    static DynamicParameters GetUpdateParams( SpecEdit dto )
+    static DynamicParameters GetUpdateParams( LookupSpecEditDto dto )
     {
         DynamicParameters parameters = GetInsertParams( dto );
         parameters.Add( PARAM_SPEC_ID, dto.SpecId );

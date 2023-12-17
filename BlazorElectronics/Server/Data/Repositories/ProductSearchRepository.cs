@@ -36,14 +36,14 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         p.Add( PARAM_SEARCH_TEXT, searchText );
         return await TryQueryAsync( Query<string>, p, STORED_PROCEDURE_GET_SUGGESTIONS );
     }
-    public async Task<string?> GetProductSearchQuery( ProductSearchRequest searchRequest )
+    public async Task<string?> GetProductSearchQuery( ProductSearchRequestDto searchRequestDto )
     {
-        SearchQueryObject query = await BuildProductSearchQuery( searchRequest );
+        SearchQueryObject query = await BuildProductSearchQuery( searchRequestDto );
         return query.SearchQuery;
     }
-    public async Task<IEnumerable<ProductSearchModel>?> GetProductSearch( ProductSearchRequest searchRequest )
+    public async Task<IEnumerable<ProductSearchModel>?> GetProductSearch( ProductSearchRequestDto searchRequestDto )
     {
-        SearchQueryObject searchQueryObject = await BuildProductSearchQuery( searchRequest );
+        SearchQueryObject searchQueryObject = await BuildProductSearchQuery( searchRequestDto );
         return await TryQueryAsync( GetProductSearchQuery, searchQueryObject.DynamicParams, searchQueryObject.SearchQuery );
     }
     
@@ -52,11 +52,11 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     {
         return await connection.QueryAsync<ProductSearchModel>( sql, dynamicParams );
     }
-    static async Task<SearchQueryObject> BuildProductSearchQuery( ProductSearchRequest request )
+    static async Task<SearchQueryObject> BuildProductSearchQuery( ProductSearchRequestDto requestDto )
     {
         var builder = new StringBuilder();
         var dynamicParams = new DynamicParameters();
-        ProductSearchFilters? filters = request.Filters;
+        ProductFiltersDto? filters = requestDto.Filters;
 
         await Task.Run( () =>
         {
@@ -74,13 +74,13 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $"WITH {CTE_PAGINATED} AS (" );
             builder.Append( $" SELECT DISTINCT {TABLE_PRODUCTS}.*, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
-            AppendCategoryJoin( builder, request.CategoryId );
+            AppendCategoryJoin( builder, requestDto.CategoryId );
             AppendSpecLookupJoin( builder, filters?.SpecsInclude is not null || filters?.SpecsExlude is not null );
             
             builder.Append( $" WHERE 1=1" );
             
-            AppendCategoryCondition( builder, dynamicParams, request.CategoryId );
-            AppendSearchTextCondition( builder, dynamicParams, request.SearchText );
+            AppendCategoryCondition( builder, dynamicParams, requestDto.CategoryId );
+            AppendSearchTextCondition( builder, dynamicParams, requestDto.SearchText );
 
             if ( filters is not null )
             {
@@ -106,12 +106,12 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $" LEFT JOIN {TABLE_PRODUCT_DESCRIPTIONS} PD ON P.{COL_PRODUCT_ID} = PD.{COL_PRODUCT_ID}" );
             builder.Append( $" LEFT JOIN {CTE_CATEGORIES} PC ON P.{COL_PRODUCT_ID} = PC.{COL_PRODUCT_ID}" );
             
-            AppendSort( builder, request.SortType );
+            AppendSort( builder, requestDto.SortType );
             builder.Append( $" OFFSET {PARAM_QUERY_OFFSET} ROWS" );
             builder.Append( $" FETCH NEXT {PARAM_QUERY_ROWS} ROWS ONLY;" );
 
-            dynamicParams.Add( PARAM_QUERY_OFFSET, Math.Max( 0, request.Page - 1 ) * request.Rows );
-            dynamicParams.Add( PARAM_QUERY_ROWS, request.Rows );
+            dynamicParams.Add( PARAM_QUERY_OFFSET, Math.Max( 0, requestDto.Page - 1 ) * requestDto.Rows );
+            dynamicParams.Add( PARAM_QUERY_ROWS, requestDto.Rows );
         } );
         
         return new SearchQueryObject() 

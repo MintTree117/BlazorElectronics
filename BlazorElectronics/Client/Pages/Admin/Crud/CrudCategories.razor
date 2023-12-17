@@ -2,7 +2,7 @@
 @using BlazorElectronics.Shared.Categories
 @using BlazorElectronics.Shared.Enums
 @using BlazorElectronics.Client.Shared
-@inherits CrudPage<CategoryView, CategoryEdit>
+@inherits CrudPage<CategoryViewDtoDto, CategoryEditDtoDto>
 
 <div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
@@ -35,7 +35,7 @@
                         <div class="mb-3">
                             <label for="Primary" class="form-label">Primary Category</label>
                             <InputSelect @bind-Value="ItemEdit.PrimaryId" class="form-control" id="Primary">
-                                @foreach ( CategoryView item in GetPrimary() )
+                                @foreach ( CategoryViewDtoDto item in GetPrimary() )
                                 {
                                     <option value="@item.Id.ToString()">@item.Name</option>
                                 }
@@ -49,7 +49,7 @@
                             <label for="Parent" class="form-label">Parent Category</label>
                             <InputSelect @bind-Value="ItemEdit.ParentCategoryId" class="form-control" id="Parent">
                                 <option value="">Null</option>
-                                @foreach ( CategoryView item in GetEditParents() )
+                                @foreach ( CategoryViewDtoDto item in GetEditParents() )
                                 {
                                     <option value="@item.Id.ToString()">@item.Name</option>
                                 }

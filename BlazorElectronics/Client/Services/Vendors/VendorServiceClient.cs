@@ -9,14 +9,14 @@ public sealed class VendorServiceClient : ClientService, IVendorServiceClient
     public VendorServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    VendorsResponse? _vendors;
+    VendorsDto? _vendors;
     
-    public async Task<ServiceReply<VendorsResponse?>> GetVendors()
+    public async Task<ServiceReply<VendorsDto?>> GetVendors()
     {
         if ( _vendors is not null )
-            return new ServiceReply<VendorsResponse?>( _vendors );
+            return new ServiceReply<VendorsDto?>( _vendors );
 
-        ServiceReply<VendorsResponse?> reply = await TryGetRequest<VendorsResponse?>( "api/vendors/get" );
+        ServiceReply<VendorsDto?> reply = await TryGetRequest<VendorsDto?>( "api/vendors/get" );
         _vendors = reply.Data;
 
         return reply;

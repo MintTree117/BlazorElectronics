@@ -19,14 +19,14 @@ public class SpecsController : _Controller
     }
     
     [HttpGet( "get" )]
-    public async Task<ActionResult<SpecsResponse?>> GetSpecLookups()
+    public async Task<ActionResult<LookupSpecsDto?>> GetSpecLookups()
     {
         ServiceReply<List<int>?> categoryReply = await _categoryService.GetPrimaryCategoryIds();
 
         if ( !categoryReply.Success || categoryReply.Data is null )
             return GetReturnFromReply( categoryReply );
         
-        ServiceReply<SpecsResponse?> reply = await _specService.GetSpecs( categoryReply.Data );
+        ServiceReply<LookupSpecsDto?> reply = await _specService.GetSpecs( categoryReply.Data );
         return GetReturnFromReply( reply );
     }
 }

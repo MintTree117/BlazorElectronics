@@ -18,12 +18,12 @@ public class ProductsController : _Controller
     }
 
     [HttpGet( "search-query" )]
-    public async Task<ActionResult<ProductSummaryResponse?>> SearchQuery()
+    public async Task<ActionResult<ProductSummaryDto?>> SearchQuery()
     {
-        ProductSearchRequest r = new()
+        ProductSearchRequestDto r = new()
         {
             CategoryId = 1,
-            Filters = new ProductSearchFilters
+            Filters = new ProductFiltersDto
             {
                 SpecsInclude = new Dictionary<int, List<int>>() { { 1, new List<int>(){ 1 } } }
             }
@@ -32,9 +32,9 @@ public class ProductsController : _Controller
         return GetReturnFromReply( reply );
     }
     [HttpPost( "search" )]
-    public async Task<ActionResult<ProductSummaryResponse?>> SearchProducts( [FromBody] ProductSearchRequest request )
+    public async Task<ActionResult<ProductSummaryDto?>> SearchProducts( [FromBody] ProductSearchRequestDto requestDto )
     {
-        ServiceReply<ProductSearchResponse?> reply = await _productService.GetProductSearch( request );
+        ServiceReply<ProductSearchReplyDto?> reply = await _productService.GetProductSearch( requestDto );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "suggestions" )]

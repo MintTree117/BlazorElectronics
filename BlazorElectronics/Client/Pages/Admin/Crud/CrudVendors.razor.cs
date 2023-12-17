@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudVendors : CrudPage<CrudView, VendorEdit>
+public sealed partial class CrudVendors : CrudPage<CrudViewDto, VendorEditDtoDto>
 {
     [Inject] public IAdminCategoryHelper CategoryHelper { get; set; } = default!;
 

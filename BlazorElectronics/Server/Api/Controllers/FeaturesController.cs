@@ -17,9 +17,9 @@ public class FeaturesController : _Controller
     }
 
     [HttpGet( "get" )]
-    public async Task<ActionResult<FeaturesResponse>> GetFeaturedProducts()
+    public async Task<ActionResult<FeaturesReplyDto>> GetFeaturedProducts()
     {
-        ServiceReply<FeaturesResponse?> featureReply = await _featuresService.GetFeatures();
+        ServiceReply<FeaturesReplyDto?> featureReply = await _featuresService.GetFeatures();
         return GetReturnFromReply( featureReply );
     }
 }

@@ -18,58 +18,58 @@ public sealed class AdminFeaturesController : _AdminController
     }
     
     [HttpPost( "get-view" )]
-    public async Task<ActionResult<List<CrudView>?>> GetView( [FromBody] UserRequest request )
+    public async Task<ActionResult<List<CrudViewDto>?>> GetView( [FromBody] UserRequestDto requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<List<CrudView>?> reply = await _featuresService.GetFeaturesView();
+        ServiceReply<List<CrudViewDto>?> reply = await _featuresService.GetFeaturesView();
         return GetReturnFromReply( reply );
     }
     [HttpPost( "get-edit" )]
-    public async Task<ActionResult<FeatureEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<FeatureDtoEditDto?>> GetEdit( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<FeatureEdit?> reply = await _featuresService.GetFeatureEdit( request.Payload.Value );
+        ServiceReply<FeatureDtoEditDto?> reply = await _featuresService.GetFeatureEdit( requestDto.Payload.Value );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
-    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<FeatureEdit> request )
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequestDto<FeatureDtoEditDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<int> reply = await _featuresService.AddFeature( request.Payload );
+        ServiceReply<int> reply = await _featuresService.AddFeature( requestDto.Payload );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<FeatureEdit> request )
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequestDto<FeatureDtoEditDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.UpdateFeature( request.Payload );
+        ServiceReply<bool> reply = await _featuresService.UpdateFeature( requestDto.Payload );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "remove" )]
-    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _featuresService.RemoveFeature( request.Payload.Value );
+        ServiceReply<bool> reply = await _featuresService.RemoveFeature( requestDto.Payload.Value );
         return GetReturnFromReply( reply );
     }
 }

@@ -17,17 +17,17 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
     public CategoryRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
 
-    public async Task<IEnumerable<CategoryModel>?> Get()
+    public async Task<IEnumerable<CategoryFullDto>?> Get()
     {
-        return await TryQueryAsync( Query<CategoryModel>, null, PROCEDURE_GET );
+        return await TryQueryAsync( Query<CategoryFullDto>, null, PROCEDURE_GET );
     }
-    public async Task<CategoryModel?> GetEdit( int categoryId )
+    public async Task<CategoryFullDto?> GetEdit( int categoryId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_CATEGORY_ID, categoryId );
-        return await TryQueryAsync( QuerySingleOrDefault<CategoryModel?>, p, PROCEDURE_GET_EDIT );
+        return await TryQueryAsync( QuerySingleOrDefault<CategoryFullDto?>, p, PROCEDURE_GET_EDIT );
     }
-    public async Task<bool> BulkInsert( List<CategoryEdit> dtos )
+    public async Task<bool> BulkInsert( List<CategoryEditDtoDto> dtos )
     {
         DataTable table = new();
         table.Columns.Add( COL_CATEGORY_PARENT_ID, typeof( int ) );
@@ -36,7 +36,7 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         table.Columns.Add( COL_CATEGORY_URL, typeof( string ) );
         table.Columns.Add( COL_CATEGORY_IMAGE, typeof( string ) );
 
-        foreach ( CategoryEdit c in dtos )
+        foreach ( CategoryEditDtoDto c in dtos )
         {
             DataRow row = table.NewRow();
             row[ COL_CATEGORY_PARENT_ID ] = c.ParentCategoryId;
@@ -53,14 +53,14 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
 
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_BULK_INSERT );
     }
-    public async Task<int> Insert( CategoryEdit dto )
+    public async Task<int> Insert( CategoryEditDtoDto dtoDto )
     {
-        DynamicParameters p = GetInsertParameters( dto );
+        DynamicParameters p = GetInsertParameters( dtoDto );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( CategoryEdit dto )
+    public async Task<bool> Update( CategoryEditDtoDto dtoDto )
     {
-        DynamicParameters p = GetUpdateParameters( dto );
+        DynamicParameters p = GetUpdateParameters( dtoDto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
     }
     public async Task<bool> Delete( int categoryId )
@@ -70,21 +70,21 @@ public class CategoryRepository : DapperRepository, ICategoryRepository
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
     
-    static DynamicParameters GetInsertParameters( CategoryEdit dto )
+    static DynamicParameters GetInsertParameters( CategoryEditDtoDto dtoDto )
     {
         DynamicParameters p = new();
-        p.Add( PARAM_CATEGORY_PARENT_ID, dto.ParentCategoryId );
-        p.Add( PARAM_CATEGORY_TIER, dto.Tier );
-        p.Add( PARAM_CATEGORY_NAME, dto.Name );
-        p.Add( PARAM_CATEGORY_API_URL, dto.ApiUrl );
-        p.Add( PARAM_CATEGORY_IMAGE_URL, dto.ImageUrl );
+        p.Add( PARAM_CATEGORY_PARENT_ID, dtoDto.ParentCategoryId );
+        p.Add( PARAM_CATEGORY_TIER, dtoDto.Tier );
+        p.Add( PARAM_CATEGORY_NAME, dtoDto.Name );
+        p.Add( PARAM_CATEGORY_API_URL, dtoDto.ApiUrl );
+        p.Add( PARAM_CATEGORY_IMAGE_URL, dtoDto.ImageUrl );
 
         return p;
     }
-    static DynamicParameters GetUpdateParameters( CategoryEdit dto )
+    static DynamicParameters GetUpdateParameters( CategoryEditDtoDto dtoDto )
     {
-        DynamicParameters p = GetInsertParameters( dto );
-        p.Add( PARAM_CATEGORY_ID, dto.CategoryId );
+        DynamicParameters p = GetInsertParameters( dtoDto );
+        p.Add( PARAM_CATEGORY_ID, dtoDto.CategoryId );
         return p;
     }
 }

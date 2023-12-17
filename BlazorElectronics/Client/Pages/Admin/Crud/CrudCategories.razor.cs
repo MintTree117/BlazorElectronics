@@ -5,7 +5,7 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit>
+public sealed partial class CrudCategories : CrudPage<CategoryViewDtoDto, CategoryEditDtoDto>
 {
     protected override async Task OnInitializedAsync()
     {
@@ -47,11 +47,11 @@ public sealed partial class CrudCategories : CrudPage<CategoryView, CategoryEdit
         ItemEdit.PrimaryId = 1;
         ItemEdit.ParentCategoryId = null;
     }
-    List<CategoryView> GetPrimary()
+    List<CategoryViewDtoDto> GetPrimary()
     {
         return ItemsView.Where( c => c.Tier == CategoryTier.Primary ).ToList();
     }
-    List<CategoryView> GetEditParents()
+    List<CategoryViewDtoDto> GetEditParents()
     {
         return ItemEdit.Tier == CategoryTier.Tertiary 
             ? ItemsView.Where( c => c.ParentCategoryId == ItemEdit.PrimaryId ).ToList() 

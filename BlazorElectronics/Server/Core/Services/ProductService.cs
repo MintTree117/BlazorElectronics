@@ -26,15 +26,26 @@ public class ProductService : ApiService, IProductService
         _productRepository = productRepository;
     }
 
-    public Task<ServiceReply<List<int>>> GetAllIds()
-    {
-        throw new NotImplementedException();
-    }
-    public async Task<ServiceReply<string?>> GetProductSearchQueryString( ProductSearchRequest request )
+    public async Task<ServiceReply<List<int>>> GetAllIds()
     {
         try
         {
-            var reply = await _productSearchRepository.GetProductSearchQuery( request );
+            IEnumerable<int>? ids = await _productRepository.GetIds();
+            return ids is not null
+                ? new ServiceReply<List<int>>( ids.ToList() )
+                : new ServiceReply<List<int>>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<List<int>>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<string?>> GetProductSearchQueryString( ProductSearchRequestDto requestDto )
+    {
+        try
+        {
+            var reply = await _productSearchRepository.GetProductSearchQuery( requestDto );
             return new ServiceReply<string?>( reply );
         }
         catch ( RepositoryException e )
@@ -58,21 +69,21 @@ public class ProductService : ApiService, IProductService
             return new ServiceReply<List<string>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<ProductSearchResponse?>> GetProductSearch( ProductSearchRequest request )
+    public async Task<ServiceReply<ProductSearchReplyDto?>> GetProductSearch( ProductSearchRequestDto requestDto )
     {
         try
         {
-            IEnumerable<ProductSearchModel>? models = await _productSearchRepository.GetProductSearch( request );
-            ProductSearchResponse? response = await MapProductSearchToResponse( models );
+            IEnumerable<ProductSearchModel>? models = await _productSearchRepository.GetProductSearch( requestDto );
+            ProductSearchReplyDto? response = await MapProductSearchToResponse( models );
 
             return response is not null
-                ? new ServiceReply<ProductSearchResponse?>( response )
-                : new ServiceReply<ProductSearchResponse?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<ProductSearchReplyDto?>( response )
+                : new ServiceReply<ProductSearchReplyDto?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<ProductSearchResponse?>( ServiceErrorType.ServerError );
+            return new ServiceReply<ProductSearchReplyDto?>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<ProductDto?>> GetProductDetails( int productId )
@@ -92,36 +103,52 @@ public class ProductService : ApiService, IProductService
             return new ServiceReply<ProductDto?>( ServiceErrorType.ServerError );
         }
     }
-    static async Task<ProductSearchRequest> ValidateProductSearchRequest( ProductSearchRequest request )
+    public async Task<ServiceReply<bool>> UpdateProductsReviewData()
+    {
+        try
+        {
+            bool result = await _productRepository.UpdateReviewData();
+            return result
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    
+    static async Task<ProductSearchRequestDto> ValidateProductSearchRequest( ProductSearchRequestDto requestDto )
     {
         return await Task.Run( () =>
         {
-            request.Page = Math.Max( request.Page, 0 );
-            request.Rows = Math.Clamp( request.Rows, 0, MAX_PRODUCT_LIST_ROWS );
+            requestDto.Page = Math.Max( requestDto.Page, 0 );
+            requestDto.Rows = Math.Clamp( requestDto.Rows, 0, MAX_PRODUCT_LIST_ROWS );
 
-            if ( request.SearchText?.Length > MAX_SEARCH_TEXT_LENGTH )
-                request.SearchText.Remove( MAX_SEARCH_TEXT_LENGTH - 1 );
+            if ( requestDto.SearchText?.Length > MAX_SEARCH_TEXT_LENGTH )
+                requestDto.SearchText.Remove( MAX_SEARCH_TEXT_LENGTH - 1 );
             
-            if ( request.Filters is null )
-                return request;
+            if ( requestDto.Filters is null )
+                return requestDto;
 
-            ProductSearchFilters filters = request.Filters;
+            ProductFiltersDto filtersDto = requestDto.Filters;
 
-            filters.MinPrice = filters.MinPrice is null ? null : Math.Max( filters.MinPrice.Value, 0 );
-            filters.MaxPrice = filters.MaxPrice is null ? null : Math.Max( filters.MaxPrice.Value, 0 );
-            filters.MinRating = filters.MinRating is null ? null : Math.Max( filters.MinRating.Value, 0 );
+            filtersDto.MinPrice = filtersDto.MinPrice is null ? null : Math.Max( filtersDto.MinPrice.Value, 0 );
+            filtersDto.MaxPrice = filtersDto.MaxPrice is null ? null : Math.Max( filtersDto.MaxPrice.Value, 0 );
+            filtersDto.MinRating = filtersDto.MinRating is null ? null : Math.Max( filtersDto.MinRating.Value, 0 );
             
-            return request;
+            return requestDto;
         } );
     }
-    static async Task<ProductSearchResponse?> MapProductSearchToResponse( IEnumerable<ProductSearchModel>? models )
+    static async Task<ProductSearchReplyDto?> MapProductSearchToResponse( IEnumerable<ProductSearchModel>? models )
     {
         if ( models is null )
             return null;
         
         return await Task.Run( () =>
         {
-            ProductSearchResponse dto = new();
+            ProductSearchReplyDto dto = new();
             
             foreach ( ProductSearchModel p in models )
             {
@@ -134,7 +161,7 @@ public class ProductService : ApiService, IProductService
                         categoryIds.Add( value );
                 }
 
-                dto.Products.Add( new ProductSummaryResponse
+                dto.Products.Add( new ProductSummaryDto
                 {
                     Id = p.ProductId,
                     VendorId = p.VendorId,
@@ -153,7 +180,7 @@ public class ProductService : ApiService, IProductService
             return dto;
         } );
     }
-    static async Task<ProductDto?> MapProductToDto( ProductModel? model )
+    async Task<ProductDto?> MapProductToDto( ProductModel? model )
     {
         if ( model?.Product is null )
             return null;
@@ -180,6 +207,9 @@ public class ProductService : ApiService, IProductService
             foreach ( ProductCategoryModel c in model.Categories )
                 dto.Categories.Add( c.CategoryId );
 
+            foreach ( ProductImageModel i in model.Images )
+                dto.Images.Add( i.ImageUrl );
+            
             foreach ( ProductSpecLookupModel l in model.SpecLookups )
             {
                 if ( !dto.LookupSpecs.TryGetValue( l.SpecId, out List<int>? values ) )
@@ -194,7 +224,6 @@ public class ProductService : ApiService, IProductService
             return dto;
         } );
     }
-
     static Dictionary<string, string> ParseFromXml( string xmlString )
     {
         XDocument doc = XDocument.Parse( xmlString );

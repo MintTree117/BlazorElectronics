@@ -23,9 +23,9 @@ public class VendorRepository : DapperRepository, IVendorRepository
     { 
         return await TryQueryAsync( GetQuery );
     }
-    public async Task<IEnumerable<VendorModel>?> GetView()
+    public async Task<IEnumerable<VendorDto>?> GetView()
     {
-        return await TryQueryAsync( Query<VendorModel>, null, PROCEDURE_GET_VIEW );
+        return await TryQueryAsync( Query<VendorDto>, null, PROCEDURE_GET_VIEW );
     }
     public async Task<VendorEditModel?> GetEdit( int vendorId )
     {
@@ -33,14 +33,14 @@ public class VendorRepository : DapperRepository, IVendorRepository
         p.Add( PARAM_VENDOR_ID, vendorId );
         return await TryQueryAsync( GetEditQuery, p );
     }
-    public async Task<int> Insert( VendorEdit dto )
+    public async Task<int> Insert( VendorEditDtoDto dtoDto )
     {
-        DynamicParameters p = GetInsertParameters( dto );
+        DynamicParameters p = GetInsertParameters( dtoDto );
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<int>, p, PROCEDURE_INSERT );
     }
-    public async Task<bool> Update( VendorEdit dto )
+    public async Task<bool> Update( VendorEditDtoDto dtoDto )
     {
-        DynamicParameters p = GetUpdateParameters( dto );
+        DynamicParameters p = GetUpdateParameters( dtoDto );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE );
     }
     public async Task<bool> Delete( int vendorId )
@@ -59,7 +59,7 @@ public class VendorRepository : DapperRepository, IVendorRepository
 
         return new VendorsModel
         {
-            Vendors = await multi.ReadAsync<VendorModel>(),
+            Vendors = await multi.ReadAsync<VendorDto>(),
             Categories = await multi.ReadAsync<VendorCategoryModel>()
         };
     }
@@ -72,28 +72,28 @@ public class VendorRepository : DapperRepository, IVendorRepository
         
         return new VendorEditModel
         {
-            Vendor = await multi.ReadSingleOrDefaultAsync<VendorModel>(),
+            Vendor = await multi.ReadSingleOrDefaultAsync<VendorDto>(),
             Categories = await multi.ReadAsync<VendorCategoryModel>()
         };
     }
     
-    static DynamicParameters GetInsertParameters( VendorEdit dto )
+    static DynamicParameters GetInsertParameters( VendorEditDtoDto dtoDto )
     {
         var parameters = new DynamicParameters();
 
-        parameters.Add( PARAM_VENDOR_NAME, dto.VendorName );
-        parameters.Add( PARAM_VENDOR_URL, dto.VendorUrl );
-        parameters.Add( PARAM_IS_GLOBAL, dto.IsGlobal );
+        parameters.Add( PARAM_VENDOR_NAME, dtoDto.VendorName );
+        parameters.Add( PARAM_VENDOR_URL, dtoDto.VendorUrl );
+        parameters.Add( PARAM_IS_GLOBAL, dtoDto.IsGlobal );
 
-        DataTable categoriesTable = GetPrimaryCategoriesTable( dto.PrimaryCategories );
+        DataTable categoriesTable = GetPrimaryCategoriesTable( dtoDto.PrimaryCategories );
         parameters.Add( PARAM_CATEGORY_IDS, categoriesTable.AsTableValuedParameter( TVP_CATEGORY_IDS ) );
         
         return parameters;
     }
-    static DynamicParameters GetUpdateParameters( VendorEdit dto )
+    static DynamicParameters GetUpdateParameters( VendorEditDtoDto dtoDto )
     {
-        DynamicParameters parameters = GetInsertParameters( dto );
-        parameters.Add( PARAM_VENDOR_ID, dto.VendorId );
+        DynamicParameters parameters = GetInsertParameters( dtoDto );
+        parameters.Add( PARAM_VENDOR_ID, dtoDto.VendorId );
         
         return parameters;
     }

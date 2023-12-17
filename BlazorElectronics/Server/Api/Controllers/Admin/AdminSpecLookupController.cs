@@ -18,58 +18,58 @@ public sealed class AdminSpecLookupController : _AdminController
     }
     
     [HttpPost( "get-view" )]
-    public async Task<ActionResult<List<CrudView>?>> GetView( [FromBody] UserRequest request )
+    public async Task<ActionResult<List<CrudViewDto>?>> GetView( [FromBody] UserRequestDto requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<List<CrudView>?> reply = await _lookupService.GetView();
+        ServiceReply<List<CrudViewDto>?> reply = await _lookupService.GetView();
         return GetReturnFromReply( reply );
     }
     [HttpPost( "get-edit" )]
-    public async Task<ActionResult<SpecEdit?>> GetEdit( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<LookupSpecEditDto?>> GetEdit( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<SpecEdit?> reply = await _lookupService.GetEdit( request.Payload.Value );
+        ServiceReply<LookupSpecEditDto?> reply = await _lookupService.GetEdit( requestDto.Payload.Value );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
-    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequest<SpecEdit> request )
+    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequestDto<LookupSpecEditDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<int> reply = await _lookupService.Add( request.Payload );
+        ServiceReply<int> reply = await _lookupService.Add( requestDto.Payload );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequest<SpecEdit> request )
+    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequestDto<LookupSpecEditDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _lookupService.Update( request.Payload );
+        ServiceReply<bool> reply = await _lookupService.Update( requestDto.Payload );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "remove" )]
-    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequest<IntDto> request )
+    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( request );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _lookupService.Remove( request.Payload.Value );
+        ServiceReply<bool> reply = await _lookupService.Remove( requestDto.Payload.Value );
         return GetReturnFromReply( reply );
     }
 }

@@ -13,23 +13,23 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         : base( logger, http, storage ) { }
 
 
-    public Task<ServiceReply<CartResponse?>> GetCart()
+    public Task<ServiceReply<CartReplyDto?>> GetCart()
     {
         throw new NotImplementedException();
     }
-    public Task<ServiceReply<CartResponse?>> UpdateCart()
+    public Task<ServiceReply<CartReplyDto?>> UpdateCart()
     {
         throw new NotImplementedException();
     }
-    public Task<ServiceReply<CartResponse?>> AddToCart( CartItem item )
+    public Task<ServiceReply<CartReplyDto?>> AddToCart( CartItemDto itemDto )
     {
         throw new NotImplementedException();
     }
-    public Task<ServiceReply<CartResponse?>> UpdateCartQuantity( CartItem item )
+    public Task<ServiceReply<CartReplyDto?>> UpdateCartQuantity( CartItemDto itemDto )
     {
         throw new NotImplementedException();
     }
-    public Task<ServiceReply<CartResponse?>> RemoveFromCart( int productId )
+    public Task<ServiceReply<CartReplyDto?>> RemoveFromCart( int productId )
     {
         throw new NotImplementedException();
     }

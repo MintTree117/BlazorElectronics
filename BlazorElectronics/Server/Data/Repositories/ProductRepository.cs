@@ -8,17 +8,20 @@ namespace BlazorElectronics.Server.Data.Repositories;
 
 public class ProductRepository : DapperRepository, IProductRepository
 {
+    const string PROCEDURE_GET_IDS = "Get_ProductIds";
     const string PROCEDURE_GET = "Get_Product";
     const string PROCEDURE_INSERT = "Insert_Product";
     const string PROCEDURE_UPDATE = "Update_Product";
     const string PROCEDURE_DELETE = "Delete_Product";
-
-    const string PROCEDURE_UPDATE_PRODUCT_RATING = "Update_ProductRatings";
-    const string PROCEDURE_UPDATE_PRODUCT_REVIEW_COUNT = "Update_ProductReviewCount";
+    const string PROCEDURE_UPDATE_REVIEW_DATA = "Update_ProductReviewData";
 
     public ProductRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
-    
+
+    public async Task<IEnumerable<int>?> GetIds()
+    {
+        return await TryQueryAsync( Query<int>, null, PROCEDURE_GET_IDS );
+    }
     public async Task<ProductModel?> Get( int productId )
     {
         DynamicParameters p = new();
@@ -41,13 +44,9 @@ public class ProductRepository : DapperRepository, IProductRepository
         p.Add( PARAM_PRODUCT_ID, productId );
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
     }
-    public async Task<bool> UpdateRatings()
+    public async Task<bool> UpdateReviewData()
     {
-        return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_PRODUCT_RATING );
-    }
-    public async Task<bool> UpdateReviewCount()
-    {
-        return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_PRODUCT_REVIEW_COUNT );
+        return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_REVIEW_DATA );
     }
 
     static async Task<ProductModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )

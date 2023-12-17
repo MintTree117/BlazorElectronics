@@ -12,7 +12,7 @@ public partial class UserLogin : PageView
 {
     [Inject] IUserServiceClient UserService { get; set; } = default!;
     [Inject] ICartServiceClient CartService { get; set; } = default!;
-    readonly UserLoginRequest _loginRequest = new();
+    readonly LoginRequestDto _loginRequestDto = new();
 
     string _returnUrl = string.Empty;
 
@@ -28,7 +28,7 @@ public partial class UserLogin : PageView
     }
     async Task HandleLogin()
     {
-        ServiceReply<UserSessionResponse?> loginReply = await UserService.Login( _loginRequest );
+        ServiceReply<SessionReplyDto?> loginReply = await UserService.Login( _loginRequestDto );
 
         if ( !loginReply.Success || loginReply.Data is null )
         {

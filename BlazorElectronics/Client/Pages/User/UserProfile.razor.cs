@@ -5,11 +5,11 @@ namespace BlazorElectronics.Client.Pages.User;
 
 public partial class UserProfile : UserPage
 {
-    readonly PasswordChangeRequest _changeRequest = new();
+    readonly PasswordRequestDto _requestDto = new();
 
     async Task ChangePassword()
     {
-        ServiceReply<bool> result = await UserService.ChangePassword( _changeRequest );
+        ServiceReply<bool> result = await UserService.ChangePassword( _requestDto );
         
         
     }
