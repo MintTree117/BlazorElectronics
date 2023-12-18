@@ -1,7 +1,7 @@
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
 
-namespace BlazorElectronics.Client.Services.Users.Cart;
+namespace BlazorElectronics.Client.Services.Cart;
 
 public interface ICartServiceClient
 {

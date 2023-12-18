@@ -36,7 +36,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IUserSeedService, UserSeedService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserAccountRepository>();
 
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();

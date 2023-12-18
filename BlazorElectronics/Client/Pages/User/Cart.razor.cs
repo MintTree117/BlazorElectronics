@@ -1,4 +1,4 @@
-using BlazorElectronics.Client.Services.Users.Cart;
+using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
 using Microsoft.AspNetCore.Components;
@@ -8,7 +8,7 @@ namespace BlazorElectronics.Client.Pages.User;
 public partial class Cart : PageView
 {
     [Inject] ICartServiceClient CartService { get; init; } = default!;
-    CartReplyDto? _cart;
+    CartReplyDto _cart = new();
 
     protected override async Task OnInitializedAsync()
     {

@@ -11,4 +11,5 @@ public interface IUserAccountService
     Task<ServiceReply<int>> VerifyAdminId( int adminId );
     Task<ServiceReply<int>> ValidateUserId( string email );
     Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword );
+    Task<ServiceReply<bool>> ActivateAccount( string token );
 }

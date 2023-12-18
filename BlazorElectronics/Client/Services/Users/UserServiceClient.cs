@@ -19,14 +19,19 @@ public class UserServiceClient : ClientService, IUserServiceClient
     const string API_ROUTE_LOGOUT = API_ROUTE + "/logout";
     const string API_ROUTE_AUTHORIZE = API_ROUTE + "/authorize";
     const string API_ROUTE_CHANGE_PASSWORD = API_ROUTE + "/change-password";
+    const string API_ROUTE_ACTIVATE_ACCOUNT = API_ROUTE + "/activate";
     const string SESSION_DATA_KEY = "UserSession";
     
     SessionReplyDto? _userSession;
     
     public async Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto )
     {
-        ServiceReply<SessionReplyDto?> registerReply = await TryGetSessionResponse( API_ROUTE_REGISTER, requestDto );
-        return new ServiceReply<bool>( false );
+        ServiceReply<bool> registerReply = await TryPostRequest<bool>( API_ROUTE_REGISTER, requestDto );
+        return registerReply;
+    }
+    public async Task<ServiceReply<bool>> ActivateAccount( string token )
+    {
+        return await TryPostRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
     }
     public async Task<ServiceReply<SessionReplyDto?>> Login( LoginRequestDto requestDto )
     {
@@ -39,11 +44,19 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ServiceReply<bool>> AuthorizeUser()
     {
-        ServiceReply<bool> serviceReply = await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
+        ServiceReply<bool> authorizeReply = await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
 
-        return serviceReply.Success
+        if ( !authorizeReply.Success )
+        {
+            ServiceReply<bool> logoutReply = await Logout();
+
+            if ( !logoutReply.Success )
+                Logger.LogError( $"Failed to log user out! {logoutReply.ErrorType} : {logoutReply.Message}" );
+        }
+
+        return authorizeReply.Success
             ? new ServiceReply<bool>( true )
-            : new ServiceReply<bool>( serviceReply.ErrorType, serviceReply.Message );
+            : new ServiceReply<bool>( authorizeReply.ErrorType, authorizeReply.Message );
     }
     public async Task<ServiceReply<bool>> Logout()
     {
@@ -65,6 +78,34 @@ public class UserServiceClient : ClientService, IUserServiceClient
 
         return new SessionMeta( reply.Data.IsAdmin ? SessionType.Admin : SessionType.User, reply.Data.Username );
     }
+
+    protected async Task<ServiceReply<T?>> TryUserRequest<T>( string apiRoute )
+    {
+        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
+
+        if ( !sessionReply.Success || sessionReply.Data is null )
+        {
+            Logger.LogError( sessionReply.ErrorType + sessionReply.Message );
+            return new ServiceReply<T?>( sessionReply.ErrorType );
+        }
+
+        var apiRequest = new UserRequestDto( sessionReply.Data );
+        return await TryPostRequest<T?>( apiRoute, apiRequest );
+    }
+    protected async Task<ServiceReply<RESPONSE?>> TryUserRequest<REQUEST, RESPONSE>( string apiRoute, REQUEST payload ) where REQUEST : class
+    {
+        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
+
+        if ( !sessionReply.Success || sessionReply.Data is null )
+        {
+            Logger.LogError( sessionReply.Message );
+            return new ServiceReply<RESPONSE?>( sessionReply.ErrorType );
+        }
+
+        var apiRequest = new UserDataRequestDto<REQUEST>( sessionReply.Data, payload );
+        return await TryPostRequest<RESPONSE?>( apiRoute, apiRequest );
+    }
+    
     async Task<ServiceReply<SessionReplyDto?>> TryGetLocalUserSession()
     {
         if ( _userSession is not null )
@@ -83,33 +124,6 @@ public class UserServiceClient : ClientService, IUserServiceClient
         return _userSession is not null 
             ? new ServiceReply<SessionReplyDto?>( _userSession ) 
             : new ServiceReply<SessionReplyDto?>( ServiceErrorType.NotFound );
-    }
-
-    protected async Task<ServiceReply<T?>> TryUserRequest<T>( string apiRoute )
-    {
-        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
-        
-        if ( !sessionReply.Success || sessionReply.Data is null )
-        {
-            Logger.LogError( sessionReply.ErrorType + sessionReply.Message );
-            return new ServiceReply<T?>( sessionReply.ErrorType );
-        }
-
-        var apiRequest = new UserRequestDto( sessionReply.Data );
-        return await TryPostRequest<T?>( apiRoute, apiRequest );
-    }
-    protected async Task<ServiceReply<RESPONSE?>> TryUserRequest<REQUEST,RESPONSE>( string apiRoute, REQUEST payload ) where REQUEST : class
-    {
-        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
-
-        if ( !sessionReply.Success || sessionReply.Data is null )
-        {
-            Logger.LogError( sessionReply.Message );
-            return new ServiceReply<RESPONSE?>( sessionReply.ErrorType );
-        }
-
-        var apiRequest = new UserDataRequestDto<REQUEST>( sessionReply.Data, payload );
-        return await TryPostRequest<RESPONSE?>( apiRoute, apiRequest );
     }
     async Task<ServiceReply<SessionReplyDto?>> TryGetSessionResponse<T>( string apiPath, T requestObject )
     {

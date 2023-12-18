@@ -1,6 +1,41 @@
 @page "/cart"
+@using BlazorElectronics.Shared.Cart
 @inherits PageView
 
-<PageTitle>Shopping Cart</PageTitle>
-
-<h3>Shopping Cart</h3>
+<div class="container-sm">
+    <h1>Shopping Cart</h1>
+    <a href="@Routes.CHECKOUT">Checkout</a>
+    
+    @if ( PageIsReady() )
+    {
+        <div class="d-flex flex-column align-items-center justify-content-start">
+            @if ( _cart.Items.Count <= 0 )
+            {
+                <span>Cart is empty</span>
+            }
+            else
+            {
+                foreach ( CartProductDto p in _cart.Items )
+                {
+                    <div class="flex-grow-1 d-flex flex-row">
+                        <img src="@p.ProductThumbnail" alt="@p.ProductTitle"/>
+                        <div class="">
+                            <h3>@p.ProductTitle</h3>
+                            @if ( p.SalePrice is not null )
+                            {
+                                <span class="original-price">@p.Price</span>
+                                <span class="sale-price">@p.SalePrice</span>
+                            }
+                            else
+                            {
+                                <span class="price">@p.Price</span>
+                            }
+                            <span>@p.Quantity</span>
+                            <button class="btn btn-danger">Remove</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>

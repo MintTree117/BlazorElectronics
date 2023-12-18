@@ -71,7 +71,6 @@ public abstract class DapperRepository
     protected const string PARAM_PRODUCT_XML = $"@{COL_PRODUCT_XML}";
     protected const string PARAM_PRODUCT_IMAGES = $"@{TVP_PRODUCT_IMAGES}";
     
-    
     // VENDORS
     protected const string COL_VENDOR_ID = "VendorId";
     protected const string PARAM_VENDOR_ID = "@VendorId";
@@ -106,6 +105,7 @@ public abstract class DapperRepository
     protected const string PARAM_USER_PHONE = "@Phone";
     protected const string PARAM_USER_PASSWORD_HASH = "@PasswordHash";
     protected const string PARAM_USER_PASSWORD_SALT = "@PasswordSalt";
+    protected const string PARAM_USER_VERIFICATION_TOKEN = "@VerificationCode";
 
     // SESSION
     protected const string PARAM_SESSION_ID = "@SessionId";

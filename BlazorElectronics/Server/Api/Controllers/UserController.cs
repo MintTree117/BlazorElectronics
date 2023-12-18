@@ -25,29 +25,29 @@ public class UserController : _Controller
         return dto;
     }
 
-    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeUser( UserRequestDto? request )
+    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeUser( UserRequestDto request )
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<bool>( ServiceErrorType.ValidationError );
 
-        return await SessionService.AuthorizeSession( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+        return await SessionService.AuthorizeSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( UserRequestDto? request )
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( UserRequestDto request )
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        return await SessionService.AuthorizeSessionId( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+        return await SessionService.AuthorizeSessionId( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId<T>( UserDataRequestDto<T>? request ) where T : class
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId<T>( UserDataRequestDto<T> request ) where T : class
     {
         if ( !ValidateUserHttp( request ) )
             return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        return await SessionService.AuthorizeSessionId( request!.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+        return await SessionService.AuthorizeSessionId( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
     }
     
-    static bool ValidateUserHttp( UserRequestDto? request )
+    static bool ValidateUserHttp( UserRequestDto request )
     {
         return request is not null && 
                ValidateRequestSession( request.SessionId, request.SessionToken );

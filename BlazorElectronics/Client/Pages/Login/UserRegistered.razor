@@ -1,0 +1,25 @@
+@page "/registered"
+@using System.Collections.Specialized
+@using System.Web
+@inherits PageView
+
+<div class="mt-5 p-3 text-center bg-light border border-grey">
+    <AlertMessage></AlertMessage>
+</div>
+
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
+        NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
+        string? email = queryString.Get( Routes.REGISTERED_EMAIL );
+
+        if ( string.IsNullOrWhiteSpace( email ) )
+            email = "Email not found";
+
+        InvokeAlert( AlertType.Success, $"Thank you for registering your account. An email with a verification link has been sent to {email}." );
+    }
+}

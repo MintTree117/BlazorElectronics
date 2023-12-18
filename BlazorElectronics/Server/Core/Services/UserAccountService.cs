@@ -1,9 +1,10 @@
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Users;
-using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 
@@ -39,24 +40,25 @@ public class UserAccountService : ApiService, IUserAccountService
     }
     public async Task<ServiceReply<UserLoginDto?>> Login( string emailOrUsername, string password )
     {
-        User? user;
-
         try
         {
-            user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
+            User? user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
+
+            if ( user is null )
+                return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, "User Not Found!" );
+
+            if ( !user.IsActive )
+                return new ServiceReply<UserLoginDto?>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
+
+            return VerifyPasswordHash( password, user.PasswordHash, user.PasswordSalt )
+                ? new ServiceReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Username, user.Email, user.IsAdmin ) )
+                : new ServiceReply<UserLoginDto?>( ServiceErrorType.ValidationError, BAD_PASSWORD_MESSAGE );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
-
-        if ( user is null )
-            return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, "User Not Found!" );
-
-        return VerifyPasswordHash( password, user.PasswordHash, user.PasswordSalt )
-            ? new ServiceReply<UserLoginDto?>( new UserLoginDto( user.UserId, user.Username, user.Email, user.IsAdmin ) )
-            : new ServiceReply<UserLoginDto?>( ServiceErrorType.ValidationError, BAD_PASSWORD_MESSAGE );
     }
     public async Task<ServiceReply<UserLoginDto?>> Register( string username, string email, string password, string? phone )
     {
@@ -66,115 +68,107 @@ public class UserAccountService : ApiService, IUserAccountService
 
             if ( userExists is not null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
+
+            CreatePasswordHash( password, out byte[] hash, out byte[] salt );
+            User? insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
+
+            if ( insertedUser is null )
+                return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert user!" );
+
+            string? token = await TryInsertVerificationToken( insertedUser.UserId );
+
+            if ( token is null )
+                return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert verification token!" );
+
+            SendVerificationEmail( email, token );
+
+            return new ServiceReply<UserLoginDto?>( new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
-
-        CreatePasswordHash( password, out byte[] hash, out byte[] salt );
-        User? insertedUser;
-
-        try
-        {
-            insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
-        }
-
-        return insertedUser is not null
-            ? new ServiceReply<UserLoginDto?>( new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) )
-            : new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound );
     }
     public async Task<ServiceReply<bool>> VerifyAdmin( int adminId )
     {
-        User? admin;
-
         try
         {
-            admin = await _userRepository.GetById( adminId );
+            User? admin = await _userRepository.GetById( adminId );
+
+            if ( admin is null )
+                return new ServiceReply<bool>( ServiceErrorType.NotFound );
+
+            if ( !admin.IsActive )
+                return new ServiceReply<bool>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
+
+            return admin.IsAdmin
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
-
-        if ( admin is null )
-            return new ServiceReply<bool>( ServiceErrorType.NotFound );
-
-        return admin.IsAdmin
-            ? new ServiceReply<bool>( true )
-            : new ServiceReply<bool>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
     }
     public async Task<ServiceReply<int>> VerifyAdminId( int adminId )
     {
-        User? admin;
-
         try
         {
-            admin = await _userRepository.GetById( adminId );
+            User? admin = await _userRepository.GetById( adminId );
+
+            if ( admin is null )
+                return new ServiceReply<int>( ServiceErrorType.NotFound );
+
+            if ( !admin.IsActive )
+                return new ServiceReply<int>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
+
+            return admin.IsAdmin
+                ? new ServiceReply<int>( admin.UserId )
+                : new ServiceReply<int>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
-
-        if ( admin is null )
-            return new ServiceReply<int>( ServiceErrorType.NotFound );
-
-        return admin.IsAdmin 
-            ? new ServiceReply<int>( admin.UserId ) 
-            : new ServiceReply<int>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
     }
     public async Task<ServiceReply<int>> ValidateUserId( string email )
     {
-        User? user;
-
         try
         {
-            user = await _userRepository.GetByEmail( email );
+            User? user = await _userRepository.GetByEmail( email );
+
+            if ( user is null )
+                return new ServiceReply<int>( ServiceErrorType.NotFound );
+
+            return user.IsActive 
+                ? new ServiceReply<int>( user.UserId ) 
+                : new ServiceReply<int>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
-
-        return user is not null 
-            ? new ServiceReply<int>( user.UserId ) 
-            : new ServiceReply<int>( ServiceErrorType.NotFound );
     }
     public async Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword )
     {
-        User? user;
-
         try
         {
-            user = await _userRepository.GetById( userId );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
-        }
+            User? user = await _userRepository.GetById( userId );
 
-        if ( user is null )
-            return new ServiceReply<bool>( ServiceErrorType.NotFound );
+            if ( user is null )
+                return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
-        CreatePasswordHash( newPassword, out byte[] hash, out byte[] salt );
+            if ( !user.IsActive )
+                return new ServiceReply<bool>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
 
-        user.PasswordHash = hash;
-        user.PasswordSalt = salt;
+            CreatePasswordHash( newPassword, out byte[] hash, out byte[] salt );
 
-        try
-        {
             bool success = await _userRepository.UpdatePassword( userId, hash, salt );
+            
             return success
                 ? new ServiceReply<bool>( true )
                 : new ServiceReply<bool>( ServiceErrorType.ValidationError );
@@ -185,7 +179,72 @@ public class UserAccountService : ApiService, IUserAccountService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
+    public async Task<ServiceReply<bool>> ActivateAccount( string token )
+    {
+        try
+        {
+            int userId = await _userRepository.Update_VerificationToken( token );
 
+            if ( userId <= 0 )
+                return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to activate account!" );
+
+            bool activated = await _userRepository.Update_UserAccountStatus( userId );
+
+            return activated
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to activate account!" );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to activate account!" );
+        }
+    }
+
+    async Task<string?> TryInsertVerificationToken( int userId )
+    {
+        const int safety = 1000;
+        int count = 0;
+        string token = string.Empty;
+        bool tokenInserted = false;
+        
+        while ( count < safety )
+        {
+            token = Guid.NewGuid().ToString();
+
+            if ( await _userRepository.InsertVerificationCode( userId, token ) )
+            {
+                tokenInserted = true;
+                break;   
+            }
+
+            count++;
+        }
+
+        return tokenInserted
+            ? token
+            : null;
+    }
+    static void SendVerificationEmail( string email, string token )
+    {
+        SmtpClient smtpClient = new( "smtp.gmail.com", 587 )
+        {
+            Credentials = new NetworkCredential( "martygrof3708@gmail.com", "yourPassword" ),
+            EnableSsl = true
+        };
+
+        string verificationUrl = $"http://blazorelectronics.com/verify?token={token}";
+
+        MailMessage mail = new()
+        {
+            From = new MailAddress( "martygrof3708@gmail.com" ),
+            Subject = "Email Verification",
+            Body = $"Please verify your email by clicking on this link: {verificationUrl}",
+            IsBodyHtml = true
+        };
+        mail.To.Add( new MailAddress( email ) ); // userEmail is the recipient's email address
+        smtpClient.SendAsync( mail, null );
+    }
     static void CreatePasswordHash( string password, out byte[] hash, out byte[] salt )
     {
         var hmac = new HMACSHA512();

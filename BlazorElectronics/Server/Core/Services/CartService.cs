@@ -16,11 +16,11 @@ public class CartService : ApiService, ICartService
         _cartRepository = cartRepository;
     }
 
-    public async Task<ServiceReply<CartReplyDto?>> UpdateCart( int userId, CartRequestDto requestDto )
+    public async Task<ServiceReply<CartReplyDto?>> GetCart( int userId )
     {
         try
         {
-            IEnumerable<CartProductDto>? models = await _cartRepository.UpdateCart( userId, requestDto );
+            IEnumerable<CartProductDto>? models = await _cartRepository.GetCart( userId );
             CartReplyDto? response = MapCartResponse( models );
 
             return response is not null
@@ -33,11 +33,11 @@ public class CartService : ApiService, ICartService
             return new ServiceReply<CartReplyDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CartReplyDto?>> GetCart( int userId )
+    public async Task<ServiceReply<CartReplyDto?>> UpdateCart( int userId, CartRequestDto requestDto )
     {
         try
         {
-            IEnumerable<CartProductDto>? models = await _cartRepository.GetCart( userId );
+            IEnumerable<CartProductDto>? models = await _cartRepository.UpdateCart( userId, requestDto );
             CartReplyDto? response = MapCartResponse( models );
 
             return response is not null

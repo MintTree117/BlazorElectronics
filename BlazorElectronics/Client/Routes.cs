@@ -10,9 +10,11 @@ public static class Routes
     public const string SALES = $"{SEARCH}?sales=true";
     public const string LOGIN = "/login";
     public const string LOGOUT = "/logout";
+    public const string REGISTERED = "/registered";
     public const string ACCOUNT = "/account";
     public const string ORDERS = "/account/orders";
     public const string CART = "/cart";
+    public const string CHECKOUT = "/checkout";
     
     public const string BULK_CATEGORY = "";
     public const string BULK_KEYS = "";
@@ -22,5 +24,7 @@ public static class Routes
     public const string CRUD_VENDORS = "";
     public const string SEED_DB = "";
 
+    public const string REGISTERED_EMAIL = "registeredEmail";
+    public const string VERIFY_TOKEN = "token";
     public const string SEARCH_TEXT_PARAM = "searchText";
 }

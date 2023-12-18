@@ -9,4 +9,5 @@ public sealed class User
     public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public bool IsAdmin { get; set; } = false;
+    public bool IsActive { get; set; } = false;
 }
