@@ -90,12 +90,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS9MYW5kaW5nRmVhdHVyZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/LoginRegister/UserLogin.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW5SZWdpc3Rlci9Vc2VyTG9naW4ucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/LoginRegister/UserRegistration.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW5SZWdpc3Rlci9Vc2VyUmVnaXN0cmF0aW9uLnJhem9y
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Login/UserLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4vVXNlckxvZ2luLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/PageLoader.razor]

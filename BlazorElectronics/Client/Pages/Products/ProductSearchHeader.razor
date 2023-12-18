@@ -3,8 +3,8 @@
 <div class="container-fluid mb-3 py-3 border-bottom shadow-bottom lg-content-wrapper">
     <div class="product-list-header">
         
-        <div class="product-list-breadcrumb d-flex flex-row align-items-center w-100">
-            <nav aria-label="breadcrumb">
+        <div class="product-list-breadcrumb d-flex flex-row flex-wrap align-items-center w-100">
+            <nav aria-label="breadcrumb" class="me-3">
                 <ol class="breadcrumb h4 mb-0"> <!-- Adjust h4 to your preferred size -->
                     @foreach ( KeyValuePair<string, string> kvp in _urls )
                     {
@@ -21,7 +21,7 @@
                     }
                 </ol>
             </nav>
-            <span class="d-block ms-3 text-muted">@GetViewRows()</span>
+            <span class="d-block text-muted">@GetViewRows()</span>
         </div>
 
         <div class="product-header-buttons">

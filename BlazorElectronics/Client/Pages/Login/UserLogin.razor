@@ -1,0 +1,55 @@
+@page "/login"
+@inherits PageView
+
+<div style="max-width: 360px" class="mt-5 mx-auto text-center">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <img class="mb-4" src="/Images/Logo.svg" alt="blazor" width="72" height="57">
+
+        <EditForm Model="_loginDto" OnValidSubmit="@(async () => await HandleLogin() )">
+            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+            <DataAnnotationsValidator/>
+            <div class="form-floating">
+                <InputText type="name" class="form-control" id="emailOrUsername" @bind-Value="_loginDto.EmailOrUsername">></InputText>
+                <label for="emailOrUsername">Email or Username</label>
+            </div>
+            <div class="form-floating">
+                <InputText type="password" class="form-control" id="password" @bind-Value="_loginDto.Password"></InputText>
+                <label for="password">Password</label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+        </EditForm>
+
+        <span class="my-5 d-block text-muted">- Or -</span>
+
+        <EditForm Model="_registerDto" OnValidSubmit="@(async () => await HandleRegistration() )">
+            <h1 class="h3 mb-3 fw-normal">Register</h1>
+            <DataAnnotationsValidator/>
+            <div class="form-floating">
+                <InputText type="name" class="form-control" id="username" @bind-Value="_registerDto.Username"></InputText>
+                <ValidationMessage For="@(() => _registerDto.Username)"/>
+                <label for="emailOrUsername">Username</label>
+            </div>
+            <div class="form-floating">
+                <InputText type="email" class="form-control" id="email" @bind-Value="_registerDto.Email"></InputText>
+                <ValidationMessage For="@(() => _registerDto.Email)"/>
+                <label for="email">Email</label>
+            </div>
+            <div class="form-floating">
+                <InputText type="password" class="form-control" id="registerPassword" @bind-Value="_registerDto.Password"></InputText>
+                <ValidationMessage For="@(() => _registerDto.Password)"/>
+                <label for="registerPassword">Password</label>
+            </div>
+            <div class="form-floating">
+                <InputText type="password" class="form-control" id="confirmPassword" @bind-Value="_registerDto.ConfirmPassword"></InputText>
+                <ValidationMessage For="@(() => _registerDto.ConfirmPassword)"/>
+                <label for="confirmPassword">Confirm Password</label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
+        </EditForm>
+
+        <AlertMessage Page="@this"></AlertMessage>
+    }
+</div>

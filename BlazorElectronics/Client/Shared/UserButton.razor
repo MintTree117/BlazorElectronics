@@ -11,43 +11,56 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavManager
 
-<div class="dropdown">
-    <button class="btn dropdown-toggle"
-            @onclick="ToggleUserMenu"
-            @onfocusout="HideUserMenu">
-        <i class="oi oi-person"></i>
+@if ( !_isAuthorized )
+{
+    <button class="btn" @onclick="ToggleUserMenu">
+        <a class="text-decoration-none link-dark" href="@Routes.LOGIN"><i class="oi oi-person"></i></a>
     </button>
-    
-    <div class="dropdown-menu dropdown-menu-right @_userMenuCssClass">
-        @if ( _isAuthorized )
-        {
-            <a class="dropdown-item" href="profile">Profile</a>
-            <hr/>
-            <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
+}
+else
+{
+    <div class="dropdown">
+        <button class="btn dropdown-toggle"
+                id="userDropdown"
+                data-bs-toggle="dropdown" 
+                aria-expanded="false" 
+                data-bs-offset="-60,0"
+                @onclick="ToggleUserMenu"
+                @onfocusout="HideUserMenu">
+            <i class="oi oi-person"></i>
+        </button>
 
-            @if ( _isAdmin )
+        <div class="dropdown-menu @_userMenuCssClass" aria-labelledby="userDropdown">
+            @if ( _isAuthorized )
             {
+                <a class="dropdown-item" href="profile">Profile</a>
                 <hr/>
-                <a class="dropdown-item" href="admin/bulk/categories">Bulk Categories</a>
-                <a class="dropdown-item" href="admin/bulk/product-keys">Bulk Product Keys</a>
-                <hr/>
-                <a class="dropdown-item" href="admin/crud/categories">Categories</a>
-                <a class="dropdown-item" href="admin/crud/featured-deals">Featured Deals</a>
-                <a class="dropdown-item" href="admin/crud/features">Features</a>
-                <a class="dropdown-item" href="admin/crud/products">Products</a>
-                <a class="dropdown-item" href="admin/crud/spec-lookups">Specifications</a>
-                <a class="dropdown-item" href="admin/crud/vendors">Vendors</a>
-                <hr/>
-                <a class="dropdown-item" href="admin/seed">Seed Db</a>
+                <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
+
+                @if ( _isAdmin )
+                {
+                    <hr/>
+                    <a class="dropdown-item" href="admin/bulk/categories">Bulk Categories</a>
+                    <a class="dropdown-item" href="admin/bulk/product-keys">Bulk Product Keys</a>
+                    <hr/>
+                    <a class="dropdown-item" href="admin/crud/categories">Categories</a>
+                    <a class="dropdown-item" href="admin/crud/featured-deals">Featured Deals</a>
+                    <a class="dropdown-item" href="admin/crud/features">Features</a>
+                    <a class="dropdown-item" href="admin/crud/products">Products</a>
+                    <a class="dropdown-item" href="admin/crud/spec-lookups">Specifications</a>
+                    <a class="dropdown-item" href="admin/crud/vendors">Vendors</a>
+                    <hr/>
+                    <a class="dropdown-item" href="admin/seed">Seed Db</a>
+                }
             }
-        }
-        else
-        {
-            <a class="dropdown-item" href="login?returnUrl=@NavManager.ToBaseRelativePath( NavManager.Uri )">Login</a>
-            <a class="dropdown-item" href="registration">Register</a>
-        }
-    </div>
-</div>
+            else
+            {
+                <a class="dropdown-item" href="login?returnUrl=@NavManager.ToBaseRelativePath( NavManager.Uri )">Login</a>
+                <a class="dropdown-item" href="registration">Register</a>
+            }
+        </div>
+    </div>   
+}
 
 @code 
 {
