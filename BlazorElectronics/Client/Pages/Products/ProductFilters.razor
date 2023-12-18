@@ -43,15 +43,15 @@
         </button>
         <div class="@GetCollapseDisplay( SECTION_TRENDS )">
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="InStock" @bind="@InStock">
+                <input type="checkbox" class="form-check-input" id="InStock" @bind="@_filters.InStock">
                 <label for="InStock" class="form-check-label">In Stock</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="Featured" @bind="@Featured">
+                <input type="checkbox" class="form-check-input" id="Featured" @bind="@_filters.Featured">
                 <label for="Featured" class="form-check-label">Featured</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="Sale" @bind="@OnSale">
+                <input type="checkbox" class="form-check-input" id="Sale" @bind="@_filters.OnSale">
                 <label for="Sale" class="form-check-label">On Sale</label>
             </div>
         </div>
@@ -66,11 +66,11 @@
             <div class="d-flex justify-content-between">
                 <div class="me-1 filter-pricing">
                     <small class="text-muted">Min</small>
-                    <input type="number" class="form-control" id="minPrice" aria-label="Minimum price" @bind="@MinPrice">
+                    <input type="number" class="form-control" id="minPrice" aria-label="Minimum price" @bind="@_filters.MinPrice">
                 </div>
                 <div class="ms-1 filter-pricing">
                     <small class="text-muted">Max</small>
-                    <input type="number" class="form-control" id="maxPrice" aria-label="Maximum price" @bind="@MaxPrice">
+                    <input type="number" class="form-control" id="maxPrice" aria-label="Maximum price" @bind="@_filters.MaxPrice">
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
+using BlazorElectronics.Server.Core.Models.Reviews;
 using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
@@ -20,9 +21,9 @@ public sealed class ReviewSeedService : ApiService, IReviewSeedService
 
     public async Task<ServiceReply<bool>> SeedReviews( int amount, List<int> productIds, List<int> userIds )
     {
-        List<ProductReviewModel> reviews = await GetRandomReviews( amount, productIds, userIds );
+        List<ReviewModel> reviews = await GetRandomReviews( amount, productIds, userIds );
 
-        foreach ( ProductReviewModel r in reviews )
+        foreach ( ReviewModel r in reviews )
         {
             try
             {
@@ -40,11 +41,11 @@ public sealed class ReviewSeedService : ApiService, IReviewSeedService
 
         return new ServiceReply<bool>( true );
     }
-    async Task<List<ProductReviewModel>> GetRandomReviews( int amount, IReadOnlyList<int> productIds, IReadOnlyList<int> userIds )
+    async Task<List<ReviewModel>> GetRandomReviews( int amount, IReadOnlyList<int> productIds, IReadOnlyList<int> userIds )
     {
         return await Task.Run( () =>
         {
-            List<ProductReviewModel> reviews = new();
+            List<ReviewModel> reviews = new();
 
             foreach ( int id in productIds )
             {
@@ -52,7 +53,7 @@ public sealed class ReviewSeedService : ApiService, IReviewSeedService
 
                 for ( int j = 0; j < productAmount; j++ )
                 {
-                    reviews.Add( new ProductReviewModel
+                    reviews.Add( new ReviewModel
                     {
                         ProductId = id,
                         UserId = userIds[ GetRandomInt( 0, userIds.Count - 1 ) ],

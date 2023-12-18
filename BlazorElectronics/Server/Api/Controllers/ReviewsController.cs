@@ -17,9 +17,9 @@ public class ReviewsController : _Controller
     }
     
     [HttpPost( "for-product" )]
-    public async Task<ActionResult<List<ProductReviewDto>?>> GetDetails( [FromBody] GetProductReviewsDto dto )
+    public async Task<ActionResult<ProductReviewsReplyDto?>> GetDetails( [FromBody] ProductReviewsGetDto dto )
     {
-        ServiceReply<List<ProductReviewDto>?> reply = await _reviewService.GetForProduct( dto );
+        ServiceReply<ProductReviewsReplyDto?> reply = await _reviewService.GetForProduct( dto );
         return GetReturnFromReply( reply );
     }
 }

@@ -12,8 +12,8 @@ public sealed class ReviewServiceClient : ClientService, IReviewServiceClient
     public ReviewServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( GetProductReviewsDto dto )
+    public async Task<ServiceReply<ProductReviewsReplyDto?>> GetForProduct( ProductReviewsGetDto dto )
     {
-        return await TryPostRequest<List<ProductReviewDto>?>( API_ROUTE_PRODUCT, dto );
+        return await TryPostRequest<ProductReviewsReplyDto?>( API_ROUTE_PRODUCT, dto );
     }
 }

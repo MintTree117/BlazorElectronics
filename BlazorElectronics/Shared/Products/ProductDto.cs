@@ -1,3 +1,5 @@
+using BlazorElectronics.Shared.Cart;
+
 namespace BlazorElectronics.Shared.Products;
 
 public sealed class ProductDto
@@ -18,4 +20,11 @@ public sealed class ProductDto
     public List<string> Images { get; set; } = new();
     public Dictionary<int, List<int>> LookupSpecs { get; set; } = new();
     public Dictionary<string, string> XmlSpecsAggregated { get; set; } = new();
+    
+    void TestFunction()
+    {
+        CartItemDto c = new();
+        c.IncreaseQuantity( 5 );
+    }
+    
 }

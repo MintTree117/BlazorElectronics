@@ -60,21 +60,11 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
 
         await Task.Run( () =>
         {
-            const string pSelection = $"{TABLE_PRODUCTS}.{COL_PRODUCT_ID}," +
-                                      $"{TABLE_PRODUCTS}.{COL_VENDOR_ID}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_TITLE}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_THUMBNAIL}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_RELEASE_DATE}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_PRICE}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_IS_FEATURED}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_NUMBER_SOLD}," +
-                                      $"{TABLE_PRODUCTS}.{COL_PRODUCT_NUMBER_REVIEWS}";
-            
             builder.Append( $"WITH {CTE_PAGINATED} AS (" );
             builder.Append( $" SELECT DISTINCT {TABLE_PRODUCTS}.*, TotalCount = COUNT(*) OVER() FROM {TABLE_PRODUCTS}" );
 
             AppendCategoryJoin( builder, requestDto.CategoryId );
+            AppendSearchTextJoin( builder, requestDto.SearchText );
             AppendSpecLookupJoin( builder, filters?.SpecsInclude is not null || filters?.SpecsExlude is not null );
             
             builder.Append( $" WHERE 1=1" );
@@ -130,6 +120,14 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         builder.Append( $" INNER JOIN {TABLE_PRODUCT_CATEGORIES}" );
         builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_CATEGORIES}.{COL_PRODUCT_ID}" );   
     }
+    static void AppendSearchTextJoin( StringBuilder builder, string? searchText )
+    {
+        if ( string.IsNullOrWhiteSpace( searchText ) )
+            return;
+
+        builder.Append( $" INNER JOIN {TABLE_PRODUCT_DESCRIPTIONS}" );
+        builder.Append( $" ON {TABLE_PRODUCTS}.{COL_PRODUCT_ID} = {TABLE_PRODUCT_DESCRIPTIONS}.{COL_PRODUCT_ID}" );   
+    }
     static void AppendSpecLookupJoin( StringBuilder builder, bool filtersExist )
     {
         if ( !filtersExist )
@@ -155,7 +153,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         
         builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_TITLE} LIKE {PARAM_SEARCH_TEXT}" );
         builder.Append( $" OR {TABLE_PRODUCT_DESCRIPTIONS}.{COL_PRODUCT_DESCR} LIKE {PARAM_SEARCH_TEXT} )" );
-        dynamicParams.Add( PARAM_SEARCH_TEXT, searchText );
+        dynamicParams.Add( PARAM_SEARCH_TEXT, $"%{searchText}%" );
     }
     static void AppendVendorCondition( StringBuilder builder, DynamicParameters dynamicParams, List<int>? vendors )
     {

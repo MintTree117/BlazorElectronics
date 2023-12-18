@@ -15,11 +15,6 @@ namespace BlazorElectronics.Client.Pages.Products;
 
 public partial class ProductSearch : PageView, IDisposable
 {
-    public event Action? OnOpenFilters; 
-    public event Action<Dictionary<string,string>>? InitializeHeader; 
-    public event Action<string?, List<CategoryFullDto>?, Dictionary<int, LookupSpec>, List<VendorDto>>? InitializeFilters;
-    public event Action<ProductSearchReplyDto, Dictionary<int,CategoryFullDto>, Dictionary<int, VendorDto>>? OnProductSearch;
-
     [Inject] IProductServiceClient ProductService { get; set; } = default!;
     [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
     [Inject] ISpecServiceClient SpecService { get; init; } = default!;
@@ -29,17 +24,18 @@ public partial class ProductSearch : PageView, IDisposable
     [Parameter] public string SecondaryCategory { get; init; } = string.Empty;
     [Parameter] public string TertiaryCategory { get; init; } = string.Empty;
 
+    ProductSearchHeader _searchHeader = default!;
+    ProductFilters _filters = default!;
+    ProductSearchList _searchList = default!;
+
     CategoryFullDto? _primaryCategory;
     CategoryFullDto? _currentCategory;
-    string? _searchText;
 
-    CategoryData? categories;
-    LookupSpecsDto? specs;
-    VendorsDto? vendors;
-    ProductFiltersDto? _searchFilters;
-    ProductSortType _sortType;
-    int _currentRows = 10;
-    int _currentPage = 1;
+    CategoryData categories = new();
+    LookupSpecsDto specs = new();
+    VendorsDto vendors = new();
+
+    ProductSearchRequestDto _searchRequest = new();
     ProductSearchReplyDto? _searchResults;
 
     public void Dispose()
@@ -49,13 +45,12 @@ public partial class ProductSearch : PageView, IDisposable
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        
-        if ( !await GetMetaData() )
-            return;
-
         NavManager.LocationChanged += HandleLocationChanged;
-
-        await LoadPage();
+    }
+    protected override async Task OnAfterRenderAsync( bool firstRender )
+    {
+        if ( firstRender )
+            await LoadPage();
     }
     async Task<bool> GetMetaData()
     {
@@ -77,13 +72,17 @@ public partial class ProductSearch : PageView, IDisposable
 
         if ( categoryReply is not { Success: true, Data: not null } )
         {
-            InvokeAlert( AlertType.Danger, "Failed to load product categories! " + categoryReply.ErrorType + categoryReply.Message );
-            return false;   
+            SetViewMessage( false, "Failed to load product categories! " + categoryReply.ErrorType + categoryReply.Message );
+            return false;
         }
         
         categories = categoryReply.Data;
-        specs = specReply.Data;
-        vendors = vendorReply.Data;
+
+        if ( specReply.Data is not null )
+            specs = specReply.Data;
+
+        if ( vendorReply.Data is not null )
+            vendors = vendorReply.Data;
 
         return true;
     }
@@ -91,21 +90,25 @@ public partial class ProductSearch : PageView, IDisposable
     {
         PageIsLoaded = false;
 
-        if ( !ParseUrl( categories! ) )
+        if ( !await GetMetaData() )
             return;
 
-        InitializeHeader?.Invoke( GetBreadcrumbNavigation() );
-        InitializeFilters?.Invoke( _searchText, GetCategoryFilters(), GetSpecFilters(), GetVendorFilters() );
+        if ( !ParseUrl( categories ) )
+            return;
+
+        _searchHeader.SetBreadcrumbUrls( _currentCategory, categories.CategoriesById );
+        _filters.InitializeFilters( _searchRequest.SearchText, GetCategoryFilters(), GetSpecFilters(), GetVendorFilters() );
 
         await SearchProducts();
-
         PageIsLoaded = true;
     }
     bool ParseUrl( CategoryData cData )
     {
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         Dictionary<string, string> queryParams = ParseQuery( uri.Query );
-        queryParams.TryGetValue( Routes.SEARCH_TEXT_PARAM, out _searchText );
+        queryParams.TryGetValue( Routes.SEARCH_TEXT_PARAM, out string? searchText );
+
+        _searchRequest.SearchText = searchText;
 
         if ( string.IsNullOrWhiteSpace( PrimaryCategory ) )
             return true;
@@ -124,6 +127,10 @@ public partial class ProductSearch : PageView, IDisposable
 
         _currentCategory = category;
         _primaryCategory = _currentCategory;
+        _searchRequest.CategoryId = _primaryCategory?.CategoryId;
+
+        if ( _primaryCategory is null )
+            return true;
         
         while ( _primaryCategory.Tier != CategoryTier.Primary )
         {
@@ -136,30 +143,10 @@ public partial class ProductSearch : PageView, IDisposable
 
         return _primaryCategory is not null;
     }
-    Dictionary<string, string> GetBreadcrumbNavigation()
-    {
-        Dictionary<string, string> urls = new() { { "Search", Routes.SEARCH } };
-        
-        if ( categories is null )
-            return urls;
-        
-        CategoryFullDto? m = _currentCategory;
-
-        while ( m is not null )
-        {
-            if ( m.ParentCategoryId is null || 
-                 !categories.CategoriesById.TryGetValue( m.ParentCategoryId.Value, out m ) )
-                break;
-
-            urls.Add( m.Name, $"{Routes.SEARCH}/{m.ApiUrl}" );
-        }
-
-        return urls;
-    }
     List<CategoryFullDto> GetCategoryFilters()
     {
         if ( _currentCategory is null )
-            return categories?.GetPrimaryCategories() ?? new List<CategoryFullDto>();
+            return categories.GetPrimaryCategories();
 
         return _currentCategory.Children.Count > 0
             ? _currentCategory.Children
@@ -204,61 +191,57 @@ public partial class ProductSearch : PageView, IDisposable
 
         return vendorsCategory;
     }
-
+    
     void HandleLocationChanged( object? obj, LocationChangedEventArgs args )
     {
         NavManager.NavigateTo( NavManager.Uri, true );
     }
-    public void OpenFilters()
+    void OpenFilters()
     {
-        OnOpenFilters?.Invoke();
+        _filters.ShowFilters();
     }
-    public async Task ApplyFilters( ProductFiltersDto filtersDto )
+    
+    async Task ApplyFilters( ProductFiltersDto filters )
     {
-        _searchFilters = filtersDto;
-
+        _searchList.SetPage( 1 );
+        _searchRequest.Page = 1;
+        _searchRequest.Filters = filters;
         await SearchProducts();
     }
-    public async Task ApplySort( ProductSortType type )
+    async Task ApplySort( ProductSortType type )
     {
-        _sortType = type;
-
+        _searchList.SetPage( 1 );
+        _searchRequest.Page = 1;
+        _searchRequest.SortType = type;
         await SearchProducts();
     }
-    public async Task ApplyRows( int rows )
+    async Task ApplyRows( int rows )
     {
-        _currentRows = rows;
-
+        _searchList.SetPage( 1 );
+        _searchRequest.Rows = rows;
+        _searchRequest.Page = 1;
         await SearchProducts();
     }
-    async Task ApplyPagination( int page )
+    async Task ApplyPage( int page )
     {
-        _currentPage = page;
-
+        _searchRequest.Page = page;
+        _searchList.SetPage( page );
+        _searchHeader.SetPage( page );
         await SearchProducts();
     }
     async Task SearchProducts()
     {
-        ProductSearchRequestDto requestDto = new()
-        {
-            SearchText = _searchText,
-            CategoryId = _currentCategory?.CategoryId,
-            SortType = _sortType,
-            Filters = _searchFilters,
-            Rows = _currentRows,
-            Page = _currentPage
-        };
-        
-        ServiceReply<ProductSearchReplyDto?> reply = await ProductService.GetProductSearch( requestDto );
+        ServiceReply<ProductSearchReplyDto?> reply = await ProductService.GetProductSearch( _searchRequest );
 
         if ( !reply.Success || reply.Data is null )
         {
             InvokeAlert( AlertType.Danger, reply.ErrorType + " : " + reply.Message );
             return;
         }
-
+        
         _searchResults = reply.Data;
-        OnProductSearch?.Invoke( _searchResults, categories.CategoriesById, vendors.VendorsById );
+        _searchHeader.OnSearchResults( _searchRequest.Page, _searchResults );
+        _searchList.OnSearch( _searchRequest.Rows, _searchResults, categories.CategoriesById, vendors.VendorsById );
         StateHasChanged();
     }
 }

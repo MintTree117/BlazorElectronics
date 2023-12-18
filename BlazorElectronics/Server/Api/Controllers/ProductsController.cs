@@ -16,13 +16,14 @@ public class ProductsController : _Controller
     {
         _productService = productService;
     }
-
+    
     [HttpGet( "search-query" )]
     public async Task<ActionResult<ProductSummaryDto?>> SearchQuery()
     {
         ProductSearchRequestDto r = new()
         {
             CategoryId = 1,
+            SearchText = "book",
             Filters = new ProductFiltersDto
             {
                 SpecsInclude = new Dictionary<int, List<int>>() { { 1, new List<int>(){ 1 } } }

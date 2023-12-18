@@ -1,3 +1,4 @@
+using BlazorElectronics.Client.Shared;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products.Search;
@@ -6,42 +7,81 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorElectronics.Client.Pages.Products;
 
-public partial class ProductSearchHeader : RazorView, IDisposable
+public partial class ProductSearchHeader : RazorView
 {
-    [Parameter] public Products.ProductSearch Page { get; set; } = default!;
+    [Parameter] public EventCallback OnOpenFilters { get; set; }
+    [Parameter] public EventCallback<ProductSortType> OnSortChange { get; set; }
+    [Parameter] public EventCallback<int> OnRowsChange { get; set; }
     
-    string _currentSortOption = ProductSortType.Featured.ToString();
     List<string> _sortOptions = Enum.GetNames<ProductSortType>().ToList();
+    List<int> _rowsPerPageOptions = new() { 4, 8, 16, 32 };
+    string _currentSortOption = ProductSortType.Featured.ToString();
     int _selectedSortOption = -1;
-
     int _currentPage = 1;
-    int _totalPages = 100;
     int _totalResults = 0;
-
-    int _rowsPerPage = 10;
-    List<int> _rowsPerPageOptions = new() { 10, 20, 50, 100 };
-
+    int _rowsPerPage = 8;
+    
     Dictionary<string, string> _urls = new();
+    
+    public void SetBreadcrumbUrls( CategoryFullDto? category, Dictionary<int, CategoryFullDto>? categories )
+    {
+        Dictionary<string, string> urls = new() { { "Search", Routes.SEARCH } };
 
-    public void Dispose()
-    {
-        Page.InitializeHeader -= SetBreadcrumbUrls;
-        Page.OnProductSearch -= OnSearchResults;
-    }
-    protected override void OnInitialized()
-    {
-        Page.InitializeHeader += SetBreadcrumbUrls;
-        Page.OnProductSearch += OnSearchResults;
-    }
-    void SetBreadcrumbUrls( Dictionary<string,string> urls )
-    {
+        if ( category is null || categories is null )
+        {
+            _urls = urls;
+            StateHasChanged();
+            return;
+        }
+
+        CategoryFullDto? c = category;
+        List<CategoryFullDto> categoryList = new();
+
+        do
+        {
+            if ( c is null )
+                break;
+
+            categoryList.Add( c );
+
+            if ( c.ParentCategoryId is null || !categories.TryGetValue( c.ParentCategoryId.Value, out c ) )
+                break;
+        } 
+        while ( true );
+
+        categoryList.Reverse();
+
+        foreach ( CategoryFullDto cat in categoryList )
+        {
+            urls.Add( cat.Name, $"{Routes.SEARCH}/{cat.ApiUrl}" );
+        }
+
         _urls = urls;
         StateHasChanged();
     }
-    void OnSearchResults( ProductSearchReplyDto search, Dictionary<int, CategoryFullDto> categories, Dictionary<int, VendorDto> vendors )
+    public void OnSearchResults( int page, ProductSearchReplyDto search )
     {
         _totalResults = search.TotalMatches;
+        _currentPage = page;
         StateHasChanged();
+    }
+    public void SetPage( int page )
+    {
+        _currentPage = page;
+        StateHasChanged();
+    }
+
+    string GetViewRows()
+    {
+        int start = 1 + _rowsPerPage * Math.Max( _currentPage - 1, 0 );
+        int end = start + _rowsPerPage;
+
+        return $"{start} - {end} of {_totalResults} results";
+    }
+    
+    void OpenFilters()
+    {
+        OnOpenFilters.InvokeAsync();
     }
 
     async Task SelectSort( int index )
@@ -52,7 +92,7 @@ public partial class ProductSearchHeader : RazorView, IDisposable
         _selectedSortOption = index;
         _currentSortOption = _sortOptions[ index ];
 
-        await Page.ApplySort( ( ProductSortType ) _selectedSortOption );
+        await OnSortChange.InvokeAsync( ( ProductSortType ) _selectedSortOption );
     }
     async Task SelectRows( int index )
     {
@@ -61,6 +101,6 @@ public partial class ProductSearchHeader : RazorView, IDisposable
         
         _rowsPerPage = _rowsPerPageOptions[ index ];
 
-        await Page.ApplyRows( _rowsPerPage );
+        await OnRowsChange.InvokeAsync( _rowsPerPage );
     }
 }

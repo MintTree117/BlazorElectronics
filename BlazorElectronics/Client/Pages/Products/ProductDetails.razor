@@ -7,11 +7,27 @@
 <div class="product-details-container">
     <PageLoader Page="@this"></PageLoader>
     
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Share Link</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@NavManager.Uri</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @if ( PageIsReady() && _product is not null )
     {
         <div class="mt-4 d-flex flex-column">
             <div class="product-details-top">
-            
                 <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         @for ( int i = 0; i < _product.Images.Count; i++ )
@@ -43,18 +59,18 @@
                 <div class="product-details-overview">
                     <div>
                         <h2 class="mb-3">@_product.Title</h2>
-                        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-light">
+                        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-grey">
                             <div class="d-flex flex-row align-items-center flex-wrap">
                                 <StarRating Rating="@_product.Rating"></StarRating>
-                                <span class="ms-2">( @_product.NumberReviews )</span>
-                                <a class="ms-2" href="@Routes.REVIEW/?product=@_product.Id">Write a review</a>
+                                <button class="btn btn-link p-0 ms-2 me-2" onclick="document.getElementById('ProductReviews').scrollIntoView({behavior:'smooth'})">( @_product.NumberReviews )</button>
+                                <a href="@Routes.REVIEW/?product=@_product.Id">Write a review</a>
                             </div>
-                            <button class="btn btn-sm btn-outline-secondary btn-icon">
+                            <button class="btn btn btn-outline-secondary btn-icon product-overview-button" data-bs-toggle="modal" data-bs-target="#shareModal">
                                 <i class="oi oi-share-boxed"></i>
-                                Share Link
+                                Share
                             </button>
                         </div>
-                        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-light">
+                        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-grey">
                             <div>
                                 <span class="small">Sold by: </span>
                                 <a href="@_vendor.VendorUrl">@_vendor.VendorName</a>
@@ -64,7 +80,7 @@
                                 <a href="@Routes.SEARCH?vendorId=@_vendor.VendorId">@_vendor.VendorName</a>
                             </div>
                         </div>
-                        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-light">
+                        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-grey">
                             <div>
                                 @if ( _product.SalePrice is not null )
                                 {
@@ -78,7 +94,7 @@
                                     <span class="price">$@_product.Price</span>
                                 }
                             </div>
-                            <button class="btn btn-primary">Add to Cart</button>
+                            <button class="btn btn-primary product-overview-button">Add to Cart</button>
                         </div>
                     </div>
                     <div class="product-details-overview-bottom">
@@ -108,19 +124,22 @@
                     {
                         <tr>
                             <th class="bg-light p-3">@kvp.Key</th>
-                            <td class="p-3">@kvp.Value</td>
+                            <td class="p-3 wrap-text">@kvp.Value</td>
                         </tr>
                     }
                     </tbody>
                 </table>
             </div>
 
-            <div class="mt-3 d-flex flex-row align-items-center justify-content-between">
-                <h4>Reviews</h4>
-                <div class="d-flex flex-row flex-grow-1 align-items-center justify-content-end">
+            <div id="ProductReviews" class="mt-3 px-3 d-flex flex-row flex-wrap align-items-center justify-content-between bg-light">
+                <div class="flex-grow-1 d-flex flex-grow-1 align-items-center">
+                    <h4 class="me-3">Reviews</h4>
+                    <span class="text-muted"><small>@_reviewCount reviews</small></span>
+                </div>
+                <div class="product-review-buttons">
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="Rows" data-bs-toggle="dropdown" aria-expanded="false">
-                            Rows: @_reviewPage
+                            Rows: @_productReviewsGetDto.Page
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="Rows">
                             @for ( int i = 0; i < _reviewsPerPageOptions.Count; i++ )
@@ -132,7 +151,7 @@
                     </div>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="SortBy" data-bs-toggle="dropdown" aria-expanded="false">
-                            Order by: @_currentReviewSortOption
+                            Order by: @_reviewSortOptions[ ( int ) _productReviewsGetDto.SortType - 1 ]
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="SortBy">
                             @for ( int i = 0; i < _reviewSortOptions.Count; i++ )
@@ -144,22 +163,28 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-3">
+            
+            <div class="mt-3 mb-3 px-3">
                 @foreach( ProductReviewDto review in _reviews )
                 {
-                    <div class="d-flex flex-row align-items-center justify-content-between">
-                        <div>
-                            <strong>@review.Username</strong>
-                            <StarRating Rating="@review.Rating"></StarRating>
+                    <div class="border-bottom border-grey">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <div>
+                                <strong>@review.Username</strong>
+                                <StarRating Rating="@review.Rating"></StarRating>
+                            </div>
+                            <small class="text-muted">@review.Date</small>
                         </div>
-                        <small class="text-muted">@review.Date</small>
-                    </div>
-                    <div>
-                        <p>@review.Review</p>
+                        <div>
+                            <p>@review.Review</p>
+                        </div>
                     </div>
                 }
             </div>
-            <Pagination></Pagination>
+            
+            <div class="d-flex flex-row align-items-center justify-content-center">
+                <Pagination @ref="_pagination" OnPageChange="@SelectReviewPage"></Pagination>
+            </div>
         </div>
     }
 </div>

@@ -2,7 +2,6 @@ using System.Xml.Linq;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
-using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products;
@@ -75,7 +74,7 @@ public class ProductService : ApiService, IProductService
         {
             IEnumerable<ProductSearchModel>? models = await _productSearchRepository.GetProductSearch( requestDto );
             ProductSearchReplyDto? response = await MapProductSearchToResponse( models );
-
+            
             return response is not null
                 ? new ServiceReply<ProductSearchReplyDto?>( response )
                 : new ServiceReply<ProductSearchReplyDto?>( ServiceErrorType.NotFound );
@@ -180,7 +179,7 @@ public class ProductService : ApiService, IProductService
             return dto;
         } );
     }
-    async Task<ProductDto?> MapProductToDto( ProductModel? model )
+    static async Task<ProductDto?> MapProductToDto( ProductModel? model )
     {
         if ( model?.Product is null )
             return null;
@@ -229,7 +228,10 @@ public class ProductService : ApiService, IProductService
         XDocument doc = XDocument.Parse( xmlString );
         Dictionary<string, string> dict = new();
 
-        foreach ( XElement e in doc.Descendants() )
+        if ( doc.Root is null )
+            return dict;
+
+        foreach ( XElement e in doc.Root.Elements() )
         {
             if ( !dict.ContainsKey( e.Name.LocalName ) )
             {

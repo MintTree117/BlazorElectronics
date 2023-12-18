@@ -106,6 +106,16 @@ h4 {
     animation: loading-circle-spin 2s linear infinite;
 }
 
+.wrap-text {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+}
+
+.border-grey {
+    border-color: rgb(222, 226, 230);
+}
+
 @keyframes loading-circle-spin {
     0% {
         transform: rotate(0deg);

@@ -1,8 +1,10 @@
+using System.Text.RegularExpressions;
 using BlazorElectronics.Client.Services.Categories;
 using BlazorElectronics.Client.Services.Products;
 using BlazorElectronics.Client.Services.Reviews;
 using BlazorElectronics.Client.Services.Specs;
 using BlazorElectronics.Client.Services.Vendors;
+using BlazorElectronics.Client.Shared;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
@@ -11,6 +13,7 @@ using BlazorElectronics.Shared.Reviews;
 using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace BlazorElectronics.Client.Pages.Products;
 
@@ -24,66 +27,124 @@ public partial class ProductDetails : PageView
 
     [Parameter] public string ProductId { get; set; } = string.Empty;
     
+    Pagination _pagination = default!;
     ProductDto? _product;
+    
     readonly List<CategoryFullDto> _categories = new();
     readonly Dictionary<string, string> _lookupSpecsAggregated = new();
-    VendorDto _vendor = new();
-    List<ProductReviewDto> _reviews = new();
-
-    string _currentReviewSortOption = ReviewSortType.Date.ToString();
-    List<string> _reviewSortOptions = Enum.GetNames<ReviewSortType>().ToList();
-    int _selectedReviewSortOption = 0;
+    readonly VendorDto _vendor = new();
+    
+    readonly List<ProductReviewDto> _reviews = new();
+    int _reviewCount = 0;
+    readonly List<string> _reviewSortOptions = GetReviewSortOptions();
     readonly List<int> _reviewsPerPageOptions = new() { 5, 10, 15, 20 };
-    int _reviewRows = 5;
-    int _reviewPage = 1;
+    readonly ProductReviewsGetDto _productReviewsGetDto = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        if ( !int.TryParse( ProductId, out int id ) )
-        {
-            SetViewMessage( false, "Invalid Url!" );
-            return;
-        }
-        
-        ServiceReply<ProductDto?> productReply = await ProductService.GetProductDetails( id );
-        PageIsLoaded = true;
-        
-        if ( !productReply.Success || productReply.Data is null )
-        {
-            SetViewMessage( false, $"Failed to fetch product details! {productReply.ErrorType} : {productReply.Message}" );
-            PageIsLoaded = true;
-            return;
-        }
-
-        _product = productReply.Data;
-
-        ServiceReply<CategoryData?> categoriesReply = await CategoryService.GetCategories();
-
-        if ( categoriesReply is { Success: true, Data: not null } )
-            GetProductCategories( categoriesReply.Data.CategoriesById );
-
-        ServiceReply<LookupSpecsDto?> lookupsReply = await LookupService.GetSpecLookups();
-
-        if ( lookupsReply is { Success: true, Data: not null } )
-            AggregateLookupSpecs( lookupsReply.Data );
-
-        ServiceReply<VendorsDto?> vendorReply = await VendorsService.GetVendors();
-
-        if ( vendorReply is { Success: true, Data: not null } )
-        {
-            if ( vendorReply.Data.VendorsById.TryGetValue( _product.VendorId, out VendorDto? vendor ) )
-                _vendor = vendor;
-        }
-
-        await GetReviews( ReviewSortType.Date, 5, 1 );
-    }
     public override bool PageIsReady()
     {
         return base.PageIsReady() && _product is not null;
     }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
 
+        if ( !ParseUrl( out int id ) )
+            return;
+
+        if ( !await LoadProduct( id ) )
+            return;
+
+        Task[] tasks = { LoadCategories(), LoadLookups(), LoadVendor(), LoadReviews() };
+        await Task.WhenAll( tasks );
+    }
+    bool ParseUrl( out int id )
+    {
+        if ( int.TryParse( ProductId, out id ) ) 
+            return true;
+        
+        SetViewMessage( false, "Invalid Url!" );
+        return false;
+    }
+    async Task<bool> LoadProduct( int id )
+    {
+        ServiceReply<ProductDto?> productReply = await ProductService.GetProductDetails( id );
+
+        if ( !productReply.Success || productReply.Data is null )
+        {
+            SetViewMessage( false, $"Failed to fetch product details! {productReply.ErrorType} : {productReply.Message}" );
+            return false;
+        }
+
+        _product = productReply.Data;
+        PageIsLoaded = true;
+        StateHasChanged();
+        return true;
+    }
+    async Task LoadCategories()
+    {
+        ServiceReply<CategoryData?> categoriesReply = await CategoryService.GetCategories();
+
+        if ( !categoriesReply.Success || categoriesReply.Data is null )
+            return;
+        
+        GetProductCategories( categoriesReply.Data.CategoriesById );
+        StateHasChanged();
+    }
+    async Task LoadLookups()
+    {
+        ServiceReply<LookupSpecsDto?> lookupsReply = await LookupService.GetSpecLookups();
+
+        if ( !lookupsReply.Success || lookupsReply.Data is null )
+            return;
+
+        GetAggregatedLookups( lookupsReply.Data );
+        StateHasChanged();
+    }
+    async Task LoadVendor()
+    {
+        if ( _product is null )
+            return;
+        
+        ServiceReply<VendorsDto?> vendorReply = await VendorsService.GetVendors();
+
+        if ( !vendorReply.Success || vendorReply.Data is null )
+            return;
+
+        if ( !vendorReply.Data.VendorsById.TryGetValue( _product.VendorId, out VendorDto? vendor ) )
+            return;
+
+        _vendor.VendorId = vendor.VendorId;
+        _vendor.VendorName = vendor.VendorName;
+        _vendor.VendorUrl = vendor.VendorUrl;
+        StateHasChanged();
+    }
+    async Task LoadReviews()
+    {
+        if ( _product is null )
+            return;
+
+        _productReviewsGetDto.ProductId = _product.Id;
+        _reviews.Clear();
+
+        ServiceReply<ProductReviewsReplyDto?> reply = await ReviewService.GetForProduct( _productReviewsGetDto );
+
+        if ( !reply.Success || reply.Data is null )
+            return;
+
+        _reviews.AddRange( reply.Data.Reviews );
+        _reviewCount = reply.Data.TotalMatches;
+        _pagination.UpdateTotalPages( _productReviewsGetDto.Rows, reply.Data.TotalMatches );
+        StateHasChanged();
+    }
+
+    static List<string> GetReviewSortOptions()
+    {
+        return Enum
+            .GetNames<ReviewSortType>()
+            .Select( name => Regex
+                .Replace( name, "(\\B[A-Z])", " $1" ) )
+            .ToList();
+    }
     void GetProductCategories( IReadOnlyDictionary<int, CategoryFullDto> categories )
     {
         if ( _product is null )
@@ -95,8 +156,11 @@ public partial class ProductDetails : PageView
                 _categories.Add( c );
         }
     }
-    void AggregateLookupSpecs( LookupSpecsDto lookups )
+    void GetAggregatedLookups( LookupSpecsDto lookups )
     {
+        if ( _product is null )
+            return;
+        
         foreach ( KeyValuePair<int, List<int>> kvp in _product.LookupSpecs )
         {
             if ( !lookups.SpecsById.TryGetValue( kvp.Key, out LookupSpec? lookup ) )
@@ -111,52 +175,38 @@ public partial class ProductDetails : PageView
             _lookupSpecsAggregated.TryAdd( lookup.SpecName, string.Join( ", ", valuesToAggregate ) );
         }
     }
-    async Task GetReviews( ReviewSortType sortType, int rows, int page )
+
+    async Task SelectReviewPage( int page )
     {
-        if ( _product is null )
-            return;
-        
-        GetProductReviewsDto dto = new()
-        {
-            ProductId = _product.Id,
-            Rows = rows,
-            Page = page,
-            SortType = sortType
-        };
-
-        ServiceReply<List<ProductReviewDto>?> reply = await ReviewService.GetForProduct( dto );
-
-        if ( !reply.Success )
-        {
-            Logger.LogError( reply.ErrorType.ToString() );
-        }
-        
-        if ( reply is { Success: true, Data: not null } )
-        {
-            Logger.LogError( reply.Data.Count.ToString() );
-            _reviews = reply.Data;
-            StateHasChanged();
-        }
+        _productReviewsGetDto.Page = page;
+        await LoadReviews();
     }
-
     async Task SelectReviewSort( int index )
     {
-        if ( index < 0 || index >= _reviewSortOptions.Count )
+        if ( index < 0 || index >= _reviewSortOptions.Count  )
             return;
 
-        _selectedReviewSortOption = index;
-        _currentReviewSortOption = _reviewSortOptions[ index ];
+        ReviewSortType type;
 
-        await GetReviews( ( ReviewSortType ) _selectedReviewSortOption, _reviewRows, _reviewPage );
+        try
+        {
+            type = ( ReviewSortType ) index + 1;
+        }
+        catch
+        {
+            Logger.LogError( "Invalid Review Sort Type!" );
+            return;
+        }
+        
+        _productReviewsGetDto.SortType = type;
+        await LoadReviews();
     }
     async Task SelectReviewRows( int index )
     {
         if ( index < 0 || index >= _reviewsPerPageOptions.Count )
             return;
 
-        _reviewRows = _reviewsPerPageOptions[ index ];
-
-        await GetReviews( ( ReviewSortType ) _selectedReviewSortOption, _reviewRows, _reviewPage );
-        StateHasChanged();
+        _productReviewsGetDto.Rows = _reviewsPerPageOptions[ index ];
+        await LoadReviews();
     }
 }

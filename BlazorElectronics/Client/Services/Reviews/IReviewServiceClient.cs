@@ -5,5 +5,5 @@ namespace BlazorElectronics.Client.Services.Reviews;
 
 public interface IReviewServiceClient
 {
-    Task<ServiceReply<List<ProductReviewDto>?>> GetForProduct( GetProductReviewsDto dto );
+    Task<ServiceReply<ProductReviewsReplyDto?>> GetForProduct( ProductReviewsGetDto dto );
 }

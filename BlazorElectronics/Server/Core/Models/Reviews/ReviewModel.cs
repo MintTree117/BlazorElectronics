@@ -1,7 +1,8 @@
-namespace BlazorElectronics.Server.Core.Models.Products;
+namespace BlazorElectronics.Server.Core.Models.Reviews;
 
-public sealed class ProductReviewModel
+public sealed class ReviewModel
 {
+    public int TotalCount { get; set; }
     public int ReviewId { get; set; }
     public int ProductId { get; set; }
     public string Username { get; set; } = string.Empty;

@@ -3,15 +3,11 @@
 @page "/search/{primaryCategory}"
 @page "/search"
 @inherits PageView
-@using BlazorElectronics.Client.Shared
 
-<ProductSearchHeader Page="@this"></ProductSearchHeader>
+<ProductSearchHeader @ref="_searchHeader" OnOpenFilters="@OpenFilters" OnRowsChange="@ApplyRows" OnSortChange="ApplySort"></ProductSearchHeader>
 <div class="container-fluid lg-content-wrapper">
     <div class="d-flex w-100 product-search-body">
-        <ProductFilters Page="@this"></ProductFilters>
-        <ProductSearchList Page="@this"></ProductSearchList>
-    </div>
-    <div class="w-100 d-flex flex-row align-items-center justify-content-end">
-        <Pagination CurrentPage="@_currentPage" TotalPages="@_currentRows" OnPageChanged="ApplyPagination"></Pagination>
+        <ProductFilters @ref="_filters" OnApplyFilters="@ApplyFilters"></ProductFilters>
+        <ProductSearchList @ref="_searchList" OnPageChanged="@ApplyPage"></ProductSearchList>
     </div>
 </div>

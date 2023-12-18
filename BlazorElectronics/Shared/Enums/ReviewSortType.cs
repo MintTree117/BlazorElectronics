@@ -2,7 +2,7 @@ namespace BlazorElectronics.Shared.Enums;
 
 public enum ReviewSortType
 {
-    Date,
-    Highest,
-    Lowest
+    Date = 1,
+    Highest = 2,
+    Lowest = 3
 }

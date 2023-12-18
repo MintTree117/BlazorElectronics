@@ -15,17 +15,17 @@
                         else
                         {
                             <li class="breadcrumb-item">
-                                <a class="link-dark" href="" @onclick="() => NavManager.NavigateTo( kvp.Value )">@kvp.Key</a>
+                                <a class="text-muted" href="@kvp.Value">@kvp.Key</a>
                             </li>
                         }
                     }
                 </ol>
             </nav>
-            <span class="d-block ms-3 text-muted">Viewing @_rowsPerPage of @_totalResults results</span>
+            <span class="d-block ms-3 text-muted">@GetViewRows()</span>
         </div>
 
         <div class="product-header-buttons">
-            <button class="btn btn-primary filters-mobile-button me-2" onclick="@Page.OpenFilters">Filters</button>
+            <button class="btn btn-primary filters-mobile-button me-2" onclick="@OpenFilters">Filters</button>
             <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="Rows" data-bs-toggle="dropdown" aria-expanded="false">
                     Rows: @_rowsPerPage
