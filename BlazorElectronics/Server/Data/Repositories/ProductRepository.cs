@@ -121,10 +121,11 @@ public class ProductRepository : DapperRepository, IProductRepository
         p.Add( PARAM_VENDOR_ID, m.VendorId );
         p.Add( PARAM_PRODUCT_TITLE, m.Title );
         p.Add( PARAM_PRODUCT_THUMBNAIL, m.ThumbnailUrl );
+        p.Add( PARAM_PRODUCT_RELEASE_DATE, m.ReleaseDate );
+        p.Add( PARAM_PRODUCT_IS_FEATURED, m.IsFeatured );
         p.Add( PARAM_PRODUCT_PRICE, m.Price );
         p.Add( PARAM_PRODUCT_SALE_PRICE, m.SalePrice );
-        p.Add( PARAM_PRODUCT_RELEASE_DATE, m.ReleaseDate );
-        
+
         p.Add( PARAM_PRODUCT_DESCR, m.Description );
 
         p.Add( PARAM_PRODUCT_IMAGES, GetImagesTable( m.Images ).AsTableValuedParameter( TVP_PRODUCT_IMAGES ) );

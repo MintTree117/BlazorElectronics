@@ -8,7 +8,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class UserAccountController : UserController
+public sealed class UserAccountController : UserController
 {
     public UserAccountController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
 

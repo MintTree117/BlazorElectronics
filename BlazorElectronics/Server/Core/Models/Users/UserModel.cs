@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Core.Models.Users;
 
-public sealed class User
+public sealed class UserModel
 {
     public int UserId { get; set; }
     public string Username { get; set; } = string.Empty;

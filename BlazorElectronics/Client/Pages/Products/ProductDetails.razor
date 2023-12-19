@@ -4,7 +4,7 @@
 @using BlazorElectronics.Shared.Categories
 @using BlazorElectronics.Shared.Reviews
 
-<div class="product-details-container">
+<div class="mx-auto product-details-container">
     <PageLoader Page="@this"></PageLoader>
     
     <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModal" aria-hidden="true">
@@ -27,7 +27,7 @@
     @if ( PageIsReady() && _product is not null )
     {
         <div class="mt-4 d-flex flex-column">
-            <div class="product-details-top">
+            <div class="d-flex flex-column flex-md-row justify-content-start bg-light">
                 
                 <!-- Carousel -->
                 <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -59,9 +59,9 @@
                 </div>
 
                 <!-- Overview -->
-                <div class="product-details-overview bg-light">
+                <div class="d-flex flex-column flex-grow-1 p-3 bg-light">
                     <div>
-                        <h2 class="py-3">@_product.Title</h2>
+                        <h2 class="py-3 fw-bold">@_product.Title</h2>
 
                         <!-- Rating, Review, Share -->
                         <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-grey">
@@ -109,37 +109,42 @@
                             </div>
                             <button class="btn btn-primary product-overview-button">Add to Cart</button>
                         </div>
-                    </div>
-
-                    <!-- Categories, Description -->
-                    <div class="product-details-overview-bottom">
-                        <div class="product-categories">
-                            @foreach ( CategoryFullDto c in _categories )
-                            {
-                                <a class="d-inline-block btn btn-sm btn-outline-secondary me-2 mb-2" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>
-                            }
+                        
+                        <!-- Categories -->
+                        <div>
+                            <div class="product-categories">
+                                @foreach ( CategoryFullDto c in _categories )
+                                {
+                                    <a class="d-inline-block btn btn-sm btn-outline-secondary me-2 mb-2" href="@Routes.SEARCH/@c.ApiUrl">@c.Name</a>
+                                }
+                            </div>
                         </div>
-                        <p class="product-description mb-0 overflow-auto">@_product.Description</p>
                     </div>
+                    
                 </div>
             </div>
             
+            <div class="mt-3 p-3 bg-light">
+                <h3>Description</h3>
+                <p class="product-description mb-0 overflow-auto">@_product.Description</p>
+            </div>
+            
             <!-- Specs -->
-            <div class="mt-3 product-specs">
-                <h4>Specifications</h4>
-                <table class="table">
+            <div class="mt-3 p-3 bg-light">
+                <h3>Specifications</h3>
+                <table class="table table-bordered">
                     <tbody>
                     @foreach ( KeyValuePair<string, string> kvp in _product.XmlSpecsAggregated )
                     {
                         <tr>
-                            <th class="bg-light p-3">@kvp.Key</th>
+                            <th class="bg-white p-3">@kvp.Key</th>
                             <td class="p-3">@kvp.Value</td>
                         </tr>
                     }
                     @foreach ( KeyValuePair<string, string> kvp in _lookupSpecsAggregated )
                     {
                         <tr>
-                            <th class="bg-light p-3">@kvp.Key</th>
+                            <th class="bg-white p-3">@kvp.Key</th>
                             <td class="p-3 wrap-text">@kvp.Value</td>
                         </tr>
                     }
@@ -147,62 +152,65 @@
                 </table>
             </div>
             
-            <!-- Review Header -->
-            <div id="ProductReviews" class="p-3 d-flex flex-row flex-wrap align-items-center justify-content-between bg-light">
-                <div class="flex-grow-1 d-flex flex-grow-1 align-items-center">
-                    <h4 class="me-3">Reviews</h4>
-                    <span class="text-muted"><small>@_reviewCount reviews</small></span>
-                </div>
-                <div class="product-review-buttons">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="Rows" data-bs-toggle="dropdown" aria-expanded="false">
-                            Rows: @_productReviewsGetDto.Rows
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="Rows">
-                            @for ( int i = 0; i < _reviewsPerPageOptions.Count; i++ )
-                            {
-                                int localIndex = i; // Create a local copy of the loop variable
-                                <li><button class="dropdown-item" type="button" @onclick="async () => await SelectReviewRows( localIndex )">@_reviewsPerPageOptions[ localIndex ]</button></li>
-                            }
-                        </ul>
+            <!-- Reviews -->
+            <div id="ProductReview" class="mt-3 p-3 bg-light">
+                <!-- Review Header -->
+                <div class="d-flex flex-row flex-wrap align-items-center justify-content-between bg-light">
+                    <div class="flex-grow-1 d-flex flex-grow-1 align-items-center">
+                        <h3 class="me-3">Reviews</h3>
+                        <span class="text-muted"><small>@_reviewCount reviews</small></span>
                     </div>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="SortBy" data-bs-toggle="dropdown" aria-expanded="false">
-                            Order by: @_reviewSortOptions[ ( int ) _productReviewsGetDto.SortType - 1 ]
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="SortBy">
-                            @for ( int i = 0; i < _reviewSortOptions.Count; i++ )
-                            {
-                                int localIndex = i; // Create a local copy of the loop variable
-                                <li><button class="dropdown-item" type="button" @onclick="async () => await SelectReviewSort( localIndex )">@_reviewSortOptions[ localIndex ]</button></li>
-                            }
-                        </ul>
+                    <div class="product-review-buttons">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="Rows" data-bs-toggle="dropdown" aria-expanded="false">
+                                Rows: @_productReviewsGetDto.Rows
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="Rows">
+                                @for ( int i = 0; i < _reviewsPerPageOptions.Count; i++ )
+                                {
+                                    int localIndex = i; // Create a local copy of the loop variable
+                                    <li><button class="dropdown-item" type="button" @onclick="async () => await SelectReviewRows( localIndex )">@_reviewsPerPageOptions[ localIndex ]</button></li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="SortBy" data-bs-toggle="dropdown" aria-expanded="false">
+                                Order by: @_reviewSortOptions[ ( int ) _productReviewsGetDto.SortType - 1 ]
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="SortBy">
+                                @for ( int i = 0; i < _reviewSortOptions.Count; i++ )
+                                {
+                                    int localIndex = i; // Create a local copy of the loop variable
+                                    <li><button class="dropdown-item" type="button" @onclick="async () => await SelectReviewSort( localIndex )">@_reviewSortOptions[ localIndex ]</button></li>
+                                }
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Review List -->
-            <div class="mt-3 mb-3 px-3">
-                @foreach( ProductReviewDto review in _reviews )
-                {
-                    <div class="border-bottom border-grey">
-                        <div class="d-flex flex-row align-items-center justify-content-between">
-                            <div>
-                                <strong>@review.Username</strong>
-                                <StarRating Rating="@review.Rating"></StarRating>
+                
+                <!-- Review List -->
+                <div class="mt-3 mb-3">
+                    @foreach( ProductReviewDto review in _reviews )
+                    {
+                        <div class="border-bottom border-grey">
+                            <div class="d-flex flex-row align-items-center justify-content-between">
+                                <div>
+                                    <strong>@review.Username</strong>
+                                    <StarRating Rating="@review.Rating"></StarRating>
+                                </div>
+                                <small class="text-muted">@review.Date</small>
                             </div>
-                            <small class="text-muted">@review.Date</small>
+                            <div>
+                                <p>@review.Review</p>
+                            </div>
                         </div>
-                        <div>
-                            <p>@review.Review</p>
-                        </div>
-                    </div>
-                }
-            </div>
-            
-            <!-- Review Pagination -->
-            <div class="d-flex flex-row align-items-center justify-content-center">
-                <Pagination @ref="_pagination" OnPageChange="@SelectReviewPage"></Pagination>
+                    }
+                </div>
+                
+                <!-- Review Pagination -->
+                <div class="d-flex flex-row align-items-center justify-content-center">
+                    <Pagination @ref="_pagination" OnPageChange="@SelectReviewPage"></Pagination>
+                </div>
             </div>
         </div>
     }

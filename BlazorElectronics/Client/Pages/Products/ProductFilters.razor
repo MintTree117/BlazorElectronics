@@ -5,17 +5,17 @@
 @using BlazorElectronics.Shared.Vendors
 @inherits RazorView
 
-<div class="product-filters @_showFiltersCss">
-    
-    <h4 class="text-decoration-underline me-3">Filters</h4>
+<div class="product-filters border border-grey p-3 bg-light @_showFiltersCss">
 
     <div class="d-flex flex-row justify-content-between mb-3">
-        <div class="d-grid w-100">
-            <button class="btn btn-primary w-100" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
-        </div>
+        <h3 class="text-decoration-underline m-0 mb-lg-3 p-0">Filters</h3>
         <button class="btn btn-outline-secondary product-filters-exit ms-3" onclick="@HideFilters">
             <i class="oi oi-x"></i>
         </button>
+    </div>
+    
+    <div class="d-grid w-100">
+        <button class="btn btn-outline-primary w-100" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
     </div>
 
     @if ( _subCategories is not null )

@@ -7,7 +7,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProductsController : _Controller
+public sealed class ProductsController : _Controller
 {
     readonly IProductService _productService;
 

@@ -7,7 +7,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class CartController : UserController
+public sealed class CartController : UserController
 {
     readonly ICartService _cartService;
 

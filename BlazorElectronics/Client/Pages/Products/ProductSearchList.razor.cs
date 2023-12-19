@@ -1,3 +1,4 @@
+using BlazorElectronics.Shared;
 using BlazorElectronics.Client.Shared;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Products.Search;

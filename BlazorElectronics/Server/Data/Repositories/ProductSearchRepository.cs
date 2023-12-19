@@ -91,9 +91,8 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
             builder.Append( $"GROUP BY P.{COL_PRODUCT_ID}" );
             builder.Append( " )" );
             
-            builder.Append( $" SELECT P.*, PD.{COL_PRODUCT_DESCR}, PC.CategoryIds, TotalCount" );
+            builder.Append( $" SELECT P.*, PC.CategoryIds, TotalCount" );
             builder.Append( $" FROM {CTE_PAGINATED} P" );
-            builder.Append( $" LEFT JOIN {TABLE_PRODUCT_DESCRIPTIONS} PD ON P.{COL_PRODUCT_ID} = PD.{COL_PRODUCT_ID}" );
             builder.Append( $" LEFT JOIN {CTE_CATEGORIES} PC ON P.{COL_PRODUCT_ID} = PC.{COL_PRODUCT_ID}" );
             
             AppendSort( builder, requestDto.SortType );

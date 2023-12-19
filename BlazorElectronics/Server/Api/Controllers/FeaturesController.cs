@@ -6,7 +6,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class FeaturesController : _Controller
+public sealed class FeaturesController : _Controller
 {
     readonly IFeaturesService _featuresService;
     
@@ -16,10 +16,16 @@ public class FeaturesController : _Controller
         _featuresService = featuresService;
     }
 
-    [HttpGet( "get" )]
-    public async Task<ActionResult<FeaturesReplyDto>> GetFeaturedProducts()
+    [HttpGet( "get-features" )]
+    public async Task<ActionResult<List<FeatureDto>?>> GetFeaturedProducts()
     {
-        ServiceReply<FeaturesReplyDto?> featureReply = await _featuresService.GetFeatures();
+        ServiceReply<List<FeatureDto>?> featureReply = await _featuresService.GetFeatures();
+        return GetReturnFromReply( featureReply );
+    }
+    [HttpPost( "get-deals" )]
+    public async Task<ActionResult<List<FeatureDealDto>?>> GetFeaturedDeals( [FromBody] PaginationDto pagination )
+    {
+        ServiceReply<List<FeatureDealDto>?> featureReply = await _featuresService.GetDeals( pagination.Rows, pagination.Page );
         return GetReturnFromReply( featureReply );
     }
 }

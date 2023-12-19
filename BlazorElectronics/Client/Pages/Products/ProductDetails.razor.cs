@@ -13,7 +13,6 @@ using BlazorElectronics.Shared.Reviews;
 using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace BlazorElectronics.Client.Pages.Products;
 

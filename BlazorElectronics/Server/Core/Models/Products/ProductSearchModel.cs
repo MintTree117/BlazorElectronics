@@ -13,5 +13,4 @@ public sealed class ProductSearchModel
     public int NumberSold { get; set; }
     public int NumberReviews { get; set; }
     public string CategoryIds { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
 }

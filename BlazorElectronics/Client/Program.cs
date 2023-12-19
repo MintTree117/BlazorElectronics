@@ -36,7 +36,6 @@ builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
 builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCrudService<CategoryViewDtoDto, CategoryEditDtoDto>, AdminCrudService<CategoryViewDtoDto, CategoryEditDtoDto>>();
-builder.Services.AddScoped<IAdminCrudService<CrudViewDto, FeaturedDealDtoEditDto>, AdminCrudService<CrudViewDto, FeaturedDealDtoEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, FeatureDtoEditDto>, AdminCrudService<CrudViewDto, FeatureDtoEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, LookupSpecEditDto>, AdminCrudService<CrudViewDto, LookupSpecEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, VendorEditDtoDto>, AdminCrudService<CrudViewDto, VendorEditDtoDto>>();

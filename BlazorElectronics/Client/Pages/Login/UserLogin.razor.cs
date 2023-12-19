@@ -36,13 +36,11 @@ public partial class UserLogin : PageView
 
         if ( !loginReply.Success || loginReply.Data is null )
         {
-            SetViewMessage( false, loginReply.Message ?? "Failed to login!" );
+            InvokeAlert( AlertType.Danger, $"{loginReply.ErrorType} : {loginReply.Message}" );
             return;
         }
 
         await CartService.UpdateCart();
-        
-        
         NavManager.NavigateTo( _returnUrl );
     }
     async Task HandleRegistration()

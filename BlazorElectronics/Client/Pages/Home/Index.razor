@@ -1,10 +1,82 @@
 ﻿@page "/"
-
+@using BlazorElectronics.Shared.Features
+@using BlazorElectronics.Client.Shared
 @inherits PageView
 
 <PageTitle>BlazorMedia</PageTitle>
 
-@if ( PageIsReady() )
-{
-    <LandingFeatures></LandingFeatures>
-}
+<div class="lg-content-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        if ( _features is not null )
+        {
+            <div class="featured-products-container">
+                <div id="featured-products-carousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        @for ( int i = 0; i < _features.Count; i++ )
+                        {
+                            <button
+                                type="button"
+                                data-bs-target="#featured-products-carousel"
+                                data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"
+                                aria-current="@(i == 0 ? "true" : "false")"
+                                aria-label="Slide @i">
+                            </button>
+                        }
+                    </div>
+                    <div class="carousel-inner">
+                        @foreach ( FeatureDto p in _features )
+                        {
+                            <div class="carousel-item fp-carousel-item @(p == _features.First() ? "active" : "")">
+                                <img class="d-block w-100 fp-carousel-item-img" src="@p.Image" alt="@p.Name"/>
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#featured-products-carousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    <div class="featured-products-fade">
+                    </div>
+                </div>
+            </div>
+        }
+
+        if ( _featuredDeals is not null )
+        {
+            <div class="mt-5 featured-deals">
+                <h2 class="fs-1 fw-bold mb-4">Featured Deals</h2>
+                <div class="mt-3 d-flex flex-row align-items-center featured-deals-inner">
+                    @foreach ( FeatureDealDto d in _featuredDeals )
+                    {
+                        <div class="card featured-deal-card mb-3">
+                            <a href="@Routes.PRODUCT/@d.ProductId">
+                                <img src="@d.Thumbnail" class="card-img-top" alt="@d.Title">
+                            </a>
+                            <div class="card-body bg-light">
+                                <a class="text-decoration-none" href="@Routes.PRODUCT/@d.ProductId">
+                                    <h4 class="card-title m-0 mb-2 p-0 fs-3 fw-bold">@d.Title</h4>
+                                </a>
+                                <div class="d-flex flex-row align-items-center">
+                                    <StarRating Rating="@d.Rating"></StarRating>
+                                    <span class="ms-3">@d.NumberReviews</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="original-price">@d.Price</span>
+                                    <span class="sale-price">@d.SalePrice</span>
+                                </div>
+                                <a class="btn btn-outline-primary w-100" href="@Routes.PRODUCT/@d.ProductId">Details</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

@@ -24,33 +24,33 @@ public class UserAccountRepository : DapperRepository, IUserRepository
     {
         return await TryQueryAsync( Query<int>, null, PROCEDURE_GET_ALL_IDS );
     }
-    public async Task<User?> GetById( int id )
+    public async Task<UserModel?> GetById( int id )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_ID, id );
         
-        return await TryQueryAsync( QuerySingleOrDefault<User?>, p, PROCEDURE_GET_BY_ID );
+        return await TryQueryAsync( QuerySingleOrDefault<UserModel?>, p, PROCEDURE_GET_BY_ID );
     }
-    public async Task<User?> GetByUsername( string username )
+    public async Task<UserModel?> GetByUsername( string username )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_NAME, username );
         
-        return await TryQueryAsync( QuerySingleOrDefault<User?>, p, PROCEDURE_GET_BY_USERNAME );
+        return await TryQueryAsync( QuerySingleOrDefault<UserModel?>, p, PROCEDURE_GET_BY_USERNAME );
     }
-    public async Task<User?> GetByEmail( string email )
+    public async Task<UserModel?> GetByEmail( string email )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_EMAIL, email );
         
-        return await TryQueryAsync( QuerySingleOrDefault<User?>, p, PROCEDURE_GET_BY_EMAIL );
+        return await TryQueryAsync( QuerySingleOrDefault<UserModel?>, p, PROCEDURE_GET_BY_EMAIL );
     }
-    public async Task<User?> GetByEmailOrUsername( string emailOrUsername )
+    public async Task<UserModel?> GetByEmailOrUsername( string emailOrUsername )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_NAME_OR_EMAIL, emailOrUsername );
         
-        return await TryQueryAsync( QuerySingleOrDefault<User?>, p, PROCEDURE_GET_BY_NAME_OR_EMAIL );
+        return await TryQueryAsync( QuerySingleOrDefault<UserModel?>, p, PROCEDURE_GET_BY_NAME_OR_EMAIL );
     }
     public async Task<UserExists?> GetUserExists( string username, string email )
     {
@@ -60,7 +60,7 @@ public class UserAccountRepository : DapperRepository, IUserRepository
         
         return await TryQueryAsync( QuerySingleOrDefault<UserExists?>, p, PROCEDURE_GET_USER_EXISTS );
     }
-    public async Task<User?> InsertUser( string username, string email, string? phone, byte[] hash, byte[] salt )
+    public async Task<UserModel?> InsertUser( string username, string email, string? phone, byte[] hash, byte[] salt )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_NAME, username );
@@ -69,7 +69,7 @@ public class UserAccountRepository : DapperRepository, IUserRepository
         p.Add( PARAM_USER_PASSWORD_HASH, hash );
         p.Add( PARAM_USER_PASSWORD_SALT, salt );
 
-        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<User?>, p, PROCEDURE_INSERT );
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<UserModel?>, p, PROCEDURE_INSERT );
     }
     public async Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt )
     {

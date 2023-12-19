@@ -1,14 +1,12 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models;
-using BlazorElectronics.Server.Data;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public class CategoryService : ApiService, ICategoryService
+public sealed class CategoryService : ApiService, ICategoryService
 {
     const int CACHE_LIFE = 4;
     const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";

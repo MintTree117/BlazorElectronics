@@ -2,14 +2,13 @@ using System.Xml.Linq;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products;
 using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public class ProductService : ApiService, IProductService
+public sealed class ProductService : ApiService, IProductService
 {
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductRepository _productRepository;
@@ -171,8 +170,7 @@ public class ProductService : ApiService, IProductService
                     SalePrice = p.SalePrice,
                     NumberSold = p.NumberSold,
                     NumberReviews = p.NumberReviews,
-                    Categories = categoryIds,
-                    Description = p.Description
+                    Categories = categoryIds
                 } );
             }
 

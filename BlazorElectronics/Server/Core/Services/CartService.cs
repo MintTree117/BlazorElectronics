@@ -1,12 +1,11 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public class CartService : ApiService, ICartService
+public sealed class CartService : ApiService, ICartService
 {
     readonly ICartRepository _cartRepository;
 

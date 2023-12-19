@@ -1,6 +1,5 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Models.Users;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Users;
 

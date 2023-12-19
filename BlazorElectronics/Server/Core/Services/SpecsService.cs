@@ -2,8 +2,6 @@ using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models;
 using BlazorElectronics.Server.Core.Models.SpecLookups;
-using BlazorElectronics.Server.Data;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Specs;
 
@@ -200,6 +198,15 @@ public sealed class SpecsService : ApiService, ISpecsService
             PrimaryCategories = categories,
             ValuesByIdAsString = values
         };
+    }
+    static string ConvertSpecValuesToString( IEnumerable<SpecValueModel> values )
+    {
+        List<string> specValues = values
+            .OrderBy( spec => spec.SpecValueId )
+            .Select( spec => spec.SpecValue )
+            .ToList();
+
+        return string.Join( ",", specValues );
     }
     bool CacheValid()
     {

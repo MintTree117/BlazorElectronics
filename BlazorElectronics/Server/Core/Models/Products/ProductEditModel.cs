@@ -6,9 +6,10 @@ public sealed class ProductEditModel
     public int VendorId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
+    public DateTime ReleaseDate { get; set; }
+    public bool IsFeatured { get; set; }
     public decimal Price { get; set; }
     public decimal? SalePrice { get; set; }
-    public DateTime ReleaseDate { get; set; }
     public int NumberSold { get; set; }
     public string Description { get; set; } = string.Empty;
     public List<int> Categories { get; set; } = new();

@@ -6,7 +6,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class CategoryController : _Controller
+public sealed class CategoryController : _Controller
 {
     readonly ICategoryService _categoryService;
 

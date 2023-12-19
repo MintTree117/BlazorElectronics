@@ -6,39 +6,47 @@ namespace BlazorElectronics.Client.Services.Features;
 
 public class FeaturesServiceClient : ClientService, IFeaturesServiceClient
 {
-    const string API_PATH = "api/features/get";
-    FeaturesReplyDto? _response;
+    const string API_PATH = "api/features";
+    const string API_PATH_FEATURES = $"{API_PATH}/get-features";
+    const string API_PATH_DEALS = $"{API_PATH}/get-deals";
+    
+    List<FeatureDto>? _cachedFeatures;
+    List<FeatureDealDto>? _cachedDealsFrontPage;
     
     public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
     public async Task<ServiceReply<List<FeatureDto>?>> GetFeatures()
     {
-        ServiceReply<bool> reply = await GetResponse();
-
-        return reply.Success && _response is not null
-            ? new ServiceReply<List<FeatureDto>?>( _response.Features )
-            : new ServiceReply<List<FeatureDto>?>( reply.ErrorType, reply.Message );
+        return await GetFeaturesReply();
     }
-    public async Task<ServiceReply<List<FeaturedDealDto>?>> GetFeaturedDeals()
+    public async Task<ServiceReply<List<FeatureDealDto>?>> GetFeatureDeals( PaginationDto pagination )
     {
-        ServiceReply<bool> reply = await GetResponse();
-
-        return reply.Success && _response is not null
-            ? new ServiceReply<List<FeaturedDealDto>?>( _response.Deals )
-            : new ServiceReply<List<FeaturedDealDto>?>( reply.ErrorType, reply.Message );
+        return await GetDealsReply( pagination );
     }
 
-    async Task<ServiceReply<bool>> GetResponse()
+    async Task<ServiceReply<List<FeatureDto>?>> GetFeaturesReply()
     {
-        if ( _response is not null )
-            return new ServiceReply<bool>( true );
+        if ( _cachedFeatures is not null )
+            return new ServiceReply<List<FeatureDto>?>( _cachedFeatures );
 
-        ServiceReply<FeaturesReplyDto?> reply = await TryGetRequest<FeaturesReplyDto?>( API_PATH );
-        _response = reply.Data;
+        ServiceReply<List<FeatureDto>?> reply = await TryGetRequest<List<FeatureDto>?>( API_PATH_FEATURES );
+        _cachedFeatures = reply.Data;
 
-        return _response is not null
-            ? new ServiceReply<bool>( true )
-            : new ServiceReply<bool>( reply.ErrorType, reply.Message );
+        return reply;
+    }
+    async Task<ServiceReply<List<FeatureDealDto>?>> GetDealsReply( PaginationDto pagination )
+    {
+        if ( pagination.Page == 1 && _cachedDealsFrontPage is not null )
+            return new ServiceReply<List<FeatureDealDto>?>( _cachedDealsFrontPage );
+
+        ServiceReply<List<FeatureDealDto>?> reply = await TryPostRequest<List<FeatureDealDto>?>( API_PATH_DEALS, pagination );
+        
+        if (pagination.Page == 1)
+            _cachedDealsFrontPage = reply.Data;
+
+        return _cachedFeatures is not null
+            ? new ServiceReply<List<FeatureDealDto>?>( reply.Data )
+            : new ServiceReply<List<FeatureDealDto>?>( reply.ErrorType, reply.Message );
     }
 }

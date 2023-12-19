@@ -1,7 +1,6 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Reviews;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Reviews;
 

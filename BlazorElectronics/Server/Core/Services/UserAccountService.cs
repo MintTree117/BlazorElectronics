@@ -5,12 +5,11 @@ using System.Text;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Users;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public class UserAccountService : ApiService, IUserAccountService
+public sealed class UserAccountService : ApiService, IUserAccountService
 {
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
     const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
@@ -42,7 +41,7 @@ public class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            User? user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
+            UserModel? user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
 
             if ( user is null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, "User Not Found!" );
@@ -70,7 +69,7 @@ public class UserAccountService : ApiService, IUserAccountService
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
 
             CreatePasswordHash( password, out byte[] hash, out byte[] salt );
-            User? insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
+            UserModel? insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
 
             if ( insertedUser is null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert user!" );
@@ -94,7 +93,7 @@ public class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            User? admin = await _userRepository.GetById( adminId );
+            UserModel? admin = await _userRepository.GetById( adminId );
 
             if ( admin is null )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
@@ -116,7 +115,7 @@ public class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            User? admin = await _userRepository.GetById( adminId );
+            UserModel? admin = await _userRepository.GetById( adminId );
 
             if ( admin is null )
                 return new ServiceReply<int>( ServiceErrorType.NotFound );
@@ -138,7 +137,7 @@ public class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            User? user = await _userRepository.GetByEmail( email );
+            UserModel? user = await _userRepository.GetByEmail( email );
 
             if ( user is null )
                 return new ServiceReply<int>( ServiceErrorType.NotFound );
@@ -157,7 +156,7 @@ public class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            User? user = await _userRepository.GetById( userId );
+            UserModel? user = await _userRepository.GetById( userId );
 
             if ( user is null )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );

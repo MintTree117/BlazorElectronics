@@ -2,8 +2,6 @@ using System.Xml.Linq;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Products;
-using BlazorElectronics.Server.Data;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Specs;
@@ -70,11 +68,13 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
             VendorId = PickRandomVendor( primaryCategory, vendors ),
             Title = SeedData.PRODUCT_TITLES[ primaryCategory - 1 ] + " " + i,
             ThumbnailUrl = $"/Images/{SeedData.PRODUCT_THUMBNAILS[ primaryCategory - 1 ]}",
+            ReleaseDate = GetRandomDate( SeedData.MIN_RELEASE_DATE, SeedData.MAX_RELEASE_DATE ),
+            IsFeatured = ReturnTrue20Percent(),
             Images = GetProductImages( primaryCategory ),
             Price = GetRandomDecimal( SeedData.MIN_PRICE, SeedData.MAX_PRICE ),
-            ReleaseDate = GetRandomDate( SeedData.MIN_RELEASE_DATE, SeedData.MAX_RELEASE_DATE ),
             NumberSold = GetRandomInt( 0, SeedData.MAX_NUM_SOLD ),
             Description = GetRandomDescription( primaryCategory ),
+            
         };
 
         if ( GetRandomBoolean() )
@@ -361,7 +361,11 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
 
         return _random.Next( min, max );
     }
-
+    bool ReturnTrue20Percent()
+    {
+        int randomNumber = _random.Next( 100 );
+        return randomNumber < 20;
+    }
     float GetRandomFloat( float minValue, float maxValue )
     {
         // Check if the arguments are valid

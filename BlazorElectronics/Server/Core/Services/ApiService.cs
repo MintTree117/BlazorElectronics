@@ -1,6 +1,4 @@
-using BlazorElectronics.Server.Core.Models.SpecLookups;
-
-namespace BlazorElectronics.Server.Services;
+namespace BlazorElectronics.Server.Core.Services;
 
 public abstract class ApiService
 {
@@ -12,15 +10,5 @@ public abstract class ApiService
     public ApiService( ILogger<ApiService> logger )
     {
         Logger = logger;
-    }
-    
-    protected static string ConvertSpecValuesToString( IEnumerable<SpecValueModel> values )
-    {
-        List<string> specValues = values
-            .OrderBy( spec => spec.SpecValueId )
-            .Select( spec => spec.SpecValue )
-            .ToList();
-
-        return string.Join( ",", specValues );
     }
 }

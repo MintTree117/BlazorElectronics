@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <AdditionalFiles Include="Pages\Admin\Crud\CrudCategories.razor" />
-      <AdditionalFiles Include="Pages\Admin\Crud\CrudFeaturedDeals.razor" />
       <AdditionalFiles Include="Pages\Admin\Crud\CrudFeatures.razor" />
       <AdditionalFiles Include="Pages\Admin\Crud\CrudSpecs.razor" />
       <AdditionalFiles Include="Pages\Admin\Crud\CrudVendors.razor" />

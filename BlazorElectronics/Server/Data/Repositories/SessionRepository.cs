@@ -6,9 +6,9 @@ namespace BlazorElectronics.Server.Data.Repositories;
 
 public class SessionRepository : DapperRepository, ISessionRepository
 {
-    const string PROCEDURE_GET = "Get_UserSession";
-    const string PROCEDURE_INSERT = "Insert_UserSession";
-    const string PROCEDURE_DELETE = "Delete_UserSession";
+    const string PROCEDURE_GET = "Get_Session";
+    const string PROCEDURE_INSERT = "Insert_Session";
+    const string PROCEDURE_DELETE = "Delete_Session";
 
     public SessionRepository( DapperContext dapperContext )
         : base( dapperContext ) { }

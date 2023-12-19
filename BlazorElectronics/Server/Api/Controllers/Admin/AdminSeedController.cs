@@ -9,7 +9,7 @@ namespace BlazorElectronics.Server.Api.Controllers.Admin;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class AdminSeedController : _AdminController
+public sealed class AdminSeedController : _AdminController
 {
     readonly IVendorService _vendorService;
     readonly ICategoryService _categoryService;

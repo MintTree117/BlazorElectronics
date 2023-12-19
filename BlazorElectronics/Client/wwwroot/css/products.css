@@ -82,19 +82,6 @@
     font-size: 0.8em;
 }
 
-.product-card-description {
-    display: none;
-    font-size: 0.9em; /* Slightly smaller font size */
-    line-height: 1.4; /* Improves readability */
-    color: #555; /* Slightly muted color */
-    margin-top: 10px; /* Space above the description */
-    text-align: justify; /* Justifies the text for a cleaner look */
-    overflow: hidden; /* Ensures the text doesn't overflow */
-    text-overflow: ellipsis; /* Adds an ellipsis if the text overflows */
-    display: -webkit-box; /* Needed for line clamping */
-    -webkit-line-clamp: 3; /* Limits to 3 lines */
-    -webkit-box-orient: vertical; /* Orient the text vertically */
-}
 .product-card-vendor {
     text-decoration: none;
     color: black;
@@ -116,7 +103,6 @@
     font-size: 16px; /* Base font size for better readability on mobile */
     line-height: 1.5; /* Improved line spacing */
     color: #333; /* Default text color, can be adjusted */
-    background-color: #fff; /* Background color for the popup */
     overflow-y: auto; /* Enables scrolling for longer content */
 }
 .product-filters h4 {
@@ -193,35 +179,17 @@
 
 /*--- PRODUCT DETAILS ---*/
 .product-details-container {
-    margin-left: auto;
-    margin-right: auto;
     max-width: 1000px;
     padding: 20px;
-}
-.product-details-top {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: start;
 }
 .product-details-image {
     width: 100%;
     height: auto;
 }
-.product-details-overview {
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-}
-.product-details-overview-bottom {
-    display: flex;
-    flex-direction: column;
-}
 .product-overview-button {
     min-width: 125px;
     max-width: 125px;
 }
-
 .product-description {
     display: block;
     font-size: 1em; /* Slightly smaller font size */
@@ -233,7 +201,6 @@
     display: -webkit-box; /* Needed for line clamping */
     -webkit-box-orient: vertical; /* Orient the text vertically */
 }
-
 .product-review-buttons {
     display: flex;
     flex-direction: row;
@@ -244,8 +211,6 @@
 
 @media only screen and (max-width: 1200px) {
     .product-filters {
-        border: 1px solid gray;
-        padding: 25px;
         top: 0;
         left: 0;
     }
@@ -289,9 +254,6 @@
 }
 
 @media only screen and (min-width: 768px) {
-    .product-details-top {
-        flex-direction: row;
-    }
     .product-details-image {
         min-width: 400px;
         max-width: 400px;
@@ -371,9 +333,7 @@
         flex-direction: column;
         min-width: 225px;
         max-width: 20%;
-        padding: 0 25px 0 0;
-        border-right: 1px solid lightgray;
-        overflow-y: visible;
+        overflow-y: scroll;
     }
     .product-filters h4 {
         display: block;

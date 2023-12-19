@@ -64,6 +64,7 @@ public abstract class DapperRepository
     protected const string PARAM_PRODUCT_PRICE = $"@{COL_PRODUCT_PRICE}";
     protected const string PARAM_PRODUCT_SALE_PRICE = $"@{COL_PRODUCT_SALE_PRICE}";
     protected const string PARAM_PRODUCT_RELEASE_DATE = $"@{COL_PRODUCT_RELEASE_DATE}";
+    protected const string PARAM_PRODUCT_IS_FEATURED = "@IsFeatured";
     protected const string PARAM_PRODUCT_DESCR = $"@{COL_PRODUCT_DESCR}";
     protected const string PARAM_PRODUCT_REVIEW_ID = $"@{COL_PRODUCT_REVIEW_ID}";
     protected const string PARAM_PRODUCT_RATING = $"@{COL_PRODUCT_RATING}";

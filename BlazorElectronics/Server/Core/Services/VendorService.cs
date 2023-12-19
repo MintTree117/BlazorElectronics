@@ -2,8 +2,6 @@ using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models;
 using BlazorElectronics.Server.Core.Models.Vendors;
-using BlazorElectronics.Server.Data;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 

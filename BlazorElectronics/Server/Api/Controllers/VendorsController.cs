@@ -6,7 +6,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class VendorsController : _Controller
+public sealed class VendorsController : _Controller
 {
     readonly IVendorService _vendorService;
     

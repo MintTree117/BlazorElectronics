@@ -4,12 +4,11 @@ using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Sessions;
 using BlazorElectronics.Server.Core.Models.Users;
-using BlazorElectronics.Server.Services;
 using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public class SessionService : ApiService, ISessionService
+public sealed class SessionService : ApiService, ISessionService
 {
     const int MAX_SESSION_HOURS = 48;
     const string SESSION_EXPIRED_MESSAGE = "Session has expired. Please login again.";

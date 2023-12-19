@@ -6,7 +6,7 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class ReviewsController : _Controller
+public sealed class ReviewsController : _Controller
 {
     readonly IReviewService _reviewService;
     
