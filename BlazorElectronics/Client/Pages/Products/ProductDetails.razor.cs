@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Client.Services.Categories;
 using BlazorElectronics.Client.Services.Products;
 using BlazorElectronics.Client.Services.Reviews;
@@ -6,6 +7,7 @@ using BlazorElectronics.Client.Services.Specs;
 using BlazorElectronics.Client.Services.Vendors;
 using BlazorElectronics.Client.Shared;
 using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Products;
@@ -18,6 +20,7 @@ namespace BlazorElectronics.Client.Pages.Products;
 
 public partial class ProductDetails : PageView
 {
+    [Inject] public ICartServiceClient CartService { get; set; } = default!;
     [Inject] public ICategoryServiceClient CategoryService { get; set; } = default!;
     [Inject] public IProductServiceClient ProductService { get; init; } = default!;
     [Inject] public IReviewServiceClient ReviewService { get; set; } = default!;
@@ -207,5 +210,24 @@ public partial class ProductDetails : PageView
 
         _productReviewsGetDto.Rows = _reviewsPerPageOptions[ index ];
         await LoadReviews();
+    }
+
+    async Task AddToCart()
+    {
+        if ( _product is null )
+            return;
+
+        CartItemDto item = new()
+        {
+            ProductId = _product.Id,
+            Quantity = 1
+        };
+
+        ServiceReply<bool> reply = await CartService.AddToCart( item );
+
+        if ( reply.Success )
+            InvokeAlert( AlertType.Success, "Added item to cart." );
+        else
+            InvokeAlert( AlertType.Danger, $"Failed to add item to cart! {reply.ErrorType} : {reply.Message}" );
     }
 }

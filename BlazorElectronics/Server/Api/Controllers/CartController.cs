@@ -16,7 +16,7 @@ public sealed class CartController : UserController
         _cartService = cartService;
     }
     
-    [HttpGet( "get" )]
+    [HttpPost( "get" )]
     public async Task<ActionResult<CartReplyDto?>> GetCart( [FromBody] UserRequestDto requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( requestDto );
@@ -46,7 +46,7 @@ public sealed class CartController : UserController
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<CartReplyDto?> reply = await _cartService.AddToCart( userReply.Data, requestDto!.Payload! );
+        ServiceReply<CartReplyDto?> reply = await _cartService.AddToCart( userReply.Data, requestDto.Payload! );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "quantity" )]

@@ -3,12 +3,13 @@
 @inherits PageView
 
 <div class="container-sm">
+    <PageLoader Page="@this"></PageLoader>
     <h1>Shopping Cart</h1>
     <a href="@Routes.CHECKOUT">Checkout</a>
-    
+
     @if ( PageIsReady() )
     {
-        <div class="d-flex flex-column align-items-center justify-content-start">
+        <div class="d-flex flex-column justify-content-start">
             @if ( _cart.Items.Count <= 0 )
             {
                 <span>Cart is empty</span>
@@ -17,10 +18,10 @@
             {
                 foreach ( CartProductDto p in _cart.Items )
                 {
-                    <div class="flex-grow-1 d-flex flex-row">
-                        <img src="@p.ProductThumbnail" alt="@p.ProductTitle"/>
+                    <div class="d-flex flex-row flex-grow-1 align-items-center">
+                        <img class="cart-item-image" src="@p.Thumbnail" alt="@p.Title"/>
                         <div class="">
-                            <h3>@p.ProductTitle</h3>
+                            <h3>@p.Title</h3>
                             @if ( p.SalePrice is not null )
                             {
                                 <span class="original-price">@p.Price</span>
@@ -30,8 +31,9 @@
                             {
                                 <span class="price">@p.Price</span>
                             }
-                            <span>@p.Quantity</span>
-                            <button class="btn btn-danger">Remove</button>
+                            <span>@p.ItemQuantity</span>
+                            <input class="form-control" type="number" onchange="@( async ( ChangeEventArgs e ) => await ChangeQuantity( e, p ))"/>
+                            <button class="btn btn-danger" onclick="@( async () => await RemoveItem( p ) )">Remove</button>
                         </div>
                     </div>
                 }

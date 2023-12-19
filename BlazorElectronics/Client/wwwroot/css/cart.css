@@ -1,24 +1,5 @@
-.image-wrapper {
-    width: 150px;
-    text-align: center;
-}
-
 .cart-item-image {
-    max-height: 150px;
     max-width: 150px;
-    padding: 6px;
-}
-
-.cart-item-name {
-    flex-grow: 1;
-    padding: 6px;
-}
-
-.cart-product-price {
-    font-weight: 600;
-    text-align: right;
-}
-
-.input-quantity {
-    width: 70px;
+    min-width: 150px;
+    height: auto;
 }

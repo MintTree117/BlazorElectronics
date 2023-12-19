@@ -24,25 +24,26 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     public async Task<ServiceReply<CartReplyDto?>> GetCart()
     {
         ServiceReply<CartReplyDto?> reply = await TryUserRequest<CartReplyDto>( API_ROUTE_GET );
-        return await HandleCartReply( reply );
+        await HandleCartReply( reply );
+        return reply;
     }
-    public async Task<ServiceReply<CartReplyDto?>> UpdateCart()
+    public async Task<ServiceReply<bool>> UpdateCart()
     {
         CartRequestDto request = await GetCartRequest();
         ServiceReply<CartReplyDto?> reply = await TryUserRequest<CartRequestDto, CartReplyDto>( API_ROUTE_UPDATE, request );
         return await HandleCartReply( reply );
     }
-    public async Task<ServiceReply<CartReplyDto?>> AddToCart( CartItemDto itemDto )
+    public async Task<ServiceReply<bool>> AddToCart( CartItemDto itemDto )
     {
         ServiceReply<CartReplyDto?> reply = await TryUserRequest<CartItemDto, CartReplyDto>( API_ROUTE_ADD, itemDto );
         return await HandleCartReply( reply );
     }
-    public async Task<ServiceReply<CartReplyDto?>> UpdateCartQuantity( CartItemDto itemDto )
+    public async Task<ServiceReply<bool>> UpdateCartQuantity( CartItemDto itemDto )
     {
         ServiceReply<CartReplyDto?> reply = await TryUserRequest<CartItemDto, CartReplyDto>( API_ROUTE_QUANTITY, itemDto );
         return await HandleCartReply( reply );
     }
-    public async Task<ServiceReply<CartReplyDto?>> RemoveFromCart( int productId )
+    public async Task<ServiceReply<bool>> RemoveFromCart( int productId )
     {
         IntDto intDto = new( productId );
         ServiceReply<CartReplyDto?> reply = await TryUserRequest<IntDto, CartReplyDto>( API_ROUTE_REMOVE, intDto );
@@ -54,13 +55,13 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         return await TryUserRequest<bool>( API_ROUTE_CLEAR );
     }
 
-    async Task<ServiceReply<CartReplyDto?>> HandleCartReply( ServiceReply<CartReplyDto?> reply )
+    async Task<ServiceReply<bool>> HandleCartReply( ServiceReply<CartReplyDto?> reply )
     {
         if ( !reply.Success || reply.Data is null )
-            return reply;
+            return new ServiceReply<bool>( reply.ErrorType, reply.Message );
 
         await Storage.SetItemAsync( CART_STORAGE_KEY, reply.Data );
-        return reply;
+        return new ServiceReply<bool>( true );
     }
     async Task<CartRequestDto> GetCartRequest()
     {

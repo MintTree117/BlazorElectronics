@@ -6,7 +6,7 @@ public sealed class CartReplyDto
 
     public decimal GetTotalPrice()
     {
-        return Items.Sum( item => item.Price * item.Quantity );
+        return Items.Sum( item => item.Price * item.ItemQuantity );
     }
     public bool GetSameItem( CartProductDto itemToCompare, out CartProductDto? item )
     {
@@ -16,7 +16,7 @@ public sealed class CartReplyDto
     public void AddOrUpdateQuantity( CartProductDto item )
     {
         if ( GetSameItem( item, out CartProductDto? sameItem ) )
-            sameItem!.Quantity += item.Quantity;
+            sameItem!.ItemQuantity += item.ItemQuantity;
         else
             Items.Add( item );
     }

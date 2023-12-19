@@ -13,7 +13,7 @@ public sealed class CartRequestDto
             Items.Add( new CartItemDto
             {
                 ProductId = d.ProductId,
-                Quantity = d.Quantity
+                Quantity = d.ItemQuantity
             } );
         }
     }

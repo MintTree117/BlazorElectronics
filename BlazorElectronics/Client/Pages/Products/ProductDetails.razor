@@ -6,7 +6,8 @@
 
 <div class="mx-auto product-details-container">
     <PageLoader Page="@this"></PageLoader>
-    
+    <AlertMessage Page="@this"></AlertMessage>
+
     <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -107,7 +108,7 @@
                                     <span class="price">$@_product.Price</span>
                                 }
                             </div>
-                            <button class="btn btn-primary product-overview-button">Add to Cart</button>
+                            <button class="btn btn-outline-primary product-overview-button" onclick="@( async () => await AddToCart())">Add to Cart</button>
                         </div>
                         
                         <!-- Categories -->

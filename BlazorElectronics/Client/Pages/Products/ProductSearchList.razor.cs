@@ -1,5 +1,7 @@
+using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Client.Shared;
+using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Products.Search;
 using BlazorElectronics.Shared.Vendors;
@@ -9,6 +11,7 @@ namespace BlazorElectronics.Client.Pages.Products;
 
 public partial class ProductSearchList : RazorView
 {
+    [Inject] public ICartServiceClient CartService { get; set; } = default!;
     [Parameter] public EventCallback<int> OnPageChanged { get; set; }
     Pagination _pagination = default!;
     
@@ -27,5 +30,16 @@ public partial class ProductSearchList : RazorView
         _vendors = vendors;
         _pagination.UpdateTotalPages( rows, search?.TotalMatches ?? 0 );
         StateHasChanged();
+    }
+
+    async Task AddToCart( int productId )
+    {
+        CartItemDto item = new()
+        {
+            ProductId = productId,
+            Quantity = 1
+        };
+
+        await CartService.AddToCart( item );
     }
 }
