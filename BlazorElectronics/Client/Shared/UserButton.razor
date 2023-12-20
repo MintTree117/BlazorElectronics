@@ -1,5 +1,6 @@
 @using Blazored.LocalStorage
 @using BlazorElectronics.Client.Models
+@using BlazorElectronics.Client.Services.Cart
 @using BlazorElectronics.Client.Services.Users
 @using BlazorElectronics.Shared
 @using BlazorElectronics.Shared.Users
@@ -8,6 +9,7 @@
 @implements IDisposable
 
 @inject IUserServiceClient UserService
+@inject ICartServiceClient CartService
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavManager
 
@@ -76,7 +78,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         SessionMeta? sessionReply = await UserService.GetSessionMeta();
-        HandleSessionChange( sessionReply );
+        await HandleSessionChange( this, sessionReply );
     }
     public void Dispose()
     {
@@ -99,10 +101,13 @@ else
         _showUserMenu = !_showUserMenu;
         StateHasChanged();
     }
-    void HandleSessionChange( SessionMeta? meta  )
+    async Task HandleSessionChange( object sender, SessionMeta? meta )
     {
         _isAuthorized = meta is not null;
         _isAdmin = meta is not null && meta.Type == SessionType.Admin;
+        
+        await CartService.UpdateCart();
+        
         StateHasChanged();
     }
 }

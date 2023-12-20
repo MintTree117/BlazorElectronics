@@ -11,7 +11,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     public UserServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
 
-    public event Action<SessionMeta?>? SessionChanged;
+    public event IUserServiceClient.AsyncEventHandler? SessionChanged;
 
     const string API_ROUTE = "api/UserAccount";
     const string API_ROUTE_REGISTER = API_ROUTE + "/register";
@@ -38,7 +38,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
         ServiceReply<SessionReplyDto?> loginReply = await TryGetSessionResponse( API_ROUTE_LOGIN, requestDto );
 
         if ( loginReply is { Success: true, Data: not null } )
-            SessionChanged?.Invoke( GetSessionMeta( loginReply.Data ) );
+            await InvokeOnChange( GetSessionMeta( loginReply.Data ) );
 
         return loginReply;
     }
@@ -62,7 +62,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     {
         ServiceReply<bool> serverReply = await TryUserRequest<bool>( API_ROUTE_LOGOUT );
         await Storage.RemoveItemAsync( SESSION_DATA_KEY );
-        SessionChanged?.Invoke( null );
+        await InvokeOnChange( null );
         return serverReply;
     }
     public async Task<ServiceReply<bool>> ChangePassword( PasswordRequestDto requestDto )
@@ -105,7 +105,23 @@ public class UserServiceClient : ClientService, IUserServiceClient
         var apiRequest = new UserDataRequestDto<REQUEST>( sessionReply.Data, payload );
         return await TryPostRequest<RESPONSE?>( apiRoute, apiRequest );
     }
-    
+
+    async Task InvokeOnChange( SessionMeta? session )
+    {
+        IUserServiceClient.AsyncEventHandler? handler = SessionChanged;
+        if ( handler != null )
+        {
+            Delegate[] invocationList = handler.GetInvocationList();
+            var handlerTasks = new List<Task>();
+            foreach ( Delegate @delegate in invocationList )
+            {
+                var singleHandler = ( IUserServiceClient.AsyncEventHandler ) @delegate;
+                Task task = singleHandler.Invoke( this, session );
+                handlerTasks.Add( task );
+            }
+            await Task.WhenAll( handlerTasks );
+        }
+    }
     async Task<ServiceReply<SessionReplyDto?>> TryGetLocalUserSession()
     {
         if ( _userSession is not null )

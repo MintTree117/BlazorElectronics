@@ -16,59 +16,37 @@ public sealed class CartController : UserController
         _cartService = cartService;
     }
     
-    [HttpPost( "get" )]
-    public async Task<ActionResult<CartReplyDto?>> GetCart( [FromBody] UserRequestDto requestDto )
-    {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( requestDto );
-
-        if ( !userReply.Success )
-            return GetReturnFromReply( userReply );
-
-        ServiceReply<CartReplyDto?> reply = await _cartService.GetCart( userReply.Data );
-        return GetReturnFromReply( reply );
-    }
     [HttpPost( "update" )]
-    public async Task<ActionResult<CartReplyDto?>> UpdateCart( [FromBody] UserDataRequestDto<CartRequestDto> requestDto )
+    public async Task<ActionResult<List<CartProductDto>?>> UpdateCart( [FromBody] UserDataRequestDto<List<CartItemDto>> requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( requestDto );
         
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<CartReplyDto?> reply = await _cartService.UpdateCart( userReply.Data, requestDto!.Payload! );
+        ServiceReply<List<CartProductDto>?> reply = await _cartService.UpdateCart( userReply.Data, requestDto.Payload );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "add" )]
-    public async Task<ActionResult<CartReplyDto?>> AddToCart( [FromBody] UserDataRequestDto<CartItemDto> requestDto )
+    [HttpPost( "add-update" )]
+    public async Task<ActionResult<bool>> AddToCart( [FromBody] UserDataRequestDto<CartItemDto> requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( requestDto );
 
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<CartReplyDto?> reply = await _cartService.AddToCart( userReply.Data, requestDto.Payload! );
-        return GetReturnFromReply( reply );
-    }
-    [HttpPost( "quantity" )]
-    public async Task<ActionResult<CartReplyDto?>> UpdateQuantity( [FromBody] UserDataRequestDto<CartItemDto> requestDto )
-    {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( requestDto );
-
-        if ( !userReply.Success )
-            return GetReturnFromReply( userReply );
-
-        ServiceReply<CartReplyDto?> reply = await _cartService.UpdateQuantity( userReply.Data, requestDto.Payload );
+        ServiceReply<bool> reply = await _cartService.AddToCart( userReply.Data, requestDto.Payload );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "remove" )]
-    public async Task<ActionResult<CartReplyDto?>> RemoveItemFromCart( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    public async Task<ActionResult<bool>> RemoveItemFromCart( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( requestDto );
 
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<CartReplyDto?> reply = await _cartService.RemoveFromCart( userReply.Data, requestDto!.Payload!.Value );
+        ServiceReply<bool> reply = await _cartService.RemoveFromCart( userReply.Data, requestDto.Payload.Value );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "clear" )]

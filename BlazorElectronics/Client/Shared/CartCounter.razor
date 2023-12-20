@@ -1,41 +1,57 @@
 @using Blazored.LocalStorage
+@using BlazorElectronics.Client.Models
 @using BlazorElectronics.Client.Services.Cart
+@using BlazorElectronics.Client.Services.Users
+@using BlazorElectronics.Shared
 
+@inherits RazorView
 @implements IDisposable
-
 @inject ICartServiceClient CartService
-@inject NavigationManager NavManager;
 
-<button class="btn cart-counter" @onclick="GoToCart">
-    <i class="oi oi-cart"></i>
-    <span>@_cartCount</span>
-</button>
+<div class="cart-counter d-flex flex-row">
+    <button class="btn cart-counter me-1" @onclick="GoToCart">
+        <i class="oi oi-cart"></i>
+    </button>
+    <div class="d-flex flex-column align-items-start">
+        <span class="d-block text-muted"><small>@_cartCount Items</small></span>
+        <span class="d-block fw-bold">$@_cartPrice</span>
+    </div>
+</div>
 
 @code 
 {
     string _message = string.Empty;
     int _cartCount = 0;
+    decimal _cartPrice = 0;
 
-    protected override async Task OnInitializedAsync()
+    public void Dispose()
     {
-        //_cartCount = await CartService.GetCartItemsCount();
-        StateHasChanged();
+        CartService.OnChange -= OnCartChange;
     }
     protected override void OnInitialized()
     {
         CartService.OnChange += OnCartChange;
     }
-    public void Dispose()
+    protected override async Task OnInitializedAsync()
     {
-        CartService.OnChange -= OnCartChange;
+        /*ServiceReply<CartInfoModel> infoReply = await CartService.GetLocalCartInfo();
+
+        if ( !infoReply.Success || infoReply.Data is null )
+            return;
+        
+        _cartCount = infoReply.Data.Quantity;
+        _cartPrice = infoReply.Data.TotalPrice;
+        StateHasChanged();*/
     }
+
     void GoToCart()
     {
         NavManager.NavigateTo( "cart" );
     }
-    void OnCartChange( int count )
+    void OnCartChange( CartInfoModel cartInfo )
     {
-        _cartCount = count;
+        _cartCount = cartInfo.Quantity;
+        _cartPrice = cartInfo.TotalPrice;
         StateHasChanged();
     }
 }

@@ -14,90 +14,54 @@ public sealed class CartService : ApiService, ICartService
     {
         _cartRepository = cartRepository;
     }
-
-    public async Task<ServiceReply<CartReplyDto?>> GetCart( int userId )
+    
+    public async Task<ServiceReply<List<CartProductDto>?>> UpdateCart( int userId, List<CartItemDto> items )
     {
         try
         {
-            IEnumerable<CartProductDto>? models = await _cartRepository.GetCart( userId );
-            CartReplyDto? response = MapCartResponse( models );
+            IEnumerable<CartProductDto>? models = await _cartRepository.UpdateCart( userId, items );
+            List<CartProductDto>? reply = models?.ToList();
 
-            return response is not null
-                ? new ServiceReply<CartReplyDto?>( response )
-                : new ServiceReply<CartReplyDto?>( ServiceErrorType.NotFound );
+            return reply is not null
+                ? new ServiceReply<List<CartProductDto>?>( reply )
+                : new ServiceReply<List<CartProductDto>?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CartReplyDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<List<CartProductDto>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CartReplyDto?>> UpdateCart( int userId, CartRequestDto requestDto )
+    public async Task<ServiceReply<bool>> AddToCart( int userId, CartItemDto itemDto )
     {
         try
         {
-            IEnumerable<CartProductDto>? models = await _cartRepository.UpdateCart( userId, requestDto );
-            CartReplyDto? response = MapCartResponse( models );
+            bool success = await _cartRepository.InsertOrUpdateItem( userId, itemDto );
 
-            return response is not null
-                ? new ServiceReply<CartReplyDto?>( response )
-                : new ServiceReply<CartReplyDto?>( ServiceErrorType.NotFound );
+            return success
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CartReplyDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CartReplyDto?>> AddToCart( int userId, CartItemDto itemDto )
+    public async Task<ServiceReply<bool>> RemoveFromCart( int userId, int productId )
     {
         try
         {
-            IEnumerable<CartProductDto>? models = await _cartRepository.InsertItem( userId, itemDto );
-            CartReplyDto? response = MapCartResponse( models );
+            bool success = await _cartRepository.DeleteItem( userId, productId );
 
-            return response is not null
-                ? new ServiceReply<CartReplyDto?>( response )
-                : new ServiceReply<CartReplyDto?>( ServiceErrorType.NotFound );
+            return success
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CartReplyDto?>( ServiceErrorType.ServerError );
-        }
-    }
-    public async Task<ServiceReply<CartReplyDto?>> UpdateQuantity( int userId, CartItemDto itemDto )
-    {
-        try
-        {
-            IEnumerable<CartProductDto>? models = await _cartRepository.UpdateQuantity( userId, itemDto );
-            CartReplyDto? response = MapCartResponse( models );
-
-            return response is not null
-                ? new ServiceReply<CartReplyDto?>( response )
-                : new ServiceReply<CartReplyDto?>( ServiceErrorType.NotFound );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<CartReplyDto?>( ServiceErrorType.ServerError );
-        }
-    }
-    public async Task<ServiceReply<CartReplyDto?>> RemoveFromCart( int userId, int productId )
-    {
-        try
-        {
-            IEnumerable<CartProductDto>? models = await _cartRepository.DeleteFromCart( userId, productId );
-            CartReplyDto? response = MapCartResponse( models );
-
-            return response is not null
-                ? new ServiceReply<CartReplyDto?>( response )
-                : new ServiceReply<CartReplyDto?>( ServiceErrorType.NotFound );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<CartReplyDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<bool>> ClearCart( int userId )
@@ -115,16 +79,5 @@ public sealed class CartService : ApiService, ICartService
             Logger.LogError( e.Message, e );
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
-    }
-
-    static CartReplyDto? MapCartResponse( IEnumerable<CartProductDto>? models )
-    {
-        if ( models is null )
-            return null;
-
-        return new CartReplyDto
-        {
-            Items = models.ToList()
-        };
     }
 }

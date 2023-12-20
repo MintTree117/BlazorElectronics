@@ -6,7 +6,8 @@ namespace BlazorElectronics.Client.Services.Users;
 
 public interface IUserServiceClient
 {
-    event Action<SessionMeta?> SessionChanged;
+    delegate Task AsyncEventHandler( object sender, SessionMeta? args );
+    public event AsyncEventHandler SessionChanged;
     
     Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto );
     Task<ServiceReply<bool>> ActivateAccount( string token );

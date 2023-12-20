@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using BlazorElectronics.Client.Models;
 using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Client.Services.Categories;
 using BlazorElectronics.Client.Services.Products;
@@ -31,7 +32,9 @@ public partial class ProductDetails : PageView
     
     Pagination _pagination = default!;
     ProductDto? _product;
-    
+    CartProductDto _cartProduct = new();
+    bool _isInCart = false;
+
     readonly List<CategoryFullDto> _categories = new();
     readonly Dictionary<string, string> _lookupSpecsAggregated = new();
     readonly VendorDto _vendor = new();
@@ -56,7 +59,7 @@ public partial class ProductDetails : PageView
         if ( !await LoadProduct( id ) )
             return;
 
-        Task[] tasks = { LoadCategories(), LoadLookups(), LoadVendor(), LoadReviews() };
+        Task[] tasks = { LoadCartItem(), LoadCategories(), LoadLookups(), LoadVendor(), LoadReviews() };
         await Task.WhenAll( tasks );
     }
     bool ParseUrl( out int id )
@@ -81,6 +84,21 @@ public partial class ProductDetails : PageView
         PageIsLoaded = true;
         StateHasChanged();
         return true;
+    }
+    async Task LoadCartItem()
+    {
+        if ( _product is null )
+            return;
+
+        _cartProduct = new CartProductDto( _product );
+
+        ServiceReply<int> reply = await CartService.HasItem( _product.Id );
+
+        if ( !reply.Success )
+            return;
+
+        _isInCart = true;
+        _cartProduct.ItemQuantity = reply.Data;
     }
     async Task LoadCategories()
     {
@@ -211,23 +229,54 @@ public partial class ProductDetails : PageView
         _productReviewsGetDto.Rows = _reviewsPerPageOptions[ index ];
         await LoadReviews();
     }
+    
+    async Task HandleQuantityChange( ChangeEventArgs e )
+    {
+        if ( _product is null )
+            return;
 
+        if ( !int.TryParse( e.Value?.ToString(), out int quantity ) )
+            return;
+
+        if ( quantity <= 0 )
+        {
+            ServiceReply<bool> removeReply = await CartService.RemoveItem( _product.Id );
+            
+            if ( !removeReply.Success )
+            {
+                InvokeAlert( AlertType.Danger, $"Failed update quantity! {removeReply.ErrorType} : {removeReply.Message}" );
+                return;
+            }
+
+            InvokeAlert( AlertType.Success, "Removed item from cart." );
+            _isInCart = false;
+            _cartProduct.ItemQuantity = 0;
+            StateHasChanged();
+        }
+
+        ServiceReply<bool> reply = await CartService.AddOrUpdateItem( _cartProduct );
+
+        if ( !reply.Success )
+            InvokeAlert( AlertType.Danger, $"Failed update quantity! {reply.ErrorType} : {reply.Message}" );
+        
+        _isInCart = true;
+
+        InvokeAlert( AlertType.Success, "Updated quantity." );
+        StateHasChanged();
+    }
     async Task AddToCart()
     {
         if ( _product is null )
             return;
 
-        CartItemDto item = new()
-        {
-            ProductId = _product.Id,
-            Quantity = 1
-        };
+        ServiceReply<bool> reply = await CartService.AddOrUpdateItem( _cartProduct );
 
-        ServiceReply<bool> reply = await CartService.AddToCart( item );
-
-        if ( reply.Success )
-            InvokeAlert( AlertType.Success, "Added item to cart." );
-        else
+        if ( !reply.Success )
             InvokeAlert( AlertType.Danger, $"Failed to add item to cart! {reply.ErrorType} : {reply.Message}" );
+        
+        _isInCart = true;
+
+        InvokeAlert( AlertType.Success, "Added item to cart." );
+        StateHasChanged();
     }
 }

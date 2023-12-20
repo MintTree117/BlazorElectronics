@@ -1,3 +1,4 @@
+using BlazorElectronics.Client.Models;
 using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
@@ -8,42 +9,42 @@ namespace BlazorElectronics.Client.Pages.User;
 public partial class Cart : PageView
 {
     [Inject] ICartServiceClient CartService { get; init; } = default!;
-    CartReplyDto _cart = new();
+    CartModel _cart = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<CartReplyDto?> reply = await CartService.GetCart();
+        await CartService.UpdateCart();
+        ServiceReply<CartModel?> cartReply = await CartService.UpdateCart();
 
-        PageIsLoaded = true;
-        
-        if ( !reply.Success || reply.Data is null )
+        if ( !cartReply.Success || cartReply.Data is null )
         {
-            SetViewMessage( false, reply.Message ?? "Failed to get cart!" );
+            SetViewMessage( false, cartReply.Message ?? "Failed to get cart products!" );
             return;
         }
-
-        _cart = reply.Data;
+        
+        _cart = cartReply.Data;
+        PageIsLoaded = true;
+        StateHasChanged();
     }
 
     async Task ChangeQuantity( ChangeEventArgs args, CartProductDto product )
     {
         if ( !int.TryParse( args.Value?.ToString(), out int quantity ) )
             return;
-        
-        CartItemDto dto = new()
-        {
-            ProductId = product.ProductId,
-            Quantity = Math.Max( quantity, 1 )
-        };
 
-        ServiceReply<bool> reply = await CartService.UpdateCartQuantity( dto );
+        product.ItemQuantity = Math.Max( quantity, 1 );
+
+        ServiceReply<bool> reply = await CartService.AddOrUpdateItem( product );
 
         if ( !reply.Success )
             InvokeAlert( AlertType.Danger, $"Failed to update item quantity! {reply.ErrorType} : {reply.Message}" );
+
+        InvokeAlert( AlertType.Success, "Updated quantity." );
+        StateHasChanged();
     }
     async Task RemoveItem( CartProductDto product )
     {
-        ServiceReply<bool> reply = await CartService.RemoveFromCart( product.ProductId );
+        ServiceReply<bool> reply = await CartService.RemoveItem( product.ProductId );
 
         if ( !reply.Success )
             InvokeAlert( AlertType.Danger, $"Failed to remove item! {reply.ErrorType} : {reply.Message}" );

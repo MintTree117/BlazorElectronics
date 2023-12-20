@@ -70,7 +70,7 @@
                                  <span class="price">$@p.Price</span>
                              }
                              <div class="w-100">
-                                 <button class="btn btn-outline-primary fw-bolder w-100 mt-2">Buy Now</button>
+                                 <button class="btn btn-outline-primary fw-bolder w-100 mt-2" onclick="@( async () => await AddToCart( p ) )">Buy Now</button>
                                  <a class="btn btn-outline-secondary fw-bolder w-100 mt-2" href="@Routes.PRODUCT/@p.Id">Details</a>
                              </div>
                          </div>

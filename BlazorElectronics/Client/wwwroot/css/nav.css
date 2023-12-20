@@ -37,12 +37,6 @@
     position: relative;
 }
 
-.cart-counter span {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
 .nav-sidebar {
     position: absolute;
     width: 300px;

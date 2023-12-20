@@ -1,3 +1,4 @@
+using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
 
@@ -5,12 +6,12 @@ namespace BlazorElectronics.Client.Services.Cart;
 
 public interface ICartServiceClient
 {
-    event Action<int> OnChange;
-
-    Task<ServiceReply<CartReplyDto?>> GetCart();
-    Task<ServiceReply<bool>> UpdateCart();
-    Task<ServiceReply<bool>> AddToCart( CartItemDto itemDto );
-    Task<ServiceReply<bool>> UpdateCartQuantity( CartItemDto itemDto );
-    Task<ServiceReply<bool>> RemoveFromCart( int productId );
+    public event Action<CartInfoModel>? OnChange;
+    
+    Task<ServiceReply<CartInfoModel>> GetLocalCartInfo();
+    Task<ServiceReply<CartModel?>> UpdateCart();
+    Task<ServiceReply<int>> HasItem( int productId );
+    Task<ServiceReply<bool>> AddOrUpdateItem( CartProductDto product );
+    Task<ServiceReply<bool>> RemoveItem( int productId );
     Task<ServiceReply<bool>> ClearCart();
 }

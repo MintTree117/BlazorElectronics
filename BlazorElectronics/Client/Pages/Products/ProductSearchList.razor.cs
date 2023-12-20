@@ -32,14 +32,8 @@ public partial class ProductSearchList : RazorView
         StateHasChanged();
     }
 
-    async Task AddToCart( int productId )
+    async Task AddToCart( ProductSummaryDto p )
     {
-        CartItemDto item = new()
-        {
-            ProductId = productId,
-            Quantity = 1
-        };
-
-        await CartService.AddToCart( item );
+        await CartService.AddOrUpdateItem( new CartProductDto( p ) );
     }
 }

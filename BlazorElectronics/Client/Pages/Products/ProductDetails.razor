@@ -108,7 +108,20 @@
                                     <span class="price">$@_product.Price</span>
                                 }
                             </div>
-                            <button class="btn btn-outline-primary product-overview-button" onclick="@( async () => await AddToCart())">Add to Cart</button>
+                            <div class="input-group mb-3 product-overview-button d-flex flex-row flex-nowrap">
+                                @if ( !_isInCart )
+                                {
+                                    <input type="number" class="form-control" placeholder="Quantity" min="1" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
+                                    <button class="btn btn-outline-primary flex-grow-1" type="button" @onclick="@(async () => await AddToCart() )">
+                                        Add to Cart
+                                    </button>   
+                                }
+                                else
+                                {
+                                    <input type="number" class="form-control" placeholder="Quantity" min="0" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
+                                    <a class="btn btn-outline-success flex-grow-1" href="@Routes.CART">View Cart</a>
+                                }
+                            </div>
                         </div>
                         
                         <!-- Categories -->
