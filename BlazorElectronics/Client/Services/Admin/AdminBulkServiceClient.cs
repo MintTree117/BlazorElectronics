@@ -13,9 +13,9 @@ public sealed class AdminBulkServiceClient : AdminServiceClient, IAdminBulkServi
     public AdminBulkServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEditDtoDto> categories )
+    public async Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEditDto> categories )
     {
-        return await TryUserRequest<List<CategoryEditDtoDto>, bool>( API_PATH_CATEGORIES, categories );
+        return await TryUserRequest<List<CategoryEditDto>, bool>( API_PATH_CATEGORIES, categories );
     }
     public async Task<ServiceReply<bool>> BulkInsertKeys( ProductKeysDto keysDto )
     {

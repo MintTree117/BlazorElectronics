@@ -99,6 +99,7 @@ public partial class ProductDetails : PageView
 
         _isInCart = true;
         _cartProduct.ItemQuantity = reply.Data;
+        StateHasChanged();
     }
     async Task LoadCategories()
     {

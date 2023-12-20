@@ -4,7 +4,7 @@ using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorElectronics.Client.Pages.User;
+namespace BlazorElectronics.Client.Pages.CartCheckout;
 
 public partial class Cart : PageView
 {

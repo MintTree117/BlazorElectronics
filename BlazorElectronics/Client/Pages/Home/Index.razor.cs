@@ -9,6 +9,7 @@ namespace BlazorElectronics.Client.Pages.Home;
 public partial class Index : PageView
 {
     [Inject] IFeaturesServiceClient FeaturesService { get; init; } = default!;
+    [Inject] IFeaturedDealsServiceClient DealsService { get; init; } = default!;
     [Inject] IJSRuntime JsRuntime { get; init; } = default!;
 
     bool _isCarouselInitialized = false;
@@ -50,8 +51,7 @@ public partial class Index : PageView
     }
     async Task LoadDeals()
     {
-        PaginationDto pagination = new( 20, 1 );
-        ServiceReply<List<FeatureDealDto>?> reply = await FeaturesService.GetFeatureDeals( pagination );
+        ServiceReply<List<FeatureDealDto>?> reply = await DealsService.GetFrontPageDeals();
 
         if ( reply is { Success: true, Data: not null } )
             _featuredDeals = reply.Data;

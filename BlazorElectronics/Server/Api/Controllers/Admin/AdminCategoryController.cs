@@ -29,18 +29,18 @@ public sealed class AdminCategoryController : _AdminController
         return GetReturnFromReply( reply );
     }
     [HttpPost("get-edit")]
-    public async Task<ActionResult<CategoryEditDtoDto?>> GetCategoryForEdit( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    public async Task<ActionResult<CategoryEditDto?>> GetCategoryForEdit( [FromBody] UserDataRequestDto<IntDto> requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<CategoryEditDtoDto?> reply = await _service.GetCategoryEdit( requestDto.Payload.Value );
+        ServiceReply<CategoryEditDto?> reply = await _service.GetCategoryEdit( requestDto.Payload.Value );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "add-bulk" )]
-    public async Task<ActionResult<bool>> AddCategoriesBulk( [FromBody] UserDataRequestDto<List<CategoryEditDtoDto>> requestDto )
+    public async Task<ActionResult<bool>> AddCategoriesBulk( [FromBody] UserDataRequestDto<List<CategoryEditDto>> requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
         
@@ -51,7 +51,7 @@ public sealed class AdminCategoryController : _AdminController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "add" )]
-    public async Task<ActionResult<int>> AddCategory( [FromBody] UserDataRequestDto<CategoryEditDtoDto> requestDto )
+    public async Task<ActionResult<int>> AddCategory( [FromBody] UserDataRequestDto<CategoryEditDto> requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 
@@ -62,7 +62,7 @@ public sealed class AdminCategoryController : _AdminController
         return GetReturnFromReply( reply );
     }
     [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> UpdateCategory( [FromBody] UserDataRequestDto<CategoryEditDtoDto> requestDto )
+    public async Task<ActionResult<bool>> UpdateCategory( [FromBody] UserDataRequestDto<CategoryEditDto> requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
 

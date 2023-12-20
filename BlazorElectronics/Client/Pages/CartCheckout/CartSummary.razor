@@ -1,0 +1,27 @@
+@using BlazorElectronics.Client.Models
+@inherits RazorView
+
+<div class="w-100">
+    <h3 class="m-0 p-0 mb-3 fs-4 fw-bolder">Summary</h3>
+    <div class="mb-3 border-bottom border-grey">
+        <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
+            <span><small>Item(s):</small></span>
+            <span class="fs-6 fw-bold text-end">@Cart.GetTotalPrice()</span>
+        </div>
+        <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
+            <span><small>Tax:</small></span>
+            <span class="fw-bold text-end"><small>@Cart.CalculateTotalTax( 0.13 )</small></span>
+        </div>
+    </div>
+    <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
+        <span class="fs-5">Total:</span>
+        <span class="fs-5 fw-bold text-end">@Cart.CaluclateFinalPrice( 0.13 )</span>
+    </div>
+</div>
+
+@code 
+{
+    [Parameter] public CartModel Cart { get; set; } = default!;
+    [Parameter] public EventCallback<int> AddPromoCode { get; set; }
+    [Parameter] public EventCallback<int> RemovePromoCode { get; set; }
+}

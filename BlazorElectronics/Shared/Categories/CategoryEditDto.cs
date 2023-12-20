@@ -2,7 +2,7 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Shared.Categories;
 
-public sealed class CategoryEditDtoDto : ICrudEditDto
+public sealed class CategoryEditDto : ICrudEditDto
 {
     public int PrimaryId { get; set; }
     public int CategoryId { get; set; }

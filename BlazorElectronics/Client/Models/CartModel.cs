@@ -1,4 +1,5 @@
 using BlazorElectronics.Shared.Cart;
+using BlazorElectronics.Shared.Promos;
 
 namespace BlazorElectronics.Client.Models;
 
@@ -8,43 +9,45 @@ public sealed class CartModel
     {
         
     }
-    public CartModel( List<CartProductDto> products )
+    public CartModel( CartDto dto )
     {
-        Items = products;
+        Products = dto.Products;
+        PromoCodes = dto.PromoCodes;
     }
     
-    public List<CartProductDto> Items { get; set; } = new();
-
+    public List<CartProductDto> Products { get; set; } = new();
+    public List<PromoCodeDto> PromoCodes { get; set; } = new();
+    
     public List<CartItemDto> GetItemsDto()
     {
-        return Items
+        return Products
             .Select( product => new CartItemDto { ProductId = product.ProductId, ItemQuantity = product.ItemQuantity } )
             .ToList();
     }
-    
     public CartInfoModel GetCartInfo()
     {
         return new CartInfoModel
         {
-            Quantity = Items.Count,
+            Quantity = Products.Count,
             TotalPrice = GetTotalPrice()
         };
     }
-    public void Add( CartProductDto item )
+    
+    public void AddItem( CartProductDto item )
     {
-        if ( Items.All( i => i.ProductId != item.ProductId ) )
-            Items.Add( item );
+        if ( Products.All( i => i.ProductId != item.ProductId ) )
+            Products.Add( item );
     }
-    public void Remove( int productId )
+    public void RemoveItem( int productId )
     {
-        CartProductDto? i = Items.Find( i => i.ProductId == productId );
+        CartProductDto? i = Products.Find( i => i.ProductId == productId );
 
         if ( i is not null )
-            Items.Remove( i );
+            Products.Remove( i );
     }
     public bool GetSameItem( CartProductDto itemToCompare, out CartProductDto? item )
     {
-        item = Items.Find( x => x.ProductId == itemToCompare.ProductId );
+        item = Products.Find( x => x.ProductId == itemToCompare.ProductId );
         return item != null;
     }
     public void AddOrUpdateQuantity( CartProductDto item )
@@ -52,15 +55,36 @@ public sealed class CartModel
         if ( GetSameItem( item, out CartProductDto? sameItem ) )
             sameItem!.ItemQuantity += item.ItemQuantity;
         else
-            Items.Add( item );
+            Products.Add( item );
     }
 
-    decimal GetTotalPrice()
+    public void AddPromo( PromoCodeDto promo )
     {
-        return Items.Sum( GetItemPrice );
+        if ( PromoCodes.All( p => p.Code != promo.Code ) )
+            PromoCodes.Add( promo );
     }
-    decimal GetItemPrice( CartProductDto p )
+    public void RemovePromo( string code )
+    {
+        PromoCodeDto? p = PromoCodes.Find( p => p.Code == code );
+
+        if ( p is not null )
+            PromoCodes.Remove( p );
+    }
+    
+    public decimal GetItemPrice( CartProductDto p )
     {
         return p.SalePrice ?? p.Price;
+    }
+    public decimal GetTotalPrice()
+    {
+        return Products.Sum( GetItemPrice );
+    }
+    public decimal CalculateTotalTax( double percent )
+    {
+        return GetTotalPrice() * ( decimal ) percent;
+    }
+    public decimal CaluclateFinalPrice( double tax )
+    {
+        return GetTotalPrice() + CalculateTotalTax( tax );
     }
 }

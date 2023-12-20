@@ -6,8 +6,8 @@ public interface ICategoryRepository
 {
     Task<IEnumerable<CategoryFullDto>?> Get();
     Task<CategoryFullDto?> GetEdit( int categoryId );
-    Task<bool> BulkInsert( List<CategoryEditDtoDto> dtos );
-    Task<int> Insert( CategoryEditDtoDto dtoDto );
-    Task<bool> Update( CategoryEditDtoDto dtoDto );
+    Task<bool> BulkInsert( List<CategoryEditDto> dtos );
+    Task<int> Insert( CategoryEditDto dto );
+    Task<bool> Update( CategoryEditDto dto );
     Task<bool> Delete( int categoryId );
 }

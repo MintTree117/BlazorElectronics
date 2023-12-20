@@ -15,21 +15,20 @@ public sealed class CartService : ApiService, ICartService
         _cartRepository = cartRepository;
     }
     
-    public async Task<ServiceReply<List<CartProductDto>?>> UpdateCart( int userId, List<CartItemDto> items )
+    public async Task<ServiceReply<CartDto?>> UpdateCart( int userId, List<CartItemDto> items )
     {
         try
         {
-            IEnumerable<CartProductDto>? models = await _cartRepository.UpdateCart( userId, items );
-            List<CartProductDto>? reply = models?.ToList();
+            CartDto? model = await _cartRepository.UpdateCart( userId, items );
 
-            return reply is not null
-                ? new ServiceReply<List<CartProductDto>?>( reply )
-                : new ServiceReply<List<CartProductDto>?>( ServiceErrorType.NotFound );
+            return model is not null
+                ? new ServiceReply<CartDto?>( model )
+                : new ServiceReply<CartDto?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<List<CartProductDto>?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CartDto?>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<bool>> AddToCart( int userId, CartItemDto itemDto )

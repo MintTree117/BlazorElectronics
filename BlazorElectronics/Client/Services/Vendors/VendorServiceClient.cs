@@ -4,21 +4,25 @@ using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Client.Services.Vendors;
 
-public sealed class VendorServiceClient : ClientService, IVendorServiceClient
+public sealed class VendorServiceClient : CachedClientService<VendorsDto>, IVendorServiceClient
 {
     public VendorServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
-        : base( logger, http, storage ) { }
-
-    VendorsDto? _vendors;
+        : base( logger, http, storage, 1, "Vendors" ) { }
+    
     
     public async Task<ServiceReply<VendorsDto?>> GetVendors()
     {
-        if ( _vendors is not null )
-            return new ServiceReply<VendorsDto?>( _vendors );
+        VendorsDto? cached = await TryGetCachedItem();
+        
+        if ( cached is not null )
+            return new ServiceReply<VendorsDto?>( cached );
 
         ServiceReply<VendorsDto?> reply = await TryGetRequest<VendorsDto?>( "api/vendors/get" );
-        _vendors = reply.Data;
 
+        if ( !reply.Success || reply.Data is null )
+            return new ServiceReply<VendorsDto?>( reply.ErrorType, reply.Message );
+        
+        await TrySetCachedItem( reply.Data );
         return reply;
     }
 }

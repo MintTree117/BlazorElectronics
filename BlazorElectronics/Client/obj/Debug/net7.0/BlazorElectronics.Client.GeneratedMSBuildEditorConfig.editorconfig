@@ -68,12 +68,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQ3J1ZC9DcnVkSGVhZGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Admin/Crud/CrudPromos.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQ3J1ZC9DcnVkUHJvbW9zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Admin/TestSeed/TestSeedPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vVGVzdFNlZWQvVGVzdFNlZWRQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/AlertMessage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWxlcnRNZXNzYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/CartCheckout/Cart.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2FydENoZWNrb3V0L0NhcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/CartCheckout/CartSummary.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2FydENoZWNrb3V0L0NhcnRTdW1tYXJ5LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Login/UserLogin.razor]
@@ -110,10 +122,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Products/ProductSearchList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdFNlYXJjaExpc3QucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/Cart.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9DYXJ0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserProfile.razor]

@@ -4,28 +4,28 @@ using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Client.Services.Categories;
 
-public class CategoryServiceClient : ClientService, ICategoryServiceClient
+public class CategoryServiceClient : CachedClientService<CategoryData>, ICategoryServiceClient
 {
     const string API_PATH = "api/category/get";
-    CategoryData? _categories;
 
     public CategoryServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
-        : base( logger, http, storage ) { }
+        : base( logger, http, storage, 1, "Category Data" ) { }
 
     public async Task<ServiceReply<CategoryData?>> GetCategories()
     {
-        if ( _categories is not null )
-            return new ServiceReply<CategoryData?>( _categories );
+        CategoryData? data = await TryGetCachedItem();
+        
+        if ( data is not null )
+            return new ServiceReply<CategoryData?>( data );
 
         ServiceReply<List<CategoryLightDto>?> reply = await TryGetRequest<List<CategoryLightDto>?>( API_PATH );
 
         if ( !reply.Success || reply.Data is null )
             return new ServiceReply<CategoryData?>( reply.ErrorType, reply.Message );
 
-        _categories = new CategoryData( reply.Data );
+        data = new CategoryData( reply.Data );
+        await TrySetCachedItem( data );
 
-        return _categories is not null
-            ? new ServiceReply<CategoryData?>( _categories )
-            : new ServiceReply<CategoryData?>( reply.ErrorType, reply.Message );
+        return new ServiceReply<CategoryData?>( data );
     }
 }

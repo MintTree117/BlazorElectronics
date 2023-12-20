@@ -66,8 +66,8 @@ public partial class BulkCategories : AdminPage
             .Split( "," )
             .ToList();
 
-        List<CategoryEditDtoDto> categories = names
-            .Select( s => new CategoryEditDtoDto
+        List<CategoryEditDto> categories = names
+            .Select( s => new CategoryEditDto
             {
                 ParentCategoryId = _seed.ParentCategoryId,
                 Tier = _seed.Tier,

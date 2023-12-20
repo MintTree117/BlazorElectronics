@@ -5,7 +5,7 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Client.Pages.Admin.Crud;
 
-public sealed partial class CrudCategories : CrudPage<CategoryViewDtoDto, CategoryEditDtoDto>
+public sealed partial class CrudCategories : CrudPage<CategoryViewDtoDto, CategoryEditDto>
 {
     protected override async Task OnInitializedAsync()
     {

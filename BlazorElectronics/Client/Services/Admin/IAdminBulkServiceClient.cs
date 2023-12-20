@@ -6,6 +6,6 @@ namespace BlazorElectronics.Client.Services.Admin;
 
 public interface IAdminBulkServiceClient
 {
-    Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEditDtoDto> categories );
+    Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEditDto> categories );
     Task<ServiceReply<bool>> BulkInsertKeys( ProductKeysDto keysDto );
 }

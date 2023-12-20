@@ -72,24 +72,24 @@ public sealed class CategoryService : ApiService, ICategoryService
             return new ServiceReply<List<CategoryViewDtoDto>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDtoDto?>> GetCategoryEdit( int categoryId )
+    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId )
     {
         try
         {
             CategoryFullDto? model = await _repository.GetEdit( categoryId );
-            CategoryEditDtoDto? dto = MapEdit( model );
+            CategoryEditDto? dto = MapEdit( model );
 
             return dto is not null
-                ? new ServiceReply<CategoryEditDtoDto?>( dto )
-                : new ServiceReply<CategoryEditDtoDto?>( ServiceErrorType.NotFound );
+                ? new ServiceReply<CategoryEditDto?>( dto )
+                : new ServiceReply<CategoryEditDto?>( ServiceErrorType.NotFound );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<CategoryEditDtoDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEditDtoDto> categories )
+    public async Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEditDto> categories )
     {
         try
         {
@@ -105,11 +105,11 @@ public sealed class CategoryService : ApiService, ICategoryService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> AddCategory( CategoryEditDtoDto dtoDto )
+    public async Task<ServiceReply<int>> AddCategory( CategoryEditDto dto )
     {
         try
         {
-            int id = await _repository.Insert( dtoDto );
+            int id = await _repository.Insert( dto );
 
             return id > 0
                 ? new ServiceReply<int>( id )
@@ -121,11 +121,11 @@ public sealed class CategoryService : ApiService, ICategoryService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDtoDto dtoDto )
+    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto )
     {
         try
         {
-            bool result = await _repository.Update( dtoDto );
+            bool result = await _repository.Update( dto );
 
             return result
                 ? new ServiceReply<bool>( result )
@@ -215,12 +215,12 @@ public sealed class CategoryService : ApiService, ICategoryService
                 .ToList();
         } );
     }
-    static CategoryEditDtoDto? MapEdit( CategoryFullDto? model )
+    static CategoryEditDto? MapEdit( CategoryFullDto? model )
     {
         if ( model is null )
             return null;
 
-        return new CategoryEditDtoDto
+        return new CategoryEditDto
         {
             CategoryId = model.CategoryId,
             ParentCategoryId = model.ParentCategoryId,

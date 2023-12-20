@@ -12,9 +12,9 @@ public interface ICategoryService
 
     // ADMIN
     Task<ServiceReply<List<CategoryViewDtoDto>?>> GetCategoriesView();
-    Task<ServiceReply<CategoryEditDtoDto?>> GetCategoryEdit( int categoryId );
-    Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEditDtoDto> categories );
-    Task<ServiceReply<int>> AddCategory( CategoryEditDtoDto dtoDto );
-    Task<ServiceReply<bool>> UpdateCategory( CategoryEditDtoDto dtoDto );
+    Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId );
+    Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEditDto> categories );
+    Task<ServiceReply<int>> AddCategory( CategoryEditDto dto );
+    Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto );
     Task<ServiceReply<bool>> RemoveCategory( int categoryId );
 }

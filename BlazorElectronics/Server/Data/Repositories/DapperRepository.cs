@@ -72,6 +72,11 @@ public abstract class DapperRepository
     protected const string PARAM_PRODUCT_XML = $"@{COL_PRODUCT_XML}";
     protected const string PARAM_PRODUCT_IMAGES = $"@{TVP_PRODUCT_IMAGES}";
     
+    // PROMOS
+    protected const string PARAM_PROMO_ID = "@PromoId";
+    protected const string PARAM_PROMO_CODE = "@PromoCode";
+    protected const string PARAM_PROMO_DISCOUNT = "@PromoDiscount";
+    
     // VENDORS
     protected const string COL_VENDOR_ID = "VendorId";
     protected const string PARAM_VENDOR_ID = "@VendorId";

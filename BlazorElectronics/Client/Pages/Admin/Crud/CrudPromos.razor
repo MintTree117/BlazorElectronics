@@ -1,0 +1,31 @@
+@page "/admin/crud/promos"
+@using BlazorElectronics.Client.Shared
+@using BlazorElectronics.Shared.Promos
+@inherits CrudPage<PromoEditDto, PromoEditDto>
+
+<div class="container-sm form-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+        @if ( PageIsReady() )
+        {
+            if ( !IsEditing )
+            {
+                <CrudViewTable Page="@this"></CrudViewTable>
+            }
+            else
+            {
+                <CrudHeader Page="@this"></CrudHeader>
+
+                <EditForm Model="ItemEdit" OnSubmit="( async () => await Submit() )">
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Promo Code</label>
+                        <InputText @bind-Value="ItemEdit.Name" class="form-control" id="Name"></InputText>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Discount" class="form-label">Promo Discount</label>
+                        <InputNumber @bind-Value="ItemEdit.PromoDiscount" class="form-control" id="Discount"></InputNumber>
+                    </div>
+                    <FormSubmit Page="@this"></FormSubmit>
+                </EditForm>
+            }
+        }
+</div>

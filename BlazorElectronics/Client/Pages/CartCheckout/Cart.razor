@@ -1,0 +1,77 @@
+@page "/cart"
+@using BlazorElectronics.Shared.Cart
+@inherits PageView
+
+<div class="mt-3 mx-auto cart-container" style="max-width: 1000px;">
+    <PageLoader Page="@this"></PageLoader>
+
+    @if ( PageIsReady() )
+    {
+        <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-grey">
+            <div class="d-flex flex-row align-items-center">
+                <h1 class="fs-4 fw-bolder m-0 p-0">Shopping Cart</h1>
+                <span class="ms-2">(@_cart.Products.Count Items)</span>
+            </div>
+            <button class="btn btn-danger btn-icon">
+                Empty Cart
+                <i class="oi oi-trash ms-1"></i>
+            </button>
+        </div>
+        
+        <div class="cart-checkout-sm">
+            <a class="btn btn-success w-100" href="@Routes.CHECKOUT">Checkout</a>
+            
+            <CartSummary Cart="@_cart"></CartSummary>
+        </div>
+        
+        <div class="d-flex flex-row align-items-stretch justify-content-between">
+            <div class="d-flex flex-column flex-grow-1">
+                @if ( _cart.Products.Count <= 0 )
+                {
+                    <span>Cart is empty</span>
+                }
+                else
+                {
+                    foreach ( CartProductDto p in _cart.Products )
+                    {
+                        <div class="mb-3 d-flex flex-row align-items-stretch border border-grey bg-light">
+                            <a href="@Routes.PRODUCT/@p.ProductId">
+                                <img class="rounded-start cart-item-image" src="@p.Thumbnail" alt="@p.Title"/>
+                            </a>
+                            <div id="body" class="p-3 d-flex flex-column justify-content-between flex-grow-1" style="min-height: 100%; max-height: 100%;">
+                                <div class="d-flex flex-row justify-content-between align-items-start">
+                                    <a class="text-decoration-none" href="@Routes.PRODUCT/@p.ProductId">
+                                        <h3 class="m-0 p-0 fs-3 fw-normal">@p.Title</h3>
+                                    </a>
+                                    <div class="d-flex flex-column">
+                                        @if ( p.SalePrice is not null )
+                                        {
+                                            <span class="original-price d-block text-end">@p.Price</span>
+                                            <span class="sale-price d-block">@p.SalePrice</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="price">@p.Price</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row align-items-end justify-content-between">
+                                    <input class="form-control flex-shrink-1 flex-grow-0" style="min-width: 100px; max-width: 300px;" type="number" value="@p.ItemQuantity" onchange="@( async ( ChangeEventArgs e ) => await ChangeQuantity( e, p ))"/>
+                                    <button class="btn btn-danger btn-icon" onclick="@( async () => await RemoveItem( p ) )">
+                                        Remove
+                                        <i class="oi oi-trash ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            
+            <div class="cart-checkout-lg bg-light border border-grey ms-3 p-3" style="min-width: 300px; max-width: 300px;">
+                <CartSummary Cart="@_cart"></CartSummary>
+                <a class="btn btn-success w-100" href="@Routes.CHECKOUT">Checkout</a>
+            </div>
+        </div>
+    }
+</div>

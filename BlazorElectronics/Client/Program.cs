@@ -14,6 +14,7 @@ using BlazorElectronics.Client.Services.Vendors;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Features;
+using BlazorElectronics.Shared.Promos;
 using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
 
@@ -26,6 +27,7 @@ builder.Services.AddScoped( sp => new HttpClient { BaseAddress = new Uri( builde
 
 builder.Services.AddScoped<ICartServiceClient, CartServiceClient>();
 builder.Services.AddScoped<ICategoryServiceClient, CategoryServiceClient>();
+builder.Services.AddScoped<IFeaturedDealsServiceClient, FeaturedDealsServiceClient>();
 builder.Services.AddScoped<IFeaturesServiceClient, FeaturesServiceClient>();
 builder.Services.AddScoped<IProductServiceClient, ProductServiceClient>();
 builder.Services.AddScoped<IReviewServiceClient, ReviewServiceClient>();
@@ -35,14 +37,14 @@ builder.Services.AddScoped<IVendorServiceClient, VendorServiceClient>();
 builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 
 builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
-builder.Services.AddScoped<IAdminCrudService<CategoryViewDtoDto, CategoryEditDtoDto>, AdminCrudService<CategoryViewDtoDto, CategoryEditDtoDto>>();
+builder.Services.AddScoped<IAdminCrudService<CategoryViewDtoDto, CategoryEditDto>, AdminCrudService<CategoryViewDtoDto, CategoryEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, FeatureDtoEditDto>, AdminCrudService<CrudViewDto, FeatureDtoEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, LookupSpecEditDto>, AdminCrudService<CrudViewDto, LookupSpecEditDto>>();
+builder.Services.AddScoped<IAdminCrudService<PromoEditDto, PromoEditDto>, AdminCrudService<PromoEditDto, PromoEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, VendorEditDtoDto>, AdminCrudService<CrudViewDto, VendorEditDtoDto>>();
 builder.Services.AddScoped<IAdminSeedService, AdminSeedService>();
 builder.Services.AddScoped<IAdminCategoryHelper, AdminCategoryHelper>();
 builder.Services.AddScoped<IAdminBulkServiceClient, AdminBulkServiceClient>();
-
 
 builder.Logging.SetMinimumLevel( LogLevel.Error ); // Set the minimum level of logging
 

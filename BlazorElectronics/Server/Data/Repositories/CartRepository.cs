@@ -1,7 +1,10 @@
 using System.Data;
+using System.Data.Common;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Shared.Cart;
+using BlazorElectronics.Shared.Promos;
 using Dapper;
+using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Data.Repositories;
 
@@ -14,10 +17,10 @@ public class CartRepository : DapperRepository, ICartRepository
 
     public CartRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
-    public async Task<IEnumerable<CartProductDto>?> UpdateCart( int userId, List<CartItemDto> items )
+    public async Task<CartDto?> UpdateCart( int userId, List<CartItemDto> items )
     {
         DynamicParameters p = GetCartItemsParameters( userId, items );
-        return await TryQueryTransactionAsync( QueryTransaction<CartProductDto>, p, PROCEDURE_UPDATE_CART );
+        return await TryQueryTransactionAsync( UpdateCartQuery, p );
     }
     public async Task<bool> InsertOrUpdateItem( int userId, CartItemDto itemDto )
     {
@@ -42,6 +45,20 @@ public class CartRepository : DapperRepository, ICartRepository
         p.Add( PARAM_USER_ID, userId );
 
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_CART );
+    }
+
+    static async Task<CartDto?> UpdateCartQuery( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? p )
+    {
+        SqlMapper.GridReader multi = await connection.QueryMultipleAsync( PROCEDURE_UPDATE_CART, p, transaction, commandType: CommandType.StoredProcedure );
+
+        if ( multi is null )
+            return null;
+
+        return new CartDto
+        {
+            Products = ( await multi.ReadAsync<CartProductDto>() ).ToList(),
+            PromoCodes = ( await multi.ReadAsync<PromoCodeDto>() ).ToList()
+        };
     }
 
     static DynamicParameters GetCartItemsParameters( int userId, List<CartItemDto> items )

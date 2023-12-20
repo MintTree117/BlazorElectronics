@@ -4,21 +4,24 @@ using BlazorElectronics.Shared.Specs;
 
 namespace BlazorElectronics.Client.Services.Specs;
 
-public sealed class SpecServiceClient : ClientService, ISpecServiceClient
+public sealed class SpecServiceClient : CachedClientService<LookupSpecsDto>, ISpecServiceClient
 {
     public SpecServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
-        : base( logger, http, storage ) { }
+        : base( logger, http, storage, 1, "Spec Lookups" ) { }
 
-    LookupSpecsDto? _lookups;
-    
     public async Task<ServiceReply<LookupSpecsDto?>> GetSpecLookups()
     {
-        if ( _lookups is not null )
-            return new ServiceReply<LookupSpecsDto?>( _lookups );
+        LookupSpecsDto? cached = await TryGetCachedItem();
+        
+        if ( cached is not null )
+            return new ServiceReply<LookupSpecsDto?>( cached );
         
         ServiceReply<LookupSpecsDto?> reply = await TryGetRequest<LookupSpecsDto?>( "api/specs/get" );
-        _lookups = reply.Data;
 
+        if ( !reply.Success || reply.Data is null )
+            return new ServiceReply<LookupSpecsDto?>( reply.ErrorType, reply.Message );
+
+        await TrySetCachedItem( reply.Data );
         return reply;
     }
 }

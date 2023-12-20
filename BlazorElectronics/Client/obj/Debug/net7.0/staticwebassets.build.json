@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "OPZNhSM7PCPxcw0hxUPwDQLyYrQb+lYw6T9awkDMCiw=",
+  "Hash": "tETAmjt4ZpTDaAxWLIkz4g0Ty/4lzOFiswLGhIMBdBk=",
   "Source": "BlazorElectronics.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -1153,7 +1153,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.configuration.abstractions/7.0.0/lib/net7.0/Microsoft.Extensions.Configuration.Abstractions.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/lib/net7.0/Microsoft.Extensions.Configuration.Abstractions.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Configuration.Binder.dll",
@@ -1238,7 +1238,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/7.0.0/lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.dll",
@@ -1255,7 +1255,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.dependencyinjection/7.0.0/lib/net7.0/Microsoft.Extensions.DependencyInjection.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.dependencyinjection/8.0.0/lib/net7.0/Microsoft.Extensions.DependencyInjection.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.FileProviders.Abstractions.dll",
@@ -1309,6 +1309,23 @@
       "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.filesystemglobbing/7.0.0/lib/net7.0/Microsoft.Extensions.FileSystemGlobbing.dll"
     },
     {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Http.dll",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Http.dll",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "BlazorWebAssemblyResource",
+      "AssetTraitValue": "runtime",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.http/8.0.0/lib/net7.0/Microsoft.Extensions.Http.dll"
+    },
+    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.Abstractions.dll",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -1323,7 +1340,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.logging.abstractions/7.0.1/lib/net7.0/Microsoft.Extensions.Logging.Abstractions.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/lib/net7.0/Microsoft.Extensions.Logging.Abstractions.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.dll",
@@ -1340,7 +1357,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.logging/7.0.0/lib/net7.0/Microsoft.Extensions.Logging.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.logging/8.0.0/lib/net7.0/Microsoft.Extensions.Logging.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Options.dll",
@@ -1357,7 +1374,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.options/7.0.1/lib/net7.0/Microsoft.Extensions.Options.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.options/8.0.0/lib/net7.0/Microsoft.Extensions.Options.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Primitives.dll",
@@ -1374,7 +1391,7 @@
       "AssetTraitValue": "runtime",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.primitives/7.0.0/lib/net7.0/Microsoft.Extensions.Primitives.dll"
+      "OriginalItemSpec": "/home/martin/.nuget/packages/microsoft.extensions.primitives/8.0.0/lib/net7.0/Microsoft.Extensions.Primitives.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.JSInterop.dll",
@@ -4318,23 +4335,6 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Security.AccessControl.dll"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/+aDGpF4U.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.Options.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Options.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Options.dll"
-    },
-    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/+b9oO8rs.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -4522,6 +4522,23 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Threading.Timer.dll"
     },
     {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/1gb9G5EW.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Options.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Options.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Options.dll"
+    },
+    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/1OcHDcwU.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -4624,23 +4641,6 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Resources.Reader.dll"
     },
     {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/4NIl5sVU.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.DependencyInjection.Abstractions.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.Abstractions.dll"
-    },
-    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/4rqcHUFm.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -4707,23 +4707,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Security.Cryptography.Csp.dll"
-    },
-    {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/5V+CoLVR.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.Configuration.Abstractions.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Configuration.Abstractions.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Configuration.Abstractions.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/66pIBMzQ.gz",
@@ -4928,23 +4911,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Threading.Overlapped.dll"
-    },
-    {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/9QLjn+n6.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.Logging.Abstractions.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.Abstractions.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.Abstractions.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/a+2u4sdJ.gz",
@@ -5321,6 +5287,23 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Text.Encoding.dll"
     },
     {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/CMf1I3Zs.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Http.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Http.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Http.dll"
+    },
+    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/CWHItAkC.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -5523,6 +5506,23 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Diagnostics.Tools.dll"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/ESDnyNk4.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.DependencyInjection.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/ezSnLJYM.gz",
@@ -5744,23 +5744,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Reflection.Emit.Lightweight.dll"
-    },
-    {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/HVUzm6Xk.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.Primitives.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Primitives.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Primitives.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/hZoFIK2s.gz",
@@ -6324,6 +6307,23 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Security.SecureString.dll"
     },
     {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/N8kKwwcE.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Logging.Abstractions.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.Abstractions.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.Abstractions.dll"
+    },
+    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/NHbLW9cA.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -6596,6 +6596,23 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Threading.Tasks.Parallel.dll"
     },
     {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/QAnZFF2D.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Logging.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.dll"
+    },
+    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/QB7doAtf.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -6798,23 +6815,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Configuration.Json.dll"
-    },
-    {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/SCvPI+cz.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.DependencyInjection.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/SgJdmddr.gz",
@@ -7157,6 +7157,23 @@
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/System.Reflection.Emit.ILGeneration.dll"
     },
     {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/uXK07VLb.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Primitives.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Primitives.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Primitives.dll"
+    },
+    {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/UZ4UvqI+.gz",
       "SourceId": "BlazorElectronics.Client",
       "SourceType": "Computed",
@@ -7240,23 +7257,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.AspNetCore.Metadata.dll"
-    },
-    {
-      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/Vm7AEFsB.gz",
-      "SourceId": "BlazorElectronics.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.Extensions.Logging.dll.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.dll",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Logging.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/vtLzBfNP.gz",
@@ -7546,6 +7546,40 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.JSInterop.WebAssembly.dll"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/xkEMBWux.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.Configuration.Abstractions.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Configuration.Abstractions.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.Configuration.Abstractions.dll"
+    },
+    {
+      "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/xNtpbE7t.gz",
+      "SourceId": "BlazorElectronics.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/",
+      "BasePath": "/",
+      "RelativePath": "_framework/Microsoft.Extensions.DependencyInjection.Abstractions.dll.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "RelatedAsset": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/bin/Debug/net7.0/wwwroot/_framework/Microsoft.Extensions.DependencyInjection.Abstractions.dll"
     },
     {
       "Identity": "/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/obj/Debug/net7.0/build-gz/XnxrGxjZ.gz",

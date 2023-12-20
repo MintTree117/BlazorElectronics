@@ -14,4 +14,7 @@ public interface ICartServiceClient
     Task<ServiceReply<bool>> AddOrUpdateItem( CartProductDto product );
     Task<ServiceReply<bool>> RemoveItem( int productId );
     Task<ServiceReply<bool>> ClearCart();
+
+    Task<ServiceReply<bool>> AddPromoCode( string code );
+    Task<ServiceReply<bool>> RemovePromoCode( string code );
 }
