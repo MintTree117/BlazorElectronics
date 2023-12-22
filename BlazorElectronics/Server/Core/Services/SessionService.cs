@@ -15,10 +15,13 @@ public sealed class SessionService : ApiService, ISessionService
     const string INVALID_SESSION_TOKEN_MESSAGE = "Invalid session token. Try loging in again.";
     
     readonly ISessionRepository _sessionRepository;
+    readonly IUserRepository _userRepository;
     
-    public SessionService( ILogger<ApiService> logger, ISessionRepository sessionRepository ) : base( logger )
+    public SessionService( ILogger<ApiService> logger, ISessionRepository sessionRepository, IUserRepository userRepository ) 
+        : base( logger )
     {
         _sessionRepository = sessionRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<ServiceReply<SessionDto?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo )
@@ -54,49 +57,19 @@ public sealed class SessionService : ApiService, ISessionService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> AuthorizeSession( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
+    public async Task<ServiceReply<int>> AuthorizeSessionAndUserId( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo, bool mustBeAdmin = false )
     {
         try
         {
             UserSession? session = await _sessionRepository.GetSession( sessionId );
+            ServiceReply<int> validateReply = await AuthorizeSession( session, sessionToken );
 
-            if ( session is null )
-                return new ServiceReply<bool>( ServiceErrorType.NotFound );
+            if ( !validateReply.Success )
+                return validateReply;
 
-            if ( !session.IsValid( MAX_SESSION_HOURS ) )
-            {
-                await DeleteSession( session.SessionId );
-                return new ServiceReply<bool>( ServiceErrorType.ValidationError, SESSION_EXPIRED_MESSAGE );
-            }
+            UserValidationModel? user = await _userRepository.GetValidation( session!.UserId );
 
-            return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
-                ? new ServiceReply<bool>( true )
-                : new ServiceReply<bool>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
-        }
-    }
-    public async Task<ServiceReply<int>> AuthorizeSessionId( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo )
-    {
-        try
-        {
-            UserSession? session = await _sessionRepository.GetSession( sessionId );
-
-            if ( session is null )
-                return new ServiceReply<int>( ServiceErrorType.NotFound );
-
-            if ( !session.IsValid( MAX_SESSION_HOURS ) )
-            {
-                await DeleteSession( session.SessionId );
-                return new ServiceReply<int>( ServiceErrorType.ValidationError, SESSION_EXPIRED_MESSAGE );
-            }
-
-            return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
-                ? new ServiceReply<int>( session.UserId )
-                : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_SESSION_TOKEN_MESSAGE );
+            return AuthorizeUser( session.UserId, user, mustBeAdmin );
         }
         catch ( RepositoryException e )
         {
@@ -104,7 +77,38 @@ public sealed class SessionService : ApiService, ISessionService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    
+
+    async Task<ServiceReply<int>> AuthorizeSession( UserSession? session, string sessionToken )
+    {
+        if ( session is null )
+            return new ServiceReply<int>( ServiceErrorType.NotFound );
+
+        if ( !session.IsValid( MAX_SESSION_HOURS ) )
+        {
+            await DeleteSession( session.SessionId );
+            return new ServiceReply<int>( ServiceErrorType.Unauthorized, SESSION_EXPIRED_MESSAGE );
+        }
+
+        return VerifySessionToken( sessionToken, session.TokenHash, session.TokenSalt )
+            ? new ServiceReply<int>( session.SessionId )
+            : new ServiceReply<int>( ServiceErrorType.Unauthorized, INVALID_SESSION_TOKEN_MESSAGE );
+    }
+    ServiceReply<int> AuthorizeUser( int userId, UserValidationModel? user, bool mustBeAdmin = false )
+    {
+        if ( user is null )
+            return new ServiceReply<int>( ServiceErrorType.NotFound );
+
+        if ( !user.IsActive )
+            return new ServiceReply<int>( ServiceErrorType.Unauthorized, "Account is not active!" );
+
+        if ( !mustBeAdmin )
+            return new ServiceReply<int>( userId );
+
+        return user.IsAdmin
+            ? new ServiceReply<int>( userId )
+            : new ServiceReply<int>( ServiceErrorType.Unauthorized, "Account is not an admin!" );
+    }
+
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )
     {
         var hmac = new HMACSHA512();

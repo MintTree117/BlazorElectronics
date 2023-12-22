@@ -14,6 +14,14 @@ public class AdminServiceClient : UserServiceClient, IAdminServiceClient
 
     public async Task<ServiceReply<bool>> AuthorizeAdmin()
     {
-        return await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
+        return await TryUserGetRequest<bool>( API_ROUTE_AUTHORIZE );
+    }
+
+    protected static Dictionary<string, object> GetIdParam( int id )
+    {
+        return new Dictionary<string, object>
+        {
+            { "ItemId", id }
+        };
     }
 }

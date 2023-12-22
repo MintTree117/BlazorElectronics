@@ -1,6 +1,5 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Shared.Categories;
-using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Api.Controllers.Admin;
@@ -17,10 +16,10 @@ public sealed class AdminCategoryController : _AdminController
         _service = service;
     }
 
-    [HttpPost( "get-view" )]
-    public async Task<ActionResult<List<CategoryViewDtoDto>?>> GetCategoriesView( [FromBody] UserRequestDto requestDto )
+    [HttpGet( "get-view" )]
+    public async Task<ActionResult<List<CategoryViewDtoDto>?>> GetCategoriesView()
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
         
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
@@ -28,59 +27,59 @@ public sealed class AdminCategoryController : _AdminController
         ServiceReply<List<CategoryViewDtoDto>?> reply = await _service.GetCategoriesView();
         return GetReturnFromReply( reply );
     }
-    [HttpPost("get-edit")]
-    public async Task<ActionResult<CategoryEditDto?>> GetCategoryForEdit( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpGet("get-edit")]
+    public async Task<ActionResult<CategoryEditDto?>> GetCategoryForEdit( int itemId )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<CategoryEditDto?> reply = await _service.GetCategoryEdit( requestDto.Payload.Value );
+        ServiceReply<CategoryEditDto?> reply = await _service.GetCategoryEdit( itemId );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "add-bulk" )]
-    public async Task<ActionResult<bool>> AddCategoriesBulk( [FromBody] UserDataRequestDto<List<CategoryEditDto>> requestDto )
+    [HttpPut( "add-bulk" )]
+    public async Task<ActionResult<bool>> AddCategoriesBulk( [FromBody] List<CategoryEditDto> requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
-        
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
+
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _service.AddBulkCategories( requestDto.Payload );
+        ServiceReply<bool> reply = await _service.AddBulkCategories( requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "add" )]
-    public async Task<ActionResult<int>> AddCategory( [FromBody] UserDataRequestDto<CategoryEditDto> requestDto )
+    [HttpPut( "add" )]
+    public async Task<ActionResult<int>> AddCategory( [FromBody] CategoryEditDto requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<int> reply = await _service.AddCategory( requestDto.Payload );
+        ServiceReply<int> reply = await _service.AddCategory( requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> UpdateCategory( [FromBody] UserDataRequestDto<CategoryEditDto> requestDto )
+    [HttpPut( "update" )]
+    public async Task<ActionResult<bool>> UpdateCategory( [FromBody] CategoryEditDto requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _service.UpdateCategory( requestDto.Payload );
+        ServiceReply<bool> reply = await _service.UpdateCategory( requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "remove" )]
-    public async Task<ActionResult<bool>> RemoveCategory( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpDelete( "remove" )]
+    public async Task<ActionResult<bool>> RemoveCategory( int itemId )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _service.RemoveCategory( requestDto.Payload.Value );
+        ServiceReply<bool> reply = await _service.RemoveCategory( itemId );
         return GetReturnFromReply( reply );
     }
 }

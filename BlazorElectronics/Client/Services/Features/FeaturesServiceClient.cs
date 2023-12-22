@@ -6,7 +6,7 @@ namespace BlazorElectronics.Client.Services.Features;
 
 public class FeaturesServiceClient : CachedClientService<List<FeatureDto>>, IFeaturesServiceClient
 {
-    const string API_PATH = "api/features/get";
+    const string API_PATH = "api/features/get-features";
 
     public FeaturesServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage, 1, "Features" ) { }

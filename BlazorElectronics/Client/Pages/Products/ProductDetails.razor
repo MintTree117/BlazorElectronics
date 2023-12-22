@@ -112,7 +112,7 @@
                                 @if ( !_isInCart )
                                 {
                                     <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.ItemQuantity" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
-                                    <button class="btn btn-outline-primary flex-grow-1" type="button" @onclick="@(async () => await AddToCart() )">
+                                    <button class="btn btn-outline-warning flex-grow-1" type="button" @onclick="@(async () => await AddToCart() )">
                                         Add to Cart
                                     </button>   
                                 }

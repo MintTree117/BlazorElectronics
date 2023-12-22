@@ -1,4 +1,6 @@
+using System.Collections.Specialized;
 using System.Net.Http.Json;
+using System.Web;
 using Blazored.LocalStorage;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Enums;
@@ -17,105 +19,128 @@ public abstract class ClientService
         Http = http;
         Storage = storage;
     }
-    
-    protected async Task<ServiceReply<T?>> TryGetRequest<T>( string apiPath )
+
+    protected async Task<ServiceReply<T?>> TryGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
     {
         try
         {
-            HttpResponseMessage httpResponse = await Http.GetAsync( apiPath );
-
-            if ( httpResponse.IsSuccessStatusCode )
-            {
-                var getReply = await httpResponse.Content.ReadFromJsonAsync<T>();
-
-                return getReply is not null
-                    ? new ServiceReply<T?>( getReply )
-                    : new ServiceReply<T?>( ServiceErrorType.NotFound, "No data returned from request" );
-            }
-
-            string errorContent = await httpResponse.Content.ReadAsStringAsync();
-
-            switch ( httpResponse.StatusCode )
-            {
-                case System.Net.HttpStatusCode.BadRequest:
-                    Logger.LogError( $"TryGetRequest: Bad request: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.ValidationError, errorContent );
-
-                case System.Net.HttpStatusCode.NotFound:
-                    Logger.LogError( $"TryGetRequest: Not found: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.NotFound, errorContent );
-
-                case System.Net.HttpStatusCode.Unauthorized:
-                    Logger.LogError( $"TryGetRequest: Unauthorized: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.Unauthorized, errorContent );
-
-                case System.Net.HttpStatusCode.Conflict:
-                    Logger.LogError( $"TryGetRequest: Conflict: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.Conflict, errorContent );
-
-                case System.Net.HttpStatusCode.InternalServerError:
-                    Logger.LogError( $"TryGetRequest: Server error: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.ServerError, errorContent );
-
-                default:
-                    Logger.LogError( $"TryGetRequest: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
-            }
+            string path = GetQueryParameters( apiPath, parameters );
+            HttpResponseMessage httpResponse = await Http.GetAsync( path );
+            return await HandleHttpResponse<T?>( httpResponse, "Get" );
         }
         catch ( Exception e )
         {
-            Logger.LogError( e, "TryGetRequest: Exception occurred while sending API request." );
-            return new ServiceReply<T?>( ServiceErrorType.ServerError, e.Message );
+            return HandleHttpException<T?>( e, "Get" );
         }
     }
-    protected async Task<ServiceReply<T?>> TryPostRequest<T>( string apiPath, object? data = null )
+    protected async Task<ServiceReply<T?>> TryPostRequest<T>( string apiPath, object? body = null )
     {
         try
         {
-            HttpResponseMessage httpResponse = await Http.PostAsJsonAsync( apiPath, data );
-
-            if ( httpResponse.IsSuccessStatusCode )
-            {
-                var postReply = await httpResponse.Content.ReadFromJsonAsync<T>();
-
-                return postReply is not null
-                    ? new ServiceReply<T?>( postReply )
-                    : new ServiceReply<T?>( ServiceErrorType.NotFound, "No data returned from request" );
-            }
-            
-            string errorContent = await httpResponse.Content.ReadAsStringAsync();
-
-            switch ( httpResponse.StatusCode )
-            {
-                case System.Net.HttpStatusCode.BadRequest:
-                    Logger.LogError( $"TryPostRequest: Bad request: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.ValidationError, errorContent );
-
-                case System.Net.HttpStatusCode.NotFound:
-                    Logger.LogError( $"TryPostRequest: Not found: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.NotFound, errorContent );
-
-                case System.Net.HttpStatusCode.Unauthorized:
-                    Logger.LogError( $"TryPostRequest: Unauthorized: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.Unauthorized, errorContent );
-
-                case System.Net.HttpStatusCode.Conflict:
-                    Logger.LogError( $"TryPostRequest: Conflict: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.Conflict, errorContent );
-
-                case System.Net.HttpStatusCode.InternalServerError:
-                    Logger.LogError( $"TryPostRequest: Server error: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.ServerError, errorContent );
-
-                default:
-                    Logger.LogError( $"TryPostRequest: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
-                    return new ServiceReply<T?>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
-            }
+            HttpResponseMessage httpResponse = await Http.PostAsJsonAsync( apiPath, body );
+            return await HandleHttpResponse<T?>( httpResponse, "Post" );
         }
         catch ( Exception e )
         {
-            Logger.LogError( e, "TryPostRequest: Exception occurred while sending API request." );
-            return new ServiceReply<T?>( ServiceErrorType.ServerError, e.Message );
+            return HandleHttpException<T?>( e, "Post" );
         }
+    }
+    protected async Task<ServiceReply<T?>> TryPutRequest<T>( string apiPath, object? body = null )
+    {
+        try
+        {
+            HttpResponseMessage httpResponse = await Http.PutAsJsonAsync( apiPath, body );
+            return await HandleHttpResponse<T?>( httpResponse, "Put" );
+        }
+        catch ( Exception e )
+        {
+            return HandleHttpException<T?>( e, "Put" );
+        }
+    }
+    protected async Task<ServiceReply<T?>> TryDeleteRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
+    {
+        try
+        {
+            string path = GetQueryParameters( apiPath, parameters );
+            HttpResponseMessage httpResponse = await Http.DeleteAsync( path );
+            return await HandleHttpResponse<T?>( httpResponse, "Delete" );
+        }
+        catch ( Exception e )
+        {
+            return HandleHttpException<T?>( e, "Delete" );
+        }
+    }
+
+    protected static Dictionary<string, object> GetIdParam( int id )
+    {
+        return new Dictionary<string, object>
+        {
+            { "Id", id }
+        };
+    }
+
+    string GetQueryParameters( string apiPath, Dictionary<string, object>? parameters )
+    {
+        if ( parameters is null )
+            return apiPath;
+        
+        NameValueCollection query = HttpUtility.ParseQueryString( string.Empty );
+        
+        foreach ( KeyValuePair<string, object> param in parameters )
+        {
+            query[ param.Key ] = param.Value.ToString();
+        }
+
+        var uriBuilder = new UriBuilder( apiPath )
+        {
+            Query = query.ToString()
+        };
+
+        return uriBuilder.Uri.ToString();
+    }
+    async Task<ServiceReply<T?>> HandleHttpResponse<T>( HttpResponseMessage httpResponse, string requestTypeName )
+    {
+        if ( httpResponse.IsSuccessStatusCode )
+        {
+            var getReply = await httpResponse.Content.ReadFromJsonAsync<T>();
+
+            return getReply is not null
+                ? new ServiceReply<T?>( getReply )
+                : new ServiceReply<T?>( ServiceErrorType.NotFound, "No data returned from request" );
+        }
+        
+        string errorContent = await httpResponse.Content.ReadAsStringAsync();
+        
+        switch ( httpResponse.StatusCode )
+        {
+            case System.Net.HttpStatusCode.BadRequest:
+                Logger.LogError( $"{requestTypeName}: Bad request: {errorContent}" );
+                return new ServiceReply<T?>( ServiceErrorType.ValidationError, errorContent );
+
+            case System.Net.HttpStatusCode.NotFound:
+                Logger.LogError( $"{requestTypeName}: Not found: {errorContent}" );
+                return new ServiceReply<T?>( ServiceErrorType.NotFound, errorContent );
+
+            case System.Net.HttpStatusCode.Unauthorized:
+                Logger.LogError( $"{requestTypeName}: Unauthorized: {errorContent}" );
+                return new ServiceReply<T?>( ServiceErrorType.Unauthorized, errorContent );
+
+            case System.Net.HttpStatusCode.Conflict:
+                Logger.LogError( $"{requestTypeName}: Conflict: {errorContent}" );
+                return new ServiceReply<T?>( ServiceErrorType.Conflict, errorContent );
+
+            case System.Net.HttpStatusCode.InternalServerError:
+                Logger.LogError( $"{requestTypeName}: Server error: {errorContent}" );
+                return new ServiceReply<T?>( ServiceErrorType.ServerError, errorContent );
+
+            default:
+                Logger.LogError( $"{requestTypeName}: Other error: {httpResponse.StatusCode}, Content: {errorContent}" );
+                return new ServiceReply<T?>( ServiceErrorType.ServerError, $"Error: {httpResponse.StatusCode}" );
+        }
+    }
+    ServiceReply<T?> HandleHttpException<T>( Exception e, string requestType )
+    {
+        Logger.LogError( e, $"{requestType}: Exception occurred while sending API request." );
+        return new ServiceReply<T?>( ServiceErrorType.ServerError, e.Message );
     }
 }

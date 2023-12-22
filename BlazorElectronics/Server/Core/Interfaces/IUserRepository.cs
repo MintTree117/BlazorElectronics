@@ -11,6 +11,7 @@ public interface IUserRepository
     Task<UserModel?> GetByEmailOrUsername( string emailOrUsername );
     Task<UserExists?> GetUserExists( string username, string email );
     Task<UserModel?> InsertUser( string username, string email, string? phone, byte[] hash, byte[] salt );
+    Task<UserValidationModel?> GetValidation( int userId );
     Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt );
     Task<bool> InsertVerificationCode( int userId, string code );
     Task<int> Update_VerificationToken( string token );

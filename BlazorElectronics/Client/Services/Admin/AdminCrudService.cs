@@ -10,22 +10,22 @@ public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCr
     
     public async Task<ServiceReply<List<Tview>?>> GetView( string path )
     {
-        return await TryUserRequest<List<Tview>?>( path );
+        return await TryUserGetRequest<List<Tview>?>( path );
     }
-    public async Task<ServiceReply<Tedit?>> GetEdit( string path, IntDto itemId )
+    public async Task<ServiceReply<Tedit?>> GetEdit( string path, int id )
     {
-        return await TryUserRequest<IntDto,Tedit?>( path, itemId );
+        return await TryUserGetRequest<Tedit?>( path, GetIdParam( id ) );
     }
     public async Task<ServiceReply<int>> Add( string path, Tedit dto )
     {
-        return await TryUserRequest<Tedit, int>( path, dto );
+        return await TryUserPutRequest<int>( path, dto );
     }
     public async Task<ServiceReply<bool>> Update( string path, Tedit dto )
     {
-        return await TryUserRequest<Tedit, bool>( path, dto );
+        return await TryUserPostRequest<bool>( path, dto );
     }
-    public async Task<ServiceReply<bool>> RemoveItem( string path, IntDto itemId )
+    public async Task<ServiceReply<bool>> RemoveItem( string path, int id )
     {
-        return await TryUserRequest<IntDto, bool>( path, itemId );
+        return await TryUserDeleteRequest<bool>( path, GetIdParam( id ) );
     }
 }

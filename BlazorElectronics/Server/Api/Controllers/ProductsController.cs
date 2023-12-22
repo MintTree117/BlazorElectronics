@@ -38,14 +38,14 @@ public sealed class ProductsController : _Controller
         ServiceReply<ProductSearchReplyDto?> reply = await _productService.GetProductSearch( requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "suggestions" )]
-    public async Task<ActionResult<List<string>?>> SearchSuggestions( [FromBody] string searchText )
+    [HttpGet( "suggestions" )]
+    public async Task<ActionResult<List<string>?>> SearchSuggestions( string searchText )
     {
         ServiceReply<List<string>?> reply = await _productService.GetProductSuggestions( searchText );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "details" )]
-    public async Task<ActionResult<ProductDto?>> GetDetails( [FromBody] int productId )
+    [HttpGet( "details" )]
+    public async Task<ActionResult<ProductDto?>> GetDetails( int productId )
     {
         ServiceReply<ProductDto?> reply = await _productService.GetProductDetails( productId );
         return GetReturnFromReply( reply );

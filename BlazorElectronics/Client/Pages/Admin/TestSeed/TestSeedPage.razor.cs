@@ -26,17 +26,17 @@ public partial class TestSeedPage : AdminPage
     
     async Task SeedProducts()
     {
-        ServiceReply<bool> reply = await SeedService.SeedProducts( ProductCount );
+        ServiceReply<bool> reply = await SeedService.SeedProducts( ProductCount.Value );
         InvokeAlert( reply.Success ? AlertType.Success : AlertType.Danger, reply.Success ? "Successfully seeded products." : reply.Message ?? FAIL_SEED_MESSAGE );
     }
     async Task SeedReviews()
     {
-        ServiceReply<bool> reply = await SeedService.SeedReviews( ReviewCount );
+        ServiceReply<bool> reply = await SeedService.SeedReviews( ReviewCount.Value );
         InvokeAlert( reply.Success ? AlertType.Success : AlertType.Danger, reply.Success ? "Successfully seeded reviews." : reply.Message ?? FAIL_SEED_MESSAGE );
     }
     async Task SeedUsers()
     {
-        ServiceReply<bool> reply = await SeedService.SeedUsers( UserCount );
+        ServiceReply<bool> reply = await SeedService.SeedUsers( UserCount.Value );
         InvokeAlert( reply.Success ? AlertType.Success : AlertType.Danger, reply.Success ? "Successfully seeded users." : reply.Message ?? FAIL_SEED_MESSAGE );
     }
 }

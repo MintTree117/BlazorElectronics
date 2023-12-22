@@ -15,10 +15,10 @@ public sealed class AdminBulkServiceClient : AdminServiceClient, IAdminBulkServi
     
     public async Task<ServiceReply<bool>> BulkInsertCategories( List<CategoryEditDto> categories )
     {
-        return await TryUserRequest<List<CategoryEditDto>, bool>( API_PATH_CATEGORIES, categories );
+        return await TryUserPutRequest<bool>( API_PATH_CATEGORIES, categories );
     }
     public async Task<ServiceReply<bool>> BulkInsertKeys( ProductKeysDto keysDto )
     {
-        return await TryUserRequest<ProductKeysDto, bool>( API_PATH_PRODUCT_KEYS, keysDto );
+        return await TryUserPutRequest<bool>( API_PATH_PRODUCT_KEYS, keysDto );
     }
 }

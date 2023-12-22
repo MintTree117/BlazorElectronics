@@ -14,6 +14,15 @@ public sealed class ReviewServiceClient : ClientService, IReviewServiceClient
     
     public async Task<ServiceReply<ProductReviewsReplyDto?>> GetForProduct( ProductReviewsGetDto dto )
     {
-        return await TryPostRequest<ProductReviewsReplyDto?>( API_ROUTE_PRODUCT, dto );
+        Dictionary<string, object> parameters = new()
+        {
+            { nameof( dto.TotalMatches ), dto.TotalMatches },
+            { nameof( dto.ProductId ), dto.ProductId },
+            { nameof( dto.Rows ), dto.Rows },
+            { nameof( dto.Page ), dto.Page },
+            { nameof( dto.SortType ), dto.SortType }
+        };
+
+        return await TryGetRequest<ProductReviewsReplyDto?>( API_ROUTE_PRODUCT, parameters );
     }
 }

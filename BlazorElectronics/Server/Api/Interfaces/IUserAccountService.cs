@@ -9,7 +9,7 @@ public interface IUserAccountService
     Task<ServiceReply<UserLoginDto?>> Register( string username, string email, string password, string? phone );
     Task<ServiceReply<bool>> VerifyAdmin( int adminId );
     Task<ServiceReply<int>> VerifyAdminId( int adminId );
-    Task<ServiceReply<int>> ValidateUserId( string email );
+    Task<ServiceReply<int>> ValidateUserId( int id );
     Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword );
     Task<ServiceReply<bool>> ActivateAccount( string token );
 }

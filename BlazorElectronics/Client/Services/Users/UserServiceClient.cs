@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Blazored.LocalStorage;
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
@@ -9,7 +10,10 @@ namespace BlazorElectronics.Client.Services.Users;
 public class UserServiceClient : ClientService, IUserServiceClient
 {
     public UserServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
-        : base( logger, http, storage ) { }
+        : base( logger, http, storage )
+    {
+        
+    }
 
     public event IUserServiceClient.AsyncEventHandler? SessionChanged;
 
@@ -44,7 +48,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ServiceReply<bool>> AuthorizeUser()
     {
-        ServiceReply<bool> authorizeReply = await TryUserRequest<bool>( API_ROUTE_AUTHORIZE );
+        ServiceReply<bool> authorizeReply = await TryUserGetRequest<bool>( API_ROUTE_AUTHORIZE );
 
         if ( !authorizeReply.Success )
         {
@@ -60,14 +64,14 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ServiceReply<bool>> Logout()
     {
-        ServiceReply<bool> serverReply = await TryUserRequest<bool>( API_ROUTE_LOGOUT );
+        ServiceReply<bool> serverReply = await TryUserPostRequest<bool>( API_ROUTE_LOGOUT );
         await Storage.RemoveItemAsync( SESSION_DATA_KEY );
         await InvokeOnChange( null );
         return serverReply;
     }
     public async Task<ServiceReply<bool>> ChangePassword( PasswordRequestDto requestDto )
     {
-        return await TryUserRequest<PasswordRequestDto, bool>( API_ROUTE_CHANGE_PASSWORD, requestDto );
+        return await TryUserPostRequest<bool>( API_ROUTE_CHANGE_PASSWORD, requestDto );
     }
     public async Task<SessionMeta?> GetSessionMeta()
     {
@@ -79,33 +83,35 @@ public class UserServiceClient : ClientService, IUserServiceClient
         return new SessionMeta( reply.Data.IsAdmin ? SessionType.Admin : SessionType.User, reply.Data.Username );
     }
 
-    protected async Task<ServiceReply<T?>> TryUserRequest<T>( string apiRoute )
+    protected async Task<ServiceReply<T?>> TryUserGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
     {
-        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
-
-        if ( !sessionReply.Success || sessionReply.Data is null )
-        {
-            Logger.LogError( sessionReply.ErrorType + sessionReply.Message );
-            return new ServiceReply<T?>( sessionReply.ErrorType );
-        }
-
-        var apiRequest = new UserRequestDto( sessionReply.Data );
-        return await TryPostRequest<T?>( apiRoute, apiRequest );
+        if ( !await SetUserHttpHeader() )
+            return new ServiceReply<T?>( ServiceErrorType.Unauthorized, "No session found!" );
+        
+        return await TryGetRequest<T?>( apiPath, parameters );
     }
-    protected async Task<ServiceReply<RESPONSE?>> TryUserRequest<REQUEST, RESPONSE>( string apiRoute, REQUEST payload ) where REQUEST : class
+    protected async Task<ServiceReply<T?>> TryUserPostRequest<T>( string apiPath, object? body = null )
     {
-        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
-
-        if ( !sessionReply.Success || sessionReply.Data is null )
-        {
-            Logger.LogError( sessionReply.Message );
-            return new ServiceReply<RESPONSE?>( sessionReply.ErrorType );
-        }
-
-        var apiRequest = new UserDataRequestDto<REQUEST>( sessionReply.Data, payload );
-        return await TryPostRequest<RESPONSE?>( apiRoute, apiRequest );
+        if ( !await SetUserHttpHeader() )
+            return new ServiceReply<T?>( ServiceErrorType.Unauthorized, "No session found!" );
+        
+        return await TryPostRequest<T?>( apiPath, body );
     }
-
+    protected async Task<ServiceReply<T?>> TryUserPutRequest<T>( string apiPath, object? body = null )
+    {
+        if ( !await SetUserHttpHeader() )
+            return new ServiceReply<T?>( ServiceErrorType.Unauthorized, "No session found!" );
+        
+        return await TryPutRequest<T?>( apiPath, body );
+    }
+    protected async Task<ServiceReply<T?>> TryUserDeleteRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
+    {
+        if ( !await SetUserHttpHeader() )
+            return new ServiceReply<T?>( ServiceErrorType.Unauthorized, "No session found!" );
+        
+        return await TryDeleteRequest<T?>( apiPath, parameters );
+    }
+    
     async Task InvokeOnChange( SessionMeta? session )
     {
         IUserServiceClient.AsyncEventHandler? handler = SessionChanged;
@@ -164,6 +170,22 @@ public class UserServiceClient : ClientService, IUserServiceClient
         {
             Logger.LogError( e.Message + e.InnerException?.Message );
         }
+    }
+
+    async Task<bool> SetUserHttpHeader()
+    {
+        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
+
+        if ( !sessionReply.Success || sessionReply.Data is null )
+            return false;
+
+        int sessionId = sessionReply.Data.SessionId;
+        string sessionToken = sessionReply.Data.SessionToken;
+
+        Http.DefaultRequestHeaders.Add( "SessionId", sessionId.ToString() );
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue( "Bearer", sessionToken );
+
+        return true;
     }
 
     static SessionMeta GetSessionMeta( SessionReplyDto sessionReply )

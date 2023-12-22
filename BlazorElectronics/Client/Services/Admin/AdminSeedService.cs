@@ -13,16 +13,16 @@ public sealed class AdminSeedService : AdminServiceClient, IAdminSeedService
     public AdminSeedService( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
     
-    public async Task<ServiceReply<bool>> SeedProducts( IntDto amount )
+    public async Task<ServiceReply<bool>> SeedProducts( int amount )
     {
-        return await TryUserRequest<IntDto, bool>( API_ROUTE_PRODUCTS, amount );
+        return await TryUserPutRequest<bool>( API_ROUTE_PRODUCTS, amount );
     }
-    public async Task<ServiceReply<bool>> SeedReviews( IntDto amount )
+    public async Task<ServiceReply<bool>> SeedReviews( int amount )
     {
-        return await TryUserRequest<IntDto, bool>( API_ROUTE_REVIEWS, amount );
+        return await TryUserPutRequest<bool>( API_ROUTE_REVIEWS, amount );
     }
-    public async Task<ServiceReply<bool>> SeedUsers( IntDto amount )
+    public async Task<ServiceReply<bool>> SeedUsers( int amount )
     {
-        return await TryUserRequest<IntDto, bool>( API_ROUTE_USERS, amount );
+        return await TryUserPutRequest<bool>( API_ROUTE_USERS, amount );
     }
 }

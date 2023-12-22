@@ -22,10 +22,16 @@ public sealed class FeaturesController : _Controller
         ServiceReply<List<FeatureDto>?> featureReply = await _featuresService.GetFeatures();
         return GetReturnFromReply( featureReply );
     }
-    [HttpPost( "get-deals" )]
-    public async Task<ActionResult<List<FeatureDealDto>?>> GetFeaturedDeals( [FromBody] PaginationDto pagination )
+    [HttpGet( "get-front-page-deals" )]
+    public async Task<ActionResult<List<FeatureDealDto>?>> GetFrontPageDeals()
     {
-        ServiceReply<List<FeatureDealDto>?> featureReply = await _featuresService.GetDeals( pagination.Rows, pagination.Page );
+        ServiceReply<List<FeatureDealDto>?> featureReply = await _featuresService.GetDeals( 20, 1 );
+        return GetReturnFromReply( featureReply );
+    }
+    [HttpGet( "get-deals" )]
+    public async Task<ActionResult<List<FeatureDealDto>?>> GetFeaturedDeals( int rows, int page )
+    {
+        ServiceReply<List<FeatureDealDto>?> featureReply = await _featuresService.GetDeals( rows, page );
         return GetReturnFromReply( featureReply );
     }
 }

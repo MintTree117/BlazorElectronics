@@ -1,5 +1,4 @@
 using BlazorElectronics.Server.Api.Interfaces;
-using BlazorElectronics.Shared.Users;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,59 +16,59 @@ public sealed class AdminVendorController : _AdminController
         _vendorService = vendorService;
     }
     
-    [HttpPost( "get-view" )]
-    public async Task<ActionResult<List<CrudViewDto>?>> GetView( [FromBody] UserRequestDto requestDto )
+    [HttpGet( "get-view" )]
+    public async Task<ActionResult<List<CrudViewDto>?>> GetView()
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
-        
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
+
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
         ServiceReply<List<CrudViewDto>?> reply = await _vendorService.GetView();
         return GetReturnFromReply( reply );
     }
-    [HttpPost("get-edit")]
-    public async Task<ActionResult<VendorEditDtoDto?>> GetEdit( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpGet("get-edit")]
+    public async Task<ActionResult<VendorEditDtoDto?>> GetEdit( int itemId )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<VendorEditDtoDto?> reply = await _vendorService.GetEdit( requestDto.Payload.Value );
+        ServiceReply<VendorEditDtoDto?> reply = await _vendorService.GetEdit( itemId );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "add" )]
-    public async Task<ActionResult<int>> Add( [FromBody] UserDataRequestDto<VendorEditDtoDto> requestDto )
+    [HttpPut( "add" )]
+    public async Task<ActionResult<int>> Add( [FromBody] VendorEditDtoDto requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<int> reply = await _vendorService.Add( requestDto.Payload );
+        ServiceReply<int> reply = await _vendorService.Add( requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "update" )]
-    public async Task<ActionResult<bool>> Update( [FromBody] UserDataRequestDto<VendorEditDtoDto> requestDto )
+    [HttpPut( "update" )]
+    public async Task<ActionResult<bool>> Update( [FromBody] VendorEditDtoDto requestDto )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _vendorService.Update( requestDto.Payload );
+        ServiceReply<bool> reply = await _vendorService.Update( requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPost( "remove" )]
-    public async Task<ActionResult<bool>> Remove( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpDelete( "remove" )]
+    public async Task<ActionResult<bool>> Remove( [FromBody] int itemId )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _vendorService.Remove( requestDto.Payload.Value );
+        ServiceReply<bool> reply = await _vendorService.Remove( itemId );
         return GetReturnFromReply( reply );
     }
 }

@@ -1,7 +1,6 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Specs;
-using BlazorElectronics.Shared.Users;
 using BlazorElectronics.Shared.Vendors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,10 +43,10 @@ public sealed class AdminSeedController : _AdminController
         _productService = productService;
     }
 
-    [HttpPost( "products" )]
-    public async Task<ActionResult<bool>> SeedProducts( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpPut( "products" )]
+    public async Task<ActionResult<bool>> SeedProducts( int amount )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
@@ -67,14 +66,14 @@ public sealed class AdminSeedController : _AdminController
         if ( !vendorReply.Success || vendorReply.Data is null )
             return GetReturnFromReply( vendorReply );
 
-        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( requestDto.Payload.Value, categoryReply.Data, lookupReply.Data, vendorReply.Data );
+        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( amount, categoryReply.Data, lookupReply.Data, vendorReply.Data );
 
         return GetReturnFromReply( seedReply );
     }
-    [HttpPost( "reviews" )]
-    public async Task<ActionResult<bool>> SeedReviews( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpPut( "reviews" )]
+    public async Task<ActionResult<bool>> SeedReviews( int amount )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
@@ -91,7 +90,7 @@ public sealed class AdminSeedController : _AdminController
         
         Logger.LogError( productReply.Data.Count.ToString() );
 
-        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( requestDto.Payload.Value, productReply.Data, userReply.Data );
+        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( amount, productReply.Data, userReply.Data );
 
         if ( !seedReply.Success )
             return GetReturnFromReply( seedReply );
@@ -99,15 +98,15 @@ public sealed class AdminSeedController : _AdminController
         ServiceReply<bool> updateReply = await _productService.UpdateProductsReviewData();
         return GetReturnFromReply( updateReply );
     }
-    [HttpPost( "users" )]
-    public async Task<ActionResult<bool>> SeedUsers( [FromBody] UserDataRequestDto<IntDto> requestDto )
+    [HttpPut( "users" )]
+    public async Task<ActionResult<bool>> SeedUsers( int amount )
     {
-        ServiceReply<int> adminReply = await ValidateAndAuthorizeAdminId( requestDto );
+        ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> seedReply = await _userSeedService.SeedUsers( requestDto!.Payload!.Value );
+        ServiceReply<bool> seedReply = await _userSeedService.SeedUsers( amount );
         return GetReturnFromReply( seedReply );
     }
 }

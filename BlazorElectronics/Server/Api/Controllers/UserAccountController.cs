@@ -12,7 +12,7 @@ public sealed class UserAccountController : UserController
 {
     public UserAccountController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
 
-    [HttpPost( "register" )]
+    [HttpPut( "register" )]
     public async Task<ActionResult<SessionReplyDto>> Register( [FromBody] RegisterRequestDto request )
     {
         if ( !ValidateRegisterRequest( request ) )
@@ -49,37 +49,40 @@ public sealed class UserAccountController : UserController
         return Ok( session );
     }
     [HttpPost( "authorize" )]
-    public async Task<ActionResult<bool>> AuthorizeSession( [FromBody] UserRequestDto requestDto )
+    public async Task<ActionResult<bool>> AuthorizeSession()
     {
-        ServiceReply<bool> authorizeReply = await ValidateAndAuthorizeUser( requestDto );
-        return GetReturnFromReply( authorizeReply );
+        ServiceReply<int> authorizeReply = await ValidateAndAuthorizeUserId();
+
+        return authorizeReply.Success
+            ? true
+            : GetReturnFromReply( authorizeReply );
     }
-    [HttpPost( "change-password" )]
-    public async Task<ActionResult<bool>> ChangePassword( [FromBody] UserDataRequestDto<PasswordRequestDto>? request )
+    [HttpPut( "change-password" )]
+    public async Task<ActionResult<bool>> ChangePassword( [FromBody] PasswordRequestDto request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
 
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        if ( !ValidateChangePasswordRequest( request!.Payload ) )
+        if ( !ValidateChangePasswordRequest( request ) )
             return BadRequest( "Invalid password request!" );
 
-        ServiceReply<bool> passwordReply = await UserAccountService.ChangePassword( userReply.Data, request.Payload.Password );
+        ServiceReply<bool> passwordReply = await UserAccountService.ChangePassword( userReply.Data, request.Password );
         return GetReturnFromReply( passwordReply );
     }
-    [HttpPost( "logout" )]
-    public async Task<ActionResult<bool>> Logout( [FromBody] UserRequestDto request )
+    [HttpPut( "logout" )]
+    public async Task<ActionResult<bool>> Logout()
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId( request );
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
 
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
         
-        ServiceReply<bool> deleteReply = await SessionService.DeleteSession( request.SessionId );
+        ServiceReply<bool> deleteReply = await SessionService.DeleteSession( userReply.Data );
         return GetReturnFromReply( deleteReply );
     }
-    [HttpPost( "activate" )]
+    [HttpPut( "activate" )]
     public async Task<ActionResult<bool>> Activate( [FromBody] string token )
     {
         ServiceReply<bool> activateReply = await UserAccountService.ActivateAccount( token );

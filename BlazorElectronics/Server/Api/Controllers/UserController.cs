@@ -2,15 +2,18 @@ using System.Net;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Models.Users;
 using BlazorElectronics.Shared.Enums;
-using BlazorElectronics.Shared.Users;
+using Microsoft.Extensions.Primitives;
 
 namespace BlazorElectronics.Server.Api.Controllers;
 
 public class UserController : _Controller
 {
+    const string ID_HEADER = "SessionId";
+    const string AUTH_HEADER = "Authorization";
+    
     protected readonly IUserAccountService UserAccountService;
     protected readonly ISessionService SessionService;
-    
+
     public UserController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService )
         : base( logger )
     {
@@ -25,43 +28,28 @@ public class UserController : _Controller
         return dto;
     }
 
-    protected async Task<ServiceReply<bool>> ValidateAndAuthorizeUser( UserRequestDto request )
+    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( bool mustBeAdmin = false )
     {
-        if ( !ValidateUserHttp( request ) )
-            return new ServiceReply<bool>( ServiceErrorType.ValidationError );
+        if ( !GetHeaderStrings( out int sessionId, out string sessionToken ) )
+            return new ServiceReply<int>( ServiceErrorType.ValidationError, "Failed to validate http header!" );
 
-        return await SessionService.AuthorizeSession( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
+        return await SessionService.AuthorizeSessionAndUserId( sessionId, sessionToken, GetRequestDeviceInfo(), mustBeAdmin );
     }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId( UserRequestDto request )
-    {
-        if ( !ValidateUserHttp( request ) )
-            return new ServiceReply<int>( ServiceErrorType.ValidationError );
 
-        return await SessionService.AuthorizeSessionId( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
-    }
-    protected async Task<ServiceReply<int>> ValidateAndAuthorizeUserId<T>( UserDataRequestDto<T> request ) where T : class
+    bool GetHeaderStrings( out int sessionId, out string sessionToken )
     {
-        if ( !ValidateUserHttp( request ) )
-            return new ServiceReply<int>( ServiceErrorType.ValidationError );
+        sessionId = -1;
+        sessionToken = string.Empty;
 
-        return await SessionService.AuthorizeSessionId( request.SessionId, request.SessionToken, GetRequestDeviceInfo() );
-    }
-    
-    static bool ValidateUserHttp( UserRequestDto request )
-    {
-        return request is not null && 
-               ValidateRequestSession( request.SessionId, request.SessionToken );
-    }
-    static bool ValidateUserHttp<T>( UserDataRequestDto<T>? request ) where T : class
-    {
-        return request?.Payload is not null && 
-               ValidateRequestSession( request.SessionId, request.SessionToken );
-    }
-    static bool ValidateRequestSession( int sessionId, string? sessionToken )
-    {
-        bool validId = sessionId >= 1;
-        bool validToken = !string.IsNullOrWhiteSpace( sessionToken );
+        if ( !HttpContext.Request.Headers.TryGetValue( ID_HEADER, out StringValues idHeader ) )
+            return false;
 
-        return validId && validToken;
+        if ( !HttpContext.Request.Headers.TryGetValue( AUTH_HEADER, out StringValues authHeader ) )
+            return false;
+
+        var sessionIdString = idHeader.ToString();
+        sessionToken = authHeader.ToString().Substring( "Bearer".Length ).Trim();
+
+        return int.TryParse( sessionIdString, out sessionId ) && !string.IsNullOrWhiteSpace( sessionToken );
     }
 }

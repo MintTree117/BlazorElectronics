@@ -133,17 +133,17 @@ public sealed class UserAccountService : ApiService, IUserAccountService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> ValidateUserId( string email )
+    public async Task<ServiceReply<int>> ValidateUserId( int id )
     {
         try
         {
-            UserModel? user = await _userRepository.GetByEmail( email );
+            UserModel? user = await _userRepository.GetById( id );
 
             if ( user is null )
                 return new ServiceReply<int>( ServiceErrorType.NotFound );
 
-            return user.IsActive 
-                ? new ServiceReply<int>( user.UserId ) 
+            return user.IsActive
+                ? new ServiceReply<int>( user.UserId )
                 : new ServiceReply<int>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
         }
         catch ( RepositoryException e )

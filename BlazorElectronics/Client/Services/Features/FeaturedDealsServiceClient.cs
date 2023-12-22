@@ -7,8 +7,8 @@ namespace BlazorElectronics.Client.Services.Features;
 public class FeaturedDealsServiceClient : CachedClientService<List<FeatureDealDto>>, IFeaturedDealsServiceClient
 {
     const string API_ROUTE = "api/features";
-    const string API_ROUTE_FRONT_PAGE = $"{API_ROUTE}/front-page-deals";
-    const string API_ROUTE_GET_DEALS = $"{API_ROUTE}/featured-deals";
+    const string API_ROUTE_FRONT_PAGE = $"{API_ROUTE}/get-front-page-deals";
+    const string API_ROUTE_GET_DEALS = $"{API_ROUTE}/get-featured-deals";
     
     public FeaturedDealsServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage, 1, "Front Page Deals" ) { }

@@ -24,27 +24,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         : base( logger, http, storage ) { }
 
     public event Action<CartInfoModel>? OnChange;
-    
-    public async Task<ServiceReply<CartInfoModel>> GetLocalCartInfo()
-    {
-        CartModel cart = await GetLocalCart();
-        return new ServiceReply<CartInfoModel>( cart.GetCartInfo() );
-    }
-    public async Task<ServiceReply<CartModel?>> UpdateCart()
-    {
-        List<CartItemDto> localItems = ( await GetLocalCart() ).GetItemsDto();
-        ServiceReply<CartDto?> reply = await TryUserRequest<List<CartItemDto>, CartDto>( API_ROUTE_UPDATE_CART, localItems );
 
-        if ( !reply.Success || reply.Data is null )
-            return new ServiceReply<CartModel?>( reply.ErrorType, $"Failed to update cart! {reply.Message}" );
-
-        CartModel cart = new( reply.Data );
-        
-        await TryStoreLocalCart( cart );
-        OnChange?.Invoke( cart.GetCartInfo() );
-        
-        return new ServiceReply<CartModel?>( cart );
-    }
     public async Task<ServiceReply<int>> HasItem( int productId )
     {
         CartModel cart = await GetLocalCart();
@@ -60,10 +40,30 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
             ? new ServiceReply<int>( item.ItemQuantity )
             : new ServiceReply<int>( updateReply.ErrorType, updateReply.Message );
     }
+    public async Task<ServiceReply<CartInfoModel>> GetLocalCartInfo()
+    {
+        CartModel cart = await GetLocalCart();
+        return new ServiceReply<CartInfoModel>( cart.GetCartInfo() );
+    }
+    public async Task<ServiceReply<CartModel?>> UpdateCart()
+    {
+        List<CartItemDto> localItems = ( await GetLocalCart() ).GetItemsDto();
+        ServiceReply<CartDto?> reply = await TryUserPostRequest<CartDto>( API_ROUTE_UPDATE_CART, localItems );
+
+        if ( !reply.Success || reply.Data is null )
+            return new ServiceReply<CartModel?>( reply.ErrorType, $"Failed to update cart! {reply.Message}" );
+
+        CartModel cart = new( reply.Data );
+        
+        await TryStoreLocalCart( cart );
+        OnChange?.Invoke( cart.GetCartInfo() );
+        
+        return new ServiceReply<CartModel?>( cart );
+    }
     public async Task<ServiceReply<bool>> AddOrUpdateItem( CartProductDto product )
     {
         CartItemDto dto = new( product.ProductId, product.ItemQuantity );
-        ServiceReply<bool> reply = await TryUserRequest<CartItemDto, bool>( API_ROUTE_ADD_ITEM, dto );
+        ServiceReply<bool> reply = await TryUserPostRequest<bool>( API_ROUTE_ADD_ITEM, dto );
         
         CartModel cart = await GetLocalCart();
         cart.AddItem( product );
@@ -77,8 +77,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     }
     public async Task<ServiceReply<bool>> RemoveItem( int productId )
     {
-        IntDto intDto = new( productId );
-        ServiceReply<bool> reply = await TryUserRequest<IntDto, bool>( API_ROUTE_REMOVE_ITEM, intDto );
+        ServiceReply<bool> reply = await TryUserDeleteRequest<bool>( API_ROUTE_REMOVE_ITEM, GetIdParam( productId ) );
         
         CartModel cart = await GetLocalCart();
         cart.RemoveItem( productId );
@@ -93,12 +92,12 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     public async Task<ServiceReply<bool>> ClearCart()
     {
         await TryStoreLocalCart( new CartModel() );
-        return await TryUserRequest<bool>( API_ROUTE_CLEAR_CART );
+        return await TryUserDeleteRequest<bool>( API_ROUTE_CLEAR_CART );
     }
     
     public async Task<ServiceReply<bool>> AddPromoCode( string code )
     {
-        ServiceReply<PromoCodeDto?> reply = await TryUserRequest<string, PromoCodeDto>( API_ROUTE_ADD_PROMO, code );
+        ServiceReply<PromoCodeDto?> reply = await TryUserPutRequest<PromoCodeDto>( API_ROUTE_ADD_PROMO, code );
 
         if ( !reply.Success || reply.Data is null )
             return new ServiceReply<bool>( reply.ErrorType, reply.Message );
@@ -118,7 +117,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         OnChange?.Invoke( cart.GetCartInfo() );
         
-        ServiceReply<bool> reply = await TryUserRequest<string, bool>( API_ROUTE_REMOVE_PROMO, code );
+        ServiceReply<bool> reply = await TryUserDeleteRequest<bool>( API_ROUTE_REMOVE_PROMO, GetRemovePromoParam( code ) );
 
         return reply.Success
             ? new ServiceReply<bool>( true )
@@ -150,5 +149,13 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
             Logger.LogError( e.Message, e );
             return new CartModel();
         }
+    }
+
+    static Dictionary<string, object> GetRemovePromoParam( string code )
+    {
+        return new Dictionary<string, object>
+        {
+            { "PromoCode", code }
+        };
     }
 }

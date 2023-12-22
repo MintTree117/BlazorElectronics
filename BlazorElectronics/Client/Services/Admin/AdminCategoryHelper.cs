@@ -16,7 +16,7 @@ public sealed class AdminCategoryHelper : AdminServiceClient, IAdminCategoryHelp
 
     public async Task<ServiceReply<bool>> Init()
     {
-        ServiceReply<List<CategoryViewDtoDto>?> reply = await TryUserRequest<List<CategoryViewDtoDto>?>( "api/AdminCategory/get-view" );
+        ServiceReply<List<CategoryViewDtoDto>?> reply = await TryUserGetRequest<List<CategoryViewDtoDto>?>( "api/AdminCategory/get-view" );
 
         if ( !reply.Success || reply.Data is null )
         {

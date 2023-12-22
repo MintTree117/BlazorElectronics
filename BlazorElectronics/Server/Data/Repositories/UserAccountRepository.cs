@@ -17,6 +17,7 @@ public class UserAccountRepository : DapperRepository, IUserRepository
     const string PROCEDURE_INSERT_VERIFICATION_CODE = "Insert_VerificationToken";
     const string PROCEDURE_UPDATE_VERIFICATION_TOKEN = "Update_VerificationToken";
     const string PROCEDURE_UPDATE_ACCOUNT_STATUS = "Update_UserAccountStatus";
+    const string PROCEDURE_GET_USER_VALIDATION = "Get_UserValidation";
 
     public UserAccountRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
@@ -70,6 +71,13 @@ public class UserAccountRepository : DapperRepository, IUserRepository
         p.Add( PARAM_USER_PASSWORD_SALT, salt );
 
         return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<UserModel?>, p, PROCEDURE_INSERT );
+    }
+    public async Task<UserValidationModel?> GetValidation( int userId )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_ID, userId );
+
+        return await TryQueryAsync( QuerySingleOrDefault<UserValidationModel?>, p, PROCEDURE_GET_USER_VALIDATION );
     }
     public async Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt )
     {

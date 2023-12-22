@@ -121,7 +121,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudViewDto where 
     {
         PageIsLoaded = false;
         
-        ServiceReply<Tedit?> reply = await CrudService.GetEdit( $"{ApiPath}/get-edit", new IntDto( itemId ) );
+        ServiceReply<Tedit?> reply = await CrudService.GetEdit( $"{ApiPath}/get-edit", itemId );
 
         if ( !reply.Success || reply.Data is null )
         {
@@ -141,7 +141,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudViewDto where 
     }
     public async Task RemoveItem( int itemId )
     {
-        ServiceReply<bool> result = await CrudService.RemoveItem( $"{ApiPath}/remove", new IntDto( itemId ) );
+        ServiceReply<bool> result = await CrudService.RemoveItem( $"{ApiPath}/remove", itemId );
 
         if ( !result.Success )
         {
