@@ -9,13 +9,11 @@
 
     <div class="d-flex flex-row justify-content-between mb-3">
         <h3 class="text-decoration-underline m-0 mb-lg-3 p-0">Filters</h3>
-        <button class="btn btn-outline-secondary product-filters-exit ms-3" onclick="@HideFilters">
-            <i class="oi oi-x"></i>
-        </button>
+        <button class="btn btn-close product-filters-exit ms-3" onclick="@HideFilters"></button>
     </div>
     
     <div class="d-grid w-100">
-        <button class="btn btn-outline-primary w-100" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
+        <button class="mb-3 mt-2 btn btn-outline-primary w-100" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
     </div>
 
     @if ( _subCategories is not null )

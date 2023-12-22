@@ -17,7 +17,8 @@ public sealed class ProductServiceClient : ClientService, IProductServiceClient
 
     public async Task<ServiceReply<List<string>?>> GetProductSearchSuggestions( string searchText )
     {
-        return await TryPostRequest<List<string>?>( API_ROUTE_SUGGESTIONS, searchText );
+        Dictionary<string, object> p = new() { { "searchText", searchText } };
+        return await TryGetRequest<List<string>?>( API_ROUTE_SUGGESTIONS, p );
     }
     public async Task<ServiceReply<ProductSearchReplyDto?>> GetProductSearch( ProductSearchRequestDto requestDto )
     {
@@ -25,6 +26,7 @@ public sealed class ProductServiceClient : ClientService, IProductServiceClient
     }
     public async Task<ServiceReply<ProductDto?>> GetProductDetails( int productId )
     {
-        return await TryPostRequest<ProductDto?>( API_ROUTE_DETAILS, productId );
+        Dictionary<string, object> p = new() { { "productId", productId } };
+        return await TryGetRequest<ProductDto?>( API_ROUTE_DETAILS, p );
     }
 }

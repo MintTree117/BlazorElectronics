@@ -35,8 +35,12 @@ public sealed class CartModel
     
     public void AddItem( CartProductDto item )
     {
-        if ( Products.All( i => i.ProductId != item.ProductId ) )
+        CartProductDto? product = Products.Find( p => p.ProductId == item.ProductId );
+
+        if ( product is null )
             Products.Add( item );
+        else
+            product.ItemQuantity += item.ItemQuantity;
     }
     public void RemoveItem( int productId )
     {

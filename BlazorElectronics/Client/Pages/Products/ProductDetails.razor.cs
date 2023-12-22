@@ -239,22 +239,6 @@ public partial class ProductDetails : PageView
         if ( !int.TryParse( e.Value?.ToString(), out int quantity ) )
             return;
 
-        if ( quantity <= 0 )
-        {
-            ServiceReply<bool> removeReply = await CartService.RemoveItem( _product.Id );
-            
-            if ( !removeReply.Success )
-            {
-                InvokeAlert( AlertType.Danger, $"Failed update quantity! {removeReply.ErrorType} : {removeReply.Message}" );
-                return;
-            }
-
-            InvokeAlert( AlertType.Success, "Removed item from cart." );
-            _isInCart = false;
-            _cartProduct.ItemQuantity = 0;
-            StateHasChanged();
-        }
-
         ServiceReply<bool> reply = await CartService.AddOrUpdateItem( _cartProduct );
 
         if ( !reply.Success )

@@ -116,6 +116,22 @@ h4 {
     border-color: rgb(222, 226, 230);
 }
 
+.fa-star {
+    color: #4d4d4d;
+}
+
+.fa-star-checked {
+    color: #f5bc42;
+}
+
+.oi-star {
+    color: #4d4d4d;
+}
+
+.oi-star-checked {
+    color: #f5bc42;
+}
+
 @keyframes loading-circle-spin {
     0% {
         transform: rotate(0deg);

@@ -22,9 +22,8 @@
         @foreach ( PromoCodeDto p in Page.CartModel.PromoCodes )
         {
             <div class="d-flex flex-row align-items-center justify-content-between">
-                <span>@p.Code</span>
-                <button class="btn btn-secondary" onclick="@( async () => await Page.RemovePromoCode( p.PromoId ) )">
-                    <i class="oi oi-minus"></i>
+                <span>@p.PromoCode</span>
+                <button class="mb-2 btn btn-close" onclick="@( async () => await Page.RemovePromoCode( p.PromoId ) )">
                 </button>
             </div>
         }

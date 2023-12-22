@@ -79,7 +79,7 @@ public abstract class ClientService
         };
     }
 
-    string GetQueryParameters( string apiPath, Dictionary<string, object>? parameters )
+    static string GetQueryParameters( string apiPath, Dictionary<string, object>? parameters )
     {
         if ( parameters is null )
             return apiPath;
@@ -91,12 +91,7 @@ public abstract class ClientService
             query[ param.Key ] = param.Value.ToString();
         }
 
-        var uriBuilder = new UriBuilder( apiPath )
-        {
-            Query = query.ToString()
-        };
-
-        return uriBuilder.Uri.ToString();
+        return $"{apiPath}?{query}";
     }
     async Task<ServiceReply<T?>> HandleHttpResponse<T>( HttpResponseMessage httpResponse, string requestTypeName )
     {

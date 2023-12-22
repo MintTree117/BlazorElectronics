@@ -4,16 +4,24 @@
 @if ( _show )
 {
     <div class="nav-sidebar bg-light">
-        <div class="bg-dark d-flex align-items-center justify-content-between">
-            @if ( _sessionMeta is not null )
-            {
-                <a class="text-decoration-none link-light" href="@Routes.HOME">Welcome, @_sessionMeta.Username</a>
-            }
-            else
-            {
-                <a class="text-decoration-none link-light" href="@Routes.LOGIN">Hello, Sign In</a>
-            }
-            <button class="btn btn-primary" @onclick="() => ToggleSidebar( false )">
+        <div class="p-3 bg-dark d-flex align-items-center justify-content-between">
+            <div>
+                @if ( _sessionMeta is not null )
+                {
+                    <a class="text-decoration-none link-light fs-5" href="@Routes.ACCOUNT">
+                        <i class="oi oi-person"></i>
+                        <span class="ms-2">Welcome, @_sessionMeta.Username</span>
+                    </a>
+                }
+                else
+                {
+                    <a class="text-decoration-none link-light fs-5" href="@Routes.LOGIN">
+                        <i class="oi oi-person"></i>
+                        <span class="ms-2">Hello, Sign In</span>
+                    </a>
+                }
+            </div>
+            <button class="btn btn-close-white" @onclick="() => ToggleSidebar( false )">
                 <i class="oi oi-x"></i>
             </button>
         </div>

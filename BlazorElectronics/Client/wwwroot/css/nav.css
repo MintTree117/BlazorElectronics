@@ -39,7 +39,8 @@
 
 .nav-sidebar {
     position: absolute;
-    width: 300px;
+    min-width: 100vw;
+    max-width: 100vw;
     height: auto;
     z-index: 100;
     box-shadow: 0 0 3px 3px #4d4d4d;
@@ -93,4 +94,11 @@
 .nav-sidebar hr {
     /* Styling for horizontal dividers */
     margin: 0; /* Remove default margins */
+}
+
+@media only screen and (min-width: 1080px) {
+    .nav-sidebar {
+        min-width: 400px;
+        max-width: 400px;
+    }
 }

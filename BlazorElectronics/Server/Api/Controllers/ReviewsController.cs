@@ -17,7 +17,7 @@ public sealed class ReviewsController : _Controller
     }
     
     [HttpGet( "for-product" )]
-    public async Task<ActionResult<ProductReviewsReplyDto?>> GetDetails( ProductReviewsGetDto dto )
+    public async Task<ActionResult<ProductReviewsReplyDto?>> GetDetails( [FromQuery] ProductReviewsGetDto dto )
     {
         ServiceReply<ProductReviewsReplyDto?> reply = await _reviewService.GetForProduct( dto );
         return GetReturnFromReply( reply );

@@ -47,6 +47,7 @@ public sealed class ProductsController : _Controller
     [HttpGet( "details" )]
     public async Task<ActionResult<ProductDto?>> GetDetails( int productId )
     {
+        Logger.LogError( "Hit" );
         ServiceReply<ProductDto?> reply = await _productService.GetProductDetails( productId );
         return GetReturnFromReply( reply );
     }

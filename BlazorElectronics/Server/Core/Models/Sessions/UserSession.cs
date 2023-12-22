@@ -1,4 +1,4 @@
-namespace BlazorElectronics.Server.Core.Models.Users;
+namespace BlazorElectronics.Server.Core.Models.Sessions;
 
 public sealed class UserSession
 {
