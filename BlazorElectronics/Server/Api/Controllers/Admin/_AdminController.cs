@@ -12,10 +12,12 @@ public class _AdminController : UserController
     public _AdminController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService )
         : base( logger, userAccountService, sessionService ) { }
 
-    [HttpPost( "authorize" )]
+    [HttpGet( "authorize" )]
     public async Task<ActionResult<bool>> AuthorizeAdmin()
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
+        
+        Logger.LogError( $"Admin authorized: {adminReply.Success}" );
         
         return adminReply.Success
             ? true

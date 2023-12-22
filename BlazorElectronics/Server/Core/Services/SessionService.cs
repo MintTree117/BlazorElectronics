@@ -96,19 +96,22 @@ public sealed class SessionService : ApiService, ISessionService
     ServiceReply<int> AuthorizeUser( int userId, UserValidationModel? user, bool mustBeAdmin = false )
     {
         if ( user is null )
-            return new ServiceReply<int>( ServiceErrorType.NotFound );
+        {
+            return new ServiceReply<int>( ServiceErrorType.NotFound );   
+        }
 
         if ( !user.IsActive )
+        {
             return new ServiceReply<int>( ServiceErrorType.Unauthorized, "Account is not active!" );
+        }
 
         if ( !mustBeAdmin )
             return new ServiceReply<int>( userId );
-
+        
         return user.IsAdmin
             ? new ServiceReply<int>( userId )
             : new ServiceReply<int>( ServiceErrorType.Unauthorized, "Account is not an admin!" );
     }
-
     static void CreateSessionToken( out string token, out byte[] hash, out byte[] salt )
     {
         var hmac = new HMACSHA512();

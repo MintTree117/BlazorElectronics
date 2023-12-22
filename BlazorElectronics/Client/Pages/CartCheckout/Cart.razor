@@ -10,29 +10,28 @@
         <div class="mb-3 pb-3 d-flex flex-row align-items-center justify-content-between border-bottom border-grey">
             <div class="d-flex flex-row align-items-center">
                 <h1 class="fs-4 fw-bolder m-0 p-0">Shopping Cart</h1>
-                <span class="ms-2">(@_cart.Products.Count Items)</span>
+                <span class="ms-2">(@CartModel.Products.Count Items)</span>
             </div>
-            <button class="btn btn-danger btn-icon">
+            <button class="btn btn-secondary btn-icon">
                 Empty Cart
                 <i class="oi oi-trash ms-1"></i>
             </button>
         </div>
-        
-        <div class="cart-checkout-sm">
-            <a class="btn btn-warning w-100" href="@Routes.CHECKOUT">Checkout</a>
+
+        <div class="cart-body">
+            <div class="cart-checkout bg-light border border-grey p-3">
+                <CartSummary @ref="_summary" Page="@this"></CartSummary>
+                <a class="btn btn-warning w-100" href="@Routes.CHECKOUT">Checkout</a>
+            </div>
             
-            <CartSummary Cart="@_cart"></CartSummary>
-        </div>
-        
-        <div class="d-flex flex-row align-items-stretch justify-content-between">
             <div class="d-flex flex-column flex-grow-1">
-                @if ( _cart.Products.Count <= 0 )
+                @if ( CartModel.Products.Count <= 0 )
                 {
                     <span>Cart is empty</span>
                 }
                 else
                 {
-                    foreach ( CartProductDto p in _cart.Products )
+                    foreach ( CartProductDto p in CartModel.Products )
                     {
                         <div class="mb-3 d-flex flex-row align-items-stretch border border-grey bg-light">
                             <a href="@Routes.PRODUCT/@p.ProductId">
@@ -57,7 +56,7 @@
                                 </div>
                                 <div class="d-flex flex-row align-items-end justify-content-between">
                                     <input class="form-control flex-shrink-1 flex-grow-0" style="min-width: 100px; max-width: 300px;" type="number" value="@p.ItemQuantity" onchange="@( async ( ChangeEventArgs e ) => await ChangeQuantity( e, p ))"/>
-                                    <button class="btn btn-danger btn-icon" onclick="@( async () => await RemoveItem( p ) )">
+                                    <button class="btn btn-secondary btn-icon" onclick="@( async () => await RemoveItem( p ) )">
                                         Remove
                                         <i class="oi oi-trash ms-2"></i>
                                     </button>
@@ -66,11 +65,6 @@
                         </div>
                     }
                 }
-            </div>
-            
-            <div class="cart-checkout-lg bg-light border border-grey ms-3 p-3" style="min-width: 300px; max-width: 300px;">
-                <CartSummary Cart="@_cart"></CartSummary>
-                <a class="btn btn-success w-100" href="@Routes.CHECKOUT">Checkout</a>
             </div>
         </div>
     }

@@ -7,23 +7,23 @@
     <div class="mb-3 border-bottom border-grey">
         <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
             <span><small>Item(s):</small></span>
-            <span class="fs-6 fw-bold text-end">@Cart.GetTotalPrice()</span>
+            <span class="fs-6 fw-bold text-end">@Page.CartModel.GetTotalPrice()</span>
         </div>
         <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
             <span><small>Tax:</small></span>
-            <span class="fw-bold text-end"><small>@Cart.CalculateTotalTax( 0.13 )</small></span>
+            <span class="fw-bold text-end"><small>@Page.CartModel.CalculateTotalTax( 0.13 )</small></span>
         </div>
     </div>
     <div class="mb-3 d-flex flex-column">
         <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
-            <input class="form-control" type="text"/>
-            <button class="btn btn-secondary" onclick="@AddPromoCode.InvokeAsync()">Apply</button>
+            <input class="form-control" @bind="_currentPromo" type="text"/>
+            <button class="btn btn-secondary" onclick="@( async () => await Page.AddPromoCode( _currentPromo ) )">Apply</button>
         </div>
-        @foreach ( PromoCodeDto p in Cart.PromoCodes )
+        @foreach ( PromoCodeDto p in Page.CartModel.PromoCodes )
         {
             <div class="d-flex flex-row align-items-center justify-content-between">
                 <span>@p.Code</span>
-                <button class="btn btn-secondary">
+                <button class="btn btn-secondary" onclick="@( async () => await Page.RemovePromoCode( p.PromoId ) )">
                     <i class="oi oi-minus"></i>
                 </button>
             </div>
@@ -31,13 +31,18 @@
     </div>
     <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
         <span class="fs-5">Total:</span>
-        <span class="fs-5 fw-bold text-end">@Cart.CaluclateFinalPrice( 0.13 )</span>
+        <span class="fs-5 fw-bold text-end">@Page.CartModel.CaluclateFinalPrice( 0.13 )</span>
     </div>
 </div>
 
 @code
 {
-    [Parameter] public CartModel Cart { get; set; } = default!;
-    [Parameter] public EventCallback<string> AddPromoCode { get; set; }
-    [Parameter] public EventCallback<int> RemovePromoCode { get; set; }
+    [Parameter] public Cart Page { get; set; } = default!;
+    
+    public void OnAddSuccess()
+    {
+        _currentPromo = string.Empty;
+    }
+    
+    string _currentPromo = string.Empty;
 }

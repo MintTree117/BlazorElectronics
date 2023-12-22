@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Blazored.LocalStorage;
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
@@ -9,6 +8,9 @@ namespace BlazorElectronics.Client.Services.Users;
 
 public class UserServiceClient : ClientService, IUserServiceClient
 {
+    const string SESSION_ID_HEADER = "SessionId";
+    const string SESSION_TOKEN_HEADER = "Bearer";
+    
     public UserServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage )
     {
@@ -182,8 +184,11 @@ public class UserServiceClient : ClientService, IUserServiceClient
         int sessionId = sessionReply.Data.SessionId;
         string sessionToken = sessionReply.Data.SessionToken;
 
-        Http.DefaultRequestHeaders.Add( "SessionId", sessionId.ToString() );
-        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue( "Bearer", sessionToken );
+        if ( Http.DefaultRequestHeaders.Contains( SESSION_ID_HEADER ) )
+            Http.DefaultRequestHeaders.Remove( SESSION_ID_HEADER );
+
+        Http.DefaultRequestHeaders.Add( SESSION_ID_HEADER, sessionId.ToString() );
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue( SESSION_TOKEN_HEADER, sessionToken );
 
         return true;
     }

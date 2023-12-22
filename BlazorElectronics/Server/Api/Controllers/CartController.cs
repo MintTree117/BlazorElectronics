@@ -1,5 +1,6 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Shared.Cart;
+using BlazorElectronics.Shared.Promos;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public sealed class CartController : UserController
 
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
-
+        
         ServiceReply<CartDto?> reply = await _cartService.UpdateCart( userReply.Data, requestDto );
         return GetReturnFromReply( reply );
     }
@@ -58,6 +59,28 @@ public sealed class CartController : UserController
             return GetReturnFromReply( userReply );
 
         ServiceReply<bool> reply = await _cartService.ClearCart( userReply.Data );
+        return GetReturnFromReply( reply );
+    }
+    [HttpPut( "add-promo" )]
+    public async Task<ActionResult<PromoCodeDto?>> AddPromo( [FromBody] string promoCode )
+    {
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
+
+        if ( !userReply.Success )
+            return GetReturnFromReply( userReply );
+
+        ServiceReply<PromoCodeDto?> reply = await _cartService.AddPromo( userReply.Data, promoCode );
+        return GetReturnFromReply( reply );
+    }
+    [HttpDelete( "remove-promo" )]
+    public async Task<ActionResult<bool>> RemovePromo( int promoId )
+    {
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
+
+        if ( !userReply.Success )
+            return GetReturnFromReply( userReply );
+
+        ServiceReply<bool> reply = await _cartService.RemovePromo( userReply.Data, promoId );
         return GetReturnFromReply( reply );
     }
 }

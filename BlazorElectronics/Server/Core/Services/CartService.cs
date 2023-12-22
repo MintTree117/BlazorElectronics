@@ -2,6 +2,7 @@ using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.Promos;
 
 namespace BlazorElectronics.Server.Core.Services;
 
@@ -70,6 +71,38 @@ public sealed class CartService : ApiService, ICartService
             bool result = await _cartRepository.DeleteCart( userId );
             
             return result
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<PromoCodeDto?>> AddPromo( int userId, string code )
+    {
+        try
+        {
+            PromoCodeDto? promo = await _cartRepository.InsertCartPromo( userId, code );
+
+            return promo is not null
+                ? new ServiceReply<PromoCodeDto?>( promo )
+                : new ServiceReply<PromoCodeDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<PromoCodeDto?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<bool>> RemovePromo( int userId, int promoId )
+    {
+        try
+        {
+            bool success = await _cartRepository.DeleteCartPromo( userId, promoId );
+
+            return success
                 ? new ServiceReply<bool>( true )
                 : new ServiceReply<bool>( ServiceErrorType.NotFound );
         }

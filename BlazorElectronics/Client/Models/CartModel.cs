@@ -60,12 +60,12 @@ public sealed class CartModel
 
     public void AddPromo( PromoCodeDto promo )
     {
-        if ( PromoCodes.All( p => p.Code != promo.Code ) )
+        if ( PromoCodes.All( p => p.PromoId != promo.PromoId ) )
             PromoCodes.Add( promo );
     }
-    public void RemovePromo( string code )
+    public void RemovePromo( int id )
     {
-        PromoCodeDto? p = PromoCodes.Find( p => p.Code == code );
+        PromoCodeDto? p = PromoCodes.Find( p => p.PromoId == id );
 
         if ( p is not null )
             PromoCodes.Remove( p );

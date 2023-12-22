@@ -95,29 +95,29 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         return await TryUserDeleteRequest<bool>( API_ROUTE_CLEAR_CART );
     }
     
-    public async Task<ServiceReply<bool>> AddPromoCode( string code )
+    public async Task<ServiceReply<PromoCodeDto?>> AddPromoCode( string code )
     {
         ServiceReply<PromoCodeDto?> reply = await TryUserPutRequest<PromoCodeDto>( API_ROUTE_ADD_PROMO, code );
 
         if ( !reply.Success || reply.Data is null )
-            return new ServiceReply<bool>( reply.ErrorType, reply.Message );
+            return new ServiceReply<PromoCodeDto?>( reply.ErrorType, reply.Message );
 
         CartModel cart = await GetLocalCart();
         cart.AddPromo( reply.Data );
         await TryStoreLocalCart( cart );
         
         OnChange?.Invoke( cart.GetCartInfo() );
-        return new ServiceReply<bool>( true );
+        return new ServiceReply<PromoCodeDto?>( reply.Data );
     }
-    public async Task<ServiceReply<bool>> RemovePromoCode( string code )
+    public async Task<ServiceReply<bool>> RemovePromoCode( int id )
     {
         CartModel cart = await GetLocalCart();
-        cart.RemovePromo( code );
+        cart.RemovePromo( id );
         await TryStoreLocalCart( cart );
 
         OnChange?.Invoke( cart.GetCartInfo() );
         
-        ServiceReply<bool> reply = await TryUserDeleteRequest<bool>( API_ROUTE_REMOVE_PROMO, GetRemovePromoParam( code ) );
+        ServiceReply<bool> reply = await TryUserDeleteRequest<bool>( API_ROUTE_REMOVE_PROMO, GetRemovePromoParam( id ) );
 
         return reply.Success
             ? new ServiceReply<bool>( true )
@@ -150,12 +150,12 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
             return new CartModel();
         }
     }
-
-    static Dictionary<string, object> GetRemovePromoParam( string code )
+    
+    static Dictionary<string, object> GetRemovePromoParam( int id )
     {
         return new Dictionary<string, object>
         {
-            { "PromoCode", code }
+            { "PromoId", id }
         };
     }
 }

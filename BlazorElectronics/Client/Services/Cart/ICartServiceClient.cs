@@ -1,6 +1,7 @@
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
+using BlazorElectronics.Shared.Promos;
 
 namespace BlazorElectronics.Client.Services.Cart;
 
@@ -15,6 +16,6 @@ public interface ICartServiceClient
     Task<ServiceReply<bool>> RemoveItem( int productId );
     Task<ServiceReply<bool>> ClearCart();
 
-    Task<ServiceReply<bool>> AddPromoCode( string code );
-    Task<ServiceReply<bool>> RemovePromoCode( string code );
+    Task<ServiceReply<PromoCodeDto?>> AddPromoCode( string code );
+    Task<ServiceReply<bool>> RemovePromoCode( int id );
 }

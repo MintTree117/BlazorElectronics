@@ -20,10 +20,10 @@ public sealed class AdminPromoController : _AdminController
     public async Task<ActionResult<List<PromoEditDto>?>> GetCategoriesView()
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
-
+        
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
-
+        
         ServiceReply<List<PromoEditDto>?> reply = await _service.GetView();
         return GetReturnFromReply( reply );
     }

@@ -11,9 +11,11 @@ namespace BlazorElectronics.Server.Data.Repositories;
 public class CartRepository : DapperRepository, ICartRepository
 {
     const string PROCEDURE_UPDATE_CART = "Update_Cart";
-    const string PROCEDURE_INSERT_TO_CART = "InsertOrUpdate_CartItem";
-    const string PROCEDURE_DELETE = "Delete_CartItem";
+    const string PROCEDURE_INSERT_UPDATE_ITEM = "InsertOrUpdate_CartItem";
+    const string PROCEDURE_DELETE_ITEM = "Delete_CartItem";
     const string PROCEDURE_DELETE_CART = "Delete_Cart";
+    const string PROCEDURE_INSERT_PROMO = "Insert_CartPromo";
+    const string PROCEDURE_DELETE_PROMO = "Delete_CartPromo";
 
     public CartRepository( DapperContext dapperContext ) : base( dapperContext ) { }
     
@@ -29,7 +31,7 @@ public class CartRepository : DapperRepository, ICartRepository
         p.Add( PARAM_PRODUCT_ID, itemDto.ProductId );
         p.Add( PARAM_CART_QUANTITY, itemDto.ItemQuantity );
 
-        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_INSERT_TO_CART );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_INSERT_UPDATE_ITEM );
     }
     public async Task<bool> DeleteItem( int userId, int productId )
     {
@@ -37,7 +39,7 @@ public class CartRepository : DapperRepository, ICartRepository
         p.Add( PARAM_USER_ID, userId );
         p.Add( PARAM_PRODUCT_ID, productId );
 
-        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE );
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_ITEM );
     }
     public async Task<bool> DeleteCart( int userId )
     {
@@ -45,6 +47,22 @@ public class CartRepository : DapperRepository, ICartRepository
         p.Add( PARAM_USER_ID, userId );
 
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_CART );
+    }
+    public async Task<PromoCodeDto?> InsertCartPromo( int userId, string code )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_ID, userId );
+        p.Add( PARAM_PROMO_CODE, code );
+
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<PromoCodeDto?>, p, PROCEDURE_INSERT_PROMO );
+    }
+    public async Task<bool> DeleteCartPromo( int userId, int promoId )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_ID, userId );
+        p.Add( PARAM_PROMO_ID, promoId );
+
+        return await TryQueryTransactionAsync( Execute, p, PROCEDURE_DELETE_PROMO );
     }
 
     static async Task<CartDto?> UpdateCartQuery( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? p )
