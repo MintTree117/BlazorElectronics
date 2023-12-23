@@ -92,7 +92,7 @@ public partial class ProductDetails : PageView
 
         _cartProduct = new CartProductDto( _product );
 
-        ServiceReply<int> reply = await CartService.HasItem( _product.Id );
+        ServiceReply<int> reply = await CartService.HasItem( _product.ProductId );
 
         if ( !reply.Success )
             return;
@@ -144,7 +144,7 @@ public partial class ProductDetails : PageView
         if ( _product is null )
             return;
 
-        _productReviewsGetDto.ProductId = _product.Id;
+        _productReviewsGetDto.ProductId = _product.ProductId;
         _reviews.Clear();
 
         ServiceReply<ProductReviewsReplyDto?> reply = await ReviewService.GetForProduct( _productReviewsGetDto );

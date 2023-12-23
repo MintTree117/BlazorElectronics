@@ -19,12 +19,13 @@ public partial class ProductFilters : RazorView
     string _showFiltersCss = string.Empty;
     string _searchText = string.Empty;
     
-    readonly ProductFiltersDto _filters = new();
+    ProductFiltersDto _filters = new();
 
     IReadOnlyList<CategoryFullDto>? _subCategories = new List<CategoryFullDto>();
     IReadOnlyDictionary<int, LookupSpec> _specs = new Dictionary<int, LookupSpec>();
     IReadOnlyList<VendorDto> _vendors = new List<VendorDto>();
-    
+
+    int? _selectedRating = null;
     Dictionary<string, bool> _collapsedSections = new();
     Dictionary<(int specId, int specValueId), bool> _selectedSpecs = new();
     Dictionary<int, bool> _selectedVendors = new();
@@ -115,10 +116,28 @@ public partial class ProductFilters : RazorView
 
         await OnApplyFilters.InvokeAsync( _filters );
     }
+    void ClearFilters()
+    {
+        _filters = new ProductFiltersDto();
+        _selectedRating = null;
+        
+        foreach ( (int specId, int specValueId) key in _selectedSpecs.Keys )
+        {
+            _selectedSpecs[ key ] = false;
+        }
+        foreach ( var key in _selectedVendors.Keys )
+        {
+            _selectedVendors[ key ] = false;
+        }
+        
+        StateHasChanged();
+    }
 
     void SetMinimumRating( int rating )
     {
         _filters.MinRating = rating;
+        _selectedRating = rating;
+        StateHasChanged();
     }
     void OnLookupFilterChanged( int specId, int specValueId, bool isChecked )
     {

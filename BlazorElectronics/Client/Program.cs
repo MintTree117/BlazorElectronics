@@ -14,6 +14,7 @@ using BlazorElectronics.Client.Services.Vendors;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Features;
+using BlazorElectronics.Shared.Products;
 using BlazorElectronics.Shared.Promos;
 using BlazorElectronics.Shared.Specs;
 using BlazorElectronics.Shared.Vendors;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IAdminCrudService<CategoryViewDtoDto, CategoryEditDto
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, FeatureDtoEditDto>, AdminCrudService<CrudViewDto, FeatureDtoEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, LookupSpecEditDto>, AdminCrudService<CrudViewDto, LookupSpecEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<PromoEditDto, PromoEditDto>, AdminCrudService<PromoEditDto, PromoEditDto>>();
+builder.Services.AddScoped<IAdminCrudService<CrudViewDto, ProductEditDto>, AdminCrudService<CrudViewDto, ProductEditDto>>();
 builder.Services.AddScoped<IAdminCrudService<CrudViewDto, VendorEditDtoDto>, AdminCrudService<CrudViewDto, VendorEditDtoDto>>();
 builder.Services.AddScoped<IAdminSeedService, AdminSeedService>();
 builder.Services.AddScoped<IAdminCategoryHelper, AdminCategoryHelper>();

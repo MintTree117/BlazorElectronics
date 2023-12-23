@@ -192,14 +192,14 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         if ( minPrice.HasValue )
         {
             builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE} >= {PARAM_MIN_PRICE}" );
-            builder.Append( $" OR {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} >= {PARAM_MIN_PRICE} )" );
+            builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} >= {PARAM_MIN_PRICE} )" );
             dynamicParams.Add( PARAM_MIN_PRICE, minPrice.Value, DbType.Decimal );
         }
         if ( maxPrice.HasValue )
         {
-            builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE} <= {PARAM_MIN_PRICE}" );
-            builder.Append( $" OR {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} <= {PARAM_MIN_PRICE} )" );
-            dynamicParams.Add( PARAM_MAX_PRICE, maxPrice.Value );
+            builder.Append( $" AND ( {TABLE_PRODUCTS}.{COL_PRODUCT_PRICE} <= {PARAM_MAX_PRICE}" );
+            builder.Append( $" AND {TABLE_PRODUCTS}.{COL_PRODUCT_SALE_PRICE} <= {PARAM_MAX_PRICE} )" );
+            dynamicParams.Add( PARAM_MAX_PRICE, maxPrice.Value, DbType.Decimal );
         }
     }
     static void AppendSpecConditions( StringBuilder builder, DynamicParameters dynamicParams, Dictionary<int, List<int>>? specs, bool exclude )

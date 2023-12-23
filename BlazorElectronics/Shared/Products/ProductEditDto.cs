@@ -1,9 +1,9 @@
 namespace BlazorElectronics.Shared.Products;
 
-public class ProductDto
+public class ProductEditDto : ICrudEditDto
 {
     public int ProductId { get; set; }
-    public int VendorId { get; set; }
+    public string VendorName { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Thumbnail { get; set; } = string.Empty;
     public decimal Price { get; set; }
@@ -14,8 +14,13 @@ public class ProductDto
     public int NumberReviews { get; set; }
     public int NumberSold { get; set; }
     public string Description { get; set; } = string.Empty;
-    public List<int> Categories { get; set; } = new();
+    public List<string> Categories { get; set; } = new();
     public List<string> Images { get; set; } = new();
     public Dictionary<int, List<int>> LookupSpecs { get; set; } = new();
     public Dictionary<string, string> XmlSpecsAggregated { get; set; } = new();
+    
+    public void SetId( int id )
+    {
+        ProductId = id;
+    }
 }

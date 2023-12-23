@@ -1,7 +1,7 @@
 <div>
     @for ( int i = 0; i < 5; i++ )
     {
-        if ( i <= Rating )
+        if ( i < RoundedRating )
         {
             <span class="oi oi-star oi-star-checked"></span>   
         }
@@ -20,6 +20,6 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        RoundedRating = ( int ) Math.Round( Rating );
+        RoundedRating = ( int ) Rating;
     }
 }

@@ -186,7 +186,7 @@ public sealed class ProductService : ApiService, IProductService
         {
             ProductDto dto = new()
             {
-                Id = model.Product.ProductId,
+                ProductId = model.Product.ProductId,
                 VendorId = model.Product.VendorId,
                 Title = model.Product.Title,
                 Thumbnail = model.Product.Thumbnail,

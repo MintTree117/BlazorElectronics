@@ -11,7 +11,7 @@ public sealed class CartProductDto
     }
     public CartProductDto( ProductDto p )
     {
-        ProductId = p.Id;
+        ProductId = p.ProductId;
         Title = p.Title;
         Thumbnail = p.Thumbnail;
         Price = p.Price;

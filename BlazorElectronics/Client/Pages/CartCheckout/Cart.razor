@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row align-items-end justify-content-between">
-                                    <input class="form-control flex-shrink-1 flex-grow-0" style="min-width: 100px; max-width: 300px;" type="number" value="@p.ItemQuantity" onchange="@( async ( ChangeEventArgs e ) => await ChangeQuantity( e, p ))"/>
+                                    <input class="form-control flex-shrink-1 flex-grow-0" style="min-width: 100px; max-width: 100px;" type="number" value="@p.ItemQuantity" onchange="@( async ( ChangeEventArgs e ) => await ChangeQuantity( e, p ))"/>
                                     <button class="btn btn-secondary btn-icon" onclick="@( async () => await RemoveItem( p ) )">
                                         Remove
                                         <i class="oi oi-trash ms-2"></i>

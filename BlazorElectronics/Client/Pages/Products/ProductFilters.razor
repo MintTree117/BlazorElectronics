@@ -7,15 +7,19 @@
 
 <div class="product-filters border border-grey p-3 bg-light @_showFiltersCss">
 
+    <!-- TITLE & CLOSE -->
     <div class="d-flex flex-row justify-content-between mb-3">
         <h3 class="text-decoration-underline m-0 mb-lg-3 p-0">Filters</h3>
         <button class="btn btn-close product-filters-exit ms-3" onclick="@HideFilters"></button>
     </div>
     
-    <div class="d-grid w-100">
-        <button class="mb-3 mt-2 btn btn-outline-primary w-100" type="button" @onclick="@( async () => await ApplyFilters() )">Apply Filters</button>
+    <!-- APPLY & CLEAR -->
+    <div class="mb-3 mt-2 d-flex flex-row align-items-center justify-content-between gap-2 w-100">
+        <button class="flex-grow-1 btn btn-outline-primary" type="button" @onclick="@( async () => await ApplyFilters() )">Apply</button>
+        <button class="flex-grow-1 btn btn-outline-secondary" type="button" @onclick="ClearFilters">Clear</button>
     </div>
-
+    
+    <!-- CATEGORIES -->
     @if ( _subCategories is not null )
     {
         <div class="product-filters-section d-grid">
@@ -33,7 +37,8 @@
             </div>
         </div>
     }
-
+    
+    <!-- TRENDS -->
     <div class="product-filters-section d-grid">
         <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_TRENDS )">
             <span>Trends/Availability</span>
@@ -54,7 +59,8 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- PRICE -->
     <div class="product-filters-section d-grid">
         <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_PRICE )">
             <span>Pricing</span>
@@ -73,7 +79,8 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- RATING -->
     <div class="product-filters-section d-grid">
         <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_RATING )">
             <span>User Rating</span>
@@ -81,18 +88,25 @@
         </button>
         <div class="@GetCollapseDisplay( SECTION_RATING )">
             <div class="d-flex flex-column ">
-                @for ( int i = 5; i >= 1; i-- )
+                @for ( int i = 4; i > 0; i-- )
                 {
                     int index = i;
-                    <button type="button" class="btn mb-2 ps-0 d-flex justify-content-start align-items-center" @onclick="() => SetMinimumRating( index )">
-                        <StarRating Rating="@index" ></StarRating>
-                        & up
-                    </button>
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <button type="button" class="btn mb-2 ps-0 d-flex justify-content-start align-items-center" @onclick="() => SetMinimumRating( index )">
+                            <StarRating Rating="@index" ></StarRating>
+                            & up
+                        </button>
+                        @if ( i == _selectedRating )
+                        {
+                            <i class="oi oi-check"></i>
+                        }
+                    </div>
                 }
             </div>
         </div>
     </div>
     
+    <!-- VENDORS -->
     <div class="product-filters-section d-grid">
         <button class="btn product-filters-button" type="button" @onclick="() => ToggleSectionCollapse( SECTION_VENDORS )">
             <span>Vendors</span>
@@ -109,7 +123,8 @@
             }
         </div>
     </div>
-
+    
+    <!-- SPECS -->
     @foreach ( LookupSpec s in _specs.Values )
     {
         <div class="product-filters-section d-grid">

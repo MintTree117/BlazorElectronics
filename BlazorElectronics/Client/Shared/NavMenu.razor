@@ -3,11 +3,11 @@
 @using BlazorElectronics.Shared.Categories
 @inherits RazorView
 
-<header class="p-0 ">
+<header class="p-0 main-nav">
     
     <NavSidebar NavMenu="@this"></NavSidebar>
     
-    <div class="container-fluid border-bottom py-3 top-nav bg-light">
+    <div class="container-fluid border-bottom py-3 top-nav background-light">
         <div class="d-flex flex-nowrap align-items-center justify-content-between top-nav-inner">
             <div class="d-flex align-items-center justify-content-between gap-3">
                 <button class="btn" onclick="@OpenSidebar">
@@ -35,7 +35,7 @@
     </div>
 
 
-    <div class="d-none d-lg-block container-fluid py-1 bg-light border-bottom shadow-bottom top-nav-secondary">
+    <div class="d-none d-lg-block container-fluid py-1 background-light border-bottom shadow-bottom top-nav-secondary">
         @if ( _categories is not null )
         {
             <div class="d-flex flex-nowrap align-items-center justify-content-evenly">

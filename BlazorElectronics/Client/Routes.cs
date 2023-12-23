@@ -27,4 +27,5 @@ public static class Routes
     public const string REGISTERED_EMAIL = "registeredEmail";
     public const string VERIFY_TOKEN = "token";
     public const string SEARCH_TEXT_PARAM = "searchText";
+    public const string PRODUCT_EDIT_NEW_PARAM = "newProduct";
 }

@@ -1,0 +1,27 @@
+@page "/admin/edit-product/{productId}"
+@using BlazorElectronics.Client.Pages.Admin.Crud
+@inherits AdminPage
+
+<div class="container-sm form-wrapper">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <CrudHeader Page="@this"></CrudHeader>
+        
+        <EditForm Model="_productDto" OnSubmit="( async () => await Submit() )">
+            <div class="mb-3">
+                <label for="Name" class="form-label">Product Name</label>
+                <InputText @bind-Value="_productDto.Title" class="form-control" id="Name"></InputText>
+            </div>
+            <div class="mb-3">
+                <label for="Vendor" class="form-label">Product Name</label>
+                <InputText @bind-Value="_productDto.VendorName" class="form-control" id="Vendor"></InputText>
+            </div>
+            <div class="mb-3">
+                <label for="Thumbnail" class="form-label">Thumbnail</label>
+                <InputText @bind-Value="_productDto.Thumbnail" class="form-control" id="Thumbnail"></InputText>
+            </div>
+        </EditForm>
+    }
+</div>

@@ -21,7 +21,7 @@
              foreach ( ProductSummaryDto p in _search.Products )
              {
                  int roundedRating = ( int ) Math.Round( p.Rating );
-                 <div class="product-card bg-light">
+                 <div class="product-card bg-light shadow">
                      <a href="@Routes.PRODUCT/@p.Id" class="product-card-image">
                          <img src="@p.Thumbnail" alt="@p.Title"/>
                      </a>
