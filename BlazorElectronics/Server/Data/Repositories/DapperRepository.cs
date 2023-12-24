@@ -22,6 +22,8 @@ public abstract class DapperRepository
     protected const string PARAM_ROWS = "@Rows";
     protected const string PARAM_OFFSET = "@Offset";
     protected const string PARAM_REVIEW_SORT_TYPE = "@ReviewSort";
+    protected const string COL_QUANTITY = "Quantity";
+    protected const string PARAM_QUANTITY = $"@{COL_QUANTITY}";
     
     // CATEGORIES
     protected const string COL_CATEGORY_ID = "CategoryId";
@@ -73,9 +75,11 @@ public abstract class DapperRepository
     protected const string PARAM_PRODUCT_IMAGES = $"@{TVP_PRODUCT_IMAGES}";
     
     // PROMOS
+    protected const string COL_PROMO_CODE = "PromoCode";
+    protected const string COL_PROMO_DISCOUNT = "PromoDiscount";
     protected const string PARAM_PROMO_ID = "@PromoId";
-    protected const string PARAM_PROMO_CODE = "@PromoCode";
-    protected const string PARAM_PROMO_DISCOUNT = "@PromoDiscount";
+    protected const string PARAM_PROMO_CODE = $"@{COL_PROMO_CODE}";
+    protected const string PARAM_PROMO_DISCOUNT = $"@{COL_PROMO_DISCOUNT}";
     
     // VENDORS
     protected const string COL_VENDOR_ID = "VendorId";
@@ -122,10 +126,18 @@ public abstract class DapperRepository
     protected const string PARAM_SESSION_SALT = "@SessionSalt";
 
     // CART
-    protected const string COL_CART_ITEM_QUANTITY = "ItemQuantity";
     protected const string TVP_CART_ITEMS = "TVP_CartItems";
     protected const string PARAM_CART_ITEMS = $"@{TVP_CART_ITEMS}";
-    protected const string PARAM_CART_QUANTITY = $"@{COL_CART_ITEM_QUANTITY}";
+
+    // ORDERS
+    protected const string COL_TOTAL_PRICE = "TotalPrice";
+    protected const string TVP_ORDER_ITEMS = "TVP_OrderItems";
+    protected const string TVP_ORDER_PROMOS = "TVP_OrderPromos";
+    protected const string PARAM_ORDER_ITEMS = $@"{TVP_ORDER_ITEMS}";
+    protected const string PARAM_ORDER_PROMOS = $@"{TVP_ORDER_PROMOS}";
+    protected const string PARAM_ORDER_ID = "@OrderId";
+    protected const string PARAM_ORDER_DATE = "@OrderDate";
+    protected const string PARAM_TOTAL_PRICE = $"@{COL_TOTAL_PRICE}";
 
     // EXCEPTION CONSTS
     const int MAX_RETRIES = 3;

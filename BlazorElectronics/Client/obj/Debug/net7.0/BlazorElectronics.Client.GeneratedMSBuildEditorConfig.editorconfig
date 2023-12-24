@@ -72,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQ3J1ZC9DcnVkUHJvbW9zLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Admin/ProductEdit/EditProduct.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vUHJvZHVjdEVkaXQvRWRpdFByb2R1Y3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Admin/TestSeed/TestSeedPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vVGVzdFNlZWQvVGVzdFNlZWRQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -86,6 +90,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/CartCheckout/CartSummary.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2FydENoZWNrb3V0L0NhcnRTdW1tYXJ5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/CartCheckout/OrderSuccess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2FydENoZWNrb3V0L09yZGVyU3VjY2Vzcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/Login/UserLogin.razor]
@@ -124,8 +132,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMvUHJvZHVjdFNlYXJjaExpc3QucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserProfile.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyUHJvZmlsZS5yYXpvcg==
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserAccountDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyQWNjb3VudERldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserAccountNav.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyQWNjb3VudE5hdi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserAccountOrderDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyQWNjb3VudE9yZGVyRGV0YWlscy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserAccountOrders.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyQWNjb3VudE9yZGVycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Pages/User/UserAccountSessions.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyQWNjb3VudFNlc3Npb25zLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Client/Shared/CartCounter.razor]

@@ -9,14 +9,14 @@ public sealed class CartItemDto
     public CartItemDto( int id, int quantity )
     {
         ProductId = id;
-        ItemQuantity = quantity;
+        Quantity = quantity;
     }
     
     public int ProductId { get; init; }
-    public int ItemQuantity { get; set; }
+    public int Quantity { get; set; }
     
     public void IncreaseQuantity( int amount )
     {
-        ItemQuantity += amount;
+        Quantity += amount;
     }
 }

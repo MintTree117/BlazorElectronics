@@ -3,6 +3,7 @@ using System.Web;
 using BlazorElectronics.Client.Services.Cart;
 using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
+using BlazorElectronics.Shared.Sessions;
 using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Components;
 
@@ -32,7 +33,7 @@ public partial class UserLogin : PageView
     }
     async Task HandleLogin()
     {
-        ServiceReply<SessionReplyDto?> loginReply = await UserService.Login( _loginDto );
+        ServiceReply<SessionDto?> loginReply = await UserService.Login( _loginDto );
 
         if ( !loginReply.Success || loginReply.Data is null )
         {

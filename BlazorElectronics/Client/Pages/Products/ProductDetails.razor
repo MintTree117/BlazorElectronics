@@ -114,14 +114,14 @@
                             <div class="input-group mb-3 d-flex flex-row flex-nowrap" style="max-width: 45%;">
                                 @if ( !_isInCart )
                                 {
-                                    <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.ItemQuantity" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
+                                    <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.Quantity" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
                                     <button class="btn btn-outline-primary flex-grow-1" type="button" @onclick="@(async () => await AddToCart() )">
                                         Add to Cart
                                     </button>   
                                 }
                                 else
                                 {
-                                    <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.ItemQuantity" style="min-width: 75px;" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
+                                    <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.Quantity" style="min-width: 75px;" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
                                     <a class="btn btn-outline-primary flex-grow-1" href="@Routes.CART">View Cart</a>
                                 }
                             </div>

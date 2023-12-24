@@ -1,0 +1,54 @@
+@page "/account/details"
+@inherits UserPage
+
+<div class="container-sm mt-3" style="max-width: 1000px;">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <AlertMessage Page="@this"></AlertMessage>
+        
+        <div class="d-flex flex-column flex-lg-row gap-3">
+            
+            <UserAccountNav></UserAccountNav>
+
+            <div class="p-3 w-100 flex-grow-1 d-flex flex-column ms-lg-3 bg-light border border-grey">
+                <h2 class="m-0 mb-3">Account Details</h2>
+                <EditForm class="mb-3 w-100" Model="_detailsDto" OnValidSubmit="@(async () => await UpdateAccount() )">
+                    <div class="mb-3 form-floating">
+                        <InputText class="form-control" id="name" @bind-Value="_detailsDto.Username" type="text"/>
+                        <label for="name">Username</label>
+                        <ValidationMessage For="@(() => _detailsDto.Username)"/>
+                    </div>
+                    <div class="mb-3 form-floating">
+                        <InputText class="form-control" id="email" @bind-Value="_detailsDto.Email" type="email"/>
+                        <label for="email">Email</label>
+                        <ValidationMessage For="@(() => _detailsDto.Email)"/>
+                    </div>
+                    <div class="mb-3 form-floating">
+                        <InputText class="form-control" id="phone" @bind-Value="_detailsDto.Phone" type="phone"/>
+                        <label for="phone">Phone</label>
+                        <ValidationMessage For="@(() => _detailsDto.Phone)"/>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Apply</button>
+                </EditForm>
+                
+                <h2 class="m-0 mb-3">Change Password</h2>
+                <EditForm class="mb-3 w-100" Model="_passwordDto" OnValidSubmit="@(async () => await UpdatePassword() )">
+                    <div class="mb-3 form-floating">
+                        <InputText class="form-control" id="password" @bind-Value="_passwordDto.Password" type="password"/>
+                        <label for="password">New Password</label>
+                        <ValidationMessage For="@(() => _passwordDto.Password)"/>
+                    </div>
+                    <div class="mb-3 form-floating">
+                        <InputText class="form-control" id="confirm-password" @bind-Value="_passwordDto.ConfirmPassword" type="password"/>
+                        <label for="confirm-password">Confirm New Password</label>
+                        <ValidationMessage For="@(() => _passwordDto.ConfirmPassword)"/>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Apply</button>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+

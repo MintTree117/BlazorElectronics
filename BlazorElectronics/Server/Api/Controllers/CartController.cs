@@ -21,7 +21,7 @@ public sealed class CartController : UserController
     public async Task<ActionResult<CartDto?>> UpdateCart( [FromBody] List<CartItemDto> requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
-
+        
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
         

@@ -27,7 +27,7 @@ public abstract class UserPage : PageView
         if ( !PageIsAuthorized )
         {
             Logger.LogError( reply.ErrorType + reply.Message );
-            StartPageRedirection( "You are not logged in!" );
+            StartPageRedirection( $"You are not logged in! {reply.ErrorType} : {reply.Message}" );
         }
     }
 }

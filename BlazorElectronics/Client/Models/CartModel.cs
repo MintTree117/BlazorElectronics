@@ -21,7 +21,7 @@ public sealed class CartModel
     public List<CartItemDto> GetItemsDto()
     {
         return Products
-            .Select( product => new CartItemDto { ProductId = product.ProductId, ItemQuantity = product.ItemQuantity } )
+            .Select( product => new CartItemDto { ProductId = product.ProductId, Quantity = product.Quantity } )
             .ToList();
     }
     public CartInfoModel GetCartInfo()
@@ -40,7 +40,7 @@ public sealed class CartModel
         if ( product is null )
             Products.Add( item );
         else
-            product.ItemQuantity += item.ItemQuantity;
+            product.Quantity += item.Quantity;
     }
     public void RemoveItem( int productId )
     {
@@ -57,7 +57,7 @@ public sealed class CartModel
     public void AddOrUpdateQuantity( CartProductDto item )
     {
         if ( GetSameItem( item, out CartProductDto? sameItem ) )
-            sameItem!.ItemQuantity += item.ItemQuantity;
+            sameItem!.Quantity += item.Quantity;
         else
             Products.Add( item );
     }

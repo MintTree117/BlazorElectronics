@@ -1,5 +1,6 @@
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Client.Services.Cart;
+using BlazorElectronics.Client.Services.Orders;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Promos;
@@ -10,6 +11,7 @@ namespace BlazorElectronics.Client.Pages.CartCheckout;
 public partial class Cart : PageView
 {
     [Inject] ICartServiceClient CartService { get; init; } = default!;
+    [Inject] IOrderServiceClient OrderService { get; init; } = default!;
     public CartModel CartModel = new();
 
     CartSummary _summary = default!;
@@ -49,7 +51,7 @@ public partial class Cart : PageView
         if ( !int.TryParse( args.Value?.ToString(), out int quantity ) )
             return;
 
-        product.ItemQuantity = Math.Max( quantity, 1 );
+        product.Quantity = Math.Max( quantity, 1 );
 
         ServiceReply<bool> reply = await CartService.AddOrUpdateItem( product );
 
@@ -65,5 +67,19 @@ public partial class Cart : PageView
 
         if ( !reply.Success )
             InvokeAlert( AlertType.Danger, $"Failed to remove item! {reply.ErrorType} : {reply.Message}" );
+    }
+
+    async Task PlaceOrder()
+    {
+        ServiceReply<string?> orderReply = await OrderService.PlaceOrder();
+
+        if ( !orderReply.Success || orderReply.Data is null )
+        {
+            InvokeAlert( AlertType.Danger, $"Failed to place order! {orderReply.ErrorType} : {orderReply.Message}" );
+            return;
+        }
+
+        string url = orderReply.Data;
+        NavManager.NavigateTo( url );
     }
 }

@@ -7,8 +7,7 @@
     
     @if ( PageIsReady() )
     {
-        <CrudHeader Page="@this"></CrudHeader>
-        
+
         <EditForm Model="_productDto" OnSubmit="( async () => await Submit() )">
             <div class="mb-3">
                 <label for="Name" class="form-label">Product Name</label>

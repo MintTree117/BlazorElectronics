@@ -5,6 +5,7 @@ using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Sessions;
 using BlazorElectronics.Server.Core.Models.Users;
 using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.Sessions;
 
 namespace BlazorElectronics.Server.Core.Services;
 
@@ -21,16 +22,42 @@ public sealed class SessionService : ApiService, ISessionService
         _sessionRepository = sessionRepository;
     }
 
-    public async Task<ServiceReply<SessionDto?>> CreateSession( int userId, UserDeviceInfoDto? deviceInfo )
+    public async Task<ServiceReply<List<SessionInfoDto>?>> GetUserSessions( int userId )
+    {
+        try
+        {
+            IEnumerable<SessionModel>? models = await _sessionRepository.GetSessions( userId );
+            List<SessionInfoDto>? dto = MapSessionInfo( models );
+
+            return dto is not null
+                ? new ServiceReply<List<SessionInfoDto>?>( dto )
+                : new ServiceReply<List<SessionInfoDto>?>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<List<SessionInfoDto>?>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<SessionDto?>> CreateSession( UserLoginDto dto, UserDeviceInfoDto? deviceInfo )
     {
         try
         {
             CreateSessionToken( out string token, out byte[] hash, out byte[] salt );
-            UserSession? insertedSession = await _sessionRepository.InsertSession( userId, hash, salt, deviceInfo );
+            SessionModel? insertedSession = await _sessionRepository.InsertSession( dto.UserId, hash, salt, deviceInfo );
 
-            return insertedSession is not null
-                ? new ServiceReply<SessionDto?>( new SessionDto( insertedSession.SessionId, token ) )
-                : new ServiceReply<SessionDto?>( ServiceErrorType.NotFound );
+            if ( insertedSession is null )
+                return new ServiceReply<SessionDto?>( ServiceErrorType.Conflict, "Failed to create session!" );
+
+            SessionDto session = new()
+            {
+                Username = dto.Username,
+                SessionId = insertedSession.SessionId,
+                SessionToken = token,
+                IsAdmin = dto.IsAdmin
+            };
+
+            return new ServiceReply<SessionDto?>( session );
         }
         catch ( RepositoryException e )
         {
@@ -43,6 +70,22 @@ public sealed class SessionService : ApiService, ISessionService
         try
         {
             bool success = await _sessionRepository.DeleteSession( sessionId );
+
+            return success
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    public async Task<ServiceReply<bool>> DeleteAllSessions( int userId )
+    {
+        try
+        {
+            bool success = await _sessionRepository.DeleteAllSessions( userId );
 
             return success
                 ? new ServiceReply<bool>( true )
@@ -115,5 +158,17 @@ public sealed class SessionService : ApiService, ISessionService
         hmac.Dispose();
         
         return computedHash.SequenceEqual( hash );
+    }
+    static List<SessionInfoDto>? MapSessionInfo( IEnumerable<SessionModel>? models )
+    {
+        return models?
+            .Select( m => new SessionInfoDto 
+                { 
+                    SessionId = m.SessionId, 
+                    DateCreated = m.DateCreated,
+                    LastActive = m.LastActivityDate, 
+                    IpAddress = m.IpAddress ?? string.Empty 
+                } )
+            .ToList();
     }
 }

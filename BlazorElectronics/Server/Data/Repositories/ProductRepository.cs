@@ -22,7 +22,7 @@ public class ProductRepository : DapperRepository, IProductRepository
     {
         return await TryQueryAsync( Query<int>, null, PROCEDURE_GET_IDS );
     }
-    public async Task<ProductModel?> Get( int productId )
+    public async Task<ProductDetailsModel?> Get( int productId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_PRODUCT_ID, productId );
@@ -49,14 +49,14 @@ public class ProductRepository : DapperRepository, IProductRepository
         return await TryQueryTransactionAsync( Execute, null, PROCEDURE_UPDATE_REVIEW_DATA );
     }
 
-    static async Task<ProductModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
+    static async Task<ProductDetailsModel?> GetQuery( SqlConnection connection, string? dynamicSql, DynamicParameters? dynamicParams )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET, dynamicParams, commandType: CommandType.StoredProcedure );
 
         if ( multi is null )
             return null;
 
-        return new ProductModel
+        return new ProductDetailsModel
         {
             Product = await multi.ReadSingleOrDefaultAsync<ProductSummaryModel>(),
             Description = await multi.ReadSingleOrDefaultAsync<ProductDescriptionModel>(),

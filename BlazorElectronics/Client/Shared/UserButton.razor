@@ -35,8 +35,9 @@ else
         <div class="dropdown-menu @_userMenuCssClass" aria-labelledby="userDropdown">
             @if ( _isAuthorized )
             {
-                <a class="dropdown-item" href="profile">Profile</a>
-                <hr/>
+                <a class="dropdown-item" href="@Routes.ACCOUNT_DETAILS">Account</a>
+                <a class="dropdown-item" href="@Routes.ACCOUNT_ORDERS">Orders</a>
+                <a class="dropdown-item" href="@Routes.ACCOUNT_SESSIONS">Sessions</a>
                 <button class="dropdown-item" @onclick="@(async () => await Logout() )">Logout</button>
 
                 @if ( _isAdmin )

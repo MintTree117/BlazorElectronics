@@ -98,7 +98,7 @@ public partial class ProductDetails : PageView
             return;
 
         _isInCart = true;
-        _cartProduct.ItemQuantity = reply.Data;
+        _cartProduct.Quantity = reply.Data;
         StateHasChanged();
     }
     async Task LoadCategories()

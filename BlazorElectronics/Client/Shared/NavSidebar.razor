@@ -8,7 +8,7 @@
             <div>
                 @if ( _sessionMeta is not null )
                 {
-                    <a class="text-decoration-none link-light fs-5" href="@Routes.ACCOUNT">
+                    <a class="text-decoration-none link-light fs-5" href="@Routes.ACCOUNT_DETAILS">
                         <i class="oi oi-person"></i>
                         <span class="ms-2">Welcome, @_sessionMeta.Username</span>
                     </a>
@@ -79,10 +79,10 @@
                 else
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="@Routes.ACCOUNT">Account</a>
+                        <a class="nav-link" href="@Routes.ACCOUNT_DETAILS">Account</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="@Routes.ORDERS">Purchases</a>
+                        <a class="nav-link" href="@Routes.ACCOUNT_ORDERS">Purchases</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="@Routes.LOGOUT">Logout</a>

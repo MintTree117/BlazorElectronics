@@ -1,0 +1,37 @@
+@page "/account/order-details"
+@using BlazorElectronics.Shared.Orders
+@inherits UserPage
+
+<div class="container-sm mt-3" style="max-width: 1000px;">
+    <PageLoader Page="@this"></PageLoader>
+    
+    @if ( PageIsReady() )
+    {
+        <AlertMessage Page="@this"></AlertMessage>
+        
+        <div class="d-flex flex-column flex-lg-row gap-3">
+            
+            <UserAccountNav></UserAccountNav>
+
+            <div class="p-3 w-100 flex-grow-1 d-flex flex-column ms-lg-3 bg-light border border-grey">
+                <h1>Order Details</h1>
+                <h3>Order Date: @_details.OrderDate</h3>
+                <h3>Total Price: @_details.TotalPrice</h3>
+                
+                @foreach ( OrderDetailsProductDto p in _details.Products )
+                {
+                    <div class="d-flex flex-row align-items-center justify-content-between">
+                        <a href="@Routes.PRODUCT/@p.ProductId">
+                            <img src="@p.ImageUrl" alt="@p.Title" style="max-width: 150px; height: auto;"/>
+                        </a>
+                        <a href="@Routes.PRODUCT/@p.ProductId">
+                            <p>@p.Title</p>
+                        </a>
+                        <p>@p.Quantity items</p>
+                        <p>$@p.TotalPrice</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

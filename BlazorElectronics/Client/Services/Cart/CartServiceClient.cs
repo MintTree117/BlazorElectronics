@@ -31,13 +31,13 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         CartProductDto? item = cart.Products.Find( p => p.ProductId == productId );
 
         if ( item != null )
-            return new ServiceReply<int>( item.ItemQuantity );
+            return new ServiceReply<int>( item.Quantity );
 
         ServiceReply<CartModel?> updateReply = await UpdateCart();
         item = updateReply.Data?.Products.Find( p => p.ProductId == productId );
 
         return item is not null
-            ? new ServiceReply<int>( item.ItemQuantity )
+            ? new ServiceReply<int>( item.Quantity )
             : new ServiceReply<int>( updateReply.ErrorType, updateReply.Message );
     }
     public async Task<ServiceReply<CartInfoModel>> GetLocalCartInfo()
@@ -62,7 +62,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     }
     public async Task<ServiceReply<bool>> AddOrUpdateItem( CartProductDto product )
     {
-        CartItemDto dto = new( product.ProductId, product.ItemQuantity );
+        CartItemDto dto = new( product.ProductId, product.Quantity );
         ServiceReply<bool> reply = await TryUserPostRequest<bool>( API_ROUTE_ADD_ITEM, dto );
         
         CartModel cart = await GetLocalCart();

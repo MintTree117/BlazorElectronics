@@ -1,8 +1,9 @@
 namespace BlazorElectronics.Shared.Promos;
 
-public sealed class PromoCodeDto
+public sealed record PromoCodeDto
 {
-    public int PromoId { get; set; }
-    public string PromoCode { get; set; } = string.Empty;
-    public double Discount { get; set; }
+    public int PromoId { get; init; }
+    public string PromoCode { get; init; } = string.Empty;
+    public decimal Discount { get; init; }
+    public bool IsActive { get; init; }
 }

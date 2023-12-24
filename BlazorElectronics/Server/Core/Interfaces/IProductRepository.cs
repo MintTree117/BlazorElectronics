@@ -5,7 +5,7 @@ namespace BlazorElectronics.Server.Core.Interfaces;
 public interface IProductRepository
 {
     Task<IEnumerable<int>?> GetIds();
-    Task<ProductModel?> Get( int productId );
+    Task<ProductDetailsModel?> Get( int productId );
     Task<int> Insert( ProductEditModel editModel );
     Task<bool> Update( ProductEditModel editModel );
     Task<bool> Delete( int productId );

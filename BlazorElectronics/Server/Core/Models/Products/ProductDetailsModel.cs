@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Core.Models.Products;
 
-public sealed class ProductModel
+public sealed class ProductDetailsModel
 {
     public ProductSummaryModel? Product { get; set; }
     public ProductDescriptionModel Description { get; set; } = new();

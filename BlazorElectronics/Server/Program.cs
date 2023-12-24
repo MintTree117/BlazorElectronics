@@ -39,10 +39,15 @@ builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IUserSeedService, UserSeedService>();
-builder.Services.AddScoped<IUserRepository, UserAccountRepository>();
+builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
 
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<IVendorService, VendorService>();

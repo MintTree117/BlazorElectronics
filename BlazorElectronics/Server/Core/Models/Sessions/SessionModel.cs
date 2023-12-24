@@ -1,6 +1,6 @@
 namespace BlazorElectronics.Server.Core.Models.Sessions;
 
-public sealed class UserSession
+public sealed class SessionModel
 {
     public int SessionId { get; set; }
     public int UserId { get; set; }

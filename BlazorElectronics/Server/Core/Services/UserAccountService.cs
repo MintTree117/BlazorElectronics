@@ -6,6 +6,7 @@ using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Users;
 using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Server.Core.Services;
 
@@ -14,18 +15,18 @@ public sealed class UserAccountService : ApiService, IUserAccountService
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
     const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
     
-    readonly IUserRepository _userRepository;
+    readonly IUserAccountRepository _userAccountRepository;
 
-    public UserAccountService( ILogger<ApiService> logger, IUserRepository userRepository ) : base( logger )
+    public UserAccountService( ILogger<ApiService> logger, IUserAccountRepository userAccountRepository ) : base( logger )
     {
-        _userRepository = userRepository;
+        _userAccountRepository = userAccountRepository;
     }
 
     public async Task<ServiceReply<List<int>?>> GetAllIds()
     {
         try
         {
-            IEnumerable<int>? reply = await _userRepository.GetAllIds();
+            IEnumerable<int>? reply = await _userAccountRepository.GetAllIds();
 
             return reply is not null
                 ? new ServiceReply<List<int>?>( reply.ToList() )
@@ -37,11 +38,27 @@ public sealed class UserAccountService : ApiService, IUserAccountService
             return new ServiceReply<List<int>?>( ServiceErrorType.ServerError );
         }
     }
+    public async Task<ServiceReply<AccountDetailsDto?>> GetAccountDetails( int userId )
+    {
+        try
+        {
+            AccountDetailsDto? details = await _userAccountRepository.GetAccountDetails( userId );
+
+            return details is not null
+                ? new ServiceReply<AccountDetailsDto?>( details )
+                : new ServiceReply<AccountDetailsDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<AccountDetailsDto?>( ServiceErrorType.ServerError );
+        }
+    }
     public async Task<ServiceReply<UserLoginDto?>> Login( string emailOrUsername, string password )
     {
         try
         {
-            UserModel? user = await _userRepository.GetByEmailOrUsername( emailOrUsername );
+            UserModel? user = await _userAccountRepository.GetByEmailOrUsername( emailOrUsername );
 
             if ( user is null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, "User Not Found!" );
@@ -63,13 +80,13 @@ public sealed class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            UserExists? userExists = await _userRepository.GetUserExists( username, email );
+            UserExists? userExists = await _userAccountRepository.GetUserExists( username, email );
 
             if ( userExists is not null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
 
             CreatePasswordHash( password, out byte[] hash, out byte[] salt );
-            UserModel? insertedUser = await _userRepository.InsertUser( username, email, phone, hash, salt );
+            UserModel? insertedUser = await _userAccountRepository.InsertUser( username, email, phone, hash, salt );
 
             if ( insertedUser is null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert user!" );
@@ -93,7 +110,7 @@ public sealed class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            UserModel? admin = await _userRepository.GetById( adminId );
+            UserModel? admin = await _userAccountRepository.GetById( adminId );
 
             if ( admin is null )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
@@ -115,7 +132,7 @@ public sealed class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            UserModel? admin = await _userRepository.GetById( adminId );
+            UserModel? admin = await _userAccountRepository.GetById( adminId );
 
             if ( admin is null )
                 return new ServiceReply<int>( ServiceErrorType.NotFound );
@@ -137,7 +154,7 @@ public sealed class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            UserModel? user = await _userRepository.GetById( id );
+            UserModel? user = await _userAccountRepository.GetById( id );
 
             if ( user is null )
                 return new ServiceReply<int>( ServiceErrorType.NotFound );
@@ -152,11 +169,27 @@ public sealed class UserAccountService : ApiService, IUserAccountService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
+    public async Task<ServiceReply<AccountDetailsDto?>> UpdateAccountDetails( int userId, AccountDetailsDto dto )
+    {
+        try
+        {
+            AccountDetailsDto? details = await _userAccountRepository.UpdateAccountDetails( userId, dto );
+
+            return details is not null
+                ? new ServiceReply<AccountDetailsDto?>( details )
+                : new ServiceReply<AccountDetailsDto?>( ServiceErrorType.NotFound );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<AccountDetailsDto?>( ServiceErrorType.ServerError );
+        }
+    }
     public async Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword )
     {
         try
         {
-            UserModel? user = await _userRepository.GetById( userId );
+            UserModel? user = await _userAccountRepository.GetById( userId );
 
             if ( user is null )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
@@ -166,7 +199,7 @@ public sealed class UserAccountService : ApiService, IUserAccountService
 
             CreatePasswordHash( newPassword, out byte[] hash, out byte[] salt );
 
-            bool success = await _userRepository.UpdatePassword( userId, hash, salt );
+            bool success = await _userAccountRepository.UpdatePassword( userId, hash, salt );
             
             return success
                 ? new ServiceReply<bool>( true )
@@ -182,12 +215,12 @@ public sealed class UserAccountService : ApiService, IUserAccountService
     {
         try
         {
-            int userId = await _userRepository.Update_VerificationToken( token );
+            int userId = await _userAccountRepository.Update_VerificationToken( token );
 
             if ( userId <= 0 )
                 return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to activate account!" );
 
-            bool activated = await _userRepository.Update_UserAccountStatus( userId );
+            bool activated = await _userAccountRepository.Update_UserAccountStatus( userId );
 
             return activated
                 ? new ServiceReply<bool>( true )
@@ -211,7 +244,7 @@ public sealed class UserAccountService : ApiService, IUserAccountService
         {
             token = Guid.NewGuid().ToString();
 
-            if ( await _userRepository.InsertVerificationCode( userId, token ) )
+            if ( await _userAccountRepository.InsertVerificationCode( userId, token ) )
             {
                 tokenInserted = true;
                 break;   

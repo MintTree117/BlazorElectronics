@@ -15,13 +15,13 @@
 
 <table class="table table-hover crud-table">
     <thead class="thead-light">
-    <tr>
-        @foreach ( KeyValuePair<string, Action> meta in Page.GetTHeadMeta() )
-        {
-            <th class="crud-sort-th" @onclick="meta.Value">@meta.Key</th>
-        }
-        <th>Actions</th>
-    </tr>
+        <tr>
+            @foreach ( KeyValuePair<string, Action> meta in Page.GetTHeadMeta() )
+            {
+                <th class="crud-sort-th" @onclick="meta.Value">@meta.Key</th>
+            }
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody>
     @foreach ( TItem item in Page.GetView() )

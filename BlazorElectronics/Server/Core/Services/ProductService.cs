@@ -88,7 +88,7 @@ public sealed class ProductService : ApiService, IProductService
     {
         try
         {
-            ProductModel? model = await _productRepository.Get( productId );
+            ProductDetailsModel? model = await _productRepository.Get( productId );
             ProductDto? dto = await MapProductToDto( model );
 
             return dto is not null
@@ -177,7 +177,7 @@ public sealed class ProductService : ApiService, IProductService
             return dto;
         } );
     }
-    static async Task<ProductDto?> MapProductToDto( ProductModel? model )
+    static async Task<ProductDto?> MapProductToDto( ProductDetailsModel? model )
     {
         if ( model?.Product is null )
             return null;

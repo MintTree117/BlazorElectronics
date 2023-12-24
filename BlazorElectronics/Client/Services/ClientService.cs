@@ -95,7 +95,12 @@ public abstract class ClientService
     }
     async Task<ServiceReply<T?>> HandleHttpResponse<T>( HttpResponseMessage httpResponse, string requestTypeName )
     {
-        if ( httpResponse.IsSuccessStatusCode )
+        if ( typeof( T ) == typeof( string ) )
+        {
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            return new ServiceReply<T?>( ( T ) ( object ) responseString );
+        }
+        else if ( httpResponse.IsSuccessStatusCode )
         {
             var getReply = await httpResponse.Content.ReadFromJsonAsync<T>();
 

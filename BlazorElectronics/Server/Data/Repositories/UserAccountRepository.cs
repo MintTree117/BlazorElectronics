@@ -1,10 +1,11 @@
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Users;
+using BlazorElectronics.Shared.Users;
 using Dapper;
 
 namespace BlazorElectronics.Server.Data.Repositories;
 
-public class UserAccountRepository : DapperRepository, IUserRepository
+public class UserAccountRepository : DapperRepository, IUserAccountRepository
 {
     const string PROCEDURE_GET_ALL_IDS = "Get_UserIds";
     const string PROCEDURE_GET_BY_ID = "Get_UserAccountById";
@@ -12,12 +13,15 @@ public class UserAccountRepository : DapperRepository, IUserRepository
     const string PROCEDURE_GET_BY_EMAIL = "Get_UserAccountByEmail";
     const string PROCEDURE_GET_BY_NAME_OR_EMAIL = "Get_UserAccountByNameOrEmail";
     const string PROCEDURE_GET_USER_EXISTS = "Get_UserAccountExists";
+    const string PROCEDURE_GET_ACCOUNT_DETAILS = "Get_UserAccountDetails";
     const string PROCEDURE_INSERT = "Insert_UserAccount";
+    const string PROCEDURE_UPDATE_ACCOUNT = "Update_UserAccountDetails";
     const string PROCEDURE_UPDATE_PASSWORD = "Update_UserAccountPassword";
     const string PROCEDURE_INSERT_VERIFICATION_CODE = "Insert_VerificationToken";
     const string PROCEDURE_UPDATE_VERIFICATION_TOKEN = "Update_VerificationToken";
     const string PROCEDURE_UPDATE_ACCOUNT_STATUS = "Update_UserAccountStatus";
     const string PROCEDURE_GET_USER_VALIDATION = "Get_UserValidation";
+    const string PROCEDURE_GET_ID_BY_EMAIL = "Get_UserIdByEmail";
 
     public UserAccountRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
@@ -61,6 +65,13 @@ public class UserAccountRepository : DapperRepository, IUserRepository
         
         return await TryQueryAsync( QuerySingleOrDefault<UserExists?>, p, PROCEDURE_GET_USER_EXISTS );
     }
+    public async Task<AccountDetailsDto?> GetAccountDetails( int userId )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_ID, userId );
+
+        return await TryQueryAsync( QuerySingleOrDefault<AccountDetailsDto?>, p, PROCEDURE_GET_ACCOUNT_DETAILS );
+    }
     public async Task<UserModel?> InsertUser( string username, string email, string? phone, byte[] hash, byte[] salt )
     {
         DynamicParameters p = new();
@@ -78,6 +89,16 @@ public class UserAccountRepository : DapperRepository, IUserRepository
         p.Add( PARAM_USER_ID, userId );
 
         return await TryQueryAsync( QuerySingleOrDefault<UserValidationModel?>, p, PROCEDURE_GET_USER_VALIDATION );
+    }
+    public async Task<AccountDetailsDto?> UpdateAccountDetails( int userId, AccountDetailsDto dto )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_ID, userId );
+        p.Add( PARAM_USER_EMAIL, dto.Email );
+        p.Add( PARAM_USER_NAME, dto.Username );
+        p.Add( PARAM_USER_PHONE, dto.Phone );
+
+        return await TryQueryTransactionAsync( QuerySingleOrDefaultTransaction<AccountDetailsDto?>, p, PROCEDURE_UPDATE_ACCOUNT );
     }
     public async Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt )
     {
@@ -109,5 +130,12 @@ public class UserAccountRepository : DapperRepository, IUserRepository
         p.Add( PARAM_USER_ID, userId );
 
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_ACCOUNT_STATUS );
+    }
+    public async Task<int> GetIdByEmail( string email )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_EMAIL, email );
+
+        return await TryQueryAsync( QuerySingleOrDefault<int>, p, PROCEDURE_GET_ID_BY_EMAIL );
     }
 }

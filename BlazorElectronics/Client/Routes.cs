@@ -11,8 +11,10 @@ public static class Routes
     public const string LOGIN = "/login";
     public const string LOGOUT = "/logout";
     public const string REGISTERED = "/registered";
-    public const string ACCOUNT = "/account";
-    public const string ORDERS = "/account/orders";
+    public const string ACCOUNT_DETAILS = "/account/details";
+    public const string ACCOUNT_SESSIONS = "/account/sessions";
+    public const string ACCOUNT_ORDERS = "/account/orders";
+    public const string ACCOUNT_ORDER_DETAILS = "/account/order-details";
     public const string CART = "/cart";
     public const string CHECKOUT = "/checkout";
     

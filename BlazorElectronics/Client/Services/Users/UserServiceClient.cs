@@ -2,12 +2,14 @@ using Blazored.LocalStorage;
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Enums;
+using BlazorElectronics.Shared.Sessions;
 using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Client.Services.Users;
 
 public class UserServiceClient : ClientService, IUserServiceClient
 {
+    const string SESSION_DATA_KEY = "UserSession";
     const string SESSION_ID_HEADER = "SessionId";
     const string SESSION_TOKEN_HEADER = "Bearer";
     
@@ -26,9 +28,12 @@ public class UserServiceClient : ClientService, IUserServiceClient
     const string API_ROUTE_AUTHORIZE = API_ROUTE + "/authorize";
     const string API_ROUTE_CHANGE_PASSWORD = API_ROUTE + "/change-password";
     const string API_ROUTE_ACTIVATE_ACCOUNT = API_ROUTE + "/activate";
-    const string SESSION_DATA_KEY = "UserSession";
+    const string API_ROUTE_GET_DETAILS = API_ROUTE + "/account-details";
+    const string API_ROUTE_UPDATE_DETAILS = API_ROUTE + "/update-account-details";
+    const string API_ROUTE_GET_SESSIONS = API_ROUTE + "/get-sessions";
+    const string API_ROUTE_DELETE_ALL_SESSION = API_ROUTE + "/delete-all-sessions";
     
-    SessionReplyDto? _userSession;
+    SessionDto? _userSession;
     
     public async Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto )
     {
@@ -39,9 +44,9 @@ public class UserServiceClient : ClientService, IUserServiceClient
     {
         return await TryPostRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
     }
-    public async Task<ServiceReply<SessionReplyDto?>> Login( LoginRequestDto requestDto )
+    public async Task<ServiceReply<SessionDto?>> Login( LoginRequestDto requestDto )
     {
-        ServiceReply<SessionReplyDto?> loginReply = await TryGetSessionResponse( API_ROUTE_LOGIN, requestDto );
+        ServiceReply<SessionDto?> loginReply = await TryGetSessionResponse( API_ROUTE_LOGIN, requestDto );
 
         if ( loginReply is { Success: true, Data: not null } )
             await InvokeOnChange( GetSessionMeta( loginReply.Data ) );
@@ -66,7 +71,9 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ServiceReply<bool>> Logout()
     {
-        ServiceReply<bool> serverReply = await TryUserPostRequest<bool>( API_ROUTE_LOGOUT );
+        await TryGetLocalUserSession();
+        
+        ServiceReply<bool> serverReply = await TryUserGetRequest<bool>( API_ROUTE_LOGOUT, GetSessionIdParam( _userSession!.SessionId ) );
         await Storage.RemoveItemAsync( SESSION_DATA_KEY );
         await InvokeOnChange( null );
         return serverReply;
@@ -77,12 +84,54 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<SessionMeta?> GetSessionMeta()
     {
-        ServiceReply<SessionReplyDto?> reply = await TryGetLocalUserSession();
+        ServiceReply<SessionDto?> reply = await TryGetLocalUserSession();
 
         if ( !reply.Success || reply.Data is null )
             return null;
 
         return new SessionMeta( reply.Data.IsAdmin ? SessionType.Admin : SessionType.User, reply.Data.Username );
+    }
+    public async Task<ServiceReply<AccountDetailsDto?>> GetAccountDetails()
+    {
+        return await TryUserGetRequest<AccountDetailsDto?>( API_ROUTE_GET_DETAILS );
+    }
+    public async Task<ServiceReply<AccountDetailsDto?>> UpdateAccountDetails( AccountDetailsDto dto )
+    {
+        ServiceReply<AccountDetailsDto?> serverReply = await TryUserPostRequest<AccountDetailsDto?>( API_ROUTE_UPDATE_DETAILS, dto );
+
+        if ( !serverReply.Success || serverReply.Data is null )
+            return serverReply;
+
+        ServiceReply<SessionDto?> sessionReply = await TryGetLocalUserSession();
+
+        if ( !sessionReply.Success || sessionReply.Data is null || _userSession is null )
+            return serverReply;
+
+        _userSession.Username = serverReply.Data.Username;
+
+        await TryStoreSessionResponse();
+
+        return serverReply;
+    }
+    public async Task<ServiceReply<List<SessionInfoDto>?>> GetUserSessions()
+    {
+        return await TryUserGetRequest<List<SessionInfoDto>?>( API_ROUTE_GET_SESSIONS );
+    }
+    public async Task<ServiceReply<bool>> DeleteSession( int sessionId )
+    {
+        return await TryUserDeleteRequest<bool>( API_ROUTE_LOGOUT, GetSessionIdParam( sessionId ) );
+    }
+    public async Task<ServiceReply<bool>> DeleteAllSessions()
+    {
+        ServiceReply<bool> reply = await TryUserDeleteRequest<bool>( API_ROUTE_DELETE_ALL_SESSION );
+
+        if ( !reply.Success ) 
+            return reply;
+        
+        await Storage.RemoveItemAsync( SESSION_DATA_KEY );
+        await InvokeOnChange( null );
+
+        return reply;
     }
 
     protected async Task<ServiceReply<T?>> TryUserGetRequest<T>( string apiPath, Dictionary<string, object>? parameters = null )
@@ -113,7 +162,26 @@ public class UserServiceClient : ClientService, IUserServiceClient
         
         return await TryDeleteRequest<T?>( apiPath, parameters );
     }
-    
+
+    protected async Task<ServiceReply<SessionDto?>> TryGetLocalUserSession()
+    {
+        if ( _userSession is not null )
+            return new ServiceReply<SessionDto?>( _userSession );
+
+        try
+        {
+            _userSession = await Storage.GetItemAsync<SessionDto?>( SESSION_DATA_KEY );
+        }
+        catch ( Exception e )
+        {
+            Logger.LogError( e.Message + e.InnerException?.Message );
+            return new ServiceReply<SessionDto?>( ServiceErrorType.IoError );
+        }
+
+        return _userSession is not null
+            ? new ServiceReply<SessionDto?>( _userSession )
+            : new ServiceReply<SessionDto?>( ServiceErrorType.NotFound );
+    }
     async Task InvokeOnChange( SessionMeta? session )
     {
         IUserServiceClient.AsyncEventHandler? handler = SessionChanged;
@@ -130,28 +198,9 @@ public class UserServiceClient : ClientService, IUserServiceClient
             await Task.WhenAll( handlerTasks );
         }
     }
-    async Task<ServiceReply<SessionReplyDto?>> TryGetLocalUserSession()
+    async Task<ServiceReply<SessionDto?>> TryGetSessionResponse<T>( string apiPath, T requestObject )
     {
-        if ( _userSession is not null )
-            return new ServiceReply<SessionReplyDto?>( _userSession );
-
-        try
-        {
-            _userSession = await Storage.GetItemAsync<SessionReplyDto?>( SESSION_DATA_KEY );
-        }
-        catch ( Exception e )
-        {
-            Logger.LogError( e.Message + e.InnerException?.Message );
-            return new ServiceReply<SessionReplyDto?>( ServiceErrorType.IoError );
-        }
-
-        return _userSession is not null 
-            ? new ServiceReply<SessionReplyDto?>( _userSession ) 
-            : new ServiceReply<SessionReplyDto?>( ServiceErrorType.NotFound );
-    }
-    async Task<ServiceReply<SessionReplyDto?>> TryGetSessionResponse<T>( string apiPath, T requestObject )
-    {
-        ServiceReply<SessionReplyDto?> sessionReply = await TryPostRequest<SessionReplyDto?>( apiPath, requestObject );
+        ServiceReply<SessionDto?> sessionReply = await TryPostRequest<SessionDto?>( apiPath, requestObject );
 
         if ( !sessionReply.Success || sessionReply.Data is null )
             return sessionReply;
@@ -160,7 +209,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
 
         await TryStoreSessionResponse();
         
-        return new ServiceReply<SessionReplyDto?>( _userSession );
+        return new ServiceReply<SessionDto?>( _userSession );
     }
     async Task TryStoreSessionResponse()
     {
@@ -173,10 +222,9 @@ public class UserServiceClient : ClientService, IUserServiceClient
             Logger.LogError( e.Message + e.InnerException?.Message );
         }
     }
-
     async Task<bool> SetUserHttpHeader()
     {
-        ServiceReply<SessionReplyDto?> sessionReply = await TryGetLocalUserSession();
+        ServiceReply<SessionDto?> sessionReply = await TryGetLocalUserSession();
 
         if ( !sessionReply.Success || sessionReply.Data is null )
             return false;
@@ -193,8 +241,12 @@ public class UserServiceClient : ClientService, IUserServiceClient
         return true;
     }
 
-    static SessionMeta GetSessionMeta( SessionReplyDto sessionReply )
+    static Dictionary<string, object> GetSessionIdParam( int sessionId )
     {
-        return new SessionMeta( sessionReply.IsAdmin ? SessionType.Admin : SessionType.User, sessionReply.Username );
+        return new Dictionary<string, object> { { "sessionId", sessionId } };
+    }
+    static SessionMeta GetSessionMeta( SessionDto session )
+    {
+        return new SessionMeta( session.IsAdmin ? SessionType.Admin : SessionType.User, session.Username );
     }
 }

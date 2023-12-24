@@ -386,3 +386,4 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.genruntimeconfig.cache
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Debug/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll
+/home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/bin/Debug/net7.0/ubuntu.22.04-x64/Stripe.net.dll

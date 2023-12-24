@@ -1,0 +1,17 @@
+@page "/order-success"
+@using BlazorElectronics.Client.Services.Cart
+@inject ICartServiceClient CartService
+
+<div class="mx-auto" style="max-width: 500px;">
+    <h3>Thank you!</h3>
+    
+    <span>Thank you for your order! You can check your orders <a href="@Routes.ACCOUNT_ORDERS">here</a>.</span>
+</div>
+
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await CartService.UpdateCart();
+    }
+}

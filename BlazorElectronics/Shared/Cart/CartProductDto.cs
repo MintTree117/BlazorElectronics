@@ -31,5 +31,5 @@ public sealed class CartProductDto
     public string Thumbnail { get; init; } = string.Empty;
     public decimal Price { get; init; }
     public decimal? SalePrice { get; init; }
-    public int ItemQuantity { get; set; } = 1;
+    public int Quantity { get; set; } = 1;
 }
