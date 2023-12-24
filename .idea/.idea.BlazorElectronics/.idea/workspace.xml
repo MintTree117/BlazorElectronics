@@ -475,7 +475,23 @@
       <option name="project" value="LOCAL" />
       <updated>1703388544161</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="d">
+      <option name="closed" value="true" />
+      <created>1703394336197</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703394336197</updated>
+    </task>
+    <task id="LOCAL-00003" summary="cd">
+      <option name="closed" value="true" />
+      <created>1703394522293</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1703394522293</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -485,7 +501,9 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Testing production commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Testing production commit" />
+    <MESSAGE value="d" />
+    <MESSAGE value="cd" />
+    <option name="LAST_COMMIT_MESSAGE" value="cd" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
