@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorElectronics.Server", "BlazorElectronics\Server\BlazorElectronics.Server.csproj", "{6370A03E-B1C0-4C72-AF2C-844E0BF941B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorElectronics.Server", "Server\BlazorElectronics.Server.csproj", "{6370A03E-B1C0-4C72-AF2C-844E0BF941B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorElectronics.Client", "BlazorElectronics\Client\BlazorElectronics.Client.csproj", "{F2AAC004-75A8-4D84-82EF-4C7D22EF73D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorElectronics.Client", "Client\BlazorElectronics.Client.csproj", "{F2AAC004-75A8-4D84-82EF-4C7D22EF73D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorElectronics.Shared", "BlazorElectronics\Shared\BlazorElectronics.Shared.csproj", "{AE8C20C8-A05E-4AB2-9F59-D95D676FDA1E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorElectronics.Shared", "Shared\BlazorElectronics.Shared.csproj", "{AE8C20C8-A05E-4AB2-9F59-D95D676FDA1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

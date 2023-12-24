@@ -1,5 +1,0 @@
-CREATE PROCEDURE Get_TopDeals
-AS
-BEGIN
-    SELECT * FROM Features_TopDeals
-END;
