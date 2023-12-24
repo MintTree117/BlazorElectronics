@@ -27,6 +27,13 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+  </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/482f9905b0e14778b261d356820578703a108/f5/6bc803b9/LayoutComponentBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/863c5a9eb0fd481e9b4fee5cf80fe1d1a29c00/ab/24635449/Int32.cs" root0="SKIP_HIGHLIGHTING" />
@@ -458,7 +465,17 @@
       <workItem from="1703356411990" duration="22145000" />
       <workItem from="1703386174552" duration="29000" />
       <workItem from="1703386384249" duration="2039000" />
+      <workItem from="1703388434905" duration="139000" />
     </task>
+    <task id="LOCAL-00001" summary="Testing production commit">
+      <option name="closed" value="true" />
+      <created>1703388544161</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1703388544161</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -467,6 +484,8 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Testing production commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Testing production commit" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
