@@ -8,4 +8,4 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows,browser
 build_property.RootNamespace = BlazorElectronics.Shared
-build_property.ProjectDir = /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Shared/
+build_property.ProjectDir = /home/martin/RiderProjects/BlazorElectronics/Shared/
