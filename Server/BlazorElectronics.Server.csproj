@@ -32,6 +32,11 @@
 
     <ItemGroup>
       <Folder Include="Api\Dtos\" />
+      <Folder Include="Properties\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Properties\launchSettings.json" />
     </ItemGroup>
 
 
