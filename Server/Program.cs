@@ -1,14 +1,18 @@
 global using BlazorElectronics.Shared;
+using System.Configuration;
+using System.Data;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Services;
 using BlazorElectronics.Server.Data;
 using BlazorElectronics.Server.Data.Repositories;
+using Microsoft.Data.SqlClient;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
