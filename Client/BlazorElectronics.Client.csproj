@@ -47,12 +47,4 @@
       <_ContentIncludedByDefault Remove="Pages\User\Admin\Crud\CrudViewTable.razor" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Properties\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Properties\launchSettings.json" />
-    </ItemGroup>
-
 </Project>
