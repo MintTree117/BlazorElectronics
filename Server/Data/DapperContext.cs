@@ -13,15 +13,22 @@ public class DapperContext
         _config = config;
         Logger = logger;
         _connectionString = config.GetConnectionString( "DefaultConnection" ) ?? string.Empty;
-        
-        Logger.LogError( "COnn : " + _connectionString );
-        Logger.LogWarning( "COnn : " + _connectionString );
     }
     
     public async Task<SqlConnection> GetOpenConnection()
     {
-        var connection = new SqlConnection( _connectionString );
-        await connection.OpenAsync();
-        return connection;
+        try
+        {
+            Logger.LogError( "COnn -------------------------------------------------------- : " + _connectionString );
+            Logger.LogWarning( "COnn -------------------------------------------------- : " + _connectionString );
+            var connection = new SqlConnection( _connectionString );
+            await connection.OpenAsync();
+            return connection;
+        }
+        catch ( Exception e )
+        {
+            Logger.LogError( $"----------------------------------------- STRING---------- {_connectionString} e.Message ", e );
+            return null;
+        }
     }
 }
