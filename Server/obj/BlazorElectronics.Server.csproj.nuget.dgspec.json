@@ -146,31 +146,19 @@
           "dependencies": {
             "Dapper": {
               "target": "Package",
-              "version": "[2.0.151, )"
-            },
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
-              "target": "Package",
-              "version": "[7.0.12, )"
+              "version": "[2.1.24, )"
             },
             "Microsoft.AspNetCore.Components.WebAssembly.Server": {
               "target": "Package",
-              "version": "[7.0.11, )"
+              "version": "[7.0.14, )"
             },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
-              "version": "[5.1.1, )"
-            },
-            "Microsoft.IdentityModel.Tokens": {
-              "target": "Package",
-              "version": "[7.0.3, )"
+              "version": "[5.1.2, )"
             },
             "Stripe.net": {
               "target": "Package",
               "version": "[43.8.0, )"
-            },
-            "System.IdentityModel.Tokens.Jwt": {
-              "target": "Package",
-              "version": "[7.0.3, )"
             }
           },
           "imports": [

@@ -404,7 +404,6 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Azure.Identity.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Blazored.LocalStorage.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Dapper.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authorization.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Authorization.dll

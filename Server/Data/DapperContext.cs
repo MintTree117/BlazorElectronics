@@ -19,6 +19,7 @@ public class DapperContext
     {
         try
         {
+            Logger.LogWarning( "COnn -------------------------------------------------- : " + _connectionString );
             Logger.LogError( "COnn -------------------------------------------------------- : " + _connectionString );
             Logger.LogWarning( "COnn -------------------------------------------------- : " + _connectionString );
             var connection = new SqlConnection( _connectionString );
