@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Core.Interfaces;
 
-public interface IVendorRepository
+public interface IVendorRepository : IDapperRepository
 {
     Task<VendorsModel?> Get();
     Task<IEnumerable<VendorDto>?> GetView();

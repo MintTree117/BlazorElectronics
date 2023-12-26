@@ -3,7 +3,7 @@ using BlazorElectronics.Shared.Specs;
 
 namespace BlazorElectronics.Server.Core.Interfaces;
 
-public interface ISpecRepository
+public interface ISpecRepository : IDapperRepository
 {
     Task<SpecsModel?> Get();
     Task<IEnumerable<SpecModel>?> GetView();

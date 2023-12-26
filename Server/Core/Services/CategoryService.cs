@@ -1,23 +1,40 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
-using BlazorElectronics.Server.Core.Models;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class CategoryService : ApiService, ICategoryService
+public sealed class CategoryService : _CachedApiService, ICategoryService
 {
-    const int CACHE_LIFE = 4;
     const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
     readonly ICategoryRepository _repository;
 
-    CachedObject<CategoryData>? _cachedData;
-    CachedObject<List<CategoryLightDto>>? _cachedResponse;
+    CategoryData? _cachedData;
+    List<CategoryLightDto>? _cachedResponse;
 
-    public CategoryService( ILogger<ApiService> logger, ICategoryRepository repository ) : base( logger )
+    public CategoryService( ILogger<_ApiService> logger, ICategoryRepository repository )
+        : base( logger, repository, 4, "Categories" )
     {
         _repository = repository;
+    }
+
+    protected override void UpdateCache()
+    {
+        try
+        {
+            IEnumerable<CategoryFullDto>? models = Task
+                .Run( () => _repository.Get() ).Result;
+
+            if ( models is null )
+                return;
+
+            MapModels( models );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+        }
     }
 
     public async Task<ServiceReply<List<int>?>> GetPrimaryCategoryIds()
@@ -25,7 +42,7 @@ public sealed class CategoryService : ApiService, ICategoryService
         ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedData is not null
-            ? new ServiceReply<List<int>?>( _cachedData.Object.PrimaryIds )
+            ? new ServiceReply<List<int>?>( _cachedData.PrimaryIds )
             : new ServiceReply<List<int>?>( getReply.ErrorType, getReply.Message );
     }
     public async Task<ServiceReply<CategoryData?>> GetCategoryData()
@@ -33,7 +50,7 @@ public sealed class CategoryService : ApiService, ICategoryService
         ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedData is not null
-            ? new ServiceReply<CategoryData?>( _cachedData.Object )
+            ? new ServiceReply<CategoryData?>( _cachedData )
             : new ServiceReply<CategoryData?>( getReply.ErrorType, getReply.Message );
     }
     public async Task<ServiceReply<List<CategoryLightDto>?>> GetCategoryResponse()
@@ -41,7 +58,7 @@ public sealed class CategoryService : ApiService, ICategoryService
         ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedResponse is not null
-            ? new ServiceReply<List<CategoryLightDto>?>( _cachedResponse.Object )
+            ? new ServiceReply<List<CategoryLightDto>?>( _cachedResponse )
             : new ServiceReply<List<CategoryLightDto>?>( getReply.ErrorType, getReply.Message );
     }
     public async Task<ServiceReply<int>> ValidateCategoryUrl( string url )
@@ -51,7 +68,7 @@ public sealed class CategoryService : ApiService, ICategoryService
         if ( !reply.Success || _cachedData is null )
             return new ServiceReply<int>( reply.ErrorType, reply.Message );
 
-        return _cachedData.Object.ValidateUrl( url, out int categoryId )
+        return _cachedData.ValidateUrl( url, out int categoryId )
             ? new ServiceReply<int>( categoryId )
             : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
@@ -156,7 +173,7 @@ public sealed class CategoryService : ApiService, ICategoryService
 
     async Task<ServiceReply<bool>> TryGetData()
     {
-        if ( _cachedData is not null && _cachedData.IsValid( CACHE_LIFE ) )
+        if ( _cachedData is not null )
             return new ServiceReply<bool>( true );
 
         IEnumerable<CategoryFullDto>? models;
@@ -174,22 +191,19 @@ public sealed class CategoryService : ApiService, ICategoryService
         if ( models is null )
             return new ServiceReply<bool>( ServiceErrorType.NotFound );
         
-        await MapModels( models );
+        MapModels( models );
         return new ServiceReply<bool>( true );
     }
     
-    async Task MapModels( IEnumerable<CategoryFullDto> models )
+    void MapModels( IEnumerable<CategoryFullDto> models )
     {
-        await Task.Run( () =>
-        {
-            List<CategoryFullDto> list = models.ToList();
-            List<CategoryLightDto> response = MapResponse( list );
-            CategoryData data = new ( list );
-            _cachedData = new CachedObject<CategoryData>( data );
-            _cachedResponse = new CachedObject<List<CategoryLightDto>>( response );
-        } );
+        List<CategoryFullDto> list = models.ToList();
+        List<CategoryLightDto> response = MapResponse( list );
+        CategoryData data = new( list );
+        _cachedData = data;
+        _cachedResponse = response;
     }
-    List<CategoryLightDto> MapResponse( IEnumerable<CategoryFullDto> models )
+    static List<CategoryLightDto> MapResponse( IEnumerable<CategoryFullDto> models )
     {
         return models
             .Select( m => new CategoryLightDto

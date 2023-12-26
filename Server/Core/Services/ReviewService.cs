@@ -6,11 +6,11 @@ using BlazorElectronics.Shared.Reviews;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class ReviewService : ApiService, IReviewService
+public sealed class ReviewService : _ApiService, IReviewService
 {
     readonly IReviewRepository _repository;
 
-    public ReviewService( ILogger<ApiService> logger, IReviewRepository repository )
+    public ReviewService( ILogger<_ApiService> logger, IReviewRepository repository )
         : base( logger )
     {
         _repository = repository;

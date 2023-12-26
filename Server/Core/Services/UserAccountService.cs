@@ -10,14 +10,14 @@ using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class UserAccountService : ApiService, IUserAccountService
+public sealed class UserAccountService : _ApiService, IUserAccountService
 {
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
     const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
     
     readonly IUserAccountRepository _userAccountRepository;
 
-    public UserAccountService( ILogger<ApiService> logger, IUserAccountRepository userAccountRepository ) : base( logger )
+    public UserAccountService( ILogger<_ApiService> logger, IUserAccountRepository userAccountRepository ) : base( logger )
     {
         _userAccountRepository = userAccountRepository;
     }

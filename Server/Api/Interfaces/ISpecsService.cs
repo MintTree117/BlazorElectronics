@@ -4,7 +4,7 @@ namespace BlazorElectronics.Server.Api.Interfaces;
 
 public interface ISpecsService
 {
-    Task<ServiceReply<LookupSpecsDto?>> GetSpecs( List<int> primaryCategoryIds );
+    Task<ServiceReply<LookupSpecsDto?>> GetSpecs();
     Task<ServiceReply<List<CrudViewDto>?>> GetView();
     Task<ServiceReply<LookupSpecEditDto?>> GetEdit( int specId );
     Task<ServiceReply<int>> Add( LookupSpecEditDto dto );

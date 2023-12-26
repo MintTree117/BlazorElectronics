@@ -1,7 +1,6 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Promos;
-using BlazorElectronics.Shared.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Api.Controllers;

@@ -56,7 +56,7 @@ public sealed class AdminSeedController : _AdminController
         if ( !categoryReply.Success || categoryReply.Data is null )
             return GetReturnFromReply( categoryReply );
         
-        ServiceReply<LookupSpecsDto?> lookupReply = await _lookupService.GetSpecs( categoryReply.Data.PrimaryIds );
+        ServiceReply<LookupSpecsDto?> lookupReply = await _lookupService.GetSpecs();
 
         if ( !lookupReply.Success || lookupReply.Data is null )
             return GetReturnFromReply( lookupReply );

@@ -6,11 +6,11 @@ using BlazorElectronics.Shared.Promos;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class CartService : ApiService, ICartService
+public sealed class CartService : _ApiService, ICartService
 {
     readonly ICartRepository _cartRepository;
 
-    public CartService( ILogger<ApiService> logger, ICartRepository cartRepository )
+    public CartService( ILogger<_ApiService> logger, ICartRepository cartRepository )
         : base( logger )
     {
         _cartRepository = cartRepository;

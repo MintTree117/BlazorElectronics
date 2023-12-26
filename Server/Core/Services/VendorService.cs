@@ -1,35 +1,50 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
-using BlazorElectronics.Server.Core.Models;
 using BlazorElectronics.Server.Core.Models.Vendors;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class VendorService : ApiService, IVendorService
+public sealed class VendorService : _CachedApiService, IVendorService
 {
-    const int MAX_VENDOR_LIFE = 0;
-
     readonly IVendorRepository _repository;
-    CachedObject<VendorsDto>? _cachedVendors;
+    VendorsDto? _cachedVendors;
 
-    public VendorService( ILogger<ApiService> logger, IVendorRepository repository )
-        : base( logger )
+    public VendorService( ILogger<_ApiService> logger, IVendorRepository repository )
+        : base( logger, repository, 4, "Vendors" )
     {
         _repository = repository;
     }
     
+    protected override void UpdateCache()
+    {
+        try
+        {
+            VendorsModel? models = Task
+                .Run( () => _repository.Get() ).Result;
+
+            if ( models is null )
+                return;
+
+            MapModels( models );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+        }
+    }
+    
     public async Task<ServiceReply<VendorsDto?>> GetVendors()
     {
-        if ( _cachedVendors is not null && _cachedVendors.IsValid( MAX_VENDOR_LIFE ) )
-            return new ServiceReply<VendorsDto?>( _cachedVendors.Object );
+        if ( _cachedVendors is not null )
+            return new ServiceReply<VendorsDto?>( _cachedVendors );
 
         try
         {
             VendorsModel? model = await _repository.Get();
-            VendorsDto? response = MapResponse( model );
-            _cachedVendors = response is not null ? new CachedObject<VendorsDto>( response ) : null;
+            VendorsDto? response = MapModels( model );
+            _cachedVendors = response;
             
             return response is not null
                 ? new ServiceReply<VendorsDto?>( response ) 
@@ -124,7 +139,7 @@ public sealed class VendorService : ApiService, IVendorService
         }
     }
 
-    static VendorsDto? MapResponse( VendorsModel? model )
+    static VendorsDto? MapModels( VendorsModel? model )
     {
         if ( model?.Vendors is null || model.Categories is null )
             return null;

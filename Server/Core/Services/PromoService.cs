@@ -6,11 +6,11 @@ using BlazorElectronics.Shared.Promos;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class PromoService : ApiService, IPromoService
+public sealed class PromoService : _ApiService, IPromoService
 {
     readonly IPromoRepository _repository;
     
-    public PromoService( ILogger<ApiService> logger, IPromoRepository repository )
+    public PromoService( ILogger<_ApiService> logger, IPromoRepository repository )
         : base( logger )
     {
         _repository = repository;

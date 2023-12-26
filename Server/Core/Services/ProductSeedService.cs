@@ -9,7 +9,7 @@ using BlazorElectronics.Shared.Vendors;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class ProductSeedService : ApiService, IProductSeedService
+public sealed class ProductSeedService : _ApiService, IProductSeedService
 {
     const int SAFETY = 200;
     Random _random = new();
@@ -17,7 +17,7 @@ public sealed class ProductSeedService : ApiService, IProductSeedService
     readonly IProductRepository _productRepository;
     readonly IReviewRepository _reviewRepository;
 
-    public ProductSeedService( ILogger<ApiService> logger, IProductRepository productRepository, IReviewRepository reviewRepository )
+    public ProductSeedService( ILogger<_ApiService> logger, IProductRepository productRepository, IReviewRepository reviewRepository )
         : base( logger )
     {
         _productRepository = productRepository;

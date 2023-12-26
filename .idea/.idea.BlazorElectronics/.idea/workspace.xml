@@ -14,7 +14,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Server/Core/Services/_ApiService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Api/Controllers/Admin/AdminSeedController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Controllers/Admin/AdminSeedController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Api/Controllers/CartController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Controllers/CartController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Api/Controllers/SpecsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Controllers/SpecsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Api/Interfaces/ISpecsService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Interfaces/ISpecsService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Interfaces/ICategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Interfaces/ICategoryRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Interfaces/IFeaturesRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Interfaces/IFeaturesRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Interfaces/ISpecRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Interfaces/ISpecRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Interfaces/IVendorRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Interfaces/IVendorRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Models/CachedObject.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/ApiService.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/CartService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/CartService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/CategoryService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/CategoryService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/FeaturesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/FeaturesService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/OrderService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/OrderService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/PaymentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/PaymentService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/ProductSeedService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/ProductSeedService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/ProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/PromoService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/PromoService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/ReviewSeedService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/ReviewSeedService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/ReviewService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/ReviewService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/SessionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/SessionService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/SpecsService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/SpecsService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/UserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/UserAccountService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/UserSeedService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/UserSeedService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/VendorService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/VendorService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Data/DapperContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/DapperContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Data/Repositories/DapperRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/Repositories/DapperRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/rider.project.restore.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -472,6 +505,8 @@
       <workItem from="1703430767242" duration="2690000" />
       <workItem from="1703463081652" duration="607000" />
       <workItem from="1703532011323" duration="1072000" />
+      <workItem from="1703541670242" duration="1630000" />
+      <workItem from="1703554716365" duration="5021000" />
     </task>
     <task id="LOCAL-00001" summary="Testing production commit">
       <option name="closed" value="true" />

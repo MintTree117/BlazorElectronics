@@ -1,28 +1,45 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
-using BlazorElectronics.Server.Core.Models;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class FeaturesService : ApiService, IFeaturesService
+public sealed class FeaturesService : _CachedApiService, IFeaturesService
 {
-    const int CACHE_LIFE = 1;
     readonly IFeaturesRepository _repository;
-    CachedObject<List<FeatureDto>>? _cachedFeatures;
-    CachedObject<List<FeatureDealDto>>? _cachedDealsFrontPage;
+    List<FeatureDto>? _cachedFeatures;
+    List<FeatureDealDto>? _cachedDealsFrontPage;
 
-    public FeaturesService( ILogger<ApiService> logger, IFeaturesRepository repository )
-        : base( logger )
+    public FeaturesService( ILogger<_ApiService> logger, IFeaturesRepository repository )
+        : base( logger, repository, 4, "Features" )
     {
         _repository = repository;
     }
 
+    protected override void UpdateCache()
+    {
+        try
+        {
+            IEnumerable<FeatureDto>? featureModels = Task
+                .Run( () => _repository.GetFeatures() ).Result;
+            
+            IEnumerable<FeatureDealDto>? dealModels = Task
+                .Run( () => _repository.GetDeals( 20, 0 ) ).Result;
+
+            _cachedFeatures = featureModels?.ToList();
+            _cachedDealsFrontPage = dealModels?.ToList();
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+        }
+    }
+
     public async Task<ServiceReply<List<FeatureDealDto>?>> GetDeals( int rows, int page )
     {
-        if ( page == 1 && CacheValid( _cachedDealsFrontPage ) )
-            return new ServiceReply<List<FeatureDealDto>?>( _cachedDealsFrontPage!.Object );
+        if ( page == 1 && _cachedDealsFrontPage is not null)
+            return new ServiceReply<List<FeatureDealDto>?>( _cachedDealsFrontPage );
 
         try
         {
@@ -35,7 +52,7 @@ public sealed class FeaturesService : ApiService, IFeaturesService
             List<FeatureDealDto> dto = models.ToList();
 
             if ( page == 1 )
-                _cachedDealsFrontPage = new CachedObject<List<FeatureDealDto>>( dto );
+                _cachedDealsFrontPage = dto;
 
             return new ServiceReply<List<FeatureDealDto>?>( dto );
         }
@@ -47,8 +64,8 @@ public sealed class FeaturesService : ApiService, IFeaturesService
     }
     public async Task<ServiceReply<List<FeatureDto>?>> GetFeatures()
     {
-        if ( CacheValid( _cachedFeatures ) )
-            return new ServiceReply<List<FeatureDto>?>( _cachedFeatures!.Object );
+        if ( _cachedFeatures is not null )
+            return new ServiceReply<List<FeatureDto>?>( _cachedFeatures );
         
         try
         {
@@ -58,7 +75,7 @@ public sealed class FeaturesService : ApiService, IFeaturesService
                 return new ServiceReply<List<FeatureDto>?>( ServiceErrorType.NotFound );
 
             List<FeatureDto> dto = models.ToList();
-            _cachedFeatures = new CachedObject<List<FeatureDto>>( dto );
+            _cachedFeatures = dto;
 
             return new ServiceReply<List<FeatureDto>?>( dto );
         }
@@ -155,9 +172,5 @@ public sealed class FeaturesService : ApiService, IFeaturesService
         return models?
             .Select( m => new CrudViewDto { Id = m.FeatureId, Name = m.Name } )
             .ToList();
-    }
-    bool CacheValid<T>( CachedObject<T>? _cache )
-    {
-        return _cache is not null && _cache.IsValid( CACHE_LIFE );
     }
 }

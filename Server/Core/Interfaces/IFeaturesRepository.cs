@@ -2,7 +2,7 @@ using BlazorElectronics.Shared.Features;
 
 namespace BlazorElectronics.Server.Core.Interfaces;
 
-public interface IFeaturesRepository
+public interface IFeaturesRepository : IDapperRepository
 {
     Task<IEnumerable<FeatureDealDto>?> GetDeals( int rows, int offset );
     Task<IEnumerable<FeatureDto>?> GetFeatures();

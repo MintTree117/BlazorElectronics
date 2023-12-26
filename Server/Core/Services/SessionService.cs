@@ -9,14 +9,14 @@ using BlazorElectronics.Shared.Sessions;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class SessionService : ApiService, ISessionService
+public sealed class SessionService : _ApiService, ISessionService
 {
     const int MAX_SESSION_HOURS = 48;
     const string SESSION_EXPIRED_MESSAGE = "Session has expired. Please login again.";
 
     readonly ISessionRepository _sessionRepository;
 
-    public SessionService( ILogger<ApiService> logger, ISessionRepository sessionRepository ) 
+    public SessionService( ILogger<_ApiService> logger, ISessionRepository sessionRepository ) 
         : base( logger )
     {
         _sessionRepository = sessionRepository;

@@ -5,11 +5,11 @@ using BlazorElectronics.Shared.Users;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class UserSeedService : ApiService, IUserSeedService
+public sealed class UserSeedService : _ApiService, IUserSeedService
 {
     readonly IUserAccountService _userAccountService;
     
-    public UserSeedService( ILogger<ApiService> logger, IUserAccountService userAccountService )
+    public UserSeedService( ILogger<_ApiService> logger, IUserAccountService userAccountService )
         : base( logger )
     {
         _userAccountService = userAccountService;

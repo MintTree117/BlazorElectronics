@@ -2,7 +2,7 @@ using BlazorElectronics.Shared.Categories;
 
 namespace BlazorElectronics.Server.Core.Interfaces;
 
-public interface ICategoryRepository
+public interface ICategoryRepository : IDapperRepository
 {
     Task<IEnumerable<CategoryFullDto>?> Get();
     Task<CategoryFullDto?> GetEdit( int categoryId );

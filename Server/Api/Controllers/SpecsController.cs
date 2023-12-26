@@ -8,25 +8,18 @@ namespace BlazorElectronics.Server.Api.Controllers;
 [ApiController]
 public sealed class SpecsController : _Controller
 {
-    readonly ICategoryService _categoryService;
     readonly ISpecsService _specService;
 
-    public SpecsController( ILogger<_Controller> logger, ICategoryService categoryService, ISpecsService specService )
+    public SpecsController( ILogger<_Controller> logger, ISpecsService specService )
         : base( logger )
     {
-        _categoryService = categoryService;
         _specService = specService;
     }
     
     [HttpGet( "get" )]
     public async Task<ActionResult<LookupSpecsDto?>> GetSpecLookups()
     {
-        ServiceReply<List<int>?> categoryReply = await _categoryService.GetPrimaryCategoryIds();
-
-        if ( !categoryReply.Success || categoryReply.Data is null )
-            return GetReturnFromReply( categoryReply );
-        
-        ServiceReply<LookupSpecsDto?> reply = await _specService.GetSpecs( categoryReply.Data );
+        ServiceReply<LookupSpecsDto?> reply = await _specService.GetSpecs();
         return GetReturnFromReply( reply );
     }
 }

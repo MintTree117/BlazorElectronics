@@ -1,12 +1,13 @@
 using System.Data;
 using System.Data.Common;
 using BlazorElectronics.Server.Core;
+using BlazorElectronics.Server.Core.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorElectronics.Server.Data.Repositories;
 
-public abstract class DapperRepository
+public abstract class DapperRepository : IDapperRepository
 {
     // TABLES PRODUCTS
     protected const string TABLE_PRODUCTS = "Products";
@@ -144,11 +145,23 @@ public abstract class DapperRepository
     const int RETRY_DELAY_MILLISECONDS = 1000;
     
     // DB CONTEXT
-    protected readonly DapperContext _dbContext;
+    readonly DapperContext _dbContext;
+    
+    // PING CACHE PROCEDURE
+    const string PROCEDURE_PING_CACHE = "Ping_CacheTable";
+    const string PARAM_CACHE_NAME = "CacheName";
 
     protected DapperRepository( DapperContext dapperContext )
     {
         _dbContext = dapperContext;
+    }
+
+    public async Task<DateTime> PingCacheTable( string cacheName )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_CACHE_NAME, cacheName );
+
+        return await TryQueryAsync( QuerySingleOrDefault<DateTime>, p, PROCEDURE_PING_CACHE );
     }
 
     protected delegate Task<T?> DapperQueryDelegate<T>( SqlConnection connection, string? dynamicSql = null, DynamicParameters? dynamicParams = null );

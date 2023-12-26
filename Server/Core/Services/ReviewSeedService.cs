@@ -5,12 +5,12 @@ using BlazorElectronics.Shared.Enums;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class ReviewSeedService : ApiService, IReviewSeedService
+public sealed class ReviewSeedService : _ApiService, IReviewSeedService
 {
     readonly IReviewRepository _repository;
     readonly Random _random = new();
     
-    public ReviewSeedService( ILogger<ApiService> logger, IReviewRepository repository )
+    public ReviewSeedService( ILogger<_ApiService> logger, IReviewRepository repository )
         : base( logger )
     {
         _repository = repository;

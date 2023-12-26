@@ -8,12 +8,12 @@ using BlazorElectronics.Shared.Promos;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class OrderService : ApiService, IOrderService
+public sealed class OrderService : _ApiService, IOrderService
 {
     readonly IOrderRepository _orderRepository;
     readonly ICartRepository _cartRepository;
     
-    public OrderService( ILogger<ApiService> logger, IOrderRepository orderRepository, ICartRepository cartRepository )
+    public OrderService( ILogger<_ApiService> logger, IOrderRepository orderRepository, ICartRepository cartRepository )
         : base( logger )
     {
         _orderRepository = orderRepository;

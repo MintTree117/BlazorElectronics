@@ -8,7 +8,7 @@ using BlazorElectronics.Shared.Products.Search;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class ProductService : ApiService, IProductService
+public sealed class ProductService : _ApiService, IProductService
 {
     readonly IProductSearchRepository _productSearchRepository;
     readonly IProductRepository _productRepository;
@@ -17,7 +17,7 @@ public sealed class ProductService : ApiService, IProductService
     const int MAX_SEARCH_TEXT_LENGTH = 64;
     const int MAX_FILTER_ID_LENGTH = 8;
     
-    public ProductService( ILogger<ApiService> logger, IProductSearchRepository productSearchRepository, IProductRepository productRepository )
+    public ProductService( ILogger<_ApiService> logger, IProductSearchRepository productSearchRepository, IProductRepository productRepository )
         : base( logger )
     {
         _productSearchRepository = productSearchRepository;

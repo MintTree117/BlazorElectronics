@@ -1,36 +1,64 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
-using BlazorElectronics.Server.Core.Models;
 using BlazorElectronics.Server.Core.Models.SpecLookups;
 using BlazorElectronics.Shared.Enums;
 using BlazorElectronics.Shared.Specs;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public sealed class SpecsService : ApiService, ISpecsService
+public sealed class SpecsService : _CachedApiService, ISpecsService
 {
-    const int MAX_HOURS_BEFORE_CACHE_INVALIDATION = 4;
-    CachedObject<LookupSpecsDto>? _cachedSpecData;
-
     readonly ISpecRepository _repository;
-    
-    public SpecsService( ILogger<ApiService> logger, ISpecRepository repository )
-        : base( logger )
+    readonly ICategoryService _categoryService;
+    LookupSpecsDto? _cachedSpecData;
+
+    public SpecsService( ILogger<_ApiService> logger, ISpecRepository repository, ICategoryService categoryService )
+        : base( logger, repository, 4, "SpecLookups" )
     {
         _repository = repository;
+        _categoryService = categoryService;
+    }
+
+    protected override void UpdateCache()
+    {
+        try
+        {
+            SpecsModel? models = Task
+                .Run( () => _repository.Get() ).Result;
+
+            if ( models is null )
+                return;
+
+            ServiceReply<List<int>?> ids = Task
+                .Run( () => _categoryService.GetPrimaryCategoryIds() ).Result;
+
+            if ( !ids.Success || ids.Data is null )
+                return;
+
+            MapResponse( models, ids.Data );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+        }
     }
     
-    public async Task<ServiceReply<LookupSpecsDto?>> GetSpecs( List<int> primaryCategoryIds )
+    public async Task<ServiceReply<LookupSpecsDto?>> GetSpecs()
     {
-        if ( CacheValid() )
-            return new ServiceReply<LookupSpecsDto?>( _cachedSpecData!.Object );
+        if ( _cachedSpecData is not null )
+            return new ServiceReply<LookupSpecsDto?>( _cachedSpecData );
 
         try
         {
-            SpecsModel? model = await _repository.Get();
-            LookupSpecsDto? response = MapResponse( model, primaryCategoryIds );
+            ServiceReply<List<int>?> categoryReply = await _categoryService.GetPrimaryCategoryIds();
 
-            _cachedSpecData = response is not null ? new CachedObject<LookupSpecsDto>( response ) : null;
+            if ( !categoryReply.Success || categoryReply.Data is null )
+                return new ServiceReply<LookupSpecsDto?>( categoryReply.ErrorType, categoryReply.Message );
+
+            SpecsModel? model = await _repository.Get();
+            LookupSpecsDto? response = MapResponse( model, categoryReply.Data );
+
+            _cachedSpecData = response;
 
             return response is not null 
                 ? new ServiceReply<LookupSpecsDto?>( response ) 
@@ -207,9 +235,5 @@ public sealed class SpecsService : ApiService, ISpecsService
             .ToList();
 
         return string.Join( ",", specValues );
-    }
-    bool CacheValid()
-    {
-        return _cachedSpecData is not null && _cachedSpecData.IsValid( MAX_HOURS_BEFORE_CACHE_INVALIDATION );
     }
 }
