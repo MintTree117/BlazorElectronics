@@ -14,33 +14,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/AlertMessage.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/AlertMessage.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/Login/UserRegistered.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Login/UserRegistered.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/Login/Verify.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Login/Verify.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/PageLoader.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/PageLoader.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/User/UserAccountSessions.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/User/UserAccountSessions.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Services/Users/IUserServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Services/Users/IUserServiceClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Services/Users/UserServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Services/Users/UserServiceClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Api/Controllers/UserAccountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Controllers/UserAccountController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Api/Interfaces/IOrderService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Interfaces/IOrderService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Api/Interfaces/IUserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Api/Interfaces/IUserAccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/BlazorElectronics.Server.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Server/BlazorElectronics.Server.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Core/Interfaces/IUserAccountRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Interfaces/IUserAccountRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Core/Services/OrderService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/OrderService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Core/Services/PaymentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/PaymentService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Core/Services/UserAccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/UserAccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Data/Repositories/UserAccountRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/Repositories/UserAccountRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/BlazorElectronics.Server.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/BlazorElectronics.Server.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shared/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -499,7 +473,7 @@
       <workItem from="1703463081652" duration="607000" />
       <workItem from="1703532011323" duration="1072000" />
       <workItem from="1703541670242" duration="1630000" />
-      <workItem from="1703554716365" duration="14176000" />
+      <workItem from="1703554716365" duration="14562000" />
     </task>
     <task id="LOCAL-00001" summary="Testing production commit">
       <option name="closed" value="true" />

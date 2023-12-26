@@ -22,11 +22,11 @@ builder.Services.AddSingleton<DapperContext>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddSingleton<ICategoryService, CategoryService>();
+builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 
-builder.Services.AddScoped<IFeaturesService, FeaturesService>();
-builder.Services.AddScoped<IFeaturesRepository, FeaturesRepository>();
+builder.Services.AddSingleton<IFeaturesService, FeaturesService>();
+builder.Services.AddSingleton<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
@@ -55,11 +55,11 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddSingleton<IVendorRepository, VendorRepository>();
+builder.Services.AddSingleton<IVendorService, VendorService>();
 
-builder.Services.AddScoped<ISpecRepository, SpecRepository>();
-builder.Services.AddScoped<ISpecsService, SpecsService>();
+builder.Services.AddSingleton<ISpecRepository, SpecRepository>();
+builder.Services.AddSingleton<ISpecsService, SpecsService>();
 
 WebApplication app = builder.Build();
 
