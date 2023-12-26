@@ -148,7 +148,7 @@ public abstract class DapperRepository : IDapperRepository
     readonly DapperContext _dbContext;
     
     // PING CACHE PROCEDURE
-    const string PROCEDURE_PING_CACHE = "Ping_CacheTable";
+    const string PROCEDURE_GET_CACHE_UPDATE = "Get_CacheUpdate";
     const string PARAM_CACHE_NAME = "CacheName";
 
     protected DapperRepository( DapperContext dapperContext )
@@ -161,7 +161,7 @@ public abstract class DapperRepository : IDapperRepository
         DynamicParameters p = new();
         p.Add( PARAM_CACHE_NAME, cacheName );
 
-        return await TryQueryAsync( QuerySingleOrDefault<DateTime>, p, PROCEDURE_PING_CACHE );
+        return await TryQueryAsync( QuerySingleOrDefault<DateTime>, p, PROCEDURE_GET_CACHE_UPDATE );
     }
 
     protected delegate Task<T?> DapperQueryDelegate<T>( SqlConnection connection, string? dynamicSql = null, DynamicParameters? dynamicParams = null );
