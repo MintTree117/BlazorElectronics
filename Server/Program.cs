@@ -20,6 +20,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<DapperContext>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 

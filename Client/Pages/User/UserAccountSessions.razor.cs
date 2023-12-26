@@ -48,7 +48,7 @@ public sealed partial class UserAccountSessions : UserPage
     }
     async Task ClearSessions()
     {
-        ServiceReply<bool> reply = new ServiceReply<bool>( false ); //await UserService.DeleteAllSessions();
+        ServiceReply<bool> reply = await UserService.DeleteAllSessions();
 
         if ( !reply.Success )
         {

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "egCmq2Zr11l1zX+PkY9T10t4pXQmDn0w+am36QPG+ls88Xrgnw0iYTe/WLCcISnx4AXfRUnlh5xUIHBJ9/w+2A==",
+  "dgSpecHash": "PnteVKkEtb2Z3OdBY6itMtlFeWVNeiuOhlPCoZjK08/DyxkZOSCzjSmXRLAXh/Omr/Gwu1nQywmV+7Yra5t07w==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/Server/BlazorElectronics.Server.csproj",
   "expectedPackageFiles": [
@@ -56,6 +56,8 @@
     "/home/martin/.nuget/packages/runtime.any.system.text.encoding/4.3.0/runtime.any.system.text.encoding.4.3.0.nupkg.sha512",
     "/home/martin/.nuget/packages/runtime.native.system/4.3.0/runtime.native.system.4.3.0.nupkg.sha512",
     "/home/martin/.nuget/packages/runtime.unix.system.private.uri/4.3.0/runtime.unix.system.private.uri.4.3.0.nupkg.sha512",
+    "/home/martin/.nuget/packages/sendgrid/9.28.1/sendgrid.9.28.1.nupkg.sha512",
+    "/home/martin/.nuget/packages/starkbank-ecdsa/1.3.3/starkbank-ecdsa.1.3.3.nupkg.sha512",
     "/home/martin/.nuget/packages/stripe.net/43.8.0/stripe.net.43.8.0.nupkg.sha512",
     "/home/martin/.nuget/packages/system.configuration.configurationmanager/6.0.1/system.configuration.configurationmanager.6.0.1.nupkg.sha512",
     "/home/martin/.nuget/packages/system.diagnostics.diagnosticsource/6.0.0/system.diagnostics.diagnosticsource.6.0.0.nupkg.sha512",

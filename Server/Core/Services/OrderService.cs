@@ -1,3 +1,4 @@
+using System.Text;
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Server.Core.Interfaces;
 using BlazorElectronics.Server.Core.Models.Orders;
@@ -12,23 +13,25 @@ public sealed class OrderService : _ApiService, IOrderService
 {
     readonly IOrderRepository _orderRepository;
     readonly ICartRepository _cartRepository;
+    readonly IEmailService _emailService;
     
-    public OrderService( ILogger<_ApiService> logger, IOrderRepository orderRepository, ICartRepository cartRepository )
+    public OrderService( ILogger<_ApiService> logger, IOrderRepository orderRepository, ICartRepository cartRepository, IEmailService emailService )
         : base( logger )
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
+        _emailService = emailService;
     }
     
-    public async Task<ServiceReply<bool>> PlaceOrder( int userId )
+    public async Task<ServiceReply<bool>> PlaceOrder( int userId, string email )
     {
-        CartDto? cartReply;
+        CartDto? cart;
 
         try
         {
-            cartReply = await _cartRepository.GetCart( userId );
+            cart = await _cartRepository.GetCart( userId );
 
-            if ( cartReply?.Products is null || cartReply.PromoCodes is null )
+            if ( cart?.Products is null || cart.PromoCodes is null )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound, "Failed to find cart for user!" );
         }
         catch ( RepositoryException e )
@@ -42,7 +45,7 @@ public sealed class OrderService : _ApiService, IOrderService
         List<OrderItemModel> orderItems = new();
         List<PromoCodeDto> promoCodes = new();
 
-        foreach ( CartProductDto m in cartReply.Products )
+        foreach ( CartProductDto m in cart.Products )
         {
             decimal price = ( m.SalePrice ?? m.Price ) * m.Quantity;
             totalPrice += ( m.SalePrice ?? m.Price ) * m.Quantity;
@@ -55,7 +58,7 @@ public sealed class OrderService : _ApiService, IOrderService
             } );
         }
 
-        foreach ( PromoCodeDto p in cartReply.PromoCodes )
+        foreach ( PromoCodeDto p in cart.PromoCodes )
         {
             promoCodes.Add( p );
             totalDiscount += p.Discount;
@@ -92,9 +95,9 @@ public sealed class OrderService : _ApiService, IOrderService
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
 
+        SendOrderEmail( email, orderModel, cart );
         return new ServiceReply<bool>( true );
     }
     public async Task<ServiceReply<List<OrderOverviewDto>?>> GetOrders( int userId )
@@ -131,6 +134,25 @@ public sealed class OrderService : _ApiService, IOrderService
         }
     }
 
+    void SendOrderEmail( string toEmail, OrderModel order, CartDto cart )
+    {
+        StringBuilder builder = new();
+
+        builder.Append( "Thank you for completing your order! We hope you enjoy it." );
+        builder.Append( "Order Summary:" );
+        builder.Append( $"Order Date: {order.OrderDate}" );
+        builder.Append( $"Order Total: {order.TotalPrice}" );
+        builder.Append( "Items: " );
+        foreach ( CartProductDto item in cart.Products )
+            builder.Append( $"{item.Title}: x {item.Quantity}" );
+        builder.Append( "Promotions: " );
+        foreach ( PromoCodeDto promo in cart.PromoCodes )
+            builder.Append( $"{promo.PromoCode}" );
+        builder.Append( "You can review your order from your account: " );
+        builder.Append( "https://blazormedia.azurewebsites.net/login" );
+
+        _emailService.SendEmailAsync( toEmail, "BlazorMedia Order", builder.ToString() );
+    }
     static OrderDetailsDto? MapOrderDetails( OrderDetailsModel? model )
     {
         if ( model?.Items is null || model.Meta is null )

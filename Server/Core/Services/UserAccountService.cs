@@ -1,5 +1,3 @@
-using System.Net;
-using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using BlazorElectronics.Server.Api.Interfaces;
@@ -13,13 +11,14 @@ namespace BlazorElectronics.Server.Core.Services;
 public sealed class UserAccountService : _ApiService, IUserAccountService
 {
     const string BAD_PASSWORD_MESSAGE = "Incorrect Password!";
-    const string NOT_ADMIN_MESSAGE = "This account is not an administrator!";
-    
-    readonly IUserAccountRepository _userAccountRepository;
 
-    public UserAccountService( ILogger<_ApiService> logger, IUserAccountRepository userAccountRepository ) : base( logger )
+    readonly IUserAccountRepository _userAccountRepository;
+    readonly IEmailService _emailService;
+
+    public UserAccountService( ILogger<_ApiService> logger, IUserAccountRepository userAccountRepository, IEmailService emailService ) : base( logger )
     {
         _userAccountRepository = userAccountRepository;
+        _emailService = emailService;
     }
 
     public async Task<ServiceReply<List<int>?>> GetAllIds()
@@ -91,7 +90,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             if ( insertedUser is null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert user!" );
 
-            string? token = await TryInsertVerificationToken( insertedUser.UserId );
+            string? token = await TryInsertVerificationToken( insertedUser.UserId, email );
 
             if ( token is null )
                 return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert verification token!" );
@@ -106,21 +105,18 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> VerifyAdmin( int adminId )
+    public async Task<ServiceReply<bool>> ResendVerificationEmail( string email )
     {
         try
         {
-            UserModel? admin = await _userAccountRepository.GetById( adminId );
+            string? token = await _userAccountRepository.GetVerificationToken( email );
 
-            if ( admin is null )
+            if ( string.IsNullOrWhiteSpace( token ) )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
-            if ( !admin.IsActive )
-                return new ServiceReply<bool>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
+            SendVerificationEmail( email, token );
 
-            return admin.IsAdmin
-                ? new ServiceReply<bool>( true )
-                : new ServiceReply<bool>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
+            return new ServiceReply<bool>( true );
         }
         catch ( RepositoryException e )
         {
@@ -128,47 +124,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> VerifyAdminId( int adminId )
-    {
-        try
-        {
-            UserModel? admin = await _userAccountRepository.GetById( adminId );
 
-            if ( admin is null )
-                return new ServiceReply<int>( ServiceErrorType.NotFound );
-
-            if ( !admin.IsActive )
-                return new ServiceReply<int>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
-
-            return admin.IsAdmin
-                ? new ServiceReply<int>( admin.UserId )
-                : new ServiceReply<int>( ServiceErrorType.Unauthorized, NOT_ADMIN_MESSAGE );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<int>( ServiceErrorType.ServerError );
-        }
-    }
-    public async Task<ServiceReply<int>> ValidateUserId( int id )
-    {
-        try
-        {
-            UserModel? user = await _userAccountRepository.GetById( id );
-
-            if ( user is null )
-                return new ServiceReply<int>( ServiceErrorType.NotFound );
-
-            return user.IsActive
-                ? new ServiceReply<int>( user.UserId )
-                : new ServiceReply<int>( ServiceErrorType.Unauthorized, "You account has not yet been activated." );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<int>( ServiceErrorType.ServerError );
-        }
-    }
     public async Task<ServiceReply<AccountDetailsDto?>> UpdateAccountDetails( int userId, AccountDetailsDto dto )
     {
         try
@@ -233,7 +189,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
         }
     }
 
-    async Task<string?> TryInsertVerificationToken( int userId )
+    async Task<string?> TryInsertVerificationToken( int userId, string userEmail )
     {
         const int safety = 1000;
         int count = 0;
@@ -244,7 +200,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
         {
             token = Guid.NewGuid().ToString();
 
-            if ( await _userAccountRepository.InsertVerificationCode( userId, token ) )
+            if ( await _userAccountRepository.InsertVerificationToken( userId, userEmail, token ) )
             {
                 tokenInserted = true;
                 break;   
@@ -257,25 +213,13 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             ? token
             : null;
     }
-    static void SendVerificationEmail( string email, string token )
+    void SendVerificationEmail( string email, string token )
     {
-        SmtpClient smtpClient = new( "smtp.gmail.com", 587 )
-        {
-            Credentials = new NetworkCredential( "martygrof3708@gmail.com", "yourPassword" ),
-            EnableSsl = true
-        };
+        string subject = "Email Verification";
+        string verificationUrl = $"https://blazormedia.azurewebsites.net/verify?token={token}";
+        string body = $"Please verify your email by clicking on this link: {verificationUrl}";
 
-        string verificationUrl = $"http://blazorelectronics.com/verify?token={token}";
-
-        MailMessage mail = new()
-        {
-            From = new MailAddress( "martygrof3708@gmail.com" ),
-            Subject = "Email Verification",
-            Body = $"Please verify your email by clicking on this link: {verificationUrl}",
-            IsBodyHtml = true
-        };
-        mail.To.Add( new MailAddress( email ) ); // userEmail is the recipient's email address
-        smtpClient.SendAsync( mail, null );
+        _emailService.SendEmailAsync( email, subject, body );
     }
     static void CreatePasswordHash( string password, out byte[] hash, out byte[] salt )
     {

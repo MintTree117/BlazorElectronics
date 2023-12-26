@@ -12,6 +12,7 @@ public interface IUserServiceClient
     
     Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto );
     Task<ServiceReply<bool>> ActivateAccount( string token );
+    Task<ServiceReply<bool>> ResendVerification();
     Task<ServiceReply<SessionDto?>> Login( LoginRequestDto requestDto );
     Task<ServiceReply<bool>> AuthorizeUser();
     Task<ServiceReply<bool>> Logout();

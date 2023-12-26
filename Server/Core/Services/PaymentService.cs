@@ -12,20 +12,19 @@ namespace BlazorElectronics.Server.Core.Services;
 public sealed class PaymentService : _ApiService, IPaymentService
 {
     readonly IOrderService _orderService;
-    readonly IOrderRepository _orderRepository;
     readonly ICartRepository _cartRepository;
     readonly IUserAccountRepository _userRepository;
 
-    const string secret = "whsec_ca95fb7851a7a56be88f4b891867980fc468cc280e654eac5c1983cf7f44e935";
+    readonly string secret;
 
-    public PaymentService( ILogger<_ApiService> logger, ICartRepository cartRepository, IUserAccountRepository userRepository, IOrderService orderService, IOrderRepository orderRepository )
+    public PaymentService( ILogger<_ApiService> logger, ICartRepository cartRepository, IUserAccountRepository userRepository, IOrderService orderService )
         : base( logger )
     {
         _cartRepository = cartRepository;
         _userRepository = userRepository;
         _orderService = orderService;
-        _orderRepository = orderRepository;
-        StripeConfiguration.ApiKey = "sk_test_51OQcjnFBq2e5mEpMCMlHKmZspWwb4r4aYMP0N5tBBIzSYHr8PNuJvgLcucV7o7hCUlX3aTx9c1QEBDfKZe1sxpHV00obxjnJYs";
+        secret = Environment.GetEnvironmentVariable( "StripeSecret" ) ?? string.Empty;
+        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable( "StripeApiKey" );
     }
 
     public async Task<ServiceReply<Session>> CreateCheckoutSession( int userId )
@@ -134,7 +133,7 @@ public sealed class PaymentService : _ApiService, IPaymentService
             if ( userId <= 0 )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
-            await _orderService.PlaceOrder( userId );
+            await _orderService.PlaceOrder( userId, session.CustomerEmail );
             return new ServiceReply<bool>( true );
         }
         catch ( StripeException e )

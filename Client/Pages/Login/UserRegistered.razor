@@ -1,14 +1,21 @@
 @page "/registered"
 @using System.Collections.Specialized
 @using System.Web
+@using BlazorElectronics.Client.Services.Users
+@using BlazorElectronics.Shared
 @inherits PageView
+@inject IUserServiceClient UserService
 
 <div class="mt-5 p-3 text-center bg-light border border-grey">
     <AlertMessage></AlertMessage>
+    <p>Thank you for registering your account. An email with a verification link has been sent to @_email.</p>
+    <p>Didn't recieve a code? <button class="link-primary" onclick="@( async () => await ResendToken() )">Resend.</button></p>
 </div>
 
 @code 
 {
+    string _email = string.Empty;
+    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -17,9 +24,18 @@
         NameValueCollection queryString = HttpUtility.ParseQueryString( uri.Query );
         string? email = queryString.Get( Routes.REGISTERED_EMAIL );
 
-        if ( string.IsNullOrWhiteSpace( email ) )
-            email = "Email not found";
+        _email = string.IsNullOrWhiteSpace( email ) ? "Email not found" : email;
+    }
 
-        InvokeAlert( AlertType.Success, $"Thank you for registering your account. An email with a verification link has been sent to {email}." );
+    async Task ResendToken()
+    {
+        ServiceReply<bool> reply = await UserService.ResendVerification();
+
+        if ( reply.Success )
+            InvokeAlert( AlertType.Success, "Verification code resent." );
+        else
+            InvokeAlert( AlertType.Danger, "Failed to send verification code! Please contact support." );
+
+        StateHasChanged();
     }
 }

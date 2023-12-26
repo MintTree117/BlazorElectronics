@@ -22,7 +22,10 @@
         string? token = queryString.Get( Routes.VERIFY_TOKEN );
 
         if ( string.IsNullOrWhiteSpace( token ) )
-            InvokeAlert( AlertType.Danger, "Invalid activation code!" );
+        {
+            InvokeAlert( AlertType.Danger, "Invalid activation code! Please contact support." );
+            return;
+        }
 
         ServiceReply<bool> reply = await UserService.ActivateAccount( token );
 

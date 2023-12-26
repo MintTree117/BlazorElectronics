@@ -18,6 +18,7 @@ public class UserAccountRepository : DapperRepository, IUserAccountRepository
     const string PROCEDURE_UPDATE_ACCOUNT = "Update_UserAccountDetails";
     const string PROCEDURE_UPDATE_PASSWORD = "Update_UserAccountPassword";
     const string PROCEDURE_INSERT_VERIFICATION_CODE = "Insert_VerificationToken";
+    const string PROCEDURE_GET_VERIFICATION_TOKEN = "Get_VerificationToken";
     const string PROCEDURE_UPDATE_VERIFICATION_TOKEN = "Update_VerificationToken";
     const string PROCEDURE_UPDATE_ACCOUNT_STATUS = "Update_UserAccountStatus";
     const string PROCEDURE_GET_USER_VALIDATION = "Get_UserValidation";
@@ -109,13 +110,21 @@ public class UserAccountRepository : DapperRepository, IUserAccountRepository
         
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_UPDATE_PASSWORD );
     }
-    public async Task<bool> InsertVerificationCode( int userId, string code )
+    public async Task<bool> InsertVerificationToken( int userId, string userEmail, string code )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_ID, userId );
+        p.Add( PARAM_USER_EMAIL, userEmail );
         p.Add( PARAM_USER_VERIFICATION_TOKEN, code );
         
         return await TryQueryTransactionAsync( Execute, p, PROCEDURE_INSERT_VERIFICATION_CODE );
+    }
+    public async Task<string?> GetVerificationToken( string email )
+    {
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_EMAIL, email );
+
+        return await TryQueryAsync( QuerySingleOrDefault<string?>, p, PROCEDURE_GET_VERIFICATION_TOKEN );
     }
     public async Task<int> Update_VerificationToken( string token )
     {

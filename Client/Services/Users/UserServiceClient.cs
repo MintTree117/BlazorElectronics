@@ -23,6 +23,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
 
     const string API_ROUTE = "api/UserAccount";
     const string API_ROUTE_REGISTER = API_ROUTE + "/register";
+    const string API_ROUTE_RESEND_VERIFICATION = API_ROUTE + "/resend-verification";
     const string API_ROUTE_LOGIN = API_ROUTE + "/login";
     const string API_ROUTE_LOGOUT = API_ROUTE + "/logout";
     const string API_ROUTE_AUTHORIZE = API_ROUTE + "/authorize";
@@ -43,6 +44,10 @@ public class UserServiceClient : ClientService, IUserServiceClient
     public async Task<ServiceReply<bool>> ActivateAccount( string token )
     {
         return await TryPostRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
+    }
+    public async Task<ServiceReply<bool>> ResendVerification()
+    {
+        return await TryUserGetRequest<bool>( API_ROUTE_RESEND_VERIFICATION );
     }
     public async Task<ServiceReply<SessionDto?>> Login( LoginRequestDto requestDto )
     {

@@ -16,7 +16,8 @@ public interface IUserAccountRepository
     Task<UserValidationModel?> GetValidation( int userId );
     Task<AccountDetailsDto?> UpdateAccountDetails( int userId, AccountDetailsDto dto );
     Task<bool> UpdatePassword( int id, byte[] hash, byte[] salt );
-    Task<bool> InsertVerificationCode( int userId, string code );
+    Task<bool> InsertVerificationToken( int userId, string userEmail, string code );
+    Task<string?> GetVerificationToken( string email );
     Task<int> Update_VerificationToken( string token );
     Task<bool> Update_UserAccountStatus( int userId );
     Task<int> GetIdByEmail( string email );

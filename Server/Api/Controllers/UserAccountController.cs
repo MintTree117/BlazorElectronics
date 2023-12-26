@@ -70,6 +70,12 @@ public sealed class UserAccountController : UserController
         ServiceReply<bool> deleteReply = await SessionService.DeleteSession( sessionId );
         return GetReturnFromReply( deleteReply );
     }
+    [HttpGet( "resend-verification" )]
+    public async Task<ActionResult<bool>> ResendVerification( [FromBody] string token )
+    {
+        ServiceReply<bool> resendReply = await UserAccountService.ResendVerificationEmail( token );
+        return GetReturnFromReply( resendReply );
+    }
     [HttpPut( "activate" )]
     public async Task<ActionResult<bool>> Activate( [FromBody] string token )
     {
