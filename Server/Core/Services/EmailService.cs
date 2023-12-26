@@ -42,8 +42,5 @@ public class EmailService : IEmailService
         
         mail.To.Add( new MailAddress( toEmail ) ); // userEmail is the recipient's email address
         smtpClient.SendAsync( mail, null );
-        
-        smtpClient.Dispose();
-        mail.Dispose();
     }
 }

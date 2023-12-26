@@ -80,10 +80,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vVGVzdFNlZWQvVGVzdFNlZWRQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/martin/RiderProjects/BlazorElectronics/Client/Pages/AlertMessage.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWxlcnRNZXNzYWdlLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/martin/RiderProjects/BlazorElectronics/Client/Pages/CartCheckout/Cart.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2FydENoZWNrb3V0L0NhcnQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -106,10 +102,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/martin/RiderProjects/BlazorElectronics/Client/Pages/Login/Verify.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4vVmVyaWZ5LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/martin/RiderProjects/BlazorElectronics/Client/Pages/PageLoader.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZUxvYWRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/Client/Pages/Products/ProductDetails.razor]
@@ -152,6 +144,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyQWNjb3VudFNlc3Npb25zLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/martin/RiderProjects/BlazorElectronics/Client/Shared/AlertMessage.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0FsZXJ0TWVzc2FnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/martin/RiderProjects/BlazorElectronics/Client/Shared/CartCounter.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NhcnRDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -170,6 +166,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/martin/RiderProjects/BlazorElectronics/Client/Shared/NavSidebar.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL05hdlNpZGViYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/martin/RiderProjects/BlazorElectronics/Client/Shared/PageLoader.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1BhZ2VMb2FkZXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/martin/RiderProjects/BlazorElectronics/Client/Shared/Pagination.razor]

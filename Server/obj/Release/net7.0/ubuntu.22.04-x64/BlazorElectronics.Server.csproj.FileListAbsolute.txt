@@ -771,3 +771,5 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.genruntimeconfig.cache
 /home/martin/RiderProjects/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/SendGrid.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/StarkbankEcdsa.dll
