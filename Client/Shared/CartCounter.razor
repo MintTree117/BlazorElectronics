@@ -34,14 +34,14 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        /*ServiceReply<CartInfoModel> infoReply = await CartService.GetLocalCartInfo();
+        ServiceReply<CartInfoModel> infoReply = await CartService.GetLocalCartInfo();
 
         if ( !infoReply.Success || infoReply.Data is null )
             return;
         
         _cartCount = infoReply.Data.Quantity;
         _cartPrice = infoReply.Data.TotalPrice;
-        StateHasChanged();*/
+        StateHasChanged();
     }
 
     void GoToCart()

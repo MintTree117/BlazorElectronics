@@ -14,7 +14,7 @@ public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCr
     }
     public async Task<ServiceReply<Tedit?>> GetEdit( string path, int id )
     {
-        return await TryUserGetRequest<Tedit?>( path, GetIdParam( id ) );
+        return await TryUserGetRequest<Tedit?>( path, GetItemIdParam( id ) );
     }
     public async Task<ServiceReply<int>> Add( string path, Tedit dto )
     {
@@ -26,6 +26,6 @@ public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCr
     }
     public async Task<ServiceReply<bool>> RemoveItem( string path, int id )
     {
-        return await TryUserDeleteRequest<bool>( path, GetIdParam( id ) );
+        return await TryUserDeleteRequest<bool>( path, GetItemIdParam( id ) );
     }
 }

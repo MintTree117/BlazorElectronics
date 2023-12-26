@@ -17,7 +17,7 @@ public class AdminServiceClient : UserServiceClient, IAdminServiceClient
         return await TryUserGetRequest<bool>( API_ROUTE_AUTHORIZE );
     }
 
-    protected static Dictionary<string, object> GetIdParam( int id )
+    protected static Dictionary<string, object> GetItemIdParam( int id )
     {
         return new Dictionary<string, object>
         {

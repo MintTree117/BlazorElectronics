@@ -15,18 +15,63 @@
   <component name="ChangeListManager">
     <list default="true" id="5bc25deb-74c3-4cec-9621-e77d9a778b7b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BlazorElectronics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/CartCheckout/Cart.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/CartCheckout/Cart.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/CartCheckout/Cart.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/CartCheckout/Cart.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/Home/Index.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Home/Index.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Pages/Admin/Crud/CrudViewTable.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Admin/Crud/CrudViewTable.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Pages/Login/UserRegistered.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Login/UserRegistered.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/Pages/Products/ProductDetails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Products/ProductDetails.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Pages/Products/ProductFilters.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Products/ProductFilters.razor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/Pages/Products/ProductSearch.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/Products/ProductSearch.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Routes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Routes.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Services/Cart/CartServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Services/Cart/CartServiceClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Shared/NavSidebar.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/NavSidebar.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Shared/ProductSearchBar.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/ProductSearchBar.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Pages/User/UserAccountOrderDetails.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Pages/User/UserAccountOrderDetails.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Services/Admin/AdminCrudService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Services/Admin/AdminCrudService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Services/Admin/AdminServiceClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Services/Admin/AdminServiceClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Shared/CartCounter.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/CartCounter.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Shared/NavMenu.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/NavMenu.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Shared/NavSidebar.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Shared/NavSidebar.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Client.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Client.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Shared.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Shared.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Shared.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/BlazorElectronics.Shared.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.dll.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.dll.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.pdb.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Client.pdb.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.dll.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.dll.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.pdb.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/BlazorElectronics.Shared.pdb.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/blazor.boot.json" beforeDir="false" afterPath="$PROJECT_DIR$/Client/bin/Release/net7.0/wwwroot/_framework/blazor.boot.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/BlazorElectronics.Client.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/blazor.boot.json" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/blazor.boot.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/Kcym6bsg.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/Kcym6bsg.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/NVOB6Z1m.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/NVOB6Z1m.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/fUHuf38x.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/fUHuf38x.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/yyNo+0Dh.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/build-gz/yyNo+0Dh.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/ref/BlazorElectronics.Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/ref/BlazorElectronics.Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/obj/Release/net7.0/refint/BlazorElectronics.Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Client/obj/Release/net7.0/refint/BlazorElectronics.Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Models/Products/ProductDetailsModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Models/Products/ProductDetailsModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Core/Services/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Core/Services/ProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Data/DapperContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/DapperContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Data/Repositories/DapperRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/Repositories/DapperRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Data/Repositories/ProductSearchRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/Repositories/ProductSearchRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/Data/Repositories/ReviewRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Data/Repositories/ReviewRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Newtonsoft.Json.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Newtonsoft.Json.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Client.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Client.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Client.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Client.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Shared.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Shared.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Shared.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Shared.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shared/Products/Search/ProductSearchRequestDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/Products/Search/ProductSearchRequestDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/refint/BlazorElectronics.Server.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Server/obj/Release/net7.0/ubuntu.22.04-x64/refint/BlazorElectronics.Server.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/Categories/CategoryData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/Categories/CategoryData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/Specs/LookupSpecsDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/Specs/LookupSpecsDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/bin/Release/net7.0/BlazorElectronics.Shared.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/bin/Release/net7.0/BlazorElectronics.Shared.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/bin/Release/net7.0/BlazorElectronics.Shared.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/bin/Release/net7.0/BlazorElectronics.Shared.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/obj/Release/net7.0/BlazorElectronics.Shared.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/obj/Release/net7.0/BlazorElectronics.Shared.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/obj/Release/net7.0/BlazorElectronics.Shared.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/obj/Release/net7.0/BlazorElectronics.Shared.pdb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -487,6 +532,7 @@
       <workItem from="1703541670242" duration="1630000" />
       <workItem from="1703554716365" duration="18860000" />
       <workItem from="1703579053125" duration="3297000" />
+      <workItem from="1703613753012" duration="2963000" />
     </task>
     <task id="LOCAL-00001" summary="Testing production commit">
       <option name="closed" value="true" />

@@ -1,0 +1,12 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Get_Feature]
+    @FeatureId INT
+AS
+BEGIN
+    SELECT * FROM Features
+    WHERE FeatureId = @FeatureId;
+END;
+GO

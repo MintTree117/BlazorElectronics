@@ -111,7 +111,7 @@
                                     <span class="price">$@_product.Price</span>
                                 }
                             </div>
-                            <div class="input-group mb-3 d-flex flex-row flex-nowrap align-items-center" style="max-width: 45%;">
+                            <div class="input-group d-flex flex-row flex-nowrap align-items-center" style="max-width: 45%;">
                                 @if ( !_isInCart )
                                 {
                                     <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.Quantity" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">

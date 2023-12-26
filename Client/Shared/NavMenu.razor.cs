@@ -16,10 +16,6 @@ public partial class NavMenu : RazorView
     [Inject] public ICategoryServiceClient CategoryService { get; set; } = default!;
     [Inject] public IUserServiceClient UserService { get; set; } = default!;
 
-    bool _showSidebar = false;
-    bool _loadedCategories = false;
-    string _categoryMessage = "Loading Categories...";
-    
     CategoryData? _categories;
 
     protected override async Task OnInitializedAsync()

@@ -1,0 +1,11 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Get_Vendors]
+AS
+BEGIN
+    SELECT * FROM Vendors;
+    SELECT * FROM Vendor_Categories;
+END;
+GO

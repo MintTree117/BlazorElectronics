@@ -1,0 +1,12 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[Delete_Sessions]
+    @UserId INT
+AS
+BEGIN
+    DELETE FROM Sessions
+    WHERE UserId = @UserId;
+END;
+GO

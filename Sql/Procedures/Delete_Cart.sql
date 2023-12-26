@@ -1,0 +1,12 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Delete_Cart]
+    @UserId INT
+AS
+BEGIN
+    DELETE FROM Cart_Items
+    WHERE UserId = @UserId;
+END;
+GO

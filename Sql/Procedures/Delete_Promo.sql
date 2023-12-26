@@ -1,0 +1,12 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Delete_Promo]
+    @PromoId INT
+AS
+BEGIN
+    DELETE FROM Promos
+    WHERE PromoId = @PromoId;
+END;
+GO

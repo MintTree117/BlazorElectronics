@@ -6,16 +6,17 @@ public sealed class LookupSpecsDto
     {
         
     }
+    
     public LookupSpecsDto( List<int> globalIds, Dictionary<int, List<int>> categories, Dictionary<int, LookupSpec> specs )
     {
         GlobalSpecIds = globalIds;
         SpecIdsByCategory = categories;
         SpecsById = specs;
     }
-    
-    public List<int> GlobalSpecIds { get; init; }
-    public Dictionary<int, List<int>> SpecIdsByCategory { get; init; }
-    public Dictionary<int, LookupSpec> SpecsById { get; init; }
+
+    public List<int> GlobalSpecIds { get; init; } = new();
+    public Dictionary<int, List<int>> SpecIdsByCategory { get; init; } = new();
+    public Dictionary<int, LookupSpec> SpecsById { get; init; } = new();
 
     public List<LookupSpec> GetGlobalResponse()
     {

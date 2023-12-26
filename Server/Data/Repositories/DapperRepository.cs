@@ -249,22 +249,37 @@ public abstract class DapperRepository : IDapperRepository
 
     protected static async Task<IEnumerable<T>?> Query<T>( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
     {
+        if ( string.IsNullOrWhiteSpace( sql ) )
+            return null;
+        
         return await connection.QueryAsync<T>( sql, dynamicParams, commandType: CommandType.StoredProcedure );
     }
     protected static async Task<IEnumerable<T>?> QueryTransaction<T>( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
     {
+        if ( string.IsNullOrWhiteSpace( sql ) )
+            return null;
+        
         return await connection.QueryAsync<T>( sql, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
-    protected static async Task<T> QuerySingleOrDefault<T>( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
+    protected static async Task<T?> QuerySingleOrDefault<T>( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
     {
+        if ( string.IsNullOrWhiteSpace( sql ) )
+            return default;
+        
         return await connection.QuerySingleOrDefaultAsync<T>( sql, dynamicParams, commandType: CommandType.StoredProcedure );
     }
-    protected static async Task<T> QuerySingleOrDefaultTransaction<T>( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
+    protected static async Task<T?> QuerySingleOrDefaultTransaction<T>( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
     {
+        if ( string.IsNullOrWhiteSpace( sql ) )
+            return default;
+        
         return await connection.QuerySingleOrDefaultAsync<T>( sql, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
     }
     protected static async Task<bool> Execute( SqlConnection connection, DbTransaction transaction, string? sql, DynamicParameters? dynamicParams )
     {
+        if ( string.IsNullOrWhiteSpace( sql ) )
+            return default;
+        
         int rows = await connection.ExecuteAsync( sql, dynamicParams, transaction, commandType: CommandType.StoredProcedure );
         return rows > 0;
     }

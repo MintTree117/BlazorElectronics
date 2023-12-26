@@ -50,6 +50,9 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
     // BUILD & EXECUTE QUERY
     static async Task<IEnumerable<ProductSearchModel>?> GetProductSearchQuery( SqlConnection connection, string? sql, DynamicParameters? dynamicParams )
     {
+        if ( string.IsNullOrWhiteSpace( sql ) )
+            return null;
+        
         return await connection.QueryAsync<ProductSearchModel>( sql, dynamicParams );
     }
     static async Task<SearchQueryObject> BuildProductSearchQuery( ProductSearchRequestDto requestDto )

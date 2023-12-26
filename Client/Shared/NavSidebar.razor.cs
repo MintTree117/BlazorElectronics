@@ -1,3 +1,4 @@
+using System.Security;
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Shared.Categories;
 using Microsoft.AspNetCore.Components;
@@ -9,7 +10,6 @@ public partial class NavSidebar : RazorView, IDisposable
     [Parameter] public NavMenu NavMenu { get; set; } = default!;
 
     bool _show = false;
-    bool _collapseNavMenu = true;
     bool _isAuthorized = false;
     bool _isAdmin = false;
 
@@ -46,8 +46,16 @@ public partial class NavSidebar : RazorView, IDisposable
             StateHasChanged();
             return;
         }
+
+        if ( _sessionMeta is null )
+        {
+            _isAuthorized = false;
+            _isAdmin = false;
+            StateHasChanged();
+            return;
+        }
         
-        _isAuthorized = _sessionMeta is not null && _sessionMeta.Type != SessionType.None;
+        _isAuthorized = _sessionMeta.Type != SessionType.None;
         _isAdmin = _sessionMeta.Type == SessionType.Admin;
         StateHasChanged();
     }

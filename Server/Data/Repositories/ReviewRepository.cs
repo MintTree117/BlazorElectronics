@@ -28,9 +28,14 @@ public sealed class ReviewRepository : DapperRepository, IReviewRepository
 
         return await TryQueryAsync( Query<ReviewModel>, p, PROCEDURE_GET_FOR_PRODUCT );
     }
-    public async Task<IEnumerable<ReviewModel>?> GetForUser( int userId, int rows, int page )
+    public async Task<IEnumerable<ReviewModel>?> GetForUser( int userId, int rows, int offset )
     {
-        throw new NotImplementedException();
+        DynamicParameters p = new();
+        p.Add( PARAM_USER_ID, userId );
+        p.Add( PARAM_ROWS, rows );
+        p.Add( PARAM_OFFSET, offset );
+
+        return await TryQueryAsync( Query<ReviewModel>, p, PROCEDURE_GET_FOR_USER );
     }
     public async Task<ReviewModel?> GetEdit( int reviewId )
     {

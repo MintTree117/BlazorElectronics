@@ -24,7 +24,7 @@ public class DapperContext
         catch ( Exception e )
         {
             Logger.LogError( e.Message, e );
-            return null;
+            return new SqlConnection();
         }
     }
 }

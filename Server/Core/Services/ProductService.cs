@@ -197,8 +197,8 @@ public sealed class ProductService : _ApiService, IProductService
                 Rating = model.Product.Rating,
                 NumberReviews = model.Product.NumberReviews,
                 NumberSold = model.Product.NumberSold,
-                Description = model.Description.Description,
-                XmlSpecsAggregated = ParseFromXml( model.XmlSpecs.XmlSpecs )
+                Description = model.Description?.Description ?? string.Empty,
+                XmlSpecsAggregated = ParseFromXml( model.XmlSpecs?.XmlSpecs ?? string.Empty )
             };
 
             foreach ( ProductCategoryModel c in model.Categories )

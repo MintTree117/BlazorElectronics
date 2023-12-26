@@ -40,7 +40,7 @@ public partial class ProductSearch : PageView, IDisposable
     LookupSpecsDto specs = new();
     VendorsDto vendors = new();
 
-    ProductSearchRequestDto _searchRequest = new();
+    readonly ProductSearchRequestDto _searchRequest = new();
     ProductSearchReplyDto? _searchResults;
 
     public void Dispose()
@@ -101,11 +101,11 @@ public partial class ProductSearch : PageView, IDisposable
         if ( !ParseUrl( categories ) )
             return;
 
-        _searchHeader.SetBreadcrumbUrls( _currentCategory, categories.CategoriesById );
-        _filters.InitializeFilters( _searchRequest.SearchText, GetCategoryFilters(), GetSpecFilters(), GetVendorFilters() );
-        
         HandleUrlSearchParams();
         
+        _searchHeader.SetBreadcrumbUrls( _currentCategory, categories.CategoriesById );
+        _filters.InitializeFilters( _searchRequest.SearchText, GetCategoryFilters(), GetSpecFilters(), GetVendorFilters() );
+
         await SearchProducts();
         PageIsLoaded = true;
     }
@@ -121,9 +121,12 @@ public partial class ProductSearch : PageView, IDisposable
 
         _searchRequest.SearchText = searchText;
 
-        bool.TryParse( sale, out _urlSale );
-        bool.TryParse( featured, out _urlFeatures );
-        bool.TryParse( featuredDeals, out _urlFeaturedDeals );
+        if ( !string.IsNullOrWhiteSpace( sale ) )
+            _urlSale = true;
+        if ( !string.IsNullOrWhiteSpace( featured ) )
+            _urlFeatures = true;
+        if ( !string.IsNullOrWhiteSpace( featuredDeals ) )
+            _urlFeaturedDeals = true;
 
         if ( int.TryParse( vendor, out int id ) )
             _urlVendorId = id;
@@ -246,11 +249,10 @@ public partial class ProductSearch : PageView, IDisposable
         _filters.ShowFilters();
     }
     
-    async Task ApplyFilters( ProductFiltersDto filters )
+    async Task ApplyFilters()
     {
         _searchList.SetPage( 1 );
         _searchRequest.Page = 1;
-        _searchRequest.Filters = filters;
         await SearchProducts();
     }
     async Task ApplySort( ProductSortType type )

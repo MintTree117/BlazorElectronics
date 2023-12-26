@@ -85,7 +85,7 @@ public sealed class CategoryData
         }
 
         // If the category has a parent, recursively get the parent's URL.
-        if ( responses.TryGetValue( m.ParentCategoryId.Value, out CategoryFullDto parent ) )
+        if ( responses.TryGetValue( m.ParentCategoryId.Value, out CategoryFullDto? parent ) )
         {
             string parentUrl = BuildApiUrl( parent, responses );
 

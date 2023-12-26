@@ -7,7 +7,7 @@ namespace BlazorElectronics.Client.Pages.User;
 
 public sealed partial class UserAccountOrderDetails : UserPage
 {
-    [Parameter] public string OrderId { get; init; }
+    [Parameter] public string OrderId { get; init; } = string.Empty;
     [Inject] public IOrderServiceClient OrderService { get; init; } = default!;
 
     OrderDetailsDto _details = new();

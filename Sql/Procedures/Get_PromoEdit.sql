@@ -1,0 +1,12 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Get_PromoEdit]
+    @PromoId INT
+AS
+BEGIN
+    SELECT * FROM Promos
+    WHERE PromoId = @PromoId;
+END;
+GO

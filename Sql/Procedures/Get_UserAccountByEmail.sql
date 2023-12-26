@@ -1,0 +1,12 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Get_UserAccountByEmail]
+    @Email NVARCHAR(254)
+AS
+BEGIN
+    SELECT * FROM User_Accounts
+    WHERE Email = @Email
+END;
+GO
