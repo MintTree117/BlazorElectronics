@@ -2,6 +2,6 @@ namespace BlazorElectronics.Server.Core.Models.Users;
 
 public class UserExists
 {
-    public bool UsernameExists { get; set; } = false;
-    public bool EmailExists { get; set; } = false;
+    public string? UsernameExists { get; set; } = null;
+    public string? EmailExists { get; set; } = null;
 }

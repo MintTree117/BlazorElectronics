@@ -116,7 +116,7 @@ public abstract class DapperRepository : IDapperRepository
     protected const string PARAM_USER_PHONE = "@Phone";
     protected const string PARAM_USER_PASSWORD_HASH = "@PasswordHash";
     protected const string PARAM_USER_PASSWORD_SALT = "@PasswordSalt";
-    protected const string PARAM_USER_VERIFICATION_TOKEN = "@VerificationCode";
+    protected const string PARAM_USER_VERIFICATION_TOKEN = "@Token";
 
     // SESSION
     protected const string PARAM_SESSION_ID = "@SessionId";

@@ -43,7 +43,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     }
     public async Task<ServiceReply<bool>> ActivateAccount( string token )
     {
-        return await TryPostRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
+        return await TryPutRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
     }
     public async Task<ServiceReply<bool>> ResendVerification()
     {

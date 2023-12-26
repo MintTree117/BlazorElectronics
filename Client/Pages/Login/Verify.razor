@@ -3,10 +3,11 @@
 @using System.Collections.Specialized
 @using System.Web
 @using BlazorElectronics.Shared
+@using BlazorElectronics.Client.Shared
 @inherits PageView
 
 <div class="mt-5 text-center">
-    <AlertMessage></AlertMessage>
+    <AlertMessage Page="@this"></AlertMessage>
 </div>
 
 @code 

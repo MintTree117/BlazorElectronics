@@ -80,8 +80,8 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
         try
         {
             UserExists? userExists = await _userAccountRepository.GetUserExists( username, email );
-
-            if ( userExists is not null )
+            
+            if ( userExists is not null && ( userExists.EmailExists is not null || userExists.UsernameExists is not null ) )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
 
             CreatePasswordHash( password, out byte[] hash, out byte[] salt );
@@ -242,11 +242,11 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
         var messageBuilder = new StringBuilder();
         messageBuilder.Append( "User already exists with " );
         
-        if ( existsObj.EmailExists )
+        if ( existsObj.EmailExists is not null )
         {
             messageBuilder.Append( $"email ({email})" );
 
-            if ( existsObj.UsernameExists )
+            if ( existsObj.UsernameExists is not null )
             {
                 messageBuilder.Append( $" and username ({username})!" );
                 return messageBuilder.ToString();
