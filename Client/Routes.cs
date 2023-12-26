@@ -5,9 +5,11 @@ public static class Routes
     public const string HOME = "/";
     public const string PRODUCT = "/product";
     public const string SEARCH = "/search";
-    public const string FEATURES = $"{SEARCH}?featured=true";
+    public const string FEATURES = $"{SEARCH}?{PARAM_SEARCH_FEATURED}";
+    public const string SALES = $"{SEARCH}?{PARAM_SEARCH_SALES}";
+    public const string FEATURED_DEALS = $"{SEARCH}?{PARAM_SEARCH_FEATURED_DEALS}";
+    public const string SEARCH_VENDOR = $"{SEARCH}?{PARAM_SEARCH_VENDOR}";
     public const string REVIEW = "/review-product";
-    public const string SALES = $"{SEARCH}?sales=true";
     public const string LOGIN = "/login";
     public const string LOGOUT = "/logout";
     public const string REGISTERED = "/registered";
@@ -26,8 +28,12 @@ public static class Routes
     public const string CRUD_VENDORS = "";
     public const string SEED_DB = "";
 
-    public const string REGISTERED_EMAIL = "registeredEmail";
+    public const string REGISTERED_EMAIL = "registered-email";
     public const string VERIFY_TOKEN = "token";
-    public const string SEARCH_TEXT_PARAM = "searchText";
-    public const string PRODUCT_EDIT_NEW_PARAM = "newProduct";
+    public const string PARAM_SEARCH_TEXT = "search-text";
+    public const string PRODUCT_EDIT_NEW_PARAM = "new-product";
+    public const string PARAM_SEARCH_FEATURED_DEALS = "featured-deals";
+    public const string PARAM_SEARCH_VENDOR = "vendorId";
+    public const string PARAM_SEARCH_SALES = "on-sale";
+    public const string PARAM_SEARCH_FEATURED = "featured";
 }

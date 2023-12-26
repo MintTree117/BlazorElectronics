@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using BlazorElectronics.Shared.Categories;
 using BlazorElectronics.Shared.Products.Search;
 using BlazorElectronics.Shared.Specs;
@@ -58,7 +59,28 @@ public partial class ProductFilters : RazorView
         _showFiltersCss = "d-flex";
         StateHasChanged();
     }
-    
+
+    public void SetSale()
+    {
+        _filters.OnSale = true;
+    }
+    public void SetFeatured()
+    {
+        _filters.Featured = true;
+    }
+    public void SetFeaturedDeals()
+    {
+        _filters.Featured = true;
+        _filters.OnSale = true;
+    }
+    public void SetVendor( int vendorId )
+    {
+        if ( _selectedVendors.ContainsKey( vendorId ) )
+            _selectedVendors[ vendorId ] = true;
+
+        _filters.Vendors.Add( vendorId );
+    }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();

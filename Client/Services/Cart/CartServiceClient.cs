@@ -50,15 +50,16 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         List<CartItemDto> localItems = ( await GetLocalCart() ).GetItemsDto();
         ServiceReply<CartDto?> reply = await TryUserPostRequest<CartDto>( API_ROUTE_UPDATE_CART, localItems );
 
-        if ( !reply.Success || reply.Data is null )
-            return new ServiceReply<CartModel?>( reply.ErrorType, $"Failed to update cart! {reply.Message}" );
-
-        CartModel cart = new( reply.Data );
+        if ( reply is { Success: true, Data: not null } )
+        {
+            CartModel cart = new( reply.Data );
+            await TryStoreLocalCart( cart );
+            OnChange?.Invoke( cart.GetCartInfo() );
+            return new ServiceReply<CartModel?>( cart );
+        }
         
-        await TryStoreLocalCart( cart );
-        OnChange?.Invoke( cart.GetCartInfo() );
-        
-        return new ServiceReply<CartModel?>( cart );
+        OnChange?.Invoke( new CartInfoModel() );
+        return new ServiceReply<CartModel?>( new CartModel() );
     }
     public async Task<ServiceReply<bool>> AddOrUpdateItem( CartProductDto product )
     {
@@ -69,7 +70,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         cart.AddItem( product );
         bool storedLocally = await TryStoreLocalCart( cart );
 
-        if ( !reply.Success || !storedLocally )
+        if ( !reply.Success && !storedLocally )
             return new ServiceReply<bool>( ServiceErrorType.NotFound, "Failed to add item to local storage or server!" );
         
         OnChange?.Invoke( cart.GetCartInfo() );
@@ -83,7 +84,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         cart.RemoveItem( productId );
         bool storedLocally = await TryStoreLocalCart( cart );
 
-        if ( !reply.Success || !storedLocally )
+        if ( !reply.Success && !storedLocally )
             return new ServiceReply<bool>( ServiceErrorType.NotFound, "Failed to remove item from local storage or server!" );
 
         OnChange?.Invoke( cart.GetCartInfo() );

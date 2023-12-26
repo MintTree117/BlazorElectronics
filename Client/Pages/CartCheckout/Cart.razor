@@ -13,7 +13,7 @@
                 <h1 class="fs-4 fw-bolder m-0 p-0">Shopping Cart</h1>
                 <span class="ms-2">(@CartModel.Products.Count Items)</span>
             </div>
-            <button class="btn btn-secondary btn-icon">
+            <button class="btn btn-secondary btn-icon" onclick="@( async () => await EmptyCart() )">
                 Empty Cart
                 <i class="oi oi-trash ms-1"></i>
             </button>

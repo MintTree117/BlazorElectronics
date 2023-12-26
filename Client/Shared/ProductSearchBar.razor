@@ -35,7 +35,7 @@
     
     void SearchProducts()
     {
-        NavManager.NavigateTo( $"{Routes.SEARCH}?{Routes.SEARCH_TEXT_PARAM}={_searchText}" );
+        NavManager.NavigateTo( $"{Routes.SEARCH}?{Routes.PARAM_SEARCH_TEXT}={_searchText}" );
     }
     async Task HandleSearch( KeyboardEventArgs args )
     {

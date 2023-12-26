@@ -68,6 +68,10 @@ public partial class Cart : PageView
         if ( !reply.Success )
             InvokeAlert( AlertType.Danger, $"Failed to remove item! {reply.ErrorType} : {reply.Message}" );
     }
+    async Task EmptyCart()
+    {
+        await CartService.ClearCart();
+    }
 
     async Task PlaceOrder()
     {

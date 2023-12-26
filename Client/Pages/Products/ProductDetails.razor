@@ -18,7 +18,7 @@
                     <h5 class="modal-title" id="exampleModalLabel">Share Link</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body d-flex flex-column align-items-center">
                     <p>@NavManager.Uri</p>
                 </div>
                 <div class="modal-footer">
@@ -91,7 +91,7 @@
                             <div>
                                 <span class="small">See more by: </span>
                                 <span class="fw-bold">
-                                    <a href="@Routes.SEARCH?vendorId=@_vendor.VendorId">@_vendor.VendorName</a>
+                                    <a href="@Routes.SEARCH_VENDOR=@_vendor.VendorId">@_vendor.VendorName</a>
                                 </span>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                                     <span class="price">$@_product.Price</span>
                                 }
                             </div>
-                            <div class="input-group mb-3 d-flex flex-row flex-nowrap" style="max-width: 45%;">
+                            <div class="input-group mb-3 d-flex flex-row flex-nowrap align-items-center" style="max-width: 45%;">
                                 @if ( !_isInCart )
                                 {
                                     <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.Quantity" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">

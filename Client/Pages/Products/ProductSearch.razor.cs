@@ -23,6 +23,11 @@ public partial class ProductSearch : PageView, IDisposable
     [Parameter] public string PrimaryCategory { get; init; } = string.Empty;
     [Parameter] public string SecondaryCategory { get; init; } = string.Empty;
     [Parameter] public string TertiaryCategory { get; init; } = string.Empty;
+    
+    bool _urlSale;
+    bool _urlFeatures;
+    bool _urlFeaturedDeals;
+    int? _urlVendorId;
 
     ProductSearchHeader _searchHeader = default!;
     ProductFilters _filters = default!;
@@ -98,7 +103,9 @@ public partial class ProductSearch : PageView, IDisposable
 
         _searchHeader.SetBreadcrumbUrls( _currentCategory, categories.CategoriesById );
         _filters.InitializeFilters( _searchRequest.SearchText, GetCategoryFilters(), GetSpecFilters(), GetVendorFilters() );
-
+        
+        HandleUrlSearchParams();
+        
         await SearchProducts();
         PageIsLoaded = true;
     }
@@ -106,9 +113,20 @@ public partial class ProductSearch : PageView, IDisposable
     {
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         Dictionary<string, string> queryParams = ParseQuery( uri.Query );
-        queryParams.TryGetValue( Routes.SEARCH_TEXT_PARAM, out string? searchText );
+        queryParams.TryGetValue( Routes.PARAM_SEARCH_TEXT, out string? searchText );
+        queryParams.TryGetValue( Routes.PARAM_SEARCH_SALES, out string? sale );
+        queryParams.TryGetValue( Routes.PARAM_SEARCH_FEATURED, out string? featured );
+        queryParams.TryGetValue( Routes.PARAM_SEARCH_FEATURED_DEALS, out string? featuredDeals );
+        queryParams.TryGetValue( Routes.PARAM_SEARCH_VENDOR, out string? vendor );
 
         _searchRequest.SearchText = searchText;
+
+        bool.TryParse( sale, out _urlSale );
+        bool.TryParse( featured, out _urlFeatures );
+        bool.TryParse( featuredDeals, out _urlFeaturedDeals );
+
+        if ( int.TryParse( vendor, out int id ) )
+            _urlVendorId = id;
 
         if ( string.IsNullOrWhiteSpace( PrimaryCategory ) )
             return true;
@@ -142,6 +160,33 @@ public partial class ProductSearch : PageView, IDisposable
         }
 
         return _primaryCategory is not null;
+    }
+    void HandleUrlSearchParams()
+    {
+        if ( _urlSale )
+        {
+            _filters.SetSale();
+            _searchRequest.Filters.OnSale = true;
+        }
+
+        if ( _urlFeatures )
+        {
+            _filters.SetFeatured();
+            _searchRequest.Filters.Featured = true;
+        }
+
+        if ( _urlFeaturedDeals )
+        {
+            _filters.SetFeaturedDeals();
+            _searchRequest.Filters.OnSale = true;
+            _searchRequest.Filters.Featured = true;
+        }
+
+        if ( _urlVendorId is not null )
+        {
+            _filters.SetVendor( _urlVendorId.Value );
+            _searchRequest.Filters.Vendors.Add( _urlVendorId.Value );
+        }
     }
     List<CategoryFullDto> GetCategoryFilters()
     {

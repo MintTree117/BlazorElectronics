@@ -9,5 +9,5 @@ public class ProductSearchRequestDto
     public int? CategoryId { get; set; }
     public string? SearchText { get; set; }
     public ProductSortType SortType { get; set; }
-    public ProductFiltersDto? Filters { get; set; }
+    public ProductFiltersDto Filters { get; set; } = new();
 }
