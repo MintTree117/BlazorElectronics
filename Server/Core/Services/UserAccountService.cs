@@ -75,34 +75,34 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<UserLoginDto?>> Register( string username, string email, string password, string? phone )
+    public async Task<ServiceReply<bool>> Register( string username, string email, string password, string? phone )
     {
         try
         {
             UserExists? userExists = await _userAccountRepository.GetUserExists( username, email );
 
             if ( userExists is not null )
-                return new ServiceReply<UserLoginDto?>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
+                return new ServiceReply<bool>( ServiceErrorType.NotFound, GetUserExistsMessage( userExists, username, email ) );
 
             CreatePasswordHash( password, out byte[] hash, out byte[] salt );
             UserModel? insertedUser = await _userAccountRepository.InsertUser( username, email, phone, hash, salt );
 
             if ( insertedUser is null )
-                return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert user!" );
+                return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to insert user!" );
 
             string? token = await TryInsertVerificationToken( insertedUser.UserId, email );
 
             if ( token is null )
-                return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError, "Failed to insert verification token!" );
+                return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to insert verification token!" );
 
             SendVerificationEmail( email, token );
 
-            return new ServiceReply<UserLoginDto?>( new UserLoginDto( insertedUser.UserId, insertedUser.Username, insertedUser.Email, insertedUser.IsAdmin ) );
+            return new ServiceReply<bool>( true );
         }
         catch ( RepositoryException e )
         {
             Logger.LogError( e.Message, e );
-            return new ServiceReply<UserLoginDto?>( ServiceErrorType.ServerError );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
     public async Task<ServiceReply<bool>> ResendVerificationEmail( string email )

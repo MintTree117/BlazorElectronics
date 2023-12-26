@@ -38,7 +38,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
     
     public async Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto )
     {
-        ServiceReply<bool> registerReply = await TryPostRequest<bool>( API_ROUTE_REGISTER, requestDto );
+        ServiceReply<bool> registerReply = await TryPutRequest<bool>( API_ROUTE_REGISTER, requestDto );
         return registerReply;
     }
     public async Task<ServiceReply<bool>> ActivateAccount( string token )

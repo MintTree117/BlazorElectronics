@@ -13,12 +13,12 @@ public sealed class UserAccountController : UserController
     public UserAccountController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
 
     [HttpPut( "register" )]
-    public async Task<ActionResult<SessionDto?>> Register( [FromBody] RegisterRequestDto request )
+    public async Task<ActionResult<bool>> Register( [FromBody] RegisterRequestDto request )
     {
         if ( !ValidateRegisterRequest( request ) )
             return BadRequest( BAD_REQUEST_MESSAGE );
 
-        ServiceReply<UserLoginDto?> reply = await UserAccountService.Register( request.Username, request.Email, request.Password, request.Phone );
+        ServiceReply<bool> reply = await UserAccountService.Register( request.Username, request.Email, request.Password, request.Phone );
         return GetReturnFromReply( reply );
     }
     [HttpPost( "login" )]

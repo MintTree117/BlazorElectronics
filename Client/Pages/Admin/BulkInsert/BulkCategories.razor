@@ -9,6 +9,8 @@
     
     @if ( PageIsReady() )
     {
+        <AlertMessage Page="@this"></AlertMessage>
+        
         <div class="form-header">
             <h3>Bulk Insert Categories</h3>
             <button class="btn btn-primary" type="button" @onclick="@NewBulk">

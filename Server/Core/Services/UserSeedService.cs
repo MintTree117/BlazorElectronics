@@ -21,7 +21,7 @@ public sealed class UserSeedService : _ApiService, IUserSeedService
 
         foreach ( RegisterRequestDto seed in seeds )
         {
-            ServiceReply<UserLoginDto?> seedReply = await _userAccountService.Register( seed.Username, seed.Username, seed.Password, seed.Phone );
+            ServiceReply<bool> seedReply = await _userAccountService.Register( seed.Username, seed.Username, seed.Password, seed.Phone );
             
             if ( !seedReply.Success )
                 return new ServiceReply<bool>( ServiceErrorType.ServerError, seedReply.Message );

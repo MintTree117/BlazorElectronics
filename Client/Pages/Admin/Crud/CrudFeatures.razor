@@ -9,6 +9,8 @@
     
     @if ( PageIsReady() )
     {
+        <AlertMessage Page="@this"></AlertMessage>
+        
         if ( !IsEditing )
         {
             <CrudViewTable Page="@this"></CrudViewTable>

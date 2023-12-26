@@ -1,13 +1,14 @@
 @page "/admin/edit-product/{productId}"
-@using BlazorElectronics.Client.Pages.Admin.Crud
 @inherits AdminPage
+@using BlazorElectronics.Client.Shared
 
 <div class="container-sm form-wrapper">
     <PageLoader Page="@this"></PageLoader>
     
     @if ( PageIsReady() )
     {
-
+        <AlertMessage Page="@this"></AlertMessage>
+        
         <EditForm Model="_productDto" OnSubmit="( async () => await Submit() )">
             <div class="mb-3">
                 <label for="Name" class="form-label">Product Name</label>

@@ -1,11 +1,14 @@
 @page "/login"
 @inherits PageView
+@using BlazorElectronics.Client.Shared
 
 <div style="max-width: 360px" class="mt-5 mx-auto text-center">
     <PageLoader Page="@this"></PageLoader>
     
     @if ( PageIsReady() )
     {
+        <AlertMessage Page="@this"></AlertMessage>
+        
         <img class="mb-4" src="/Images/Logo.svg" alt="blazor" width="72" height="57">
 
         <EditForm Model="_loginDto" OnValidSubmit="@(async () => await HandleLogin() )">
@@ -49,7 +52,5 @@
             </div>
             <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
         </EditForm>
-
-        <AlertMessage Page="@this"></AlertMessage>
     }
 </div>
