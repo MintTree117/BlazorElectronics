@@ -53,24 +53,36 @@ public partial class Cart : PageView
 
         product.Quantity = Math.Max( quantity, 1 );
 
-        ServiceReply<bool> reply = await CartService.AddOrUpdateItem( product );
+        ServiceReply<CartModel?> reply = await CartService.AddOrUpdateItem( product );
 
-        if ( !reply.Success )
-            InvokeAlert( AlertType.Danger, $"Failed to update item quantity! {reply.ErrorType} : {reply.Message}" );
+        if ( !reply.Success || reply.Data is null )
+        {
+            InvokeAlert( AlertType.Danger, $"Failed to update item! {reply.ErrorType} : {reply.Message}" );
+            return;
+        }
 
+        CartModel = reply.Data;
         InvokeAlert( AlertType.Success, "Updated quantity." );
         StateHasChanged();
     }
     async Task RemoveItem( CartProductDto product )
     {
-        ServiceReply<bool> reply = await CartService.RemoveItem( product.ProductId );
+        ServiceReply<CartModel?> reply = await CartService.RemoveItem( product.ProductId );
 
-        if ( !reply.Success )
-            InvokeAlert( AlertType.Danger, $"Failed to remove item! {reply.ErrorType} : {reply.Message}" );
+        if ( !reply.Success || reply.Data is null )
+        {
+            InvokeAlert( AlertType.Danger, $"Failed to remove item! {reply.ErrorType} : {reply.Message}" );  
+            return;
+        }
+
+        CartModel = reply.Data;
+        InvokeAlert( AlertType.Success, "Removed item." );
+        StateHasChanged();
     }
     async Task EmptyCart()
     {
         await CartService.ClearCart();
+        CartModel = new CartModel();
     }
 
     async Task PlaceOrder()

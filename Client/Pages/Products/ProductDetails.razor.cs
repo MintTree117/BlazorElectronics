@@ -239,11 +239,16 @@ public partial class ProductDetails : PageView
         if ( !int.TryParse( e.Value?.ToString(), out int quantity ) )
             return;
 
-        ServiceReply<bool> reply = await CartService.AddOrUpdateItem( _cartProduct );
+        _cartProduct.Quantity = quantity;
+
+        ServiceReply<CartModel?> reply = await CartService.AddOrUpdateItem( _cartProduct );
 
         if ( !reply.Success )
+        {
             InvokeAlert( AlertType.Danger, $"Failed update quantity! {reply.ErrorType} : {reply.Message}" );
-        
+            return;
+        }
+
         _isInCart = true;
 
         InvokeAlert( AlertType.Success, "Updated quantity." );
@@ -254,11 +259,14 @@ public partial class ProductDetails : PageView
         if ( _product is null )
             return;
 
-        ServiceReply<bool> reply = await CartService.AddOrUpdateItem( _cartProduct );
+        ServiceReply<CartModel?> reply = await CartService.AddOrUpdateItem( _cartProduct );
 
         if ( !reply.Success )
+        {
             InvokeAlert( AlertType.Danger, $"Failed to add item to cart! {reply.ErrorType} : {reply.Message}" );
-        
+            return;
+        }
+
         _isInCart = true;
 
         InvokeAlert( AlertType.Success, "Added item to cart." );
