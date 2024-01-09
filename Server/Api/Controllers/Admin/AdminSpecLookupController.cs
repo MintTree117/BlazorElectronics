@@ -8,12 +8,12 @@ namespace BlazorElectronics.Server.Api.Controllers.Admin;
 [ApiController]
 public sealed class AdminSpecLookupController : _AdminController
 {
-    readonly ISpecsService _lookupService;
+    readonly ISpecLookupsService _specLookupService;
 
-    public AdminSpecLookupController( ILogger<AdminSpecLookupController> logger, IUserAccountService userAccountService, ISessionService sessionService, ISpecsService lookupService )
+    public AdminSpecLookupController( ILogger<AdminSpecLookupController> logger, IUserAccountService userAccountService, ISessionService sessionService, ISpecLookupsService specLookupService )
         : base( logger, userAccountService, sessionService )
     {
-        _lookupService = lookupService;
+        _specLookupService = specLookupService;
     }
     
     [HttpGet( "get-view" )]
@@ -24,7 +24,7 @@ public sealed class AdminSpecLookupController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<List<CrudViewDto>?> reply = await _lookupService.GetView();
+        ServiceReply<List<CrudViewDto>?> reply = await _specLookupService.GetView();
         return GetReturnFromReply( reply );
     }
     [HttpGet( "get-edit" )]
@@ -35,10 +35,10 @@ public sealed class AdminSpecLookupController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<LookupSpecEditDto?> reply = await _lookupService.GetEdit( itemId );
+        ServiceReply<LookupSpecEditDto?> reply = await _specLookupService.GetEdit( itemId );
         return GetReturnFromReply( reply );
     }
-    [HttpPut( "add" )]
+    [HttpPost( "add" )]
     public async Task<ActionResult<int>> Add( [FromBody] LookupSpecEditDto requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
@@ -46,7 +46,7 @@ public sealed class AdminSpecLookupController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<int> reply = await _lookupService.Add( requestDto );
+        ServiceReply<int> reply = await _specLookupService.Add( requestDto );
         return GetReturnFromReply( reply );
     }
     [HttpPut( "update" )]
@@ -57,7 +57,7 @@ public sealed class AdminSpecLookupController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _lookupService.Update( requestDto );
+        ServiceReply<bool> reply = await _specLookupService.Update( requestDto );
         return GetReturnFromReply( reply );
     }
     [HttpDelete( "remove" )]
@@ -68,7 +68,7 @@ public sealed class AdminSpecLookupController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _lookupService.Remove( itemId );
+        ServiceReply<bool> reply = await _specLookupService.Remove( itemId );
         return GetReturnFromReply( reply );
     }
 }

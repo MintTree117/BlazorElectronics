@@ -9,24 +9,24 @@ public partial class SidebarCategories : RazorView
 {
     [Inject] ICategoryServiceClient CategoryService { get; init; } = default!;
 
-    CategoryData _categoryData = new();
+    CategoryDataDto _categoryDataDto = new();
     List<int> currentCategoryIds = new();
     int? currentParentId;
     
     protected override async Task OnInitializedAsync()
     {
-        ServiceReply<CategoryData?> reply = await CategoryService.GetCategories();
+        ServiceReply<CategoryDataDto?> reply = await CategoryService.GetCategories();
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return;
 
-        _categoryData = reply.Data;
-        currentCategoryIds = _categoryData.PrimaryIds;
+        _categoryDataDto = reply.Payload;
+        currentCategoryIds = _categoryDataDto.PrimaryIds;
     }
 
     void SelectCategory( int categoryId )
     {
-        CategoryFullDto categoryFull = _categoryData.CategoriesById[ categoryId ];
+        CategoryFullDto categoryFull = _categoryDataDto.CategoriesById[ categoryId ];
         currentCategoryIds = categoryFull.Children.Select( c => c.CategoryId ).ToList();
         currentParentId = categoryFull.CategoryId;
     }
@@ -35,10 +35,10 @@ public partial class SidebarCategories : RazorView
         if ( !currentParentId.HasValue ) 
             return;
 
-        CategoryFullDto parentCategoryFull = _categoryData.CategoriesById[ currentParentId.Value ];
+        CategoryFullDto parentCategoryFull = _categoryDataDto.CategoriesById[ currentParentId.Value ];
         currentParentId = parentCategoryFull.ParentCategoryId;
         currentCategoryIds = currentParentId.HasValue
-            ? _categoryData.CategoriesById[ currentParentId.Value ].Children.Select( c => c.CategoryId ).ToList()
-            : _categoryData.PrimaryIds;
+            ? _categoryDataDto.CategoriesById[ currentParentId.Value ].Children.Select( c => c.CategoryId ).ToList()
+            : _categoryDataDto.PrimaryIds;
     }
 }

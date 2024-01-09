@@ -5,6 +5,7 @@ using BlazorElectronics.Client.Services.Categories;
 using BlazorElectronics.Client.Services.Products;
 using BlazorElectronics.Client.Services.Reviews;
 using BlazorElectronics.Client.Services.Specs;
+using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Client.Services.Vendors;
 using BlazorElectronics.Client.Shared;
 using BlazorElectronics.Shared;
@@ -27,6 +28,7 @@ public partial class ProductDetails : PageView
     [Inject] public IReviewServiceClient ReviewService { get; set; } = default!;
     [Inject] public ISpecServiceClient LookupService { get; set; } = default!;
     [Inject] public IVendorServiceClient VendorsService { get; set; } = default!;
+    [Inject] public IUserServiceClient UserService { get; set; } = default!;
 
     [Parameter] public string ProductId { get; set; } = string.Empty;
     
@@ -34,6 +36,7 @@ public partial class ProductDetails : PageView
     ProductDto? _product;
     CartProductDto _cartProduct = new();
     bool _isInCart = false;
+    bool _isAdmin = false;
 
     readonly List<CategoryFullDto> _categories = new();
     readonly Dictionary<string, string> _lookupSpecsAggregated = new();
@@ -61,6 +64,12 @@ public partial class ProductDetails : PageView
 
         Task[] tasks = { LoadCartItem(), LoadCategories(), LoadLookups(), LoadVendor(), LoadReviews() };
         await Task.WhenAll( tasks );
+
+        SessionMeta? s = await UserService.GetSessionMeta();
+
+        if ( s is not null && s.Type == SessionType.Admin )
+            _isAdmin = true;
+        StateHasChanged();
     }
     bool ParseUrl( out int id )
     {
@@ -74,13 +83,13 @@ public partial class ProductDetails : PageView
     {
         ServiceReply<ProductDto?> productReply = await ProductService.GetProductDetails( id );
 
-        if ( !productReply.Success || productReply.Data is null )
+        if ( !productReply.Success || productReply.Payload is null )
         {
             SetViewMessage( false, $"Failed to fetch product details! {productReply.ErrorType} : {productReply.Message}" );
             return false;
         }
 
-        _product = productReply.Data;
+        _product = productReply.Payload;
         PageIsLoaded = true;
         StateHasChanged();
         return true;
@@ -98,27 +107,27 @@ public partial class ProductDetails : PageView
             return;
 
         _isInCart = true;
-        _cartProduct.Quantity = reply.Data;
+        _cartProduct.Quantity = reply.Payload;
         StateHasChanged();
     }
     async Task LoadCategories()
     {
-        ServiceReply<CategoryData?> categoriesReply = await CategoryService.GetCategories();
+        ServiceReply<CategoryDataDto?> categoriesReply = await CategoryService.GetCategories();
 
-        if ( !categoriesReply.Success || categoriesReply.Data is null )
+        if ( !categoriesReply.Success || categoriesReply.Payload is null )
             return;
         
-        GetProductCategories( categoriesReply.Data.CategoriesById );
+        GetProductCategories( categoriesReply.Payload.CategoriesById );
         StateHasChanged();
     }
     async Task LoadLookups()
     {
         ServiceReply<LookupSpecsDto?> lookupsReply = await LookupService.GetSpecLookups();
 
-        if ( !lookupsReply.Success || lookupsReply.Data is null )
+        if ( !lookupsReply.Success || lookupsReply.Payload is null )
             return;
 
-        GetAggregatedLookups( lookupsReply.Data );
+        GetAggregatedLookups( lookupsReply.Payload );
         StateHasChanged();
     }
     async Task LoadVendor()
@@ -128,10 +137,10 @@ public partial class ProductDetails : PageView
         
         ServiceReply<VendorsDto?> vendorReply = await VendorsService.GetVendors();
 
-        if ( !vendorReply.Success || vendorReply.Data is null )
+        if ( !vendorReply.Success || vendorReply.Payload is null )
             return;
 
-        if ( !vendorReply.Data.VendorsById.TryGetValue( _product.VendorId, out VendorDto? vendor ) )
+        if ( !vendorReply.Payload.VendorsById.TryGetValue( _product.VendorId, out VendorDto? vendor ) )
             return;
 
         _vendor.VendorId = vendor.VendorId;
@@ -149,12 +158,12 @@ public partial class ProductDetails : PageView
 
         ServiceReply<ProductReviewsReplyDto?> reply = await ReviewService.GetForProduct( _productReviewsGetDto );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return;
 
-        _reviews.AddRange( reply.Data.Reviews );
-        _reviewCount = reply.Data.TotalMatches;
-        _pagination.UpdateTotalPages( _productReviewsGetDto.Rows, reply.Data.TotalMatches );
+        _reviews.AddRange( reply.Payload.Reviews );
+        _reviewCount = reply.Payload.TotalMatches;
+        _pagination.UpdateTotalPages( _productReviewsGetDto.Rows, reply.Payload.TotalMatches );
         StateHasChanged();
     }
 

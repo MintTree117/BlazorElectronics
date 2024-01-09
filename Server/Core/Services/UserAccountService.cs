@@ -15,7 +15,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
     readonly IUserAccountRepository _userAccountRepository;
     readonly IEmailService _emailService;
 
-    public UserAccountService( ILogger<_ApiService> logger, IUserAccountRepository userAccountRepository, IEmailService emailService ) : base( logger )
+    public UserAccountService( ILogger<UserAccountService> logger, IUserAccountRepository userAccountRepository, IEmailService emailService ) : base( logger )
     {
         _userAccountRepository = userAccountRepository;
         _emailService = emailService;
@@ -95,7 +95,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             if ( token is null )
                 return new ServiceReply<bool>( ServiceErrorType.ServerError, "Failed to insert verification token!" );
 
-            SendVerificationEmail( email, token );
+            TrySendVerificationEmail( email, token );
 
             return new ServiceReply<bool>( true );
         }
@@ -114,7 +114,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             if ( string.IsNullOrWhiteSpace( token ) )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
-            SendVerificationEmail( email, token );
+            TrySendVerificationEmail( email, token );
 
             return new ServiceReply<bool>( true );
         }
@@ -141,7 +141,7 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             return new ServiceReply<AccountDetailsDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword )
+    public async Task<ServiceReply<bool>> UpdatePassword( int userId, string newPassword )
     {
         try
         {
@@ -213,13 +213,47 @@ public sealed class UserAccountService : _ApiService, IUserAccountService
             ? token
             : null;
     }
-    void SendVerificationEmail( string email, string token )
+    void TrySendVerificationEmail( string email, string token )
     {
         string subject = "Email Verification";
         string verificationUrl = $"https://blazormedia.azurewebsites.net/verify?token={token}";
-        string body = $"Please verify your email by clicking on this link: {verificationUrl}";
+        string body = $@"
+            <html>
+            <head>
+                <title>Email Verification</title>
+                <style>
+                    .email-container {{
+                        font - family: Arial, sans-serif;
+                        color: #333333;
+                        padding: 20px;
+                    }}
+                    .verification-link {{
+                        display: inline-block;
+                        padding: 10px 15px;
+                        margin-top: 20px;
+                        background-color: #007BFF;
+                        color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 5px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='email-container'>
+                    <p>Please verify your email by clicking on the link below:</p>
+                    <a href='{verificationUrl}' class='verification-link'>Verify Email</a
+                </div>
+            </body>
+            </html>";
 
-        _emailService.SendEmailAsync( email, subject, body );
+        try
+        {
+            _emailService.SendEmailAsync( email, subject, body );
+        }
+        catch ( Exception e )
+        {
+            Logger.LogError( e, e.Message );
+        }
     }
     static void CreatePasswordHash( string password, out byte[] hash, out byte[] salt )
     {

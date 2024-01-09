@@ -11,7 +11,7 @@ public sealed class VendorService : _CachedApiService, IVendorService
     readonly IVendorRepository _repository;
     VendorsDto? _cachedVendors;
 
-    public VendorService( ILogger<_ApiService> logger, IVendorRepository repository )
+    public VendorService( ILogger<VendorService> logger, IVendorRepository repository )
         : base( logger, repository, 4, "Vendors" )
     {
         _repository = repository;
@@ -35,7 +35,7 @@ public sealed class VendorService : _CachedApiService, IVendorService
         }
     }
     
-    public async Task<ServiceReply<VendorsDto?>> GetVendors()
+    public async Task<ServiceReply<VendorsDto?>> Get()
     {
         if ( _cachedVendors is not null )
             return new ServiceReply<VendorsDto?>( _cachedVendors );

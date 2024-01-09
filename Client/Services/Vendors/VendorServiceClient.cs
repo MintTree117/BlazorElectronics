@@ -19,10 +19,10 @@ public sealed class VendorServiceClient : CachedClientService<VendorsDto>, IVend
 
         ServiceReply<VendorsDto?> reply = await TryGetRequest<VendorsDto?>( "api/vendors/get" );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return new ServiceReply<VendorsDto?>( reply.ErrorType, reply.Message );
         
-        await TrySetCachedItem( reply.Data );
+        await TrySetCachedItem( reply.Payload );
         return reply;
     }
 }

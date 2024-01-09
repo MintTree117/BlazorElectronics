@@ -10,7 +10,7 @@ public sealed class ReviewSeedService : _ApiService, IReviewSeedService
     readonly IReviewRepository _repository;
     readonly Random _random = new();
     
-    public ReviewSeedService( ILogger<_ApiService> logger, IReviewRepository repository )
+    public ReviewSeedService( ILogger<ReviewSeedService> logger, IReviewRepository repository )
         : base( logger )
     {
         _repository = repository;

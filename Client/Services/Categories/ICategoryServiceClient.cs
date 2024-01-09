@@ -5,5 +5,5 @@ namespace BlazorElectronics.Client.Services.Categories;
 
 public interface ICategoryServiceClient
 {
-    Task<ServiceReply<CategoryData?>> GetCategories();
+    Task<ServiceReply<CategoryDataDto?>> GetCategories();
 }

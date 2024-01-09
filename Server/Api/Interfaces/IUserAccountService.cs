@@ -11,6 +11,6 @@ public interface IUserAccountService
     Task<ServiceReply<bool>> Register( string username, string email, string password, string? phone );
     Task<ServiceReply<bool>> ResendVerificationEmail( string token );
     Task<ServiceReply<AccountDetailsDto?>> UpdateAccountDetails( int userId, AccountDetailsDto dto );
-    Task<ServiceReply<bool>> ChangePassword( int userId, string newPassword );
+    Task<ServiceReply<bool>> UpdatePassword( int userId, string newPassword );
     Task<ServiceReply<bool>> ActivateAccount( string token );
 }

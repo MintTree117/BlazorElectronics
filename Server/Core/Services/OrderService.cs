@@ -15,7 +15,7 @@ public sealed class OrderService : _ApiService, IOrderService
     readonly ICartRepository _cartRepository;
     readonly IEmailService _emailService;
     
-    public OrderService( ILogger<_ApiService> logger, IOrderRepository orderRepository, ICartRepository cartRepository, IEmailService emailService )
+    public OrderService( ILogger<OrderService> logger, IOrderRepository orderRepository, ICartRepository cartRepository, IEmailService emailService )
         : base( logger )
     {
         _orderRepository = orderRepository;
@@ -23,29 +23,19 @@ public sealed class OrderService : _ApiService, IOrderService
         _emailService = emailService;
     }
     
-    public async Task<ServiceReply<bool>> PlaceOrder( int userId, string email )
+    public async Task<ServiceReply<bool>> FulfillOrder( int userId, string email )
     {
-        CartDto? cart;
+        ServiceReply<CartDto?> cartReply = await TryGetCart( userId );
 
-        try
-        {
-            cart = await _cartRepository.GetCart( userId );
-
-            if ( cart?.Products is null || cart.PromoCodes is null )
-                return new ServiceReply<bool>( ServiceErrorType.NotFound, "Failed to find cart for user!" );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
-        }
+        if ( !cartReply.Success || cartReply.Payload is null )
+            return new ServiceReply<bool>( cartReply.ErrorType, cartReply.Message );
 
         decimal totalPrice = 0;
         decimal totalDiscount = 0;
         List<OrderItemModel> orderItems = new();
         List<PromoCodeDto> promoCodes = new();
 
-        foreach ( CartProductDto m in cart.Products )
+        foreach ( CartProductDto m in cartReply.Payload.Products )
         {
             decimal price = ( m.SalePrice ?? m.Price ) * m.Quantity;
             totalPrice += ( m.SalePrice ?? m.Price ) * m.Quantity;
@@ -58,7 +48,7 @@ public sealed class OrderService : _ApiService, IOrderService
             } );
         }
 
-        foreach ( PromoCodeDto p in cart.PromoCodes )
+        foreach ( PromoCodeDto p in cartReply.Payload.PromoCodes )
         {
             promoCodes.Add( p );
             totalDiscount += p.Discount;
@@ -74,30 +64,15 @@ public sealed class OrderService : _ApiService, IOrderService
             OrderItems = orderItems,
             PromoCodes = promoCodes
         };
-        
-        try
-        {
-            bool placedOrder = await _orderRepository.InsertOrder( orderModel );
 
-            if ( !placedOrder )
-                return new ServiceReply<bool>( ServiceErrorType.Conflict, "Failed to place order!" );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-            return new ServiceReply<bool>( ServiceErrorType.ServerError );
-        }
+        ServiceReply<bool> orderReply = await TryPlaceOrder( orderModel );
 
-        try
-        {
-            await _cartRepository.DeleteCart( userId );
-        }
-        catch ( RepositoryException e )
-        {
-            Logger.LogError( e.Message, e );
-        }
+        if ( !orderReply.Success )
+            return new ServiceReply<bool>( orderReply.ErrorType, orderReply.Message );
 
-        SendOrderEmail( email, orderModel, cart );
+        await TryDeleteCart( userId );
+
+        SendOrderEmail( email, orderModel, cartReply.Payload );
         return new ServiceReply<bool>( true );
     }
     public async Task<ServiceReply<List<OrderOverviewDto>?>> GetOrders( int userId )
@@ -164,5 +139,50 @@ public sealed class OrderService : _ApiService, IOrderService
             TotalPrice = model.Meta.TotalPrice,
             Products = model.Items.ToList()
         };
+    }
+
+    async Task<ServiceReply<CartDto?>> TryGetCart( int userId )
+    {
+        try
+        {
+            CartDto? cart = await _cartRepository.Get( userId );
+
+            return cart?.Products is null || cart.PromoCodes is null
+                ? new ServiceReply<CartDto?>( ServiceErrorType.NotFound, "Failed to find cart for user!" )
+                : new ServiceReply<CartDto?>( cart );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<CartDto?>( ServiceErrorType.ServerError );
+        }
+    }
+    async Task<ServiceReply<bool>> TryPlaceOrder( OrderModel orderModel )
+    {
+        try
+        {
+            bool placedOrder = await _orderRepository.InsertOrder( orderModel );
+
+            return placedOrder
+                ? new ServiceReply<bool>( true )
+                : new ServiceReply<bool>( ServiceErrorType.Conflict, "Failed to place order! Please contact support." );
+
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+            return new ServiceReply<bool>( ServiceErrorType.ServerError );
+        }
+    }
+    async Task TryDeleteCart( int userId )
+    {
+        try
+        {
+            await _cartRepository.DeleteCart( userId );
+        }
+        catch ( RepositoryException e )
+        {
+            Logger.LogError( e.Message, e );
+        }
     }
 }

@@ -31,8 +31,13 @@
     @if ( PageIsReady() && _product is not null )
     {
         <div class="mt-4 d-flex flex-column">
-            <div class="d-flex flex-column flex-md-row justify-content-start bg-light">
-                
+             @if ( _isAdmin )
+             {
+                 <a class="btn btn-outline-info fw-bolder w-100 mt-2" href="@Routes.PRODUCT_EDIT/?@Routes.PARAM_PRODUCT_EDIT_ID=@_product.ProductId">Edit</a>
+             }
+             
+             <div class="d-flex flex-column flex-md-row justify-content-start bg-light">
+
                 <!-- Carousel -->
                 <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-indicators">
@@ -117,7 +122,7 @@
                                     <input type="number" class="form-control" placeholder="Quantity" min="1" value="@_cartProduct.Quantity" onchange="@( async ( ChangeEventArgs e ) => await HandleQuantityChange( e ) )">
                                     <button class="btn btn-outline-primary flex-grow-1" type="button" @onclick="@(async () => await AddToCart() )">
                                         Add to Cart
-                                    </button>   
+                                    </button>
                                 }
                                 else
                                 {
@@ -126,7 +131,7 @@
                                 }
                             </div>
                         </div>
-                        
+
                         <!-- Categories -->
                         <div>
                             <div class="product-categories">
@@ -137,15 +142,15 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
-            
+
             <div class="mt-3 p-3 bg-light">
                 <h3 class="mt-2">Description</h3>
                 <p class="product-description mb-0 overflow-auto">@_product.Description</p>
             </div>
-            
+
             <!-- Specs -->
             <div class="mt-3 p-3 bg-light">
                 <h3 class="mt-2">Specifications</h3>
@@ -168,7 +173,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Reviews -->
             <div id="ProductReview" class="mt-3 p-3 bg-light">
                 <!-- Review Header -->
@@ -204,10 +209,10 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Review List -->
                 <div class="mt-3 mb-3">
-                    @foreach( ProductReviewDto review in _reviews )
+                    @foreach ( ProductReviewDto review in _reviews )
                     {
                         <div class="border-bottom border-grey">
                             <div class="d-flex flex-row align-items-center justify-content-between">
@@ -223,7 +228,7 @@
                         </div>
                     }
                 </div>
-                
+
                 <!-- Review Pagination -->
                 <div class="d-flex flex-row align-items-center justify-content-center">
                     <Pagination @ref="_pagination" OnPageChange="@SelectReviewPage"></Pagination>

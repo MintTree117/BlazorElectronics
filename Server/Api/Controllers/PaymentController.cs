@@ -6,11 +6,11 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public class PaymentController : UserController
+public class PaymentController : _UserController
 {
     readonly IPaymentService _paymentService;
 
-    public PaymentController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IPaymentService paymentService )
+    public PaymentController( ILogger<PaymentController> logger, IUserAccountService userAccountService, ISessionService sessionService, IPaymentService paymentService )
         : base( logger, userAccountService, sessionService )
     {
         _paymentService = paymentService;
@@ -24,12 +24,8 @@ public class PaymentController : UserController
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<Session> sessionReply = await _paymentService.CreateCheckoutSession( userReply.Data );
-
-        if ( !sessionReply.Success || sessionReply.Data is null )
-            return GetReturnFromReply( sessionReply );
-
-        return Ok( sessionReply.Data.Url );
+        ServiceReply<Session> paymentSessionReply = await _paymentService.CreateCheckoutSession( userReply.Payload );
+        return GetReturnFromReply( paymentSessionReply );
     }
 
     [HttpPost( "fulfill" )]

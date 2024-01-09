@@ -4,12 +4,12 @@ using BlazorElectronics.Server.Api.Interfaces;
 
 namespace BlazorElectronics.Server.Core.Services;
 
-public class EmailService : IEmailService
+public class EmailService : _ApiService, IEmailService
 {
-    readonly string _appEmail;
-    readonly string _appPassword;
-
-    public EmailService()
+    public EmailService( ILogger<EmailService> logger )
+        : base( logger ) { }
+    
+    public void SendEmailAsync( string toEmail, string subject, string messageBody )
     {
         string? email = Environment.GetEnvironmentVariable( "AppEmail" );
         string? password = Environment.GetEnvironmentVariable( "AppEmailPassword" );
@@ -19,22 +19,16 @@ public class EmailService : IEmailService
 
         if ( string.IsNullOrWhiteSpace( password ) )
             throw new Exception( "App email password is null!" );
-
-        _appEmail = email;
-        _appPassword = password;
-    }
-    
-    public void SendEmailAsync( string toEmail, string subject, string messageBody )
-    {
+        
         SmtpClient smtpClient = new( "smtp.gmail.com", 587 )
         {
-            Credentials = new NetworkCredential( _appEmail, _appPassword ),
+            Credentials = new NetworkCredential( email, password ),
             EnableSsl = true
         };
         
         MailMessage mail = new()
         {
-            From = new MailAddress( _appEmail ),
+            From = new MailAddress( email ),
             Subject = subject,
             Body = messageBody,
             IsBodyHtml = true

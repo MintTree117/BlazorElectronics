@@ -9,46 +9,30 @@ namespace BlazorElectronics.Server.Api.Controllers;
 [ApiController]
 public sealed class ProductsController : _Controller
 {
-    readonly IProductService _productService;
+    readonly IProductServiceCustomer _productServiceCustomer;
 
-    public ProductsController( ILogger<_Controller> logger, IProductService productService )
+    public ProductsController( ILogger<_Controller> logger, IProductServiceCustomer productServiceCustomer )
         : base( logger )
     {
-        _productService = productService;
+        _productServiceCustomer = productServiceCustomer;
     }
     
-    [HttpGet( "search-query" )]
-    public async Task<ActionResult<ProductSummaryDto?>> SearchQuery()
-    {
-        ProductSearchRequestDto r = new()
-        {
-            CategoryId = 1,
-            SearchText = "book",
-            Filters = new ProductFiltersDto
-            {
-                SpecsInclude = new Dictionary<int, List<int>>() { { 1, new List<int>(){ 1 } } }
-            }
-        };
-        ServiceReply<string?> reply = await _productService.GetProductSearchQueryString( r );
-        return GetReturnFromReply( reply );
-    }
     [HttpPost( "search" )]
     public async Task<ActionResult<ProductSummaryDto?>> SearchProducts( [FromBody] ProductSearchRequestDto requestDto )
     {
-        ServiceReply<ProductSearchReplyDto?> reply = await _productService.GetProductSearch( requestDto );
+        ServiceReply<ProductSearchReplyDto?> reply = await _productServiceCustomer.GetSearch( requestDto );
         return GetReturnFromReply( reply );
     }
     [HttpGet( "suggestions" )]
     public async Task<ActionResult<List<string>?>> SearchSuggestions( string searchText )
     {
-        ServiceReply<List<string>?> reply = await _productService.GetProductSuggestions( searchText );
+        ServiceReply<List<string>?> reply = await _productServiceCustomer.GetSuggestions( searchText );
         return GetReturnFromReply( reply );
     }
     [HttpGet( "details" )]
     public async Task<ActionResult<ProductDto?>> GetDetails( int productId )
     {
-        Logger.LogError( "Hit" );
-        ServiceReply<ProductDto?> reply = await _productService.GetProductDetails( productId );
+        ServiceReply<ProductDto?> reply = await _productServiceCustomer.GetDetails( productId );
         return GetReturnFromReply( reply );
     }
 }

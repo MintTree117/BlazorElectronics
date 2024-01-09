@@ -14,13 +14,13 @@ public partial class UserAccountDetails : UserPage
 
         ServiceReply<AccountDetailsDto?> reply = await UserService.GetAccountDetails();
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             SetViewMessage( false, $"Failed to retrieve account details! {reply.ErrorType} : {reply.Message}" );
             return;
         }
 
-        _detailsDto = reply.Data;
+        _detailsDto = reply.Payload;
         PageIsLoaded = true;
         StateHasChanged();
     }
@@ -29,19 +29,19 @@ public partial class UserAccountDetails : UserPage
     {
         ServiceReply<AccountDetailsDto?> reply = await UserService.UpdateAccountDetails( _detailsDto );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"Failed to update account! {reply.ErrorType} : {reply.Message}" );
             return;
         }
 
-        _detailsDto = reply.Data;
+        _detailsDto = reply.Payload;
         InvokeAlert( AlertType.Success, "Successfully updated you account." );
         StateHasChanged();
     }
     async Task UpdatePassword()
     {
-        ServiceReply<bool> reply = await UserService.ChangePassword( _passwordDto );
+        ServiceReply<bool> reply = await UserService.UpdatePassword( _passwordDto );
 
         if ( !reply.Success )
         {

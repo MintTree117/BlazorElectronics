@@ -3,7 +3,7 @@
 
 @if ( _show )
 {
-    <div class="nav-sidebar bg-light">
+    <div class="nav-sidebar bg-light" style="z-index: 2000">
         <div class="p-3 bg-dark d-flex align-items-center justify-content-between">
             <div>
                 @if ( _sessionMeta is not null )
@@ -33,7 +33,7 @@
                     <a class="nav-link" href="@Routes.SEARCH">All Products</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="@Routes.PARAM_SEARCH_FEATURED_DEALS">Featured</a>
+                    <a class="nav-link" href="@Routes.FEATURES">Featured</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="@Routes.SALES">On Sale</a>

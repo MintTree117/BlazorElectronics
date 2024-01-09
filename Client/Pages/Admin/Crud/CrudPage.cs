@@ -58,14 +58,14 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudViewDto where 
 
         PageIsLoaded = true;
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             Logger.LogError( reply.Message ?? ERROR_GET_VIEW );
             SetViewMessage( false, reply.Message ?? ERROR_GET_VIEW );
             return;
         }
 
-        ItemsView = reply.Data;
+        ItemsView = reply.Payload;
 
         SetViewMessage( true, string.Empty );
     }
@@ -123,14 +123,14 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudViewDto where 
         
         ServiceReply<Tedit?> reply = await CrudService.GetEdit( $"{ApiPath}/get-edit", itemId );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             Logger.LogError( reply.Message ?? ERROR_GET_EDIT );
             SetViewMessage( false, reply.Message ?? ERROR_GET_EDIT );
             return;
         }
 
-        ItemEdit = reply.Data;
+        ItemEdit = reply.Payload;
         
         PageIsLoaded = true;
         IsEditing = true;
@@ -195,7 +195,7 @@ public class CrudPage<Tview, Tedit> : AdminPage where Tview : CrudViewDto where 
             return;
         }
         
-        ItemEdit.SetId( reply.Data );
+        ItemEdit.SetId( reply.Payload );
         NewItem = false;
 
         InvokeAlert( AlertType.Success, $"Successfully created {ItemTitle}" );

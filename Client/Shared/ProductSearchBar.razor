@@ -46,12 +46,12 @@
 
         ServiceReply<List<string>?> reply = await ProductService.GetProductSearchSuggestions( _searchText );
         
-        if ( reply.Data is null || !reply.Success )
+        if ( reply.Payload is null || !reply.Success )
         {
             _suggestions = new List<string>();
             return;
         }
 
-        _suggestions = reply.Data;
+        _suggestions = reply.Payload;
     }
 }

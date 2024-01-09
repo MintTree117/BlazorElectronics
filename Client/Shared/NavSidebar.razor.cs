@@ -14,7 +14,7 @@ public partial class NavSidebar : RazorView, IDisposable
     bool _isAdmin = false;
 
     SessionMeta? _sessionMeta;
-    CategoryData _categories = new();
+    CategoryDataDto _categories = new();
     List<CategoryFullDto> _primaryCategories = new();
     int? _currentParentId = null;
 
@@ -26,7 +26,7 @@ public partial class NavSidebar : RazorView, IDisposable
         NavMenu.OnToggleSidebar += ToggleSidebar;
     }
 
-    void SetCategories( CategoryData? r )
+    void SetCategories( CategoryDataDto? r )
     {
         if ( r is null )
             return;

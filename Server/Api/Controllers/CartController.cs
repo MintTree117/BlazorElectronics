@@ -1,22 +1,21 @@
 using BlazorElectronics.Server.Api.Interfaces;
 using BlazorElectronics.Shared.Cart;
-using BlazorElectronics.Shared.Promos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public sealed class CartController : UserController
+public sealed class CartController : _UserController
 {
     readonly ICartService _cartService;
 
-    public CartController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, ICartService cartService ) : base( logger, userAccountService, sessionService )
+    public CartController( ILogger<CartController> logger, IUserAccountService userAccountService, ISessionService sessionService, ICartService cartService ) : base( logger, userAccountService, sessionService )
     {
         _cartService = cartService;
     }
     
-    [HttpPost( "update-cart" )]
+    [HttpPost( "update" )]
     public async Task<ActionResult<CartDto?>> UpdateCart( [FromBody] List<CartItemDto> requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
@@ -24,10 +23,11 @@ public sealed class CartController : UserController
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
         
-        ServiceReply<CartDto?> reply = await _cartService.UpdateCart( userReply.Data, requestDto );
+        ServiceReply<CartDto?> reply = await _cartService.UpdateCart( userReply.Payload, requestDto );
         return GetReturnFromReply( reply );
     }
-    [HttpPut( "add-update-item" )]
+    
+    /*[HttpPut( "add-update-item" )]
     public async Task<ActionResult<bool>> AddToCart( [FromBody] CartItemDto requestDto )
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
@@ -81,5 +81,5 @@ public sealed class CartController : UserController
 
         ServiceReply<bool> reply = await _cartService.RemovePromo( userReply.Data, promoId );
         return GetReturnFromReply( reply );
-    }
+    }*/
 }

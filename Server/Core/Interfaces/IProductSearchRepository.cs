@@ -5,7 +5,7 @@ namespace BlazorElectronics.Server.Core.Interfaces;
 
 public interface IProductSearchRepository
 {
-    Task<string?> GetProductSearchQuery( ProductSearchRequestDto searchRequestDto );
+    Task<string?> GetSearchQuery( ProductSearchRequestDto searchRequestDto );
     Task<IEnumerable<string>?> GetSearchSuggestions( string searchText );
     Task<IEnumerable<ProductSearchModel>?> GetProductSearch( ProductSearchRequestDto searchRequestDto );
 }

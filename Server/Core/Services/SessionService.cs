@@ -16,7 +16,7 @@ public sealed class SessionService : _ApiService, ISessionService
 
     readonly ISessionRepository _sessionRepository;
 
-    public SessionService( ILogger<_ApiService> logger, ISessionRepository sessionRepository ) 
+    public SessionService( ILogger<SessionService> logger, ISessionRepository sessionRepository ) 
         : base( logger )
     {
         _sessionRepository = sessionRepository;
@@ -97,7 +97,7 @@ public sealed class SessionService : _ApiService, ISessionService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> AuthorizeSessionAndUserId( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo, bool mustBeAdmin = false )
+    public async Task<ServiceReply<int>> AuthorizeSessionWithUserId( int sessionId, string sessionToken, UserDeviceInfoDto? deviceInfo, bool mustBeAdmin = false )
     {
         try
         {

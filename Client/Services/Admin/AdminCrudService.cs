@@ -18,11 +18,11 @@ public sealed class AdminCrudService<Tview,Tedit> : AdminServiceClient, IAdminCr
     }
     public async Task<ServiceReply<int>> Add( string path, Tedit dto )
     {
-        return await TryUserPutRequest<int>( path, dto );
+        return await TryUserPostRequest<int>( path, dto );
     }
     public async Task<ServiceReply<bool>> Update( string path, Tedit dto )
     {
-        return await TryUserPostRequest<bool>( path, dto );
+        return await TryUserPutRequest<bool>( path, dto );
     }
     public async Task<ServiceReply<bool>> RemoveItem( string path, int id )
     {

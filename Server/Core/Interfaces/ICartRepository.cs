@@ -5,8 +5,8 @@ namespace BlazorElectronics.Server.Core.Interfaces;
 
 public interface ICartRepository
 {
-    Task<CartDto?> GetCart( int userId );
-    Task<CartDto?> UpdateCart( int userId, List<CartItemDto> items );
+    Task<CartDto?> Get( int userId );
+    Task<CartDto?> Update( int userId, List<CartItemDto> items );
     Task<bool> InsertOrUpdateItem( int userId, CartItemDto itemDto );
     Task<bool> DeleteItem( int userId, int productId );
     Task<bool> DeleteCart( int userId );

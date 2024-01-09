@@ -7,7 +7,7 @@ namespace BlazorElectronics.Client.Services.Features;
 public class FeaturedDealsServiceClient : CachedClientService<List<FeatureDealDto>>, IFeaturedDealsServiceClient
 {
     const string API_ROUTE = "api/features";
-    const string API_ROUTE_FRONT_PAGE = $"{API_ROUTE}/get-front-page-deals";
+    const string API_ROUTE_FRONT_PAGE = $"{API_ROUTE}/get-featured-deals-home";
     const string API_ROUTE_GET_DEALS = $"{API_ROUTE}/get-featured-deals";
     
     public FeaturedDealsServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
@@ -22,10 +22,10 @@ public class FeaturedDealsServiceClient : CachedClientService<List<FeatureDealDt
 
         ServiceReply<List<FeatureDealDto>?> reply = await TryGetRequest<List<FeatureDealDto>?>( API_ROUTE_FRONT_PAGE );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return new ServiceReply<List<FeatureDealDto>?>( reply.ErrorType, reply.Message );
 
-        await TrySetCachedItem( reply.Data );
+        await TrySetCachedItem( reply.Payload );
         return reply;
     }
     public async Task<ServiceReply<List<FeatureDealDto>?>> GetFeatureDeals( PaginationDto pagination )

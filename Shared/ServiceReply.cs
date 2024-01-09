@@ -19,21 +19,21 @@ public record ServiceReply<T>
     }
     public ServiceReply( ServiceErrorType errorType, string? message = null )
     {
-        Data = default;
+        Payload = default;
         Success = false;
         ErrorType = errorType;
         Message = message ?? GetDefaultMessage( errorType );
     }
-    public ServiceReply( T data )
+    public ServiceReply( T payload )
     {
-        Data = data;
+        Payload = payload;
         Success = true;
         Message = string.Empty;
     }
 
     public bool Success { get; init; }
     public string? Message { get; init; }
-    public T? Data { get; init; }
+    public T? Payload { get; init; }
     public ServiceErrorType ErrorType { get; init; } = ServiceErrorType.None;
 
     static string GetDefaultMessage( ServiceErrorType errorType )

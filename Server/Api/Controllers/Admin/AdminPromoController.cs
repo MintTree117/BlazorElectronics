@@ -8,67 +8,67 @@ namespace BlazorElectronics.Server.Api.Controllers.Admin;
 [ApiController]
 public sealed class AdminPromoController : _AdminController
 {
-    readonly IPromoService _service;
+    readonly IPromoService _promoService;
     
-    public AdminPromoController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IPromoService promoService )
+    public AdminPromoController( ILogger<_UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IPromoService promoPromoService )
         : base( logger, userAccountService, sessionService )
     {
-        _service = promoService;
+        _promoService = promoPromoService;
     }
     
     [HttpGet( "get-view" )]
-    public async Task<ActionResult<List<PromoEditDto>?>> GetCategoriesView()
+    public async Task<ActionResult<List<PromoEditDto>?>> GetView()
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
         
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
         
-        ServiceReply<List<PromoEditDto>?> reply = await _service.GetView();
+        ServiceReply<List<PromoEditDto>?> reply = await _promoService.GetView();
         return GetReturnFromReply( reply );
     }
     [HttpGet("get-edit")]
-    public async Task<ActionResult<PromoEditDto?>> GetCategoryForEdit( int itemId )
+    public async Task<ActionResult<PromoEditDto?>> GetEdit( int itemId )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<PromoEditDto?> reply = await _service.GetEdit( itemId );
+        ServiceReply<PromoEditDto?> reply = await _promoService.GetEdit( itemId );
         return GetReturnFromReply( reply );
     }
-    [HttpPut( "add" )]
-    public async Task<ActionResult<int>> AddCategory( [FromBody] PromoEditDto requestDto )
+    [HttpPost( "add" )]
+    public async Task<ActionResult<int>> Add( [FromBody] PromoEditDto requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<int> reply = await _service.Add( requestDto );
+        ServiceReply<int> reply = await _promoService.Add( requestDto );
         return GetReturnFromReply( reply );
     }
     [HttpPut( "update" )]
-    public async Task<ActionResult<bool>> UpdateCategory( [FromBody] PromoEditDto requestDto )
+    public async Task<ActionResult<bool>> Update( [FromBody] PromoEditDto requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _service.Update( requestDto);
+        ServiceReply<bool> reply = await _promoService.Update( requestDto);
         return GetReturnFromReply( reply );
     }
     [HttpDelete( "remove" )]
-    public async Task<ActionResult<bool>> RemoveCategory( int itemId )
+    public async Task<ActionResult<bool>> Remove( int itemId )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );
 
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<bool> reply = await _service.Remove( itemId );
+        ServiceReply<bool> reply = await _promoService.Remove( itemId );
         return GetReturnFromReply( reply );
     }
 }

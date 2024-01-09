@@ -225,10 +225,6 @@
       "PackagePath": "staticwebassets/Images/CoursesThumbnail.jpg"
     },
     {
-      "Id": "/home/martin/RiderProjects/BlazorElectronics/Client/wwwroot/Images/FeaturedEbook.png",
-      "PackagePath": "staticwebassets/Images/FeaturedEbook.png"
-    },
-    {
       "Id": "/home/martin/RiderProjects/BlazorElectronics/Client/wwwroot/Images/FeaturedGame.png",
       "PackagePath": "staticwebassets/Images/FeaturedGame.png"
     },

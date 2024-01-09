@@ -10,7 +10,7 @@ public sealed class AdminFeaturesController : _AdminController
 {
     readonly IFeaturesService _featuresService;
     
-    public AdminFeaturesController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IFeaturesService featuresService )
+    public AdminFeaturesController( ILogger<_UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IFeaturesService featuresService )
         : base( logger, userAccountService, sessionService )
     {
         _featuresService = featuresService;
@@ -38,7 +38,7 @@ public sealed class AdminFeaturesController : _AdminController
         ServiceReply<FeatureDtoEditDto?> reply = await _featuresService.GetFeatureEdit( itemId );
         return GetReturnFromReply( reply );
     }
-    [HttpPut( "add" )]
+    [HttpPost( "add" )]
     public async Task<ActionResult<int>> Add( [FromBody] FeatureDtoEditDto requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );

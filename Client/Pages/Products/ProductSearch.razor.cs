@@ -36,7 +36,7 @@ public partial class ProductSearch : PageView, IDisposable
     CategoryFullDto? _primaryCategory;
     CategoryFullDto? _currentCategory;
 
-    CategoryData categories = new();
+    CategoryDataDto categories = new();
     LookupSpecsDto specs = new();
     VendorsDto vendors = new();
 
@@ -61,7 +61,7 @@ public partial class ProductSearch : PageView, IDisposable
     {
         List<Task> apiTasks = new();
         
-        Task<ServiceReply<CategoryData?>> categoryTask = CategoryService.GetCategories();
+        Task<ServiceReply<CategoryDataDto?>> categoryTask = CategoryService.GetCategories();
         Task<ServiceReply<LookupSpecsDto?>> specTask = SpecService.GetSpecLookups();
         Task<ServiceReply<VendorsDto?>> vendorTask = VendorService.GetVendors();
 
@@ -71,23 +71,23 @@ public partial class ProductSearch : PageView, IDisposable
 
         await Task.WhenAll( apiTasks );
 
-        ServiceReply<CategoryData?> categoryReply = categoryTask.Result;
+        ServiceReply<CategoryDataDto?> categoryReply = categoryTask.Result;
         ServiceReply<LookupSpecsDto?> specReply = specTask.Result;
         ServiceReply<VendorsDto?> vendorReply = vendorTask.Result;
 
-        if ( categoryReply is not { Success: true, Data: not null } )
+        if ( categoryReply is not { Success: true, Payload: not null } )
         {
             SetViewMessage( false, "Failed to load product categories! " + categoryReply.ErrorType + categoryReply.Message );
             return false;
         }
         
-        categories = categoryReply.Data;
+        categories = categoryReply.Payload;
 
-        if ( specReply.Data is not null )
-            specs = specReply.Data;
+        if ( specReply.Payload is not null )
+            specs = specReply.Payload;
 
-        if ( vendorReply.Data is not null )
-            vendors = vendorReply.Data;
+        if ( vendorReply.Payload is not null )
+            vendors = vendorReply.Payload;
 
         return true;
     }
@@ -109,7 +109,7 @@ public partial class ProductSearch : PageView, IDisposable
         await SearchProducts();
         PageIsLoaded = true;
     }
-    bool ParseUrl( CategoryData cData )
+    bool ParseUrl( CategoryDataDto cDataDto )
     {
         Uri uri = NavManager.ToAbsoluteUri( NavManager.Uri );
         Dictionary<string, string> queryParams = ParseQuery( uri.Query );
@@ -141,9 +141,9 @@ public partial class ProductSearch : PageView, IDisposable
         if ( !string.IsNullOrWhiteSpace( TertiaryCategory ) )
             categoryUrl = $"{categoryUrl}/{TertiaryCategory}";
         
-        if ( !cData.Urls.TryGetValue( categoryUrl, out int categoryId ) )
+        if ( !cDataDto.Urls.TryGetValue( categoryUrl, out int categoryId ) )
             return false;
-        if ( !cData.CategoriesById.TryGetValue( categoryId, out CategoryFullDto? category ) )
+        if ( !cDataDto.CategoriesById.TryGetValue( categoryId, out CategoryFullDto? category ) )
             return false;
 
         _currentCategory = category;
@@ -158,7 +158,7 @@ public partial class ProductSearch : PageView, IDisposable
             if ( _primaryCategory.ParentCategoryId is null )
                 return false;
             
-            if ( !cData.CategoriesById.TryGetValue( _primaryCategory.ParentCategoryId.Value, out _primaryCategory ) )
+            if ( !cDataDto.CategoriesById.TryGetValue( _primaryCategory.ParentCategoryId.Value, out _primaryCategory ) )
                 return false;
         }
 
@@ -280,13 +280,13 @@ public partial class ProductSearch : PageView, IDisposable
     {
         ServiceReply<ProductSearchReplyDto?> reply = await ProductService.GetProductSearch( _searchRequest );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, reply.ErrorType + " : " + reply.Message );
             return;
         }
         
-        _searchResults = reply.Data;
+        _searchResults = reply.Payload;
         _searchHeader.OnSearchResults( _searchRequest.Page, _searchResults );
         _searchList.OnSearch( _searchRequest.Rows, _searchResults, categories.CategoriesById, vendors.VendorsById );
         StateHasChanged();

@@ -18,7 +18,7 @@ public abstract class AdminPage : UserPage
     async Task AuthorizeAdmin()
     {
         ServiceReply<bool> reply = await AdminService.AuthorizeAdmin();
-        PageIsAuthorized = reply.Data;
+        PageIsAuthorized = reply.Payload;
 
         if ( !PageIsAuthorized )
         {

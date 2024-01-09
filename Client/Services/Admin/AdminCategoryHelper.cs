@@ -18,13 +18,13 @@ public sealed class AdminCategoryHelper : AdminServiceClient, IAdminCategoryHelp
     {
         ServiceReply<List<CategoryViewDtoDto>?> reply = await TryUserGetRequest<List<CategoryViewDtoDto>?>( "api/AdminCategory/get-view" );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             Logger.LogError( reply.ErrorType + reply.Message );
             return new ServiceReply<bool>( reply.ErrorType, reply.Message );
         }
 
-        Categories = reply.Data;
+        Categories = reply.Payload;
         PrimarySelection = Categories
             .Where( c => c.Tier == CategoryTier.Primary )
             .Select( c => new CategorySelectionOption( c.Id, c.Name ) )

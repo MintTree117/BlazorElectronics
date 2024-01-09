@@ -20,10 +20,10 @@ public class FeaturesServiceClient : CachedClientService<List<FeatureDto>>, IFea
 
         ServiceReply<List<FeatureDto>?> reply = await TryGetRequest<List<FeatureDto>?>( API_PATH );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return new ServiceReply<List<FeatureDto>?>( reply.ErrorType, reply.Message );
 
-        await TrySetCachedItem( reply.Data );
+        await TrySetCachedItem( reply.Payload );
         return reply;
     }
 }

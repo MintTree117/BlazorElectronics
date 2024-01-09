@@ -10,10 +10,10 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
     const string INVALID_CATEGORY_MESSAGE = "Invalid Category!";
     readonly ICategoryRepository _repository;
 
-    CategoryData? _cachedData;
+    CategoryDataDto? _cachedData;
     List<CategoryLightDto>? _cachedResponse;
 
-    public CategoryService( ILogger<_ApiService> logger, ICategoryRepository repository )
+    public CategoryService( ILogger<CategoryService> logger, ICategoryRepository repository )
         : base( logger, repository, 4, "Categories" )
     {
         _repository = repository;
@@ -37,7 +37,7 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
         }
     }
 
-    public async Task<ServiceReply<List<int>?>> GetPrimaryCategoryIds()
+    public async Task<ServiceReply<List<int>?>> GetPrimaryIds()
     {
         ServiceReply<bool> getReply = await TryGetData();
 
@@ -45,15 +45,15 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             ? new ServiceReply<List<int>?>( _cachedData.PrimaryIds )
             : new ServiceReply<List<int>?>( getReply.ErrorType, getReply.Message );
     }
-    public async Task<ServiceReply<CategoryData?>> GetCategoryData()
+    public async Task<ServiceReply<CategoryDataDto?>> GetData()
     {
         ServiceReply<bool> getReply = await TryGetData();
 
         return getReply.Success && _cachedData is not null
-            ? new ServiceReply<CategoryData?>( _cachedData )
-            : new ServiceReply<CategoryData?>( getReply.ErrorType, getReply.Message );
+            ? new ServiceReply<CategoryDataDto?>( _cachedData )
+            : new ServiceReply<CategoryDataDto?>( getReply.ErrorType, getReply.Message );
     }
-    public async Task<ServiceReply<List<CategoryLightDto>?>> GetCategoryResponse()
+    public async Task<ServiceReply<List<CategoryLightDto>?>> GetDtos()
     {
         ServiceReply<bool> getReply = await TryGetData();
 
@@ -72,7 +72,8 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             ? new ServiceReply<int>( categoryId )
             : new ServiceReply<int>( ServiceErrorType.ValidationError, INVALID_CATEGORY_MESSAGE );
     }
-    public async Task<ServiceReply<List<CategoryViewDtoDto>?>> GetCategoriesView()
+    
+    public async Task<ServiceReply<List<CategoryViewDtoDto>?>> GetView()
     {
         try
         {
@@ -89,7 +90,7 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             return new ServiceReply<List<CategoryViewDtoDto>?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<CategoryEditDto?>> GetCategoryEdit( int categoryId )
+    public async Task<ServiceReply<CategoryEditDto?>> GetEdit( int categoryId )
     {
         try
         {
@@ -106,7 +107,7 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             return new ServiceReply<CategoryEditDto?>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> AddBulkCategories( List<CategoryEditDto> categories )
+    public async Task<ServiceReply<bool>> AddBulk( List<CategoryEditDto> categories )
     {
         try
         {
@@ -122,7 +123,7 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<int>> AddCategory( CategoryEditDto dto )
+    public async Task<ServiceReply<int>> Add( CategoryEditDto dto )
     {
         try
         {
@@ -138,7 +139,7 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             return new ServiceReply<int>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> UpdateCategory( CategoryEditDto dto )
+    public async Task<ServiceReply<bool>> Update( CategoryEditDto dto )
     {
         try
         {
@@ -154,7 +155,7 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
             return new ServiceReply<bool>( ServiceErrorType.ServerError );
         }
     }
-    public async Task<ServiceReply<bool>> RemoveCategory( int categoryId )
+    public async Task<ServiceReply<bool>> Remove( int categoryId )
     {
         try
         {
@@ -199,8 +200,8 @@ public sealed class CategoryService : _CachedApiService, ICategoryService
     {
         List<CategoryFullDto> list = models.ToList();
         List<CategoryLightDto> response = MapResponse( list );
-        CategoryData data = new( list );
-        _cachedData = data;
+        CategoryDataDto dataDto = new( list );
+        _cachedData = dataDto;
         _cachedResponse = response;
     }
     static List<CategoryLightDto> MapResponse( IEnumerable<CategoryFullDto> models )

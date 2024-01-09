@@ -10,7 +10,7 @@ public sealed class VendorsController : _Controller
 {
     readonly IVendorService _vendorService;
     
-    public VendorsController( ILogger<_Controller> logger, IVendorService vendorService )
+    public VendorsController( ILogger<VendorsController> logger, IVendorService vendorService )
         : base( logger )
     {
         _vendorService = vendorService;
@@ -19,7 +19,7 @@ public sealed class VendorsController : _Controller
     [HttpGet( "get" )]
     public async Task<ActionResult<VendorsDto?>> GetVendors()
     {
-        ServiceReply<VendorsDto?> reply = await _vendorService.GetVendors();
+        ServiceReply<VendorsDto?> reply = await _vendorService.Get();
         return GetReturnFromReply( reply );
     }
 }

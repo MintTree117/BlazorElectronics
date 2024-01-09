@@ -10,21 +10,13 @@ namespace BlazorElectronics.Server.Data.Repositories;
 
 public sealed class OrderRepository : DapperRepository, IOrderRepository
 {
-    const string PROCEDURE_GET_CART_ORDER = "Get_CartOrder";
     const string PROCEDURE_INSERT = "Insert_Order";
     const string PROCEDURE_GET_ORDERS = "Get_Orders";
     const string PROCEDURE_GET_ORDER_DETAILS = "Get_OrderDetails";
     
     public OrderRepository( DapperContext dapperContext )
         : base( dapperContext ) { }
-
-    public async Task<CartOrderModel?> GetCartOrder( int userId )
-    {
-        DynamicParameters p = new();
-        p.Add( PARAM_USER_ID, userId );
-
-        return await TryQueryAsync( GetCartOrderQuery, p, PROCEDURE_GET_CART_ORDER );
-    }
+    
     public async Task<bool> InsertOrder( OrderModel orderModel )
     {
         DynamicParameters p = new();
@@ -48,23 +40,10 @@ public sealed class OrderRepository : DapperRepository, IOrderRepository
         DynamicParameters p = new();
         p.Add( PARAM_ORDER_ID, orderId );
 
-        return await TryQueryAsync( GetOrderDetailsQuery, p, null );
+        return await TryQueryAsync( GetOrderDetailsQuery, p );
     }
 
-    async Task<CartOrderModel?> GetCartOrderQuery( SqlConnection connection, string? sql, DynamicParameters? p )
-    {
-        SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_CART_ORDER, p, commandType: CommandType.StoredProcedure );
-
-        if ( multi is null )
-            return null;
-
-        return new CartOrderModel
-        {
-            Items = await multi.ReadAsync<CartOrderItemModel>(),
-            Promos = await multi.ReadAsync<PromoCodeDto>()
-        };
-    }
-    async Task<OrderDetailsModel?> GetOrderDetailsQuery( SqlConnection connection, string? sql, DynamicParameters? p )
+    static async Task<OrderDetailsModel?> GetOrderDetailsQuery( SqlConnection connection, string? sql, DynamicParameters? p )
     {
         SqlMapper.GridReader? multi = await connection.QueryMultipleAsync( PROCEDURE_GET_ORDER_DETAILS, p, commandType: CommandType.StoredProcedure );
 

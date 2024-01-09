@@ -10,7 +10,7 @@ public sealed class PromoService : _ApiService, IPromoService
 {
     readonly IPromoRepository _repository;
     
-    public PromoService( ILogger<_ApiService> logger, IPromoRepository repository )
+    public PromoService( ILogger<PromoService> logger, IPromoRepository repository )
         : base( logger )
     {
         _repository = repository;

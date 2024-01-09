@@ -4,6 +4,7 @@ public static class Routes
 {
     public const string HOME = "/";
     public const string PRODUCT = "/product";
+    public const string PRODUCT_EDIT = "/admin/product-edit";
     public const string SEARCH = "/search";
     public const string FEATURES = $"{SEARCH}?{PARAM_SEARCH_FEATURED}";
     public const string SALES = $"{SEARCH}?{PARAM_SEARCH_SALES}";
@@ -31,7 +32,7 @@ public static class Routes
     public const string REGISTERED_EMAIL = "registered-email";
     public const string VERIFY_TOKEN = "token";
     public const string PARAM_SEARCH_TEXT = "search-text";
-    public const string PRODUCT_EDIT_NEW_PARAM = "new-product";
+    public const string PARAM_PRODUCT_EDIT_ID = "productId";
     public const string PARAM_SEARCH_FEATURED_DEALS = "featured-deals";
     public const string PARAM_SEARCH_VENDOR = "vendorId";
     public const string PARAM_SEARCH_SALES = "on-sale";

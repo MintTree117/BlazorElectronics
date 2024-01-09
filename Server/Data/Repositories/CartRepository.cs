@@ -20,14 +20,14 @@ public class CartRepository : DapperRepository, ICartRepository
 
     public CartRepository( DapperContext dapperContext ) : base( dapperContext ) { }
 
-    public async Task<CartDto?> GetCart( int userId )
+    public async Task<CartDto?> Get( int userId )
     {
         DynamicParameters p = new();
         p.Add( PARAM_USER_ID, userId );
 
         return await TryQueryAsync( GetCartQuery, p );
     }
-    public async Task<CartDto?> UpdateCart( int userId, List<CartItemDto> items )
+    public async Task<CartDto?> Update( int userId, List<CartItemDto> items )
     {
         DynamicParameters p = GetCartItemsParameters( userId, items );
         return await TryQueryTransactionAsync( UpdateCartQuery, p );

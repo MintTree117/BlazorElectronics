@@ -11,7 +11,7 @@ public sealed class FeaturesService : _CachedApiService, IFeaturesService
     List<FeatureDto>? _cachedFeatures;
     List<FeatureDealDto>? _cachedDealsFrontPage;
 
-    public FeaturesService( ILogger<_ApiService> logger, IFeaturesRepository repository )
+    public FeaturesService( ILogger<FeaturesService> logger, IFeaturesRepository repository )
         : base( logger, repository, 4, "Features" )
     {
         _repository = repository;

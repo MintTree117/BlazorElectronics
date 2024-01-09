@@ -9,20 +9,20 @@ namespace BlazorElectronics.Client.Shared;
 
 public partial class NavMenu : RazorView
 {
-    public event Action<CategoryData?>? OnCategoriesLoaded;
+    public event Action<CategoryDataDto?>? OnCategoriesLoaded;
     public event Action<SessionMeta?>? OnSessionLoaded;
     public event Action<bool>? OnToggleSidebar;
     
     [Inject] public ICategoryServiceClient CategoryService { get; set; } = default!;
     [Inject] public IUserServiceClient UserService { get; set; } = default!;
 
-    CategoryData? _categories;
+    CategoryDataDto? _categories;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        Task<ServiceReply<CategoryData?>> categoryTask = CategoryService.GetCategories();
+        Task<ServiceReply<CategoryDataDto?>> categoryTask = CategoryService.GetCategories();
         Task<SessionMeta?> userTask = UserService.GetSessionMeta();
 
         List<Task> tasks = new();
@@ -32,7 +32,7 @@ public partial class NavMenu : RazorView
 
         await Task.WhenAll( tasks );
 
-        _categories = categoryTask.Result.Data;
+        _categories = categoryTask.Result.Payload;
 
         OnCategoriesLoaded?.Invoke( _categories );
         OnSessionLoaded?.Invoke( userTask.Result );

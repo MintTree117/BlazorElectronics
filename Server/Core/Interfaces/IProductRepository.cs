@@ -1,4 +1,5 @@
 using BlazorElectronics.Server.Core.Models.Products;
+using BlazorElectronics.Shared.Products;
 
 namespace BlazorElectronics.Server.Core.Interfaces;
 

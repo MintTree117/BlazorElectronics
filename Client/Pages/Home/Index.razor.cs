@@ -44,8 +44,8 @@ public partial class Index : PageView
     {
         ServiceReply<List<FeatureDto>?> reply = await FeaturesService.GetFeatures();
 
-        if ( reply is { Success: true, Data: not null } )
-            _features = reply.Data;
+        if ( reply is { Success: true, Payload: not null } )
+            _features = reply.Payload;
         
         StateHasChanged();
     }
@@ -53,8 +53,8 @@ public partial class Index : PageView
     {
         ServiceReply<List<FeatureDealDto>?> reply = await DealsService.GetFrontPageDeals();
 
-        if ( reply is { Success: true, Data: not null } )
-            _featuredDeals = reply.Data;
+        if ( reply is { Success: true, Payload: not null } )
+            _featuredDeals = reply.Payload;
         
         StateHasChanged();
     }

@@ -35,7 +35,7 @@ public partial class UserLogin : PageView
     {
         ServiceReply<SessionDto?> loginReply = await UserService.Login( _loginDto );
 
-        if ( !loginReply.Success || loginReply.Data is null )
+        if ( !loginReply.Success || loginReply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"{loginReply.ErrorType} : {loginReply.Message}" );
             return;
@@ -47,13 +47,13 @@ public partial class UserLogin : PageView
     async Task HandleRegistration()
     {
         ServiceReply<bool> reply = await UserService.Register( _registerDto );
-
+        
         if ( !reply.Success )
         {
             InvokeAlert( AlertType.Danger, reply.Message ?? "Failed to register!" );
             return;
         }
 
-        NavManager.NavigateTo( Routes.REGISTERED );
+        NavManager.NavigateTo( $"{Routes.REGISTERED}?{Routes.REGISTERED_EMAIL}={_registerDto.Email}" );
     }
 }

@@ -384,6 +384,8 @@
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.genruntimeconfig.cache
 /home/martin/RiderProjects/BlazorElectronics/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Client.staticwebassets.runtime.json
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/appsettings.json
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/BrowserDebugHost.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/BrowserDebugHost.runtimeconfig.json
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/BrowserDebugProxy.dll
@@ -392,8 +394,6 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Microsoft.CodeAnalysis.Scripting.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorDebugProxy/Newtonsoft.Json.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Client.staticwebassets.runtime.json
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/appsettings.json
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.staticwebassets.runtime.json
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.deps.json
@@ -404,12 +404,8 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Azure.Identity.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Blazored.LocalStorage.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Dapper.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authorization.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Authorization.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.WebAssembly.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.WebAssembly.Server.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Metadata.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.Bcl.AsyncInterfaces.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.Data.SqlClient.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.Extensions.Configuration.Abstractions.dll
@@ -432,6 +428,8 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.SqlServer.Server.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.Win32.SystemEvents.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Newtonsoft.Json.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/SendGrid.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/StarkbankEcdsa.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Stripe.net.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/System.Configuration.ConfigurationManager.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/System.Drawing.Common.dll
@@ -616,9 +614,12 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authentication.OAuth.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authentication.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authorization.Policy.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Authorization.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Authorization.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Forms.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Server.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.Web.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Components.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Connections.Abstractions.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.CookiePolicy.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Cors.dll
@@ -648,6 +649,7 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Identity.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Localization.Routing.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Localization.dll
+/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Metadata.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Mvc.Abstractions.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Mvc.ApiExplorer.dll
 /home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/Microsoft.AspNetCore.Mvc.Core.dll
@@ -771,5 +773,3 @@
 /home/martin/RiderProjects/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.pdb
 /home/martin/RiderProjects/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/BlazorElectronics.Server.genruntimeconfig.cache
 /home/martin/RiderProjects/BlazorElectronics/Server/obj/Release/net7.0/ubuntu.22.04-x64/ref/BlazorElectronics.Server.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/SendGrid.dll
-/home/martin/RiderProjects/BlazorElectronics/Server/bin/Release/net7.0/ubuntu.22.04-x64/StarkbankEcdsa.dll

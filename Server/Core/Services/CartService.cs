@@ -10,7 +10,7 @@ public sealed class CartService : _ApiService, ICartService
 {
     readonly ICartRepository _cartRepository;
 
-    public CartService( ILogger<_ApiService> logger, ICartRepository cartRepository )
+    public CartService( ILogger<CartService> logger, ICartRepository cartRepository )
         : base( logger )
     {
         _cartRepository = cartRepository;
@@ -20,7 +20,7 @@ public sealed class CartService : _ApiService, ICartService
     {
         try
         {
-            CartDto? model = await _cartRepository.UpdateCart( userId, items );
+            CartDto? model = await _cartRepository.Update( userId, items );
 
             return model is not null
                 ? new ServiceReply<CartDto?>( model )

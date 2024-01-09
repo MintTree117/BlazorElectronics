@@ -17,7 +17,7 @@ public sealed class PaymentService : _ApiService, IPaymentService
 
     readonly string secret;
 
-    public PaymentService( ILogger<_ApiService> logger, ICartRepository cartRepository, IUserAccountRepository userRepository, IOrderService orderService )
+    public PaymentService( ILogger<PaymentService> logger, ICartRepository cartRepository, IUserAccountRepository userRepository, IOrderService orderService )
         : base( logger )
     {
         _cartRepository = cartRepository;
@@ -34,7 +34,7 @@ public sealed class PaymentService : _ApiService, IPaymentService
 
         try
         {
-            cart = await _cartRepository.GetCart( userId );
+            cart = await _cartRepository.Get( userId );
             user = await _userRepository.GetAccountDetails( userId );
 
             if ( cart is null || user is null )
@@ -133,7 +133,7 @@ public sealed class PaymentService : _ApiService, IPaymentService
             if ( userId <= 0 )
                 return new ServiceReply<bool>( ServiceErrorType.NotFound );
 
-            await _orderService.PlaceOrder( userId, session.CustomerEmail );
+            await _orderService.FulfillOrder( userId, session.CustomerEmail );
             return new ServiceReply<bool>( true );
         }
         catch ( StripeException e )

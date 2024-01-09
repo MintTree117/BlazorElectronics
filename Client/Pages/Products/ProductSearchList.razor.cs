@@ -1,4 +1,6 @@
+using BlazorElectronics.Client.Models;
 using BlazorElectronics.Client.Services.Cart;
+using BlazorElectronics.Client.Services.Users;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Client.Shared;
 using BlazorElectronics.Shared.Cart;
@@ -11,6 +13,7 @@ namespace BlazorElectronics.Client.Pages.Products;
 
 public partial class ProductSearchList : RazorView
 {
+    [Inject] public IUserServiceClient UserService { get; set; } = default!;
     [Inject] public ICartServiceClient CartService { get; set; } = default!;
     [Parameter] public EventCallback<int> OnPageChanged { get; set; }
     Pagination _pagination = default!;
@@ -18,6 +21,18 @@ public partial class ProductSearchList : RazorView
     ProductSearchReplyDto? _search;
     Dictionary<int, CategoryFullDto> _categories = new();
     Dictionary<int, VendorDto> _vendors = new();
+    bool _isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        SessionMeta? s = await UserService.GetSessionMeta();
+
+        if ( s is not null && s.Type == SessionType.Admin )
+            _isAdmin = true;
+        StateHasChanged();
+    }
 
     public void SetPage( int page )
     {

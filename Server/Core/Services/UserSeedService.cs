@@ -9,7 +9,7 @@ public sealed class UserSeedService : _ApiService, IUserSeedService
 {
     readonly IUserAccountService _userAccountService;
     
-    public UserSeedService( ILogger<_ApiService> logger, IUserAccountService userAccountService )
+    public UserSeedService( ILogger<UserSeedService> logger, IUserAccountService userAccountService )
         : base( logger )
     {
         _userAccountService = userAccountService;

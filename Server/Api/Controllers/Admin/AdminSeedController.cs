@@ -12,8 +12,8 @@ public sealed class AdminSeedController : _AdminController
 {
     readonly IVendorService _vendorService;
     readonly ICategoryService _categoryService;
-    readonly ISpecsService _lookupService;
-    readonly IProductService _productService;
+    readonly ISpecLookupsService _lookupService;
+    readonly IProductServiceAdmin _productServiceAdmin;
     readonly IUserAccountService _userSerice;
 
     readonly IProductSeedService _productSeedService;
@@ -21,13 +21,13 @@ public sealed class AdminSeedController : _AdminController
     readonly IUserSeedService _userSeedService;
 
     public AdminSeedController( 
-        ILogger<UserController> logger, 
+        ILogger<_UserController> logger, 
         IUserAccountService userAccountService, 
         ISessionService sessionService,
         ICategoryService categoryService,
         IVendorService vendorService,
-        ISpecsService lookupService,
-        IProductService productService,
+        ISpecLookupsService lookupService,
+        IProductServiceAdmin productServiceAdmin,
         IProductSeedService productSeedService,
         IReviewSeedService reviewSeedService,
         IUserSeedService userSeedService, IUserAccountService userSerice )
@@ -40,7 +40,7 @@ public sealed class AdminSeedController : _AdminController
         _reviewSeedService = reviewSeedService;
         _vendorService = vendorService;
         _lookupService = lookupService;
-        _productService = productService;
+        _productServiceAdmin = productServiceAdmin;
     }
 
     [HttpPut( "products" )]
@@ -51,22 +51,22 @@ public sealed class AdminSeedController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<CategoryData?> categoryReply = await _categoryService.GetCategoryData();
+        ServiceReply<CategoryDataDto?> categoryReply = await _categoryService.GetData();
         
-        if ( !categoryReply.Success || categoryReply.Data is null )
+        if ( !categoryReply.Success || categoryReply.Payload is null )
             return GetReturnFromReply( categoryReply );
         
-        ServiceReply<LookupSpecsDto?> lookupReply = await _lookupService.GetSpecs();
+        ServiceReply<LookupSpecsDto?> lookupReply = await _lookupService.Get();
 
-        if ( !lookupReply.Success || lookupReply.Data is null )
+        if ( !lookupReply.Success || lookupReply.Payload is null )
             return GetReturnFromReply( lookupReply );
         
-        ServiceReply<VendorsDto?> vendorReply = await _vendorService.GetVendors();
+        ServiceReply<VendorsDto?> vendorReply = await _vendorService.Get();
 
-        if ( !vendorReply.Success || vendorReply.Data is null )
+        if ( !vendorReply.Success || vendorReply.Payload is null )
             return GetReturnFromReply( vendorReply );
 
-        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( amount, categoryReply.Data, lookupReply.Data, vendorReply.Data );
+        ServiceReply<bool> seedReply = await _productSeedService.SeedProducts( amount, categoryReply.Payload, lookupReply.Payload, vendorReply.Payload );
 
         return GetReturnFromReply( seedReply );
     }
@@ -78,24 +78,24 @@ public sealed class AdminSeedController : _AdminController
         if ( !adminReply.Success )
             return GetReturnFromReply( adminReply );
 
-        ServiceReply<List<int>> productReply = await _productService.GetAllIds();
+        ServiceReply<List<int>> productReply = await _productServiceAdmin.GetAllIds();
 
-        if ( !productReply.Success || productReply.Data is null )
+        if ( !productReply.Success || productReply.Payload is null )
             return GetReturnFromReply( productReply );
 
         ServiceReply<List<int>?> userReply = await _userSerice.GetAllIds();
 
-        if ( !userReply.Success || userReply.Data is null )
+        if ( !userReply.Success || userReply.Payload is null )
             return GetReturnFromReply( userReply );
         
-        Logger.LogError( productReply.Data.Count.ToString() );
+        Logger.LogError( productReply.Payload.Count.ToString() );
 
-        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( amount, productReply.Data, userReply.Data );
+        ServiceReply<bool> seedReply = await _reviewSeedService.SeedReviews( amount, productReply.Payload, userReply.Payload );
 
         if ( !seedReply.Success )
             return GetReturnFromReply( seedReply );
 
-        ServiceReply<bool> updateReply = await _productService.UpdateProductsReviewData();
+        ServiceReply<bool> updateReply = await _productServiceAdmin.UpdateProductsReviewData();
         return GetReturnFromReply( updateReply );
     }
     [HttpPut( "users" )]

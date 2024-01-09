@@ -1,27 +1,129 @@
-@page "/admin/edit-product/{productId}"
+@page "/admin/product-edit"
 @inherits AdminPage
 @using BlazorElectronics.Client.Shared
+@using BlazorElectronics.Shared.Categories
+@using BlazorElectronics.Shared.Specs
+@using BlazorElectronics.Shared.Vendors
 
-<div class="container-sm form-wrapper">
+<div class="container-sm form-wrapper mt-3">
     <PageLoader Page="@this"></PageLoader>
     
     @if ( PageIsReady() )
     {
-        <AlertMessage Page="@this"></AlertMessage>
-        
-        <EditForm Model="_productDto" OnSubmit="( async () => await Submit() )">
-            <div class="mb-3">
-                <label for="Name" class="form-label">Product Name</label>
-                <InputText @bind-Value="_productDto.Title" class="form-control" id="Name"></InputText>
+        if ( _deleted )
+        {
+            <AlertMessage Page="@this"></AlertMessage>   
+        }
+        else
+        {
+            <!-- Title & Delete -->
+            <div class="mb-3 d-flex flex-row align-items-center justify-content-between">
+                <h1>@_title</h1>
+                <btn class="btn btn-danger" onclick="@( async () => await Remove() )"><i class="oi oi-trash"></i>Delete</btn>
             </div>
-            <div class="mb-3">
-                <label for="Vendor" class="form-label">Product Name</label>
-                <InputText @bind-Value="_productDto.VendorName" class="form-control" id="Vendor"></InputText>
-            </div>
-            <div class="mb-3">
-                <label for="Thumbnail" class="form-label">Thumbnail</label>
-                <InputText @bind-Value="_productDto.Thumbnail" class="form-control" id="Thumbnail"></InputText>
-            </div>
-        </EditForm>
+            
+            <!-- Edit Form -->
+            <EditForm Model="_productDto" OnSubmit="( async () => await Submit() )">
+                
+                <!-- Product Name -->
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Product Name</label>
+                    <InputText @bind-Value="_productDto.Title" class="form-control" id="Name"></InputText>
+                </div>
+                
+                <!-- Vendor -->
+                <div class="mb-3">
+                    <label for="Vendor" class="form-label">Vendor</label>
+                    <InputSelect @bind-Value="_productDto.VendorId" class="form-control" id="Vendor">
+                        @foreach ( VendorDto v in _vendors.VendorsById.Values )
+                        {
+                            <option value="@v.VendorId.ToString()">@v.VendorName</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <!-- Categories -->
+                <p>Categories</p>
+                <div class="mb-3 overflow-auto d-flex flex-column bg-white border border-grey" style="height: 300px;">
+                    @foreach ( CategoryFullDto c in _categories.CategoriesById.Values )
+                    {
+                        <div>
+                            <input type="checkbox" class="form-check-input" @bind="@_selectedCategories[ c.CategoryId ]" id="Category_@c.CategoryId"/>
+                            <label class="form-check-label" for="Category_@c.CategoryId">@c.Name</label>
+                        </div>
+                    }
+                </div>
+                
+                <!-- Thumbnail -->
+                <div class="mb-3">
+                    <label for="Thumbnail" class="form-label">Thumbnail</label>
+                    <InputText @bind-Value="_productDto.Thumbnail" class="form-control" id="Thumbnail"></InputText>
+                </div>
+                
+                <!-- Price -->
+                <div class="mb-3">
+                    <label for="Price" class="form-label">Price</label>
+                    <InputNumber @bind-Value="_productDto.Price" class="form-control" id="Price"></InputNumber>
+                </div>
+                
+                <!-- Sale Price -->
+                <div class="mb-3">
+                    <label for="SalePrice" class="form-label">Sale Price</label>
+                    <InputNumber @bind-Value="_productDto.SalePrice" class="form-control" id="SalePrice"></InputNumber>
+                </div>
+                
+                <!-- Release Date -->
+                <div class="mb-3">
+                    <label for="ReleaseDate" class="form-label">Release Date</label>
+                    <InputDate @bind-Value="_productDto.ReleaseDate" class="form-control" id="ReleaseDate"></InputDate>
+                </div>
+                
+                <!-- Is Featured -->
+                <div class="mb-3">
+                    <label for="IsFeatured" class="form-label">Is Featured</label>
+                    <InputCheckbox @bind-Value="_productDto.IsFeatured" type="checkbox" class="form-control" id="IsFeatured"></InputCheckbox>
+                </div>
+                
+                <!-- Description -->
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Description</label>
+                    <InputTextArea @bind-Value="_productDto.Description" class="form-control" id="Description"></InputTextArea>
+                </div>
+                
+                <!-- Images -->
+                <div class="mb-3">
+                    <label for="Images" class="form-label">Image Urls</label>
+                    <InputTextArea @bind-Value="_productDto.ImagesAsString" class="form-control" id="Images"></InputTextArea>
+                </div>
+                
+                <!-- Lookup Specs -->
+                <p>Lookup Specs</p>
+                <div class="mb-3 overflow-auto bg-white border border-grey" style="height: 300px;">
+                    @foreach ( int id in _specs.SpecsById.Keys )
+                    {
+                        LookupSpec s = _specs.SpecsById[ id ];
+                        <p class="bold mb-3 text-decoration-underline mt-2">@s.SpecName</p>
+                        for ( int i = 0; i < s.Values.Count; i++ )
+                        {
+                            int index = i;
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"
+                                       @bind="@_selectedSpecs[ ( s.SpecId, index ) ]" id="@(s.SpecName + index)"/>
+                                <label class="form-check-label" for="@(s.SpecName + index)">@s.Values[ index ]</label>
+                            </div>
+                        }
+                    }
+                </div>
+                
+                <!-- XML Specs -->
+                <div class="mb-3">
+                    <label for="XmlSpecs" class="form-label">Xml Specs</label>
+                    <InputTextArea @bind-Value="_productDto.XmlSpecsAsString" class="form-control" id="XmlSpecs"></InputTextArea>
+                </div>
+                
+                <!-- Submit -->
+                <FormSubmit Page="@this"></FormSubmit>
+            </EditForm>
+        }
     }
 </div>

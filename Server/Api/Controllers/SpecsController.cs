@@ -8,18 +8,18 @@ namespace BlazorElectronics.Server.Api.Controllers;
 [ApiController]
 public sealed class SpecsController : _Controller
 {
-    readonly ISpecsService _specService;
+    readonly ISpecLookupsService _specLookupService;
 
-    public SpecsController( ILogger<_Controller> logger, ISpecsService specService )
+    public SpecsController( ILogger<SpecsController> logger, ISpecLookupsService specLookupService )
         : base( logger )
     {
-        _specService = specService;
+        _specLookupService = specLookupService;
     }
     
     [HttpGet( "get" )]
     public async Task<ActionResult<LookupSpecsDto?>> GetSpecLookups()
     {
-        ServiceReply<LookupSpecsDto?> reply = await _specService.GetSpecs();
+        ServiceReply<LookupSpecsDto?> reply = await _specLookupService.Get();
         return GetReturnFromReply( reply );
     }
 }

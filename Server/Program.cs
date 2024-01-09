@@ -30,7 +30,8 @@ builder.Services.AddSingleton<IFeaturesRepository, FeaturesRepository>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductSearchRepository, ProductSearchRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductServiceCustomer, ProductServiceCustomer>();
+builder.Services.AddScoped<IProductServiceAdmin, ProductServiceAdmin>();
 builder.Services.AddScoped<IProductSeedService, ProductSeedService>();
 
 builder.Services.AddScoped<IPromoService, PromoService>();
@@ -59,7 +60,7 @@ builder.Services.AddSingleton<IVendorRepository, VendorRepository>();
 builder.Services.AddSingleton<IVendorService, VendorService>();
 
 builder.Services.AddSingleton<ISpecRepository, SpecRepository>();
-builder.Services.AddSingleton<ISpecsService, SpecsService>();
+builder.Services.AddSingleton<ISpecLookupsService, SpecLookupsService>();
 
 WebApplication app = builder.Build();
 

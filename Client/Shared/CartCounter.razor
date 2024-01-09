@@ -36,11 +36,11 @@
     {
         ServiceReply<CartInfoModel> infoReply = await CartService.GetLocalCartInfo();
 
-        if ( !infoReply.Success || infoReply.Data is null )
+        if ( !infoReply.Success || infoReply.Payload is null )
             return;
         
-        _cartCount = infoReply.Data.Quantity;
-        _cartPrice = infoReply.Data.TotalPrice;
+        _cartCount = infoReply.Payload.Quantity;
+        _cartPrice = infoReply.Payload.TotalPrice;
         StateHasChanged();
     }
 

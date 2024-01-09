@@ -18,10 +18,10 @@ public sealed class SpecServiceClient : CachedClientService<LookupSpecsDto>, ISp
         
         ServiceReply<LookupSpecsDto?> reply = await TryGetRequest<LookupSpecsDto?>( "api/specs/get" );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return new ServiceReply<LookupSpecsDto?>( reply.ErrorType, reply.Message );
 
-        await TrySetCachedItem( reply.Data );
+        await TrySetCachedItem( reply.Payload );
         return reply;
     }
 }

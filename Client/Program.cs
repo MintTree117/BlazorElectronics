@@ -5,6 +5,7 @@ using BlazorElectronics.Client.Services.Categories;
 using Blazored.LocalStorage;
 using BlazorElectronics.Client.Services.Admin;
 using BlazorElectronics.Client.Services.Cart;
+using BlazorElectronics.Client.Services.Checkout;
 using BlazorElectronics.Client.Services.Features;
 using BlazorElectronics.Client.Services.Orders;
 using BlazorElectronics.Client.Services.Products;
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IVendorServiceClient, VendorServiceClient>();
 
 builder.Services.AddScoped<IUserServiceClient, UserServiceClient>();
 builder.Services.AddScoped<IOrderServiceClient, OrderServiceClient>();
+builder.Services.AddScoped<ICheckoutServiceClient, CheckoutServiceClient>();
 
 builder.Services.AddScoped<IAdminServiceClient, AdminServiceClient>();
 builder.Services.AddScoped<IAdminCrudService<CategoryViewDtoDto, CategoryEditDto>, AdminCrudService<CategoryViewDtoDto, CategoryEditDto>>();

@@ -15,16 +15,14 @@ public sealed class ProductSeedService : _ApiService, IProductSeedService
     Random _random = new();
 
     readonly IProductRepository _productRepository;
-    readonly IReviewRepository _reviewRepository;
 
-    public ProductSeedService( ILogger<_ApiService> logger, IProductRepository productRepository, IReviewRepository reviewRepository )
+    public ProductSeedService( ILogger<ProductSeedService> logger, IProductRepository productRepository )
         : base( logger )
     {
         _productRepository = productRepository;
-        _reviewRepository = reviewRepository;
     }
     
-    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryData categories, LookupSpecsDto lookups, VendorsDto vendors)
+    public async Task<ServiceReply<bool>> SeedProducts( int amount, CategoryDataDto categories, LookupSpecsDto lookups, VendorsDto vendors)
     {
         _random = new Random();
         
@@ -61,7 +59,7 @@ public sealed class ProductSeedService : _ApiService, IProductSeedService
     }
     
     // BASE MODEL
-    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryData categoryData, LookupSpecsDto lookups, VendorsDto vendors )
+    ProductEditModel GetSeedModel( int primaryCategory, int i, CategoryDataDto categoryDataDto, LookupSpecsDto lookups, VendorsDto vendors )
     {
         ProductEditModel editModel = new()
         {
@@ -81,7 +79,7 @@ public sealed class ProductSeedService : _ApiService, IProductSeedService
             editModel.SalePrice = GetRandomDecimal( SeedData.MIN_PRICE, ( double ) editModel.Price );
 
         editModel.Categories.Add( primaryCategory );
-        editModel.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoryData ) );
+        editModel.Categories.AddRange( GetRandomCategories( primaryCategory, new List<int>(), categoryDataDto ) );
         
         GetRandomLookups( lookups.GlobalSpecIds, lookups )
             .ToList()
@@ -226,9 +224,9 @@ public sealed class ProductSeedService : _ApiService, IProductSeedService
     }
     // IMAGES
     // CATEGORY
-    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> pickedCategories, CategoryData categoryData )
+    IEnumerable<int> GetRandomCategories( int currentCategory, List<int> pickedCategories, CategoryDataDto categoryDataDto )
     {
-        CategoryFullDto categoryFullDto = categoryData.CategoriesById[ currentCategory ];
+        CategoryFullDto categoryFullDto = categoryDataDto.CategoriesById[ currentCategory ];
 
         if ( categoryFullDto.Children.Count <= 0 )
             return new List<int>(); // Return an empty list instead of the original one
@@ -239,7 +237,7 @@ public sealed class ProductSeedService : _ApiService, IProductSeedService
         foreach ( int category in subcategories )
         {
             // Merge the results from the recursive calls into the new list
-            newPickedCategories.AddRange( GetRandomCategories( category, newPickedCategories, categoryData ) );
+            newPickedCategories.AddRange( GetRandomCategories( category, newPickedCategories, categoryDataDto ) );
         }
 
         return newPickedCategories.Distinct(); // Remove duplicates before returning
@@ -365,19 +363,6 @@ public sealed class ProductSeedService : _ApiService, IProductSeedService
     {
         int randomNumber = _random.Next( 100 );
         return randomNumber < 20;
-    }
-    float GetRandomFloat( float minValue, float maxValue )
-    {
-        // Check if the arguments are valid
-        if ( minValue >= maxValue )
-        {
-            throw new ArgumentOutOfRangeException( nameof( minValue ), "minValue must be less than maxValue" );
-        }
-
-        // Generate a random double, cast it to float, and adjust the range
-        float range = maxValue - minValue;
-        float randomFloat = ( float ) _random.NextDouble(); // This will be between 0.0 and 1.0
-        return ( randomFloat * range ) + minValue;
     }
     bool GetRandomBoolean()
     {

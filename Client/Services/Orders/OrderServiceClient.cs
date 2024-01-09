@@ -8,17 +8,12 @@ namespace BlazorElectronics.Client.Services.Orders;
 public sealed class OrderServiceClient : UserServiceClient, IOrderServiceClient
 {
     const string API_PATH = "api/orders";
-    const string API_PATH_PLACE_ORDER = "api/payment/checkout";
-    const string API_PATH_GET_ORDERS = API_PATH + "/orders";
-    const string API_PATH_ORDER_DETAILS = API_PATH + "/order-details";
+    const string API_PATH_GET_ORDERS = API_PATH + "/get-summary";
+    const string API_PATH_ORDER_DETAILS = API_PATH + "/get-details";
     
     public OrderServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
         : base( logger, http, storage ) { }
-
-    public async Task<ServiceReply<string?>> PlaceOrder()
-    {
-        return await TryUserPostRequest<string?>( API_PATH_PLACE_ORDER );
-    }
+    
     public async Task<ServiceReply<List<OrderOverviewDto>?>> GetOrders()
     {
         return await TryUserGetRequest<List<OrderOverviewDto>?>( API_PATH_GET_ORDERS );

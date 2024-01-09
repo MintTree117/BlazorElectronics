@@ -10,7 +10,7 @@ public sealed class ReviewService : _ApiService, IReviewService
 {
     readonly IReviewRepository _repository;
 
-    public ReviewService( ILogger<_ApiService> logger, IReviewRepository repository )
+    public ReviewService( ILogger<ReviewService> logger, IReviewRepository repository )
         : base( logger )
     {
         _repository = repository;

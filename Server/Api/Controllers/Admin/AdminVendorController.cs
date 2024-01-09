@@ -10,7 +10,7 @@ public sealed class AdminVendorController : _AdminController
 {
     readonly IVendorService _vendorService;
 
-    public AdminVendorController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IVendorService vendorService )
+    public AdminVendorController( ILogger<_UserController> logger, IUserAccountService userAccountService, ISessionService sessionService, IVendorService vendorService )
         : base( logger, userAccountService, sessionService )
     {
         _vendorService = vendorService;
@@ -38,7 +38,7 @@ public sealed class AdminVendorController : _AdminController
         ServiceReply<VendorEditDtoDto?> reply = await _vendorService.GetEdit( itemId );
         return GetReturnFromReply( reply );
     }
-    [HttpPut( "add" )]
+    [HttpPost( "add" )]
     public async Task<ActionResult<int>> Add( [FromBody] VendorEditDtoDto requestDto )
     {
         ServiceReply<int> adminReply = await ValidateAndAuthorizeUserId( true );

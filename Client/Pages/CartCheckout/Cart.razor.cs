@@ -1,6 +1,6 @@
 using BlazorElectronics.Client.Models;
 using BlazorElectronics.Client.Services.Cart;
-using BlazorElectronics.Client.Services.Orders;
+using BlazorElectronics.Client.Services.Checkout;
 using BlazorElectronics.Shared;
 using BlazorElectronics.Shared.Cart;
 using BlazorElectronics.Shared.Promos;
@@ -11,7 +11,7 @@ namespace BlazorElectronics.Client.Pages.CartCheckout;
 public partial class Cart : PageView
 {
     [Inject] ICartServiceClient CartService { get; init; } = default!;
-    [Inject] IOrderServiceClient OrderService { get; init; } = default!;
+    [Inject] ICheckoutServiceClient CheckoutService { get; init; } = default!;
     public CartModel CartModel = new();
 
     CartSummary _summary = default!;
@@ -20,13 +20,13 @@ public partial class Cart : PageView
     {
         ServiceReply<CartModel?> cartReply = await CartService.UpdateCart();
 
-        if ( !cartReply.Success || cartReply.Data is null )
+        if ( !cartReply.Success || cartReply.Payload is null )
         {
             SetViewMessage( false, cartReply.Message ?? "Failed to get cart products!" );
             return;
         }
         
-        CartModel = cartReply.Data;
+        CartModel = cartReply.Payload;
         PageIsLoaded = true;
         StateHasChanged();
     }
@@ -55,13 +55,13 @@ public partial class Cart : PageView
 
         ServiceReply<CartModel?> reply = await CartService.AddOrUpdateItem( product );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"Failed to update item! {reply.ErrorType} : {reply.Message}" );
             return;
         }
 
-        CartModel = reply.Data;
+        CartModel = reply.Payload;
         InvokeAlert( AlertType.Success, "Updated quantity." );
         StateHasChanged();
     }
@@ -69,13 +69,13 @@ public partial class Cart : PageView
     {
         ServiceReply<CartModel?> reply = await CartService.RemoveItem( product.ProductId );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"Failed to remove item! {reply.ErrorType} : {reply.Message}" );  
             return;
         }
 
-        CartModel = reply.Data;
+        CartModel = reply.Payload;
         InvokeAlert( AlertType.Success, "Removed item." );
         StateHasChanged();
     }
@@ -87,15 +87,15 @@ public partial class Cart : PageView
 
     async Task PlaceOrder()
     {
-        ServiceReply<string?> orderReply = await OrderService.PlaceOrder();
+        ServiceReply<string?> orderReply = await CheckoutService.PlaceOrder();
 
-        if ( !orderReply.Success || orderReply.Data is null )
+        if ( !orderReply.Success || orderReply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"Failed to place order! {orderReply.ErrorType} : {orderReply.Message}" );
             return;
         }
 
-        string url = orderReply.Data;
+        string url = orderReply.Payload;
         NavManager.NavigateTo( url );
     }
 }

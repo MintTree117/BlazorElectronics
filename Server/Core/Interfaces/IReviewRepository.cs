@@ -1,4 +1,3 @@
-using BlazorElectronics.Server.Core.Models.Products;
 using BlazorElectronics.Server.Core.Models.Reviews;
 using BlazorElectronics.Shared.Reviews;
 

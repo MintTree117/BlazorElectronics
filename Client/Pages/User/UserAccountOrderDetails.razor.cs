@@ -24,13 +24,13 @@ public sealed partial class UserAccountOrderDetails : UserPage
 
         ServiceReply<OrderDetailsDto?> reply = await OrderService.GetOrderDetails( id );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"Failed to retrieve order details! {reply.ErrorType} : {reply.Message}" );
             return;
         }
 
-        _details = reply.Data;
+        _details = reply.Payload;
         StateHasChanged();
     }
 }

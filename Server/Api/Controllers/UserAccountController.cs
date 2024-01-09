@@ -8,56 +8,35 @@ namespace BlazorElectronics.Server.Api.Controllers;
 
 [Route( "api/[controller]" )]
 [ApiController]
-public sealed class UserAccountController : UserController
+public sealed class UserAccountController : _UserController
 {
-    public UserAccountController( ILogger<UserController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
+    public UserAccountController( ILogger<UserAccountController> logger, IUserAccountService userAccountService, ISessionService sessionService ) : base( logger, userAccountService, sessionService ) { }
 
-    [HttpPut( "register" )]
-    public async Task<ActionResult<bool>> Register( [FromBody] RegisterRequestDto request )
-    {
-        if ( !ValidateRegisterRequest( request ) )
-            return BadRequest( BAD_REQUEST_MESSAGE );
-
-        ServiceReply<bool> reply = await UserAccountService.Register( request.Username, request.Email, request.Password, request.Phone );
-        return GetReturnFromReply( reply );
-    }
-    [HttpPost( "login" )]
-    public async Task<ActionResult<SessionDto?>> Login( [FromBody] LoginRequestDto request )
-    {
-        if ( !ValidateLoginRequest( request ) )
-            return BadRequest( BAD_REQUEST_MESSAGE );
-
-        ServiceReply<UserLoginDto?> loginReply = await UserAccountService.Login( request.EmailOrUsername, request.Password );
-
-        if ( !loginReply.Success || loginReply.Data is null )
-            return GetReturnFromReply( loginReply );
-
-        ServiceReply<SessionDto?> sessionReply = await SessionService.CreateSession( loginReply.Data, GetRequestDeviceInfo() );
-
-        return GetReturnFromReply( sessionReply );
-    }
     [HttpGet( "authorize" )]
     public async Task<ActionResult<bool>> AuthorizeSession()
     {
         ServiceReply<int> authorizeReply = await ValidateAndAuthorizeUserId();
 
         return authorizeReply.Success
-            ? true
+            ? Ok( true )
             : GetReturnFromReply( authorizeReply );
     }
-    [HttpPut( "change-password" )]
-    public async Task<ActionResult<bool>> ChangePassword( [FromBody] PasswordRequestDto request )
+    [HttpPost( "login" )]
+    public async Task<ActionResult<SessionDto?>> Login( [FromBody] LoginRequestDto request )
     {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
+        if ( !ValidateLoginRequest( request ) )
+            return BadRequest( "Invalid Login Request!" );
 
-        if ( !userReply.Success )
-            return GetReturnFromReply( userReply );
+        ServiceReply<UserLoginDto?> loginReply = await UserAccountService
+            .Login( request.EmailOrUsername, request.Password );
 
-        if ( !ValidateChangePasswordRequest( request ) )
-            return BadRequest( "Invalid password request!" );
+        if ( !loginReply.Success || loginReply.Payload is null )
+            return GetReturnFromReply( loginReply );
 
-        ServiceReply<bool> passwordReply = await UserAccountService.ChangePassword( userReply.Data, request.Password );
-        return GetReturnFromReply( passwordReply );
+        ServiceReply<SessionDto?> sessionReply = await SessionService
+            .CreateSession( loginReply.Payload, GetRequestDeviceInfo() );
+
+        return GetReturnFromReply( sessionReply );
     }
     [HttpDelete( "logout" )]
     public async Task<ActionResult<bool>> Logout( int sessionId )
@@ -66,15 +45,21 @@ public sealed class UserAccountController : UserController
 
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
-        
+
         ServiceReply<bool> deleteReply = await SessionService.DeleteSession( sessionId );
         return GetReturnFromReply( deleteReply );
     }
-    [HttpGet( "resend-verification" )]
-    public async Task<ActionResult<bool>> ResendVerification( [FromBody] string token )
+    
+    [HttpPut( "register" )]
+    public async Task<ActionResult<bool>> Register( [FromBody] RegisterRequestDto request )
     {
-        ServiceReply<bool> resendReply = await UserAccountService.ResendVerificationEmail( token );
-        return GetReturnFromReply( resendReply );
+        if ( !ValidateRegisterRequest( request ) )
+            return BadRequest( "Invalid Register Request!" );
+
+        ServiceReply<bool> reply = await UserAccountService
+            .Register( request.Username, request.Email, request.Password, request.Phone );
+        
+        return GetReturnFromReply( reply );
     }
     [HttpPut( "activate" )]
     public async Task<ActionResult<bool>> Activate( [FromBody] string token )
@@ -82,7 +67,14 @@ public sealed class UserAccountController : UserController
         ServiceReply<bool> activateReply = await UserAccountService.ActivateAccount( token );
         return GetReturnFromReply( activateReply );
     }
-    [HttpGet( "account-details" )]
+    [HttpGet( "resend-verification" )]
+    public async Task<ActionResult<bool>> ResendVerification( [FromBody] string token )
+    {
+        ServiceReply<bool> resendReply = await UserAccountService.ResendVerificationEmail( token );
+        return GetReturnFromReply( resendReply );
+    }
+
+    [HttpGet( "get-account-details" )]
     public async Task<ActionResult<bool>> GetDetails()
     {
         ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
@@ -90,18 +82,7 @@ public sealed class UserAccountController : UserController
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<AccountDetailsDto?> detailsReply = await UserAccountService.GetAccountDetails( userReply.Data );
-        return GetReturnFromReply( detailsReply );
-    }
-    [HttpPost( "update-account-details" )]
-    public async Task<ActionResult<bool>> UpdateDetails( AccountDetailsDto dto )
-    {
-        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
-
-        if ( !userReply.Success )
-            return GetReturnFromReply( userReply );
-
-        ServiceReply<AccountDetailsDto?> detailsReply = await UserAccountService.UpdateAccountDetails( userReply.Data, dto );
+        ServiceReply<AccountDetailsDto?> detailsReply = await UserAccountService.GetAccountDetails( userReply.Payload );
         return GetReturnFromReply( detailsReply );
     }
     [HttpGet( "get-sessions" )]
@@ -112,8 +93,45 @@ public sealed class UserAccountController : UserController
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<List<SessionInfoDto>?> detailsReply = await SessionService.GetUserSessions( userReply.Data );
+        ServiceReply<List<SessionInfoDto>?> detailsReply = await SessionService.GetUserSessions( userReply.Payload );
         return GetReturnFromReply( detailsReply );
+    }
+    
+    [HttpPost( "update-account-details" )]
+    public async Task<ActionResult<bool>> UpdateDetails( [FromBody] AccountDetailsDto dto )
+    {
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
+
+        if ( !userReply.Success )
+            return GetReturnFromReply( userReply );
+
+        ServiceReply<AccountDetailsDto?> detailsReply = await UserAccountService.UpdateAccountDetails( userReply.Payload, dto );
+        return GetReturnFromReply( detailsReply );
+    }
+    [HttpPut( "update-password" )]
+    public async Task<ActionResult<bool>> ChangePassword( [FromBody] PasswordRequestDto request )
+    {
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
+
+        if ( !userReply.Success )
+            return GetReturnFromReply( userReply );
+
+        if ( !ValidateChangePasswordRequest( request ) )
+            return BadRequest( "Invalid password request!" );
+
+        ServiceReply<bool> passwordReply = await UserAccountService.UpdatePassword( userReply.Payload, request.Password );
+        return GetReturnFromReply( passwordReply );
+    }
+    [HttpDelete( "delete-session" )]
+    public async Task<ActionResult<List<SessionInfoDto>?>> DeleteSessions( [FromBody] int sessionId )
+    {
+        ServiceReply<int> userReply = await ValidateAndAuthorizeUserId();
+
+        if ( !userReply.Success )
+            return GetReturnFromReply( userReply );
+
+        ServiceReply<bool> deleteReply = await SessionService.DeleteSession( sessionId );
+        return GetReturnFromReply( deleteReply );
     }
     [HttpDelete( "delete-all-sessions" )]
     public async Task<ActionResult<List<SessionInfoDto>?>> DeleteAllSessions()
@@ -123,8 +141,8 @@ public sealed class UserAccountController : UserController
         if ( !userReply.Success )
             return GetReturnFromReply( userReply );
 
-        ServiceReply<bool> detailsReply = await SessionService.DeleteAllSessions( userReply.Data );
-        return GetReturnFromReply( detailsReply );
+        ServiceReply<bool> deleteReply = await SessionService.DeleteAllSessions( userReply.Payload );
+        return GetReturnFromReply( deleteReply );
     }
 
     static bool ValidateRegisterRequest( RegisterRequestDto request )

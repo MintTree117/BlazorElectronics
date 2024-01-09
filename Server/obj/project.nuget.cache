@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "PnteVKkEtb2Z3OdBY6itMtlFeWVNeiuOhlPCoZjK08/DyxkZOSCzjSmXRLAXh/Omr/Gwu1nQywmV+7Yra5t07w==",
+  "dgSpecHash": "2ksDSMXBR40PPyLUxXwC+yHzakht/24AdwvZ+KnphIUS6joCcmo/42SDCqymat2kiamFekHyL0zEOY+NGTLi+w==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/Server/BlazorElectronics.Server.csproj",
   "expectedPackageFiles": [
@@ -83,8 +83,8 @@
     "/home/martin/.nuget/packages/system.text.json/7.0.0/system.text.json.7.0.0.nupkg.sha512",
     "/home/martin/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "/home/martin/.nuget/packages/system.windows.extensions/6.0.0/system.windows.extensions.6.0.0.nupkg.sha512",
-    "/home/martin/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/7.0.11/microsoft.netcore.app.runtime.linux-x64.7.0.11.nupkg.sha512",
-    "/home/martin/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/7.0.11/microsoft.aspnetcore.app.runtime.linux-x64.7.0.11.nupkg.sha512"
+    "/home/martin/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/7.0.14/microsoft.netcore.app.runtime.linux-x64.7.0.14.nupkg.sha512",
+    "/home/martin/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/7.0.14/microsoft.aspnetcore.app.runtime.linux-x64.7.0.14.nupkg.sha512"
   ],
   "logs": []
 }

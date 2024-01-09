@@ -8,9 +8,9 @@
 @inject IUserServiceClient UserService
 
 <div class="mt-5 p-3 text-center bg-light border border-grey">
-    <AlertMessage></AlertMessage>
-    <p>Thank you for registering your account. An email with a verification link has been sent to @_email.</p>
-    <p>Didn't recieve a code? <button class="link-primary" onclick="@( async () => await ResendToken() )">Resend.</button></p>
+    <AlertMessage Page="@this"></AlertMessage>
+    <p class="mt-3">Thank you for registering your account. An email with a verification link has been sent to @_email.</p>
+    <p>Didn't recieve a code? <button class=" ms-2 btn btn-link link-primary" onclick="@( async () => await ResendToken() )">Resend.</button></p>
 </div>
 
 @code 

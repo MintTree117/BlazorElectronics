@@ -12,7 +12,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     const string CART_STORAGE_KEY = "cart";
     
     const string API_ROUTE = "api/cart";
-    const string API_ROUTE_UPDATE_CART = $"{API_ROUTE}/update-cart";
+    const string API_ROUTE_UPDATE_CART = $"{API_ROUTE}/update";
     const string API_ROUTE_ADD_PROMO = $"{API_ROUTE}/add-promo";
     const string API_ROUTE_REMOVE_PROMO = $"{API_ROUTE}/remove-promo";
     
@@ -30,7 +30,7 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
             return new ServiceReply<int>( item.Quantity );
 
         ServiceReply<CartModel?> updateReply = await UpdateCart();
-        item = updateReply.Data?.Products.Find( p => p.ProductId == productId );
+        item = updateReply.Payload?.Products.Find( p => p.ProductId == productId );
 
         return item is not null
             ? new ServiceReply<int>( item.Quantity )
@@ -47,8 +47,8 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
         List<CartItemDto> localItems = cart.GetItemsDto();
         ServiceReply<CartDto?> reply = await TryUserPostRequest<CartDto>( API_ROUTE_UPDATE_CART, localItems );
 
-        if ( reply is { Success: true, Data: not null } )
-            cart = new CartModel( reply.Data );
+        if ( reply is { Success: true, Payload: not null } )
+            cart = new CartModel( reply.Payload );
 
         await TryStoreLocalCart( cart );
         OnChange?.Invoke( cart.GetCartInfo() );
@@ -61,8 +61,8 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         ServiceReply<CartDto?> reply = await TryUserPostRequest<CartDto?>( API_ROUTE_UPDATE_CART, cart.GetItemsDto() );
         
-        if ( reply is { Success: true, Data: not null } )
-            cart = new CartModel( reply.Data );
+        if ( reply is { Success: true, Payload: not null } )
+            cart = new CartModel( reply.Payload );
 
         await TryStoreLocalCart( cart );
         OnChange?.Invoke( cart.GetCartInfo() );
@@ -75,8 +75,8 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
 
         ServiceReply<CartDto?> reply = await TryUserPostRequest<CartDto?>( API_ROUTE_UPDATE_CART, cart.GetItemsDto() );
 
-        if ( reply is { Success: true, Data: not null } )
-            cart = new CartModel( reply.Data );
+        if ( reply is { Success: true, Payload: not null } )
+            cart = new CartModel( reply.Payload );
 
         await TryStoreLocalCart( cart );
         OnChange?.Invoke( cart.GetCartInfo() );
@@ -93,15 +93,15 @@ public class CartServiceClient : UserServiceClient, ICartServiceClient
     {
         ServiceReply<PromoCodeDto?> reply = await TryUserPutRequest<PromoCodeDto>( API_ROUTE_ADD_PROMO, code );
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
             return new ServiceReply<PromoCodeDto?>( reply.ErrorType, reply.Message );
 
         CartModel cart = await GetLocalCart();
-        cart.AddPromo( reply.Data );
+        cart.AddPromo( reply.Payload );
         await TryStoreLocalCart( cart );
         
         OnChange?.Invoke( cart.GetCartInfo() );
-        return new ServiceReply<PromoCodeDto?>( reply.Data );
+        return new ServiceReply<PromoCodeDto?>( reply.Payload );
     }
     public async Task<ServiceReply<bool>> RemovePromoCode( int id )
     {

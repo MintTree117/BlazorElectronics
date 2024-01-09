@@ -18,13 +18,13 @@ public sealed partial class UserAccountSessions : UserPage
     {
         ServiceReply<List<SessionInfoDto>?> reply = await UserService.GetUserSessions();
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             InvokeAlert( AlertType.Danger, $"Failed to get sessions! {reply.ErrorType} : {reply.Message}" );
             return;
         }
 
-        _sessions = reply.Data;
+        _sessions = reply.Payload;
         StateHasChanged();
     }
     async Task DeleteSession( int sessionId )

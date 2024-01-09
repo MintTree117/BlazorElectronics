@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "4zQU7hX+wkD/dUrnyiwkv+8CoY5MR+7VHgFUJ8kExSd8SRUOOVO7ia5f0xV/eLJzHkIhoI9nwcMyY6uwOl8X0w==",
+  "dgSpecHash": "rVcY1CVVWAq/SKtLPns+vARHLa4kFJ2fBuCbTkkiSXB3qf/9agk0m4ivQ3loD+fOkn+Ky3fIZyGp5RtCfA2GFA==",
   "success": true,
   "projectFilePath": "/home/martin/RiderProjects/BlazorElectronics/Shared/BlazorElectronics.Shared.csproj",
   "expectedPackageFiles": [],

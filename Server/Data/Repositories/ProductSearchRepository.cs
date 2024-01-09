@@ -36,7 +36,7 @@ public sealed class ProductSearchRepository : DapperRepository, IProductSearchRe
         p.Add( PARAM_SEARCH_TEXT, searchText );
         return await TryQueryAsync( Query<string>, p, STORED_PROCEDURE_GET_SUGGESTIONS );
     }
-    public async Task<string?> GetProductSearchQuery( ProductSearchRequestDto searchRequestDto )
+    public async Task<string?> GetSearchQuery( ProductSearchRequestDto searchRequestDto )
     {
         SearchQueryObject query = await BuildProductSearchQuery( searchRequestDto );
         return query.SearchQuery;

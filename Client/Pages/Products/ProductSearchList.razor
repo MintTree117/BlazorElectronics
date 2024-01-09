@@ -72,6 +72,11 @@
                              <div class="w-100">
                                  <button class="btn btn-outline-primary fw-bolder w-100 mt-2" onclick="@( async () => await AddToCart( p ) )">Buy Now</button>
                                  <a class="btn btn-outline-secondary fw-bolder w-100 mt-2" href="@Routes.PRODUCT/@p.Id">Details</a>
+                                 
+                                 @if ( _isAdmin )
+                                 {
+                                     <a class="btn btn-outline-info fw-bolder w-100 mt-2" href="@Routes.PRODUCT_EDIT/?@Routes.PARAM_PRODUCT_EDIT_ID=@p.Id">Edit</a>
+                                 }
                              </div>
                          </div>
                      </div>

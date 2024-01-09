@@ -17,13 +17,13 @@ public sealed partial class UserAccountOrders : UserPage
 
         ServiceReply<List<OrderOverviewDto>?> reply = await OrderService.GetOrders();
 
-        if ( !reply.Success || reply.Data is null )
+        if ( !reply.Success || reply.Payload is null )
         {
             SetViewMessage( false, $"Failed to get orders! {reply.ErrorType} : {reply.Message}" );
             return;
         }
 
-        _orders = reply.Data;
+        _orders = reply.Payload;
         PageIsLoaded = true;
         StateHasChanged();
     }

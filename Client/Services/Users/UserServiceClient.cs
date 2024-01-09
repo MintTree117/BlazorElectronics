@@ -14,50 +14,40 @@ public class UserServiceClient : ClientService, IUserServiceClient
     const string SESSION_TOKEN_HEADER = "Bearer";
     
     public UserServiceClient( ILogger<ClientService> logger, HttpClient http, ILocalStorageService storage )
-        : base( logger, http, storage )
-    {
-        
-    }
+        : base( logger, http, storage ) { }
 
     public event IUserServiceClient.AsyncEventHandler? SessionChanged;
 
     const string API_ROUTE = "api/UserAccount";
-    const string API_ROUTE_REGISTER = API_ROUTE + "/register";
-    const string API_ROUTE_RESEND_VERIFICATION = API_ROUTE + "/resend-verification";
+    
+    const string API_ROUTE_AUTHORIZE = API_ROUTE + "/authorize";
     const string API_ROUTE_LOGIN = API_ROUTE + "/login";
     const string API_ROUTE_LOGOUT = API_ROUTE + "/logout";
-    const string API_ROUTE_AUTHORIZE = API_ROUTE + "/authorize";
-    const string API_ROUTE_CHANGE_PASSWORD = API_ROUTE + "/change-password";
+    
+    const string API_ROUTE_REGISTER = API_ROUTE + "/register";
     const string API_ROUTE_ACTIVATE_ACCOUNT = API_ROUTE + "/activate";
-    const string API_ROUTE_GET_DETAILS = API_ROUTE + "/account-details";
-    const string API_ROUTE_UPDATE_DETAILS = API_ROUTE + "/update-account-details";
+    const string API_ROUTE_RESEND_VERIFICATION = API_ROUTE + "/resend-verification";
+    
+    const string API_ROUTE_GET_DETAILS = API_ROUTE + "/get-account-details";
     const string API_ROUTE_GET_SESSIONS = API_ROUTE + "/get-sessions";
+
+    const string API_ROUTE_UPDATE_DETAILS = API_ROUTE + "/update-account-details";
+    const string API_ROUTE_CHANGE_PASSWORD = API_ROUTE + "/update-password";
+    const string API_ROUTE_DELETE_SESSION = API_ROUTE + "/delete-session";
     const string API_ROUTE_DELETE_ALL_SESSION = API_ROUTE + "/delete-all-sessions";
     
     SessionDto? _userSession;
+
+    public async Task<SessionMeta?> GetSessionMeta()
+    {
+        ServiceReply<SessionDto?> reply = await TryGetLocalUserSession();
+
+        if ( !reply.Success || reply.Payload is null )
+            return null;
+
+        return new SessionMeta( reply.Payload.IsAdmin ? SessionType.Admin : SessionType.User, reply.Payload.Username );
+    }
     
-    public async Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto )
-    {
-        ServiceReply<bool> registerReply = await TryPutRequest<bool>( API_ROUTE_REGISTER, requestDto );
-        return registerReply;
-    }
-    public async Task<ServiceReply<bool>> ActivateAccount( string token )
-    {
-        return await TryPutRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
-    }
-    public async Task<ServiceReply<bool>> ResendVerification()
-    {
-        return await TryUserGetRequest<bool>( API_ROUTE_RESEND_VERIFICATION );
-    }
-    public async Task<ServiceReply<SessionDto?>> Login( LoginRequestDto requestDto )
-    {
-        ServiceReply<SessionDto?> loginReply = await TryGetSessionResponse( API_ROUTE_LOGIN, requestDto );
-
-        if ( loginReply is { Success: true, Data: not null } )
-            await InvokeOnChange( GetSessionMeta( loginReply.Data ) );
-
-        return loginReply;
-    }
     public async Task<ServiceReply<bool>> AuthorizeUser()
     {
         ServiceReply<bool> authorizeReply = await TryUserGetRequest<bool>( API_ROUTE_AUTHORIZE );
@@ -74,57 +64,76 @@ public class UserServiceClient : ClientService, IUserServiceClient
             ? new ServiceReply<bool>( true )
             : new ServiceReply<bool>( authorizeReply.ErrorType, authorizeReply.Message );
     }
+    public async Task<ServiceReply<SessionDto?>> Login( LoginRequestDto loginRequest )
+    {
+        ServiceReply<SessionDto?> loginReply = await TryPostRequest<SessionDto?>( API_ROUTE_LOGIN, loginRequest );
+
+        if ( loginReply is { Success: true, Payload: not null } )
+            await InvokeOnChange( GetSessionMeta( loginReply.Payload ) );
+        
+        _userSession = loginReply.Payload;
+        await TryStoreSessionResponse();
+
+        return loginReply;
+    }
     public async Task<ServiceReply<bool>> Logout()
     {
         await TryGetLocalUserSession();
-        
+
         ServiceReply<bool> serverReply = await TryUserGetRequest<bool>( API_ROUTE_LOGOUT, GetSessionIdParam( _userSession!.SessionId ) );
         await Storage.RemoveItemAsync( SESSION_DATA_KEY );
         await InvokeOnChange( null );
         return serverReply;
     }
-    public async Task<ServiceReply<bool>> ChangePassword( PasswordRequestDto requestDto )
+    
+    public async Task<ServiceReply<bool>> Register( RegisterRequestDto requestDto )
     {
-        return await TryUserPostRequest<bool>( API_ROUTE_CHANGE_PASSWORD, requestDto );
+        ServiceReply<bool> registerReply = await TryPutRequest<bool>( API_ROUTE_REGISTER, requestDto );
+        return registerReply;
     }
-    public async Task<SessionMeta?> GetSessionMeta()
+    public async Task<ServiceReply<bool>> ActivateAccount( string token )
     {
-        ServiceReply<SessionDto?> reply = await TryGetLocalUserSession();
-
-        if ( !reply.Success || reply.Data is null )
-            return null;
-
-        return new SessionMeta( reply.Data.IsAdmin ? SessionType.Admin : SessionType.User, reply.Data.Username );
+        return await TryPutRequest<bool>( API_ROUTE_ACTIVATE_ACCOUNT, token );
     }
+    public async Task<ServiceReply<bool>> ResendVerification()
+    {
+        return await TryUserGetRequest<bool>( API_ROUTE_RESEND_VERIFICATION );
+    }
+
     public async Task<ServiceReply<AccountDetailsDto?>> GetAccountDetails()
     {
         return await TryUserGetRequest<AccountDetailsDto?>( API_ROUTE_GET_DETAILS );
-    }
-    public async Task<ServiceReply<AccountDetailsDto?>> UpdateAccountDetails( AccountDetailsDto dto )
-    {
-        ServiceReply<AccountDetailsDto?> serverReply = await TryUserPostRequest<AccountDetailsDto?>( API_ROUTE_UPDATE_DETAILS, dto );
-
-        if ( !serverReply.Success || serverReply.Data is null )
-            return serverReply;
-
-        ServiceReply<SessionDto?> sessionReply = await TryGetLocalUserSession();
-
-        if ( !sessionReply.Success || sessionReply.Data is null || _userSession is null )
-            return serverReply;
-
-        _userSession.Username = serverReply.Data.Username;
-
-        await TryStoreSessionResponse();
-
-        return serverReply;
     }
     public async Task<ServiceReply<List<SessionInfoDto>?>> GetUserSessions()
     {
         return await TryUserGetRequest<List<SessionInfoDto>?>( API_ROUTE_GET_SESSIONS );
     }
+
+    public async Task<ServiceReply<AccountDetailsDto?>> UpdateAccountDetails( AccountDetailsDto dto )
+    {
+        ServiceReply<AccountDetailsDto?> serverReply = await TryUserPostRequest<AccountDetailsDto?>( API_ROUTE_UPDATE_DETAILS, dto );
+
+        if ( !serverReply.Success || serverReply.Payload is null )
+            return serverReply;
+
+        ServiceReply<SessionDto?> sessionReply = await TryGetLocalUserSession();
+
+        if ( !sessionReply.Success || sessionReply.Payload is null || _userSession is null )
+            return serverReply;
+
+        _userSession.Username = serverReply.Payload.Username;
+
+        await TryStoreSessionResponse();
+
+        return serverReply;
+    }
+    public async Task<ServiceReply<bool>> UpdatePassword( PasswordRequestDto requestDto )
+    {
+        return await TryUserPostRequest<bool>( API_ROUTE_CHANGE_PASSWORD, requestDto );
+    }
     public async Task<ServiceReply<bool>> DeleteSession( int sessionId )
     {
-        return await TryUserDeleteRequest<bool>( API_ROUTE_LOGOUT, GetSessionIdParam( sessionId ) );
+        return await TryUserDeleteRequest<bool>( API_ROUTE_DELETE_SESSION, GetSessionIdParam( sessionId ) );
     }
     public async Task<ServiceReply<bool>> DeleteAllSessions()
     {
@@ -168,7 +177,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
         return await TryDeleteRequest<T?>( apiPath, parameters );
     }
 
-    protected async Task<ServiceReply<SessionDto?>> TryGetLocalUserSession()
+    async Task<ServiceReply<SessionDto?>> TryGetLocalUserSession()
     {
         if ( _userSession is not null )
             return new ServiceReply<SessionDto?>( _userSession );
@@ -179,7 +188,7 @@ public class UserServiceClient : ClientService, IUserServiceClient
         }
         catch ( Exception e )
         {
-            Logger.LogError( e.Message + e.InnerException?.Message );
+            Logger.LogError( e.Message, e );
             return new ServiceReply<SessionDto?>( ServiceErrorType.IoError );
         }
 
@@ -190,31 +199,20 @@ public class UserServiceClient : ClientService, IUserServiceClient
     async Task InvokeOnChange( SessionMeta? session )
     {
         IUserServiceClient.AsyncEventHandler? handler = SessionChanged;
-        if ( handler != null )
-        {
-            Delegate[] invocationList = handler.GetInvocationList();
-            var handlerTasks = new List<Task>();
-            foreach ( Delegate @delegate in invocationList )
-            {
-                var singleHandler = ( IUserServiceClient.AsyncEventHandler ) @delegate;
-                Task task = singleHandler.Invoke( this, session );
-                handlerTasks.Add( task );
-            }
-            await Task.WhenAll( handlerTasks );
-        }
-    }
-    async Task<ServiceReply<SessionDto?>> TryGetSessionResponse<T>( string apiPath, T requestObject )
-    {
-        ServiceReply<SessionDto?> sessionReply = await TryPostRequest<SessionDto?>( apiPath, requestObject );
 
-        if ( !sessionReply.Success || sessionReply.Data is null )
-            return sessionReply;
-        
-        _userSession = sessionReply.Data;
+        if ( handler is null )
+            return;
 
-        await TryStoreSessionResponse();
+        Delegate[] invocationList = handler.GetInvocationList();
         
-        return new ServiceReply<SessionDto?>( _userSession );
+        List<Task> handlerTasks = ( 
+            from IUserServiceClient.AsyncEventHandler? singleHandler 
+                in invocationList 
+            select singleHandler
+                .Invoke( this, session ) )
+            .ToList();
+
+        await Task.WhenAll( handlerTasks );
     }
     async Task TryStoreSessionResponse()
     {
@@ -231,11 +229,11 @@ public class UserServiceClient : ClientService, IUserServiceClient
     {
         ServiceReply<SessionDto?> sessionReply = await TryGetLocalUserSession();
 
-        if ( !sessionReply.Success || sessionReply.Data is null )
+        if ( !sessionReply.Success || sessionReply.Payload is null )
             return false;
 
-        int sessionId = sessionReply.Data.SessionId;
-        string sessionToken = sessionReply.Data.SessionToken;
+        int sessionId = sessionReply.Payload.SessionId;
+        string sessionToken = sessionReply.Payload.SessionToken;
 
         if ( Http.DefaultRequestHeaders.Contains( SESSION_ID_HEADER ) )
             Http.DefaultRequestHeaders.Remove( SESSION_ID_HEADER );
